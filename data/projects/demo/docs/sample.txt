@@ -1,0 +1,3 @@
+Our company maintains an Information Security Policy approved by the governance committee.
+All access control leverages SSO and MFA. We rely on Splunk for security monitoring
+and conduct annual incident response tabletop exercises with PagerDuty.
