@@ -1,0 +1,12 @@
+{
+  "project_id": "demo",
+  "name": "Demo Project",
+  "standard": "NIST CSF 2.0",
+  "documents": [
+    {
+      "document_id": "doc_demo",
+      "filename": "sample.txt",
+      "content": "Our company maintains an Information Security Policy approved by the governance committee.\nAll access control leverages SSO and MFA. We rely on Splunk for security monitoring\nand conduct annual incident response tabletop exercises with PagerDuty."
+    }
+  ]
+}
