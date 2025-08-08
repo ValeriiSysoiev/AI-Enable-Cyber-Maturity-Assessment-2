@@ -111,7 +111,16 @@ flowchart LR
 - [ ] JWT auth against Azure AD (MSAL) on API gateway
 - [ ] Async orchestration (Service Bus), idempotent retries
 - [ ] Cosmos DB repository for projects/findings
-- [ ] Azure OpenAI integration for higher‑fidelity analysis
+- [ ] Azure OpenAI integration for higher-fidelity analysis
 - [ ] Web UI (React + MSAL) for projects, uploads, dashboards
 - [ ] Report export to **PowerPoint** and **Word** via templates
+
+## Local development (no Docker)
+```bash
+make venv
+make deps
+cp -n .env.example .env 2>/dev/null || true
+make dev
+# Then open http://localhost:8000/docs
+
 ```
