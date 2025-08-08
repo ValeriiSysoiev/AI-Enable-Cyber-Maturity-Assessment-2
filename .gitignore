@@ -1,0 +1,9 @@
+.venv/
+__pycache__/
+.DS_Store
+data/projects/*
+!data/projects/demo/**
+
+.env
+
+README.bak
