@@ -2,8 +2,9 @@ name: build-and-deploy
 
 on:
   workflow_dispatch:
-  push:
-    branches: [ main ]
+  # Disabled automatic triggers until secrets are configured
+  # push:
+  #   branches: [ main ]
 
 jobs:
   build:
