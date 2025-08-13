@@ -7,3 +7,11 @@ data/projects/*
 .env
 
 README.bak
+
+# Terraform
+*.tfstate
+*.tfstate.*
+.terraform/
+.terraform.lock.hcl
+*.tfvars
+*.tfvars.json
