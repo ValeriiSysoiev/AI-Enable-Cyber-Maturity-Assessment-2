@@ -316,3 +316,67 @@ The application uses SQLite for persistence:
 - Contains assessments and answers tables
 
 ---
+
+## Deploy with ACR Admin (Temporary)
+
+This section describes how to deploy the application to Azure Container Apps using ACR admin credentials as a temporary measure.
+
+### Prerequisites
+
+- Azure CLI (`az`) installed and configured
+- Docker installed and running
+- Access to the Azure subscription
+
+### Deployment Steps
+
+1. **Make scripts executable and run deployment:**
+   ```bash
+   chmod +x scripts/deploy_admin.sh && ./scripts/deploy_admin.sh
+   ```
+
+2. **Get the deployed application URLs:**
+   ```bash
+   scripts/print_urls.sh
+   ```
+
+3. **Run smoke test to verify API health:**
+   ```bash
+   scripts/smoke.sh
+   ```
+
+⚠️ **Important:** Don't re-apply Terraform that touches Container Apps while using admin credentials, as it will wipe the runtime registry credentials.
+
+### Switch to Managed Identity (Recommended)
+
+Once RBAC permissions are granted, switch from ACR admin credentials to Managed Identity:
+
+1. **Grant required roles to the User-Assigned Identities:**
+   
+   For the API identity:
+   - AcrPull (on ACR)
+   - Storage Blob Data Contributor (on Storage Account)
+   - Storage Blob Data Delegator (on Storage Account)
+   - Key Vault Secrets User (on Key Vault)
+   
+   For the Web identity:
+   - AcrPull (on ACR)
+
+2. **Enable Managed Identity for storage in the API:**
+   ```bash
+   az containerapp update -g rg-aaa-demo -n api-aaa-demo --set-env-vars USE_MANAGED_IDENTITY=true
+   ```
+
+3. **Remove admin credentials from Container Apps:**
+   ```bash
+   az containerapp registry remove -g rg-aaa-demo -n api-aaa-demo --server acraaademo9lyu53.azurecr.io
+   az containerapp registry remove -g rg-aaa-demo -n web-aaa-demo --server acraaademo9lyu53.azurecr.io
+   ```
+
+4. **Disable ACR admin access:**
+   ```bash
+   az acr update -n acraaademo9lyu53 --admin-enabled false
+   ```
+
+After these steps, the Container Apps will use their Managed Identities to pull images from ACR and the API will use its identity for Azure Storage operations.
+
+---

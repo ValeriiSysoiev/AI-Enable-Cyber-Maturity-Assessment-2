@@ -1,5 +1,5 @@
 SHELL := /bin/bash
-.PHONY: venv deps dev
+.PHONY: venv deps dev deploy-admin urls smoke
 
 venv:
 	python3 -m venv .venv
@@ -12,3 +12,12 @@ deps:
 dev:
 	[ -f .env ] || cp .env.example .env; \
 	. .venv/bin/activate && honcho start
+
+deploy-admin:
+	chmod +x scripts/deploy_admin.sh && ./scripts/deploy_admin.sh
+
+urls:
+	scripts/print_urls.sh
+
+smoke:
+	scripts/smoke.sh
