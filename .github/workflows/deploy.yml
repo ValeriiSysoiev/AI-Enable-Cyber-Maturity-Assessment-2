@@ -2,8 +2,18 @@ name: build-and-deploy
 
 on:
   workflow_dispatch:
-  push:
-    branches: [ main ]
+  # Disabled automatic triggers until secrets are configured
+  # push:
+  #   branches: [ main ]
+
+# Set default permissions to read-only for security
+permissions:
+  contents: read
+
+# Prevent multiple runs for the same ref
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   build:

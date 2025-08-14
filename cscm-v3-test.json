@@ -1,0 +1,79 @@
+{
+  "id": "cscm-v3",
+  "name": "Cyber Security Capability Model v3",
+  "version": "3.0",
+  "pillars": [
+    {
+      "id": "governance",
+      "name": "Governance & Risk Management",
+      "capabilities": [
+        {
+          "id": "policy-mgmt",
+          "name": "Policy Management",
+          "questions": [
+            {
+              "id": "gov-01",
+              "text": "Is there an approved cybersecurity policy framework with defined roles and responsibilities?",
+              "weight": 1.0,
+              "scale": "0-5"
+            },
+            {
+              "id": "gov-02", 
+              "text": "Are cybersecurity risk assessments performed regularly and tracked in a risk register?",
+              "weight": 1.0,
+              "scale": "0-5"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "identity",
+      "name": "Identity & Access Management",
+      "capabilities": [
+        {
+          "id": "access-controls",
+          "name": "Access Controls",
+          "questions": [
+            {
+              "id": "iam-01",
+              "text": "Is multi-factor authentication enforced for all privileged accounts?",
+              "weight": 1.0,
+              "scale": "0-5"
+            },
+            {
+              "id": "iam-02",
+              "text": "Are access rights reviewed and recertified on a regular basis?",
+              "weight": 1.0,
+              "scale": "0-5"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "detection",
+      "name": "Detection & Response",
+      "capabilities": [
+        {
+          "id": "monitoring",
+          "name": "Security Monitoring",
+          "questions": [
+            {
+              "id": "det-01",
+              "text": "Are security events monitored and analyzed in real-time with documented alerting procedures?",
+              "weight": 1.0,
+              "scale": "0-5"
+            },
+            {
+              "id": "det-02",
+              "text": "Is there an incident response plan that is tested and updated regularly?",
+              "weight": 1.0,
+              "scale": "0-5"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
