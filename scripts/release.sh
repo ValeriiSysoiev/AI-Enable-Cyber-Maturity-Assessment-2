@@ -71,10 +71,7 @@ az acr build -r "$ACR_NAME" -t "ai-maturity-web:$TAG" -f web/Dockerfile ./web
 echo "==> Updating API container app image + env"
 az containerapp update -g "$RG" -n "$API_APP" \
   --image "$ACR_SERVER/ai-maturity-api:$TAG" \
-  --registry-server "$ACR_SERVER" \
-  --registry-username "$ACR_USER" \
-  --registry-password "$ACR_PASS" \
-  --env-vars ADMIN_EMAILS="$ADMIN_EMAILS" >/dev/null
+  --set-env-vars ADMIN_EMAILS="$ADMIN_EMAILS"
 
 API_FQDN="$(az containerapp show -g "$RG" -n "$API_APP" --query properties.configuration.ingress.fqdn -o tsv)"
 API_URL="https://${API_FQDN}"
@@ -83,10 +80,7 @@ API_URL="https://${API_FQDN}"
 echo "==> Updating WEB container app image + env"
 az containerapp update -g "$RG" -n "$WEB_APP" \
   --image "$ACR_SERVER/ai-maturity-web:$TAG" \
-  --registry-server "$ACR_SERVER" \
-  --registry-username "$ACR_USER" \
-  --registry-password "$ACR_PASS" \
-  --env-vars NEXT_PUBLIC_API_BASE="$API_URL" >/dev/null
+  --set-env-vars NEXT_PUBLIC_API_BASE="$API_URL"
 
 WEB_FQDN="$(az containerapp show -g "$RG" -n "$WEB_APP" --query properties.configuration.ingress.fqdn -o tsv)"
 WEB_URL="https://${WEB_FQDN}"

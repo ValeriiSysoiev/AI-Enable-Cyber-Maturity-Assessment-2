@@ -9,7 +9,7 @@ from ..schemas import AssessmentPreset
 
 router = APIRouter(prefix="/presets", tags=["presets"])
 
-@router.get("")
+@router.get("/")
 def list_presets():
     return svc.list_presets()
 
