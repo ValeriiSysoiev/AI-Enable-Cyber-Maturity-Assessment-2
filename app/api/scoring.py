@@ -1,5 +1,5 @@
 from typing import Dict, List, Optional, Tuple
-from app.api.models import Answer
+from .models import Answer
 
 def compute_scores(answers_by_pillar: Dict[str, List[Answer]], preset: dict) -> Tuple[Dict[str, Optional[float]], Optional[float], List[str]]:
     """

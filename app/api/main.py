@@ -4,6 +4,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from sqlmodel import Session, select
 from pathlib import Path
 import json
+import os
 from typing import List, Dict
 from .assist import router as assist_router
 from .storage import router as storage_router
@@ -11,17 +12,39 @@ from .db import create_db_and_tables, get_session
 from .models import Assessment, Answer
 from .schemas import AssessmentCreate, AssessmentResponse, AnswerUpsert, ScoreResponse, PillarScore
 from .scoring import compute_scores
+from .routes import assessments as assessments_router, orchestrations as orchestrations_router, engagements as engagements_router, documents, summary, presets as presets_router
+from ..domain.repository import InMemoryRepository
+from ..domain.file_repo import FileRepository
+from ..ai.llm import LLMClient
+from ..ai.orchestrator import Orchestrator
 
 app = FastAPI(title="AI Maturity Tool API", version="0.1.0")
 
 @app.on_event("startup")
 def on_startup():
     create_db_and_tables()
+    # Wire up new domain dependencies
+    app.state.repo = FileRepository()
+    app.state.orchestrator = Orchestrator(LLMClient())
+    
+    # Initialize preset service
+    from ..services import presets as preset_service
+    preset_service.ensure_dirs()
+    # register bundled presets if present
+    try:
+        bundled = {
+            "cyber-for-ai": Path("app/config/presets/cyber-for-ai.json"),
+            # add others here if you have them
+        }
+        preset_service.BUNDLED.update({k: v for k, v in bundled.items() if v.exists()})
+    except Exception:
+        pass
 
 # Configure CORS
+allowed_origins = os.getenv("WEB_ORIGIN", "http://localhost:3000").split(",")
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:3000"],
+    allow_origins=allowed_origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -29,23 +52,29 @@ app.add_middleware(
 
 app.include_router(assist_router)
 app.include_router(storage_router)
+app.include_router(assessments_router.router)
+app.include_router(orchestrations_router.router)
+app.include_router(engagements_router.router)
+app.include_router(documents.router)
+app.include_router(summary.router)
+app.include_router(presets_router.router)
 
 def load_preset(preset_id: str) -> dict:
-    preset_path = Path(__file__).resolve().parents[1] / "config" / "presets" / f"{preset_id}.json"
-    if not preset_path.exists():
-        raise FileNotFoundError(preset_path)
-    return json.loads(preset_path.read_text(encoding="utf-8"))
+    # Use new preset service for consistency
+    from ..services import presets as preset_service
+    try:
+        preset = preset_service.get_preset(preset_id)
+        return preset.model_dump()
+    except HTTPException as e:
+        # Fallback to old bundled method for backwards compatibility
+        preset_path = Path(__file__).resolve().parents[1] / "config" / "presets" / f"{preset_id}.json"
+        if not preset_path.exists():
+            raise FileNotFoundError(preset_path) from e
+        return json.loads(preset_path.read_text(encoding="utf-8"))
 
 @app.get("/health")
 def health():
     return {"status": "ok"}
-
-@app.get("/presets/{preset_id}")
-def get_preset(preset_id: str):
-    try:
-        return load_preset(preset_id)
-    except FileNotFoundError:
-        raise HTTPException(status_code=404, detail="Preset not found")
 
 
 @app.post("/assessments", response_model=AssessmentResponse)

@@ -265,6 +265,15 @@ AZURE_STORAGE_CONTAINER=docs
 UPLOAD_SAS_TTL_MINUTES=15
 ```
 
+**Security Guidelines for Azure Storage:**
+- **SAS Token Permissions:** Generate write-only SAS tokens with least-privilege permissions. Use only `wca` (write, create, add) for client uploads. Avoid granting list (`l`), read (`r`), or delete (`d`) permissions.
+- **Short TTL:** Use a short time-to-live (TTL) for SAS tokens (10-15 minutes recommended) to minimize exposure window.
+- **Key Rotation:** Implement periodic rotation of storage account keys to enhance security.
+- **Never Log SAS Tokens:** Ensure SAS tokens are never logged in application logs or error messages to prevent unauthorized access.
+- **Configure Storage CORS:** Restrict CORS origins to specific domains (e.g., `http://localhost:3000` for development) and always require HTTPS in production.
+- **Content Validation:** Implement file type and size validation on both client and server sides to prevent malicious uploads.
+- **Size Limits:** Enforce upload size limits to prevent storage abuse and potential denial-of-service attacks.
+
 If Azure Storage is not configured, the `/uploads/sas` endpoint returns HTTP 501.
 
 ### Running Both Services Together
@@ -314,5 +323,104 @@ The application uses SQLite for persistence:
 - Database location: `app/app.db`
 - Auto-created on first run
 - Contains assessments and answers tables
+
+---
+
+## Deploy with ACR Admin (Temporary)
+
+This section describes how to deploy the application to Azure Container Apps using ACR admin credentials as a temporary measure.
+
+### Prerequisites
+
+- Azure CLI (`az`) installed and configured
+- Docker installed and running
+- Access to the Azure subscription
+
+### Deployment Steps
+
+1. **Make scripts executable and run deployment:**
+   ```bash
+   chmod +x scripts/deploy_admin.sh && ./scripts/deploy_admin.sh
+   ```
+
+2. **Get the deployed application URLs:**
+   ```bash
+   scripts/print_urls.sh
+   ```
+
+3. **Run smoke test to verify API health:**
+   ```bash
+   scripts/smoke.sh
+   ```
+
+⚠️ **Important:** Don't re-apply Terraform that touches Container Apps while using admin credentials, as it will wipe the runtime registry credentials.
+
+### Switch to Managed Identity (Recommended)
+
+Once RBAC permissions are granted, switch from ACR admin credentials to Managed Identity:
+
+1. **Grant required roles to the User-Assigned Identities:**
+   
+   For the API identity:
+   - AcrPull (on ACR)
+   - Storage Blob Data Contributor (on Storage Account)
+   - Storage Blob Data Delegator (on Storage Account)
+   - Key Vault Secrets User (on Key Vault)
+   
+   For the Web identity:
+   - AcrPull (on ACR)
+
+2. **Enable Managed Identity for storage in the API:**
+   ```bash
+   az containerapp update -g rg-aaa-demo -n api-aaa-demo --set-env-vars USE_MANAGED_IDENTITY=true
+   ```
+
+3. **Remove admin credentials from Container Apps:**
+   ```bash
+   az containerapp registry remove -g rg-aaa-demo -n api-aaa-demo --server acraaademo9lyu53.azurecr.io
+   az containerapp registry remove -g rg-aaa-demo -n web-aaa-demo --server acraaademo9lyu53.azurecr.io
+   ```
+
+4. **Disable ACR admin access:**
+   ```bash
+   az acr update -n acraaademo9lyu53 --admin-enabled false
+   ```
+
+After these steps, the Container Apps will use their Managed Identities to pull images from ACR and the API will use its identity for Azure Storage operations.
+
+---
+
+## Build & Deploy via ACR Tasks (no Docker Desktop)
+
+This section describes how to build container images using Azure Container Registry (ACR) Tasks, eliminating the need for Docker Desktop.
+
+### Build both images:
+
+```bash
+scripts/build_acr_tasks.sh
+```
+
+This builds the API and Web images directly in Azure using ACR Tasks. The Web image can be built with or without the `API_URL` environment variable.
+
+### Deploy/update Container Apps (prints URLs):
+
+```bash
+scripts/deploy_containerapps.sh
+```
+
+This script:
+- Enables ACR admin credentials temporarily
+- Creates or updates both API and Web Container Apps
+- Prints the deployed API_URL and WEB_URL
+
+### If web was built before API_URL was known, rebuild web with baked URL:
+
+```bash
+scripts/rebuild_web_with_api.sh
+```
+
+This rebuilds the Web image with the API URL baked in at build time (for Next.js's `NEXT_PUBLIC_API_BASE_URL`), then updates the Web Container App.
+
+**Note:** This deployment uses temporary ACR admin credentials. Follow the "Switch to Managed Identity" section above to transition to a more secure authentication method using Managed Identities with proper RBAC roles (AcrPull for image access, Storage Blob roles for data, and Key Vault role for secrets).
 
 ---
