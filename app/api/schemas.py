@@ -1,6 +1,8 @@
-from pydantic import BaseModel, Field
-from typing import Optional, List, Dict
+from pydantic import BaseModel, Field, EmailStr
+from typing import Optional, List, Dict, Literal
 from datetime import datetime
+from .summary import CountSummary, ActivityItem, EngagementSummary
+from .preset import PresetQuestion, PresetCapability, PresetPillar, AssessmentPreset
 
 class AssessmentCreate(BaseModel):
     """Schema for creating an assessment"""
@@ -40,6 +42,24 @@ class ScoreResponse(BaseModel):
     pillar_scores: List[PillarScore]
     overall_score: Optional[float]
     gates_applied: List[str] = []
+
+
+class EngagementCreate(BaseModel):
+    """Schema for creating an engagement"""
+    name: str = Field(..., min_length=1, description="Name of the engagement")
+    client_code: Optional[str] = Field(None, description="Optional client code")
+
+
+class AddMemberRequest(BaseModel):
+    """Schema for adding a member to an engagement"""
+    user_email: EmailStr = Field(..., description="Email of the user to add")
+    role: Optional[Literal["member", "lead"]] = Field("member", description="Role of the member (member/lead)")
+
+
+
+
+
+
 
 
 
