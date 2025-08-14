@@ -46,12 +46,15 @@ export default function EngagementDemo() {
   const [docMsg, setDocMsg] = useState<string>("");
 
   useEffect(() => {
-    const email = requireEmail(router);
-    if (email && engagementId) {
-      // Set the engagement ID for API calls
-      setEngagementId(engagementId);
-      refreshDocs();
-    }
+    const initAuth = async () => {
+      const email = await requireEmail(router);
+      if (email && engagementId) {
+        // Set the engagement ID for API calls
+        setEngagementId(engagementId);
+        refreshDocs();
+      }
+    };
+    initAuth();
   }, [engagementId, router]);
 
   async function refreshDocs() {
