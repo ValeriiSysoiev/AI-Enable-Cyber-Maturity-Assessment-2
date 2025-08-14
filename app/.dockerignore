@@ -1,0 +1,49 @@
+__pycache__/
+.cache/
+.venv/
+*.pyc
+*.pyo
+*.pyd
+.git/
+.gitignore
+Dockerfile.bak
+
+# Environment files
+.env
+*.env
+.env.local
+.env.test
+.env.production
+.envrc
+
+# Virtual environments
+/venv/
+env/
+ENV/
+
+# Database files
+*.sqlite3
+*.db
+*.sqlite
+
+# Logs and temporary files
+logs/
+tmp/
+*.log
+
+# Python test and type checking caches
+.pytest_cache/
+.mypy_cache/
+.coverage
+htmlcov/
+
+# IDE and editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS files
+.DS_Store
+Thumbs.db

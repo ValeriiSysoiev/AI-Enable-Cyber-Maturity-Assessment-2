@@ -389,3 +389,38 @@ Once RBAC permissions are granted, switch from ACR admin credentials to Managed 
 After these steps, the Container Apps will use their Managed Identities to pull images from ACR and the API will use its identity for Azure Storage operations.
 
 ---
+
+## Build & Deploy via ACR Tasks (no Docker Desktop)
+
+This section describes how to build container images using Azure Container Registry (ACR) Tasks, eliminating the need for Docker Desktop.
+
+### Build both images:
+
+```bash
+scripts/build_acr_tasks.sh
+```
+
+This builds the API and Web images directly in Azure using ACR Tasks. The Web image can be built with or without the `API_URL` environment variable.
+
+### Deploy/update Container Apps (prints URLs):
+
+```bash
+scripts/deploy_containerapps.sh
+```
+
+This script:
+- Enables ACR admin credentials temporarily
+- Creates or updates both API and Web Container Apps
+- Prints the deployed API_URL and WEB_URL
+
+### If web was built before API_URL was known, rebuild web with baked URL:
+
+```bash
+scripts/rebuild_web_with_api.sh
+```
+
+This rebuilds the Web image with the API URL baked in at build time (for Next.js's `NEXT_PUBLIC_API_BASE_URL`), then updates the Web Container App.
+
+**Note:** This deployment uses temporary ACR admin credentials. Follow the "Switch to Managed Identity" section above to transition to a more secure authentication method using Managed Identities with proper RBAC roles (AcrPull for image access, Storage Blob roles for data, and Key Vault role for secrets).
+
+---

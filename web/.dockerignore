@@ -1,0 +1,65 @@
+node_modules/
+.next/
+.git/
+.gitignore
+Dockerfile.bak
+
+# Environment files
+.env
+.env.*
+.env.local
+.env.test
+.env.production
+.envrc
+.secrets
+
+# Editor/IDE directories and configs
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Build outputs and caches
+dist/
+build/
+coverage/
+.cache/
+.turbo/
+.parcel-cache/
+out/
+
+# Test files
+__tests__/
+*.test.js
+*.test.ts
+*.spec.js
+*.spec.ts
+
+# Package manager files (keeping lock files for reproducible builds)
+
+# TypeScript cache
+*.tsbuildinfo
+
+# Next.js specific
+.next/
+out/
+.vercel
+
+# Backup files
+*.bak
+*.backup
+
+# Temporary files
+tmp/
+temp/
