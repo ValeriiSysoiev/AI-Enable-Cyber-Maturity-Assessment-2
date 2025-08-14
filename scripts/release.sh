@@ -67,11 +67,20 @@ az acr build -r "$ACR_NAME" -t "ai-maturity-api:$TAG" -f app/Dockerfile ./app
 echo "==> Building WEB image in ACR: $TAG"
 az acr build -r "$ACR_NAME" -t "ai-maturity-web:$TAG" -f web/Dockerfile ./web
 
+# Discover current WEB FQDN before updating API (so its origin is known)
+WEB_FQDN_PRE="$(az containerapp show -g "$RG" -n "$WEB_APP" --query properties.configuration.ingress.fqdn -o tsv 2>/dev/null || true)"
+WEB_ORIGIN=""
+if [ -n "$WEB_FQDN_PRE" ]; then
+  WEB_ORIGIN="https://${WEB_FQDN_PRE}"
+fi
+# Allow override via env if needed; always include local dev origins
+ALLOWED="${API_ALLOWED_ORIGINS_OVERRIDE:-$WEB_ORIGIN,http://localhost:3000,https://localhost:3000}"
+
 # Update API
 echo "==> Updating API container app image + env"
 az containerapp update -g "$RG" -n "$API_APP" \
   --image "$ACR_SERVER/ai-maturity-api:$TAG" \
-  --set-env-vars ADMIN_EMAILS="$ADMIN_EMAILS"
+  --set-env-vars ADMIN_EMAILS="$ADMIN_EMAILS" API_ALLOWED_ORIGINS="$ALLOWED"
 
 API_FQDN="$(az containerapp show -g "$RG" -n "$API_APP" --query properties.configuration.ingress.fqdn -o tsv)"
 API_URL="https://${API_FQDN}"
