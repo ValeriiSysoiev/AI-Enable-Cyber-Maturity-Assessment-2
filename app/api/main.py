@@ -4,6 +4,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from sqlmodel import Session, select
 from pathlib import Path
 import json
+import os
 from typing import List, Dict
 from .assist import router as assist_router
 from .storage import router as storage_router
@@ -19,9 +20,19 @@ def on_startup():
     create_db_and_tables()
 
 # Configure CORS
+# Load allowed origins from environment variable
+web_urls = os.getenv("WEB_URLS", os.getenv("WEB_URL", ""))
+if web_urls:
+    # Parse comma-separated URLs and strip whitespace
+    allowed_origins = [url.strip() for url in web_urls.split(",") if url.strip()]
+else:
+    # Default to empty list if no URLs configured - CORS will be restrictive
+    allowed_origins = []
+    print("WARNING: No WEB_URL(s) configured. CORS will block all origins.")
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],    # TODO: swap to [WEB_URL] later
+    allow_origins=allowed_origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],

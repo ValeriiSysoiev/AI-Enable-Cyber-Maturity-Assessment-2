@@ -6,6 +6,15 @@ on:
   # push:
   #   branches: [ main ]
 
+# Set default permissions to read-only for security
+permissions:
+  contents: read
+
+# Prevent multiple runs for the same ref
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   build:
     runs-on: ubuntu-latest
