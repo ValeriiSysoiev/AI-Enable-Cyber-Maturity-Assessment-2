@@ -265,6 +265,15 @@ AZURE_STORAGE_CONTAINER=docs
 UPLOAD_SAS_TTL_MINUTES=15
 ```
 
+**Security Guidelines for Azure Storage:**
+- **SAS Token Permissions:** Generate write-only SAS tokens with least-privilege permissions. Use only `wca` (write, create, add) for client uploads. Avoid granting list (`l`), read (`r`), or delete (`d`) permissions.
+- **Short TTL:** Use a short time-to-live (TTL) for SAS tokens (10-15 minutes recommended) to minimize exposure window.
+- **Key Rotation:** Implement periodic rotation of storage account keys to enhance security.
+- **Never Log SAS Tokens:** Ensure SAS tokens are never logged in application logs or error messages to prevent unauthorized access.
+- **Configure Storage CORS:** Restrict CORS origins to specific domains (e.g., `http://localhost:3000` for development) and always require HTTPS in production.
+- **Content Validation:** Implement file type and size validation on both client and server sides to prevent malicious uploads.
+- **Size Limits:** Enforce upload size limits to prevent storage abuse and potential denial-of-service attacks.
+
 If Azure Storage is not configured, the `/uploads/sas` endpoint returns HTTP 501.
 
 ### Running Both Services Together

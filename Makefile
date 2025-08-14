@@ -14,10 +14,10 @@ dev:
 	. .venv/bin/activate && honcho start
 
 deploy-admin:
-	chmod +x scripts/deploy_admin.sh && ./scripts/deploy_admin.sh
+	bash ./scripts/deploy_admin.sh
 
 urls:
-	scripts/print_urls.sh
+	bash scripts/print_urls.sh
 
 smoke:
-	scripts/smoke.sh
+	bash scripts/smoke.sh
