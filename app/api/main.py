@@ -50,6 +50,7 @@ def on_startup():
     try:
         bundled = {
             "cyber-for-ai": Path("app/config/presets/cyber-for-ai.json"),
+            "cscm-v3": Path("app/config/presets/preset_cscm_v3.json"),
             # add others here if you have them
         }
         preset_service.BUNDLED.update({k: v for k, v in bundled.items() if v.exists()})
