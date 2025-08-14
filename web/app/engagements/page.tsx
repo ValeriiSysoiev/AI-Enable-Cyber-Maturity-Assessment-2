@@ -51,10 +51,13 @@ export default function Engagements() {
   }, []);
 
   useEffect(() => {
-    const email = requireEmail(router);
-    if (email) {
-      loadEngagements();
-    }
+    const initAuth = async () => {
+      const email = await requireEmail(router);
+      if (email) {
+        loadEngagements();
+      }
+    };
+    initAuth();
   }, [router, loadEngagements]);
 
   const handleCreate = async () => {
