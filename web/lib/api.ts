@@ -17,8 +17,13 @@ function getAuthHeaders(): Record<string, string> {
 // Default timeout for API requests (30 seconds)
 const DEFAULT_TIMEOUT = 30000;
 
+// Extended RequestInit interface with timeout support
+interface RequestInitWithTimeout extends RequestInit {
+  timeout?: number;
+}
+
 // Authenticated fetch wrapper with timeout support
-export async function apiFetch(url: string, options: RequestInit = {}) {
+export async function apiFetch(url: string, options: RequestInitWithTimeout = {}) {
   const authHeaders = getAuthHeaders();
   
   // Create abort controller for timeout
