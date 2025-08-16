@@ -1,6 +1,15 @@
 # Schemas module
 from .summary import CountSummary, ActivityItem, EngagementSummary
 from .preset import PresetQuestion, PresetCapability, PresetPillar, AssessmentPreset
+from .assessment import (
+    AssessmentCreate, 
+    AssessmentResponse, 
+    AnswerUpsert, 
+    ScoreResponse, 
+    PillarScore,
+    EngagementCreate,
+    AddMemberRequest
+)
 
 __all__ = [
     "CountSummary",
@@ -9,5 +18,12 @@ __all__ = [
     "PresetQuestion",
     "PresetCapability",
     "PresetPillar",
-    "AssessmentPreset"
+    "AssessmentPreset",
+    "AssessmentCreate",
+    "AssessmentResponse",
+    "AnswerUpsert",
+    "ScoreResponse",
+    "PillarScore",
+    "EngagementCreate",
+    "AddMemberRequest"
 ]

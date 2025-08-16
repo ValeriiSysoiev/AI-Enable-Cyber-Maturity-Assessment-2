@@ -1,8 +1,7 @@
 from pydantic import BaseModel, Field, EmailStr
-from typing import Optional, List, Dict, Literal
+from typing import Optional, List, Literal
 from datetime import datetime
-from .summary import CountSummary, ActivityItem, EngagementSummary
-from .preset import PresetQuestion, PresetCapability, PresetPillar, AssessmentPreset
+
 
 class AssessmentCreate(BaseModel):
     """Schema for creating an assessment"""
@@ -54,19 +53,3 @@ class AddMemberRequest(BaseModel):
     """Schema for adding a member to an engagement"""
     user_email: EmailStr = Field(..., description="Email of the user to add")
     role: Optional[Literal["member", "lead"]] = Field("member", description="Role of the member (member/lead)")
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
