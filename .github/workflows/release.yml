@@ -19,10 +19,57 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v4
 
+    - name: Check Azure credentials
+      run: |
+        if [ -z "${{ secrets.AZURE_CREDENTIALS }}" ]; then
+          echo "❌ AZURE_CREDENTIALS secret is not configured"
+          echo "Please configure the following secrets in your GitHub repository:"
+          echo "  - AZURE_CREDENTIALS (JSON with clientId, clientSecret, subscriptionId, tenantId)"
+          echo "  - AZURE_CONTAINER_REGISTRY"
+          echo "  - AZURE_RESOURCE_GROUP" 
+          echo "  - API_CONTAINER_APP"
+          echo "  - WEB_CONTAINER_APP"
+          echo ""
+          echo "For setup instructions, visit: https://github.com/Azure/login#readme"
+          exit 1
+        fi
+
     - name: Login to Azure
       uses: azure/login@v1
       with:
         creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+    - name: Validate environment variables
+      run: |
+        echo "Validating required environment variables..."
+        
+        missing_vars=()
+        
+        if [ -z "${{ env.AZURE_CONTAINER_REGISTRY }}" ]; then
+          missing_vars+=("AZURE_CONTAINER_REGISTRY")
+        fi
+        
+        if [ -z "${{ env.AZURE_RESOURCE_GROUP }}" ]; then
+          missing_vars+=("AZURE_RESOURCE_GROUP")
+        fi
+        
+        if [ -z "${{ env.API_CONTAINER_APP }}" ]; then
+          missing_vars+=("API_CONTAINER_APP")
+        fi
+        
+        if [ -z "${{ env.WEB_CONTAINER_APP }}" ]; then
+          missing_vars+=("WEB_CONTAINER_APP")
+        fi
+        
+        if [ ${#missing_vars[@]} -ne 0 ]; then
+          echo "❌ Missing required secrets:"
+          printf '  - %s\n' "${missing_vars[@]}"
+          echo ""
+          echo "Please configure these secrets in your GitHub repository settings."
+          exit 1
+        fi
+        
+        echo "✅ All required environment variables are configured"
 
     - name: Login to Azure Container Registry
       run: |

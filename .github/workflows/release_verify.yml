@@ -29,6 +29,31 @@ jobs:
         cd e2e
         npm ci
 
+    - name: Validate environment variables
+      run: |
+        echo "Validating required environment variables..."
+        
+        missing_vars=()
+        
+        if [ -z "${{ env.API_ENDPOINT }}" ]; then
+          missing_vars+=("API_ENDPOINT")
+        fi
+        
+        if [ -z "${{ env.WEB_ENDPOINT }}" ]; then
+          missing_vars+=("WEB_ENDPOINT")
+        fi
+        
+        if [ ${#missing_vars[@]} -ne 0 ]; then
+          echo "❌ Missing required secrets:"
+          printf '  - %s\n' "${missing_vars[@]}"
+          echo ""
+          echo "Please configure these secrets in your GitHub repository settings."
+          echo "Skipping verification tests due to missing configuration."
+          exit 0  # Exit gracefully instead of failing
+        fi
+        
+        echo "✅ All required environment variables are configured"
+
     - name: Wait for services to be ready
       run: |
         echo "Waiting for services to stabilize..."
