@@ -20,6 +20,22 @@ from ..ai.orchestrator import Orchestrator
 
 app = FastAPI(title="AI Maturity Tool API", version="0.1.0")
 
+# --- CORS configuration (env-driven) ---
+_origins_env = os.getenv("API_ALLOWED_ORIGINS", "")
+_origins = [o.strip() for o in _origins_env.split(",") if o.strip()]
+if not _origins:
+    # Dev-safe fallback; prod will set explicit origin(s) via release script
+    _origins = ["*"]
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=_origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],  # allow custom headers like X-User-Email, X-Engagement-ID
+    expose_headers=["Content-Disposition"],
+)
+
 @app.on_event("startup")
 def on_startup():
     create_db_and_tables()
@@ -34,21 +50,14 @@ def on_startup():
     try:
         bundled = {
             "cyber-for-ai": Path("app/config/presets/cyber-for-ai.json"),
+            "cscm-v3": Path("app/config/presets/preset_cscm_v3.json"),
             # add others here if you have them
         }
         preset_service.BUNDLED.update({k: v for k, v in bundled.items() if v.exists()})
     except Exception:
         pass
 
-# Configure CORS
-allowed_origins = os.getenv("WEB_ORIGIN", "http://localhost:3000").split(",")
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=allowed_origins,
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
+
 
 app.include_router(assist_router)
 app.include_router(storage_router)
