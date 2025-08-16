@@ -23,4 +23,4 @@ COPY ai/ ./ai/
 COPY __init__.py .
 
 EXPOSE 8000
-CMD ["python", "-m", "uvicorn", "api.main:app", "--host", "0.0.0.0", "--port", "8000"]
+CMD ["python", "-c", "import sys; sys.path.insert(0, '/app'); import uvicorn; uvicorn.run('api.main:app', host='0.0.0.0', port=8000)"]
