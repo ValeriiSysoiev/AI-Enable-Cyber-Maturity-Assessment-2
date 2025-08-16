@@ -1,0 +1,548 @@
+[1;33m=== Live Release Pipeline ===[0m
+Subscription: 10233675-d493-4a97-9c81-4001e353a7bb
+Resource Group: rg-aaa-demo
+ACR: acraaademo9lyu53
+Log file: logs/reports/run-20250816-112435-release.log
+
+[1;33m1. Setting subscription context...[0m
+[1;33m2. Running pre-deploy gate...[0m
+[1;33m==> Pre-deploy Gate: Checking recent errors[0m
+Recent errors (60m): 0
+Error threshold: 0
+[0;32m✓ Pre-deploy gate PASSED: 0 errors ≤ threshold 0[0m
+[1;33m3. Computing version information...[0m
+Git SHA: 6f9b0c00
+Build Time: 2025-08-16T17:24:42Z
+App Version: 0.2.0
+WARNING: The behavior of this command has been altered by the following extension: containerapp
+WARNING: The behavior of this command has been altered by the following extension: containerapp
+API URL: https://api-aaa-demo.bravewater-3d70a706.canadacentral.azurecontainerapps.io
+Web URL: https://web-aaa-demo.bravewater-3d70a706.canadacentral.azurecontainerapps.io
+[1;33m4. Building and pushing API image...[0m
+Building API image: ai-maturity-api:v202508161124-6f9b0c00
+WARNING: Packing source code into tar to upload...
+WARNING: Uploading archived source code from '/var/folders/zf/6z4j2b5x3hbcj3ntw022m4mr0000gn/T/build_archive_4783055086da4f9b97aa54d1e322988d.tar.gz'...
+WARNING: Sending context (153.460 KiB) to registry: acraaademo9lyu53...
+WARNING: Queued a build with ID: cx3a
+WARNING: Waiting for an agent...
+2025/08/16 17:24:55 Downloading source code...
+2025/08/16 17:24:55 Finished downloading source code
+2025/08/16 17:24:56 Using acb_vol_b0e623e0-63d8-4e0b-973e-6a7d6b837481 as the home volume
+2025/08/16 17:24:56 Setting up Docker configuration...
+2025/08/16 17:24:56 Successfully set up Docker configuration
+2025/08/16 17:24:56 Logging in to registry: acraaademo9lyu53.azurecr.io
+2025/08/16 17:24:57 Successfully logged into acraaademo9lyu53.azurecr.io
+2025/08/16 17:24:57 Executing step ID: build. Timeout(sec): 28800, Working directory: '', Network: ''
+2025/08/16 17:24:57 Scanning for dependencies...
+2025/08/16 17:24:57 Successfully scanned dependencies
+2025/08/16 17:24:57 Launching container with name: build
+Sending build context to Docker daemon  662.5kB
+Step 1/12 : FROM python:3.11-slim
+3.11-slim: Pulling from library/python
+396b1da7636e: Pulling fs layer
+fcec5a125fd8: Pulling fs layer
+a27cb4be7017: Pulling fs layer
+1961ca026b04: Pulling fs layer
+1961ca026b04: Waiting
+fcec5a125fd8: Verifying Checksum
+fcec5a125fd8: Download complete
+a27cb4be7017: Verifying Checksum
+a27cb4be7017: Download complete
+1961ca026b04: Verifying Checksum
+1961ca026b04: Download complete
+396b1da7636e: Verifying Checksum
+396b1da7636e: Download complete
+396b1da7636e: Pull complete
+fcec5a125fd8: Pull complete
+a27cb4be7017: Pull complete
+1961ca026b04: Pull complete
+Digest: sha256:9e885f8239c31f8429448f933638dd13037c9119e2a362aeebdd37ec3bee7c85
+Status: Downloaded newer image for python:3.11-slim
+ ---> 2ba2e944f9cd
+Step 2/12 : ARG GIT_SHA=unknown
+ ---> Running in 77f8909b1b71
+Removing intermediate container 77f8909b1b71
+ ---> eca250b48f46
+Step 3/12 : ARG BUILD_TIME=unknown
+ ---> Running in 4f7b15b823ed
+Removing intermediate container 4f7b15b823ed
+ ---> 22873d2a9e70
+Step 4/12 : ARG APP_VERSION=0.1.0
+ ---> Running in 9b73f1eea336
+Removing intermediate container 9b73f1eea336
+ ---> 56a0f4e9d521
+Step 5/12 : WORKDIR /workdir
+ ---> Running in f57a5817c7a8
+Removing intermediate container f57a5817c7a8
+ ---> 218fda8632a8
+Step 6/12 : ENV PYTHONDONTWRITEBYTECODE=1     PYTHONUNBUFFERED=1     PYTHONPATH=/workdir     GIT_SHA=${GIT_SHA}     BUILD_TIME=${BUILD_TIME}     APP_VERSION=${APP_VERSION}
+ ---> Running in 426ed335a7ab
+Removing intermediate container 426ed335a7ab
+ ---> 4c3417885620
+Step 7/12 : COPY requirements.txt .
+ ---> 54d58d8b0269
+Step 8/12 : RUN pip install --no-cache-dir -r requirements.txt
+ ---> Running in 6722eaee908f
+Collecting fastapi>=0.115 (from -r requirements.txt (line 1))
+  Downloading fastapi-0.116.1-py3-none-any.whl.metadata (28 kB)
+Collecting uvicorn>=0.30 (from uvicorn[standard]>=0.30->-r requirements.txt (line 2))
+  Downloading uvicorn-0.35.0-py3-none-any.whl.metadata (6.5 kB)
+Collecting sqlmodel>=0.0.16 (from -r requirements.txt (line 3))
+  Downloading sqlmodel-0.0.24-py3-none-any.whl.metadata (10 kB)
+Collecting pydantic>=2.7 (from pydantic[email]>=2.7->-r requirements.txt (line 4))
+  Downloading pydantic-2.11.7-py3-none-any.whl.metadata (67 kB)
+     ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 68.0/68.0 kB 65.6 MB/s eta 0:00:00
+Collecting python-multipart>=0.0.6 (from -r requirements.txt (line 5))
+  Downloading python_multipart-0.0.20-py3-none-any.whl.metadata (1.8 kB)
+Collecting azure-storage-blob>=12.19 (from -r requirements.txt (line 6))
+  Downloading azure_storage_blob-12.26.0-py3-none-any.whl.metadata (26 kB)
+Collecting azure-identity>=1.17 (from -r requirements.txt (line 7))
+  Downloading azure_identity-1.24.0-py3-none-any.whl.metadata (86 kB)
+     ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 86.0/86.0 kB 316.1 MB/s eta 0:00:00
+Collecting azure-cosmos>=4.5.0 (from -r requirements.txt (line 8))
+  Downloading azure_cosmos-4.9.0-py3-none-any.whl.metadata (80 kB)
+     ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 80.8/80.8 kB 334.2 MB/s eta 0:00:00
+Collecting python-dotenv>=1.0 (from -r requirements.txt (line 9))
+  Downloading python_dotenv-1.1.1-py3-none-any.whl.metadata (24 kB)
+Collecting openai<2.0.0,>=1.30.0 (from -r requirements.txt (line 10))
+  Downloading openai-1.99.9-py3-none-any.whl.metadata (29 kB)
+Collecting pypdf>=4.2.0 (from -r requirements.txt (line 11))
+  Downloading pypdf-6.0.0-py3-none-any.whl.metadata (7.1 kB)
+Collecting python-docx>=1.1.2 (from -r requirements.txt (line 12))
+  Downloading python_docx-1.2.0-py3-none-any.whl.metadata (2.0 kB)
+Collecting requests (from -r requirements.txt (line 14))
+  Downloading requests-2.32.4-py3-none-any.whl.metadata (4.9 kB)
+Collecting python-pptx>=0.6.23 (from -r requirements.txt (line 15))
+  Downloading python_pptx-1.0.2-py3-none-any.whl.metadata (2.5 kB)
+Collecting httpx>=0.24.0 (from -r requirements.txt (line 16))
+  Downloading httpx-0.28.1-py3-none-any.whl.metadata (7.1 kB)
+Collecting python-jose[cryptography] (from -r requirements.txt (line 13))
+  Downloading python_jose-3.5.0-py2.py3-none-any.whl.metadata (5.5 kB)
+Collecting starlette<0.48.0,>=0.40.0 (from fastapi>=0.115->-r requirements.txt (line 1))
+  Downloading starlette-0.47.2-py3-none-any.whl.metadata (6.2 kB)
+Collecting typing-extensions>=4.8.0 (from fastapi>=0.115->-r requirements.txt (line 1))
+  Downloading typing_extensions-4.14.1-py3-none-any.whl.metadata (3.0 kB)
+Collecting click>=7.0 (from uvicorn>=0.30->uvicorn[standard]>=0.30->-r requirements.txt (line 2))
+  Downloading click-8.2.1-py3-none-any.whl.metadata (2.5 kB)
+Collecting h11>=0.8 (from uvicorn>=0.30->uvicorn[standard]>=0.30->-r requirements.txt (line 2))
+  Downloading h11-0.16.0-py3-none-any.whl.metadata (8.3 kB)
+Collecting SQLAlchemy<2.1.0,>=2.0.14 (from sqlmodel>=0.0.16->-r requirements.txt (line 3))
+  Downloading sqlalchemy-2.0.43-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata (9.6 kB)
+Collecting annotated-types>=0.6.0 (from pydantic>=2.7->pydantic[email]>=2.7->-r requirements.txt (line 4))
+  Downloading annotated_types-0.7.0-py3-none-any.whl.metadata (15 kB)
+Collecting pydantic-core==2.33.2 (from pydantic>=2.7->pydantic[email]>=2.7->-r requirements.txt (line 4))
+  Downloading pydantic_core-2.33.2-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata (6.8 kB)
+Collecting typing-inspection>=0.4.0 (from pydantic>=2.7->pydantic[email]>=2.7->-r requirements.txt (line 4))
+  Downloading typing_inspection-0.4.1-py3-none-any.whl.metadata (2.6 kB)
+Collecting azure-core>=1.30.0 (from azure-storage-blob>=12.19->-r requirements.txt (line 6))
+  Downloading azure_core-1.35.0-py3-none-any.whl.metadata (44 kB)
+     ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 44.4/44.4 kB 308.5 MB/s eta 0:00:00
+Collecting cryptography>=2.1.4 (from azure-storage-blob>=12.19->-r requirements.txt (line 6))
+  Downloading cryptography-45.0.6-cp311-abi3-manylinux_2_34_x86_64.whl.metadata (5.7 kB)
+Collecting isodate>=0.6.1 (from azure-storage-blob>=12.19->-r requirements.txt (line 6))
+  Downloading isodate-0.7.2-py3-none-any.whl.metadata (11 kB)
+Collecting msal>=1.30.0 (from azure-identity>=1.17->-r requirements.txt (line 7))
+  Downloading msal-1.33.0-py3-none-any.whl.metadata (11 kB)
+Collecting msal-extensions>=1.2.0 (from azure-identity>=1.17->-r requirements.txt (line 7))
+  Downloading msal_extensions-1.3.1-py3-none-any.whl.metadata (7.8 kB)
+Collecting anyio<5,>=3.5.0 (from openai<2.0.0,>=1.30.0->-r requirements.txt (line 10))
+  Downloading anyio-4.10.0-py3-none-any.whl.metadata (4.0 kB)
+Collecting distro<2,>=1.7.0 (from openai<2.0.0,>=1.30.0->-r requirements.txt (line 10))
+  Downloading distro-1.9.0-py3-none-any.whl.metadata (6.8 kB)
+Collecting jiter<1,>=0.4.0 (from openai<2.0.0,>=1.30.0->-r requirements.txt (line 10))
+  Downloading jiter-0.10.0-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata (5.2 kB)
+Collecting sniffio (from openai<2.0.0,>=1.30.0->-r requirements.txt (line 10))
+  Downloading sniffio-1.3.1-py3-none-any.whl.metadata (3.9 kB)
+Collecting tqdm>4 (from openai<2.0.0,>=1.30.0->-r requirements.txt (line 10))
+  Downloading tqdm-4.67.1-py3-none-any.whl.metadata (57 kB)
+     ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 57.7/57.7 kB 272.0 MB/s eta 0:00:00
+Collecting lxml>=3.1.0 (from python-docx>=1.1.2->-r requirements.txt (line 12))
+  Downloading lxml-6.0.0-cp311-cp311-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl.metadata (6.6 kB)
+Collecting ecdsa!=0.15 (from python-jose[cryptography]->-r requirements.txt (line 13))
+  Downloading ecdsa-0.19.1-py2.py3-none-any.whl.metadata (29 kB)
+Collecting rsa!=4.1.1,!=4.4,<5.0,>=4.0 (from python-jose[cryptography]->-r requirements.txt (line 13))
+  Downloading rsa-4.9.1-py3-none-any.whl.metadata (5.6 kB)
+Collecting pyasn1>=0.5.0 (from python-jose[cryptography]->-r requirements.txt (line 13))
+  Downloading pyasn1-0.6.1-py3-none-any.whl.metadata (8.4 kB)
+Collecting charset_normalizer<4,>=2 (from requests->-r requirements.txt (line 14))
+  Downloading charset_normalizer-3.4.3-cp311-cp311-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl.metadata (36 kB)
+Collecting idna<4,>=2.5 (from requests->-r requirements.txt (line 14))
+  Downloading idna-3.10-py3-none-any.whl.metadata (10 kB)
+Collecting urllib3<3,>=1.21.1 (from requests->-r requirements.txt (line 14))
+  Downloading urllib3-2.5.0-py3-none-any.whl.metadata (6.5 kB)
+Collecting certifi>=2017.4.17 (from requests->-r requirements.txt (line 14))
+  Downloading certifi-2025.8.3-py3-none-any.whl.metadata (2.4 kB)
+Collecting Pillow>=3.3.2 (from python-pptx>=0.6.23->-r requirements.txt (line 15))
+  Downloading pillow-11.3.0-cp311-cp311-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl.metadata (9.0 kB)
+Collecting XlsxWriter>=0.5.7 (from python-pptx>=0.6.23->-r requirements.txt (line 15))
+  Downloading xlsxwriter-3.2.5-py3-none-any.whl.metadata (2.7 kB)
+Collecting httpcore==1.* (from httpx>=0.24.0->-r requirements.txt (line 16))
+  Downloading httpcore-1.0.9-py3-none-any.whl.metadata (21 kB)
+Collecting email-validator>=2.0.0 (from pydantic[email]>=2.7->-r requirements.txt (line 4))
+  Downloading email_validator-2.2.0-py3-none-any.whl.metadata (25 kB)
+Collecting httptools>=0.6.3 (from uvicorn[standard]>=0.30->-r requirements.txt (line 2))
+  Downloading httptools-0.6.4-cp311-cp311-manylinux_2_5_x86_64.manylinux1_x86_64.manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata (3.6 kB)
+Collecting pyyaml>=5.1 (from uvicorn[standard]>=0.30->-r requirements.txt (line 2))
+  Downloading PyYAML-6.0.2-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata (2.1 kB)
+Collecting uvloop>=0.15.1 (from uvicorn[standard]>=0.30->-r requirements.txt (line 2))
+  Downloading uvloop-0.21.0-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata (4.9 kB)
+Collecting watchfiles>=0.13 (from uvicorn[standard]>=0.30->-r requirements.txt (line 2))
+  Downloading watchfiles-1.1.0-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata (4.9 kB)
+Collecting websockets>=10.4 (from uvicorn[standard]>=0.30->-r requirements.txt (line 2))
+  Downloading websockets-15.0.1-cp311-cp311-manylinux_2_5_x86_64.manylinux1_x86_64.manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata (6.8 kB)
+Collecting six>=1.11.0 (from azure-core>=1.30.0->azure-storage-blob>=12.19->-r requirements.txt (line 6))
+  Downloading six-1.17.0-py2.py3-none-any.whl.metadata (1.7 kB)
+Collecting cffi>=1.14 (from cryptography>=2.1.4->azure-storage-blob>=12.19->-r requirements.txt (line 6))
+  Downloading cffi-1.17.1-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata (1.5 kB)
+Collecting dnspython>=2.0.0 (from email-validator>=2.0.0->pydantic[email]>=2.7->-r requirements.txt (line 4))
+  Downloading dnspython-2.7.0-py3-none-any.whl.metadata (5.8 kB)
+Collecting PyJWT<3,>=1.0.0 (from PyJWT[crypto]<3,>=1.0.0->msal>=1.30.0->azure-identity>=1.17->-r requirements.txt (line 7))
+  Downloading PyJWT-2.10.1-py3-none-any.whl.metadata (4.0 kB)
+Collecting greenlet>=1 (from SQLAlchemy<2.1.0,>=2.0.14->sqlmodel>=0.0.16->-r requirements.txt (line 3))
+  Downloading greenlet-3.2.4-cp311-cp311-manylinux_2_24_x86_64.manylinux_2_28_x86_64.whl.metadata (4.1 kB)
+Collecting pycparser (from cffi>=1.14->cryptography>=2.1.4->azure-storage-blob>=12.19->-r requirements.txt (line 6))
+  Downloading pycparser-2.22-py3-none-any.whl.metadata (943 bytes)
+Downloading fastapi-0.116.1-py3-none-any.whl (95 kB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 95.6/95.6 kB 249.5 MB/s eta 0:00:00
+Downloading uvicorn-0.35.0-py3-none-any.whl (66 kB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 66.4/66.4 kB 214.1 MB/s eta 0:00:00
+Downloading sqlmodel-0.0.24-py3-none-any.whl (28 kB)
+Downloading pydantic-2.11.7-py3-none-any.whl (444 kB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 444.8/444.8 kB 106.3 MB/s eta 0:00:00
+Downloading pydantic_core-2.33.2-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (2.0 MB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 2.0/2.0 MB 247.1 MB/s eta 0:00:00
+Downloading python_multipart-0.0.20-py3-none-any.whl (24 kB)
+Downloading azure_storage_blob-12.26.0-py3-none-any.whl (412 kB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 412.9/412.9 kB 454.2 MB/s eta 0:00:00
+Downloading azure_identity-1.24.0-py3-none-any.whl (187 kB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 187.9/187.9 kB 427.2 MB/s eta 0:00:00
+Downloading azure_cosmos-4.9.0-py3-none-any.whl (303 kB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 303.2/303.2 kB 455.4 MB/s eta 0:00:00
+Downloading python_dotenv-1.1.1-py3-none-any.whl (20 kB)
+Downloading openai-1.99.9-py3-none-any.whl (786 kB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 786.8/786.8 kB 445.2 MB/s eta 0:00:00
+Downloading pypdf-6.0.0-py3-none-any.whl (310 kB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 310.5/310.5 kB 464.1 MB/s eta 0:00:00
+Downloading python_docx-1.2.0-py3-none-any.whl (252 kB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 253.0/253.0 kB 422.1 MB/s eta 0:00:00
+Downloading requests-2.32.4-py3-none-any.whl (64 kB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 64.8/64.8 kB 359.2 MB/s eta 0:00:00
+Downloading python_pptx-1.0.2-py3-none-any.whl (472 kB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 472.8/472.8 kB 440.7 MB/s eta 0:00:00
+Downloading httpx-0.28.1-py3-none-any.whl (73 kB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 73.5/73.5 kB 282.6 MB/s eta 0:00:00
+Downloading httpcore-1.0.9-py3-none-any.whl (78 kB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 78.8/78.8 kB 380.7 MB/s eta 0:00:00
+Downloading annotated_types-0.7.0-py3-none-any.whl (13 kB)
+Downloading anyio-4.10.0-py3-none-any.whl (107 kB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 107.2/107.2 kB 345.5 MB/s eta 0:00:00
+Downloading azure_core-1.35.0-py3-none-any.whl (210 kB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 210.7/210.7 kB 402.1 MB/s eta 0:00:00
+Downloading certifi-2025.8.3-py3-none-any.whl (161 kB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 161.2/161.2 kB 422.4 MB/s eta 0:00:00
+Downloading charset_normalizer-3.4.3-cp311-cp311-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl (150 kB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 150.3/150.3 kB 371.5 MB/s eta 0:00:00
+Downloading click-8.2.1-py3-none-any.whl (102 kB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 102.2/102.2 kB 362.5 MB/s eta 0:00:00
+Downloading cryptography-45.0.6-cp311-abi3-manylinux_2_34_x86_64.whl (4.5 MB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 4.5/4.5 MB 266.1 MB/s eta 0:00:00
+Downloading distro-1.9.0-py3-none-any.whl (20 kB)
+Downloading ecdsa-0.19.1-py2.py3-none-any.whl (150 kB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 150.6/150.6 kB 426.0 MB/s eta 0:00:00
+Downloading email_validator-2.2.0-py3-none-any.whl (33 kB)
+Downloading h11-0.16.0-py3-none-any.whl (37 kB)
+Downloading httptools-0.6.4-cp311-cp311-manylinux_2_5_x86_64.manylinux1_x86_64.manylinux_2_17_x86_64.manylinux2014_x86_64.whl (459 kB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 459.8/459.8 kB 442.3 MB/s eta 0:00:00
+Downloading idna-3.10-py3-none-any.whl (70 kB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 70.4/70.4 kB 380.7 MB/s eta 0:00:00
+Downloading isodate-0.7.2-py3-none-any.whl (22 kB)
+Downloading jiter-0.10.0-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (352 kB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 352.2/352.2 kB 476.3 MB/s eta 0:00:00
+Downloading lxml-6.0.0-cp311-cp311-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl (5.2 MB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 5.2/5.2 MB 370.9 MB/s eta 0:00:00
+Downloading msal-1.33.0-py3-none-any.whl (116 kB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 116.9/116.9 kB 363.3 MB/s eta 0:00:00
+Downloading msal_extensions-1.3.1-py3-none-any.whl (20 kB)
+Downloading pillow-11.3.0-cp311-cp311-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl (6.6 MB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 6.6/6.6 MB 325.8 MB/s eta 0:00:00
+Downloading pyasn1-0.6.1-py3-none-any.whl (83 kB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 83.1/83.1 kB 281.8 MB/s eta 0:00:00
+Downloading PyYAML-6.0.2-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (762 kB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 763.0/763.0 kB 451.4 MB/s eta 0:00:00
+Downloading rsa-4.9.1-py3-none-any.whl (34 kB)
+Downloading sniffio-1.3.1-py3-none-any.whl (10 kB)
+Downloading sqlalchemy-2.0.43-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (3.3 MB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 3.3/3.3 MB 373.1 MB/s eta 0:00:00
+Downloading starlette-0.47.2-py3-none-any.whl (72 kB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 73.0/73.0 kB 364.4 MB/s eta 0:00:00
+Downloading tqdm-4.67.1-py3-none-any.whl (78 kB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 78.5/78.5 kB 327.9 MB/s eta 0:00:00
+Downloading typing_extensions-4.14.1-py3-none-any.whl (43 kB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 43.9/43.9 kB 248.3 MB/s eta 0:00:00
+Downloading typing_inspection-0.4.1-py3-none-any.whl (14 kB)
+Downloading urllib3-2.5.0-py3-none-any.whl (129 kB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 129.8/129.8 kB 409.0 MB/s eta 0:00:00
+Downloading uvloop-0.21.0-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (4.0 MB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 4.0/4.0 MB 230.4 MB/s eta 0:00:00
+Downloading watchfiles-1.1.0-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (453 kB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 453.1/453.1 kB 340.3 MB/s eta 0:00:00
+Downloading websockets-15.0.1-cp311-cp311-manylinux_2_5_x86_64.manylinux1_x86_64.manylinux_2_17_x86_64.manylinux2014_x86_64.whl (182 kB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 182.3/182.3 kB 366.7 MB/s eta 0:00:00
+Downloading xlsxwriter-3.2.5-py3-none-any.whl (172 kB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 172.3/172.3 kB 403.8 MB/s eta 0:00:00
+Downloading python_jose-3.5.0-py2.py3-none-any.whl (34 kB)
+Downloading cffi-1.17.1-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (467 kB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 467.2/467.2 kB 379.5 MB/s eta 0:00:00
+Downloading dnspython-2.7.0-py3-none-any.whl (313 kB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 313.6/313.6 kB 305.8 MB/s eta 0:00:00
+Downloading greenlet-3.2.4-cp311-cp311-manylinux_2_24_x86_64.manylinux_2_28_x86_64.whl (587 kB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 587.7/587.7 kB 311.0 MB/s eta 0:00:00
+Downloading PyJWT-2.10.1-py3-none-any.whl (22 kB)
+Downloading six-1.17.0-py2.py3-none-any.whl (11 kB)
+Downloading pycparser-2.22-py3-none-any.whl (117 kB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 117.6/117.6 kB 270.8 MB/s eta 0:00:00
+Installing collected packages: XlsxWriter, websockets, uvloop, urllib3, typing-extensions, tqdm, sniffio, six, pyyaml, python-multipart, python-dotenv, pypdf, PyJWT, pycparser, pyasn1, Pillow, lxml, jiter, isodate, idna, httptools, h11, greenlet, dnspython, distro, click, charset_normalizer, certifi, annotated-types, uvicorn, typing-inspection, SQLAlchemy, rsa, requests, python-pptx, python-docx, pydantic-core, httpcore, email-validator, ecdsa, cffi, anyio, watchfiles, starlette, python-jose, pydantic, httpx, cryptography, azure-core, sqlmodel, openai, fastapi, azure-storage-blob, azure-cosmos, msal, msal-extensions, azure-identity
+Successfully installed Pillow-11.3.0 PyJWT-2.10.1 SQLAlchemy-2.0.43 XlsxWriter-3.2.5 annotated-types-0.7.0 anyio-4.10.0 azure-core-1.35.0 azure-cosmos-4.9.0 azure-identity-1.24.0 azure-storage-blob-12.26.0 certifi-2025.8.3 cffi-1.17.1 charset_normalizer-3.4.3 click-8.2.1 cryptography-45.0.6 distro-1.9.0 dnspython-2.7.0 ecdsa-0.19.1 email-validator-2.2.0 fastapi-0.116.1 greenlet-3.2.4 h11-0.16.0 httpcore-1.0.9 httptools-0.6.4 httpx-0.28.1 idna-3.10 isodate-0.7.2 jiter-0.10.0 lxml-6.0.0 msal-1.33.0 msal-extensions-1.3.1 openai-1.99.9 pyasn1-0.6.1 pycparser-2.22 pydantic-2.11.7 pydantic-core-2.33.2 pypdf-6.0.0 python-docx-1.2.0 python-dotenv-1.1.1 python-jose-3.5.0 python-multipart-0.0.20 python-pptx-1.0.2 pyyaml-6.0.2 requests-2.32.4 rsa-4.9.1 six-1.17.0 sniffio-1.3.1 sqlmodel-0.0.24 starlette-0.47.2 tqdm-4.67.1 typing-extensions-4.14.1 typing-inspection-0.4.1 urllib3-2.5.0 uvicorn-0.35.0 uvloop-0.21.0 watchfiles-1.1.0 websockets-15.0.1
+WARNING: Running pip as the 'root' user can result in broken permissions and conflicting behaviour with the system package manager. It is recommended to use a virtual environment instead: https://pip.pypa.io/warnings/venv
+
+[notice] A new release of pip is available: 24.0 -> 25.2
+[notice] To update, run: pip install --upgrade pip
+Removing intermediate container 6722eaee908f
+ ---> 203e008c855c
+Step 9/12 : COPY . ./app/
+ ---> 7ddc8aeda7cb
+Step 10/12 : RUN mkdir -p data/presets data/engagements
+ ---> Running in 45e7305a8540
+Removing intermediate container 45e7305a8540
+ ---> ae3054f07a41
+Step 11/12 : EXPOSE 8000
+ ---> Running in 5b3ac0489b68
+Removing intermediate container 5b3ac0489b68
+ ---> 050a00b19100
+Step 12/12 : CMD ["python", "-m", "uvicorn", "app.api.main:app", "--host", "0.0.0.0", "--port", "8000"]
+ ---> Running in 53f58577c11b
+Removing intermediate container 53f58577c11b
+ ---> f40ecd5590a2
+Successfully built f40ecd5590a2
+Successfully tagged acraaademo9lyu53.azurecr.io/ai-maturity-api:v202508161124-6f9b0c00
+Successfully tagged acraaademo9lyu53.azurecr.io/ai-maturity-api:latest
+2025/08/16 17:25:25 Successfully executed container: build
+2025/08/16 17:25:25 Executing step ID: push. Timeout(sec): 3600, Working directory: '', Network: ''
+2025/08/16 17:25:25 Pushing image: acraaademo9lyu53.azurecr.io/ai-maturity-api:v202508161124-6f9b0c00, attempt 1
+The push refers to repository [acraaademo9lyu53.azurecr.io/ai-maturity-api]
+07794457da4f: Preparing
+25287438a9d3: Preparing
+511269a0734d: Preparing
+3880a41498d7: Preparing
+c5394e829455: Preparing
+41a3f3e0352a: Preparing
+027e5044d8c1: Preparing
+a0f52cec0ae9: Preparing
+e6a3842ebc7f: Preparing
+41a3f3e0352a: Waiting
+027e5044d8c1: Waiting
+a0f52cec0ae9: Waiting
+e6a3842ebc7f: Waiting
+3880a41498d7: Pushed
+c5394e829455: Pushed
+027e5044d8c1: Layer already exists
+41a3f3e0352a: Layer already exists
+07794457da4f: Pushed
+a0f52cec0ae9: Layer already exists
+25287438a9d3: Pushed
+e6a3842ebc7f: Pushed
+511269a0734d: Pushed
+v202508161124-6f9b0c00: digest: sha256:4732b2b29b735fa33df4d13abac843b41bc2742bc3a22227541ebf73137ce732 size: 2201
+2025/08/16 17:25:34 Successfully pushed image: acraaademo9lyu53.azurecr.io/ai-maturity-api:v202508161124-6f9b0c00
+2025/08/16 17:25:34 Pushing image: acraaademo9lyu53.azurecr.io/ai-maturity-api:latest, attempt 1
+The push refers to repository [acraaademo9lyu53.azurecr.io/ai-maturity-api]
+07794457da4f: Preparing
+25287438a9d3: Preparing
+511269a0734d: Preparing
+3880a41498d7: Preparing
+c5394e829455: Preparing
+41a3f3e0352a: Preparing
+027e5044d8c1: Preparing
+a0f52cec0ae9: Preparing
+e6a3842ebc7f: Preparing
+41a3f3e0352a: Waiting
+027e5044d8c1: Waiting
+a0f52cec0ae9: Waiting
+e6a3842ebc7f: Waiting
+07794457da4f: Layer already exists
+c5394e829455: Layer already exists
+25287438a9d3: Layer already exists
+511269a0734d: Layer already exists
+3880a41498d7: Layer already exists
+a0f52cec0ae9: Layer already exists
+41a3f3e0352a: Layer already exists
+e6a3842ebc7f: Layer already exists
+027e5044d8c1: Layer already exists
+latest: digest: sha256:4732b2b29b735fa33df4d13abac843b41bc2742bc3a22227541ebf73137ce732 size: 2201
+2025/08/16 17:25:40 Successfully pushed image: acraaademo9lyu53.azurecr.io/ai-maturity-api:latest
+2025/08/16 17:25:40 Step ID: build marked as successful (elapsed time in seconds: 28.071513)
+2025/08/16 17:25:40 Populating digests for step ID: build...
+2025/08/16 17:25:42 Successfully populated digests for step ID: build
+2025/08/16 17:25:42 Step ID: push marked as successful (elapsed time in seconds: 15.152394)
+2025/08/16 17:25:42 The following dependencies were found:
+2025/08/16 17:25:42 
+- image:
+    registry: acraaademo9lyu53.azurecr.io
+    repository: ai-maturity-api
+    tag: v202508161124-6f9b0c00
+    digest: sha256:4732b2b29b735fa33df4d13abac843b41bc2742bc3a22227541ebf73137ce732
+  runtime-dependency:
+    registry: registry.hub.docker.com
+    repository: library/python
+    tag: 3.11-slim
+    digest: sha256:9e885f8239c31f8429448f933638dd13037c9119e2a362aeebdd37ec3bee7c85
+  git: {}
+- image:
+    registry: acraaademo9lyu53.azurecr.io
+    repository: ai-maturity-api
+    tag: latest
+    digest: sha256:4732b2b29b735fa33df4d13abac843b41bc2742bc3a22227541ebf73137ce732
+  runtime-dependency:
+    registry: registry.hub.docker.com
+    repository: library/python
+    tag: 3.11-slim
+    digest: sha256:9e885f8239c31f8429448f933638dd13037c9119e2a362aeebdd37ec3bee7c85
+  git: {}
+
+Run ID: cx3a was successful after 48s
+[0;32m✓ API image built: acraaademo9lyu53.azurecr.io/ai-maturity-api:v202508161124-6f9b0c00[0m
+[1;33m5. Building and pushing Web image...[0m
+Building Web image: ai-maturity-web:v202508161125-6f9b0c00
+WARNING: Packing source code into tar to upload...
+WARNING: Uploading archived source code from '/var/folders/zf/6z4j2b5x3hbcj3ntw022m4mr0000gn/T/build_archive_8ccdd08e9a384efbaa237c28ed223ec0.tar.gz'...
+WARNING: Sending context (97.126 MiB) to registry: acraaademo9lyu53...
+WARNING: Queued a build with ID: cx3b
+WARNING: Waiting for an agent...
+2025/08/16 17:26:29 Downloading source code...
+2025/08/16 17:26:34 Finished downloading source code
+2025/08/16 17:26:34 Using acb_vol_9449f029-f335-4dcf-9324-390c2a348999 as the home volume
+2025/08/16 17:26:34 Setting up Docker configuration...
+2025/08/16 17:26:34 Successfully set up Docker configuration
+2025/08/16 17:26:34 Logging in to registry: acraaademo9lyu53.azurecr.io
+2025/08/16 17:26:35 Successfully logged into acraaademo9lyu53.azurecr.io
+2025/08/16 17:26:35 Executing step ID: build. Timeout(sec): 28800, Working directory: '', Network: ''
+2025/08/16 17:26:35 Scanning for dependencies...
+2025/08/16 17:26:35 Successfully scanned dependencies
+2025/08/16 17:26:35 Launching container with name: build
+Sending build context to Docker daemon  454.7kB
+Step 1/26 : FROM node:20-alpine AS builder
+20-alpine: Pulling from library/node
+9824c27679d3: Pulling fs layer
+8c59d92d6fc9: Pulling fs layer
+54225bd60196: Pulling fs layer
+a9e48ad1219d: Pulling fs layer
+a9e48ad1219d: Waiting
+9824c27679d3: Verifying Checksum
+9824c27679d3: Download complete
+a9e48ad1219d: Verifying Checksum
+a9e48ad1219d: Download complete
+9824c27679d3: Pull complete
+54225bd60196: Verifying Checksum
+54225bd60196: Download complete
+8c59d92d6fc9: Verifying Checksum
+8c59d92d6fc9: Download complete
+8c59d92d6fc9: Pull complete
+54225bd60196: Pull complete
+a9e48ad1219d: Pull complete
+Digest: sha256:df02558528d3d3d0d621f112e232611aecfee7cbc654f6b375765f72bb262799
+Status: Downloaded newer image for node:20-alpine
+ ---> 7cdef5a33192
+Step 2/26 : WORKDIR /app
+ ---> Running in f6c6cb85c998
+Removing intermediate container f6c6cb85c998
+ ---> 328434e75291
+Step 3/26 : ARG GIT_SHA=unknown
+ ---> Running in bdec68a23364
+Removing intermediate container bdec68a23364
+ ---> a14e9aecae9a
+Step 4/26 : ARG BUILD_TIME=unknown
+ ---> Running in 53b8e93cf3fe
+Removing intermediate container 53b8e93cf3fe
+ ---> 6dadf56639bd
+Step 5/26 : ARG APP_VERSION=0.1.0
+ ---> Running in 2744d849961b
+Removing intermediate container 2744d849961b
+ ---> e38919ab7b80
+Step 6/26 : ARG NEXT_PUBLIC_API_BASE_URL=""
+ ---> Running in 5de1883ea768
+Removing intermediate container 5de1883ea768
+ ---> c70f5031cfd6
+Step 7/26 : COPY package.json package-lock.json* pnpm-lock.yaml* yarn.lock* ./
+ ---> 79ac6d7d8333
+Step 8/26 : RUN   if [ -f package-lock.json ]; then npm ci;   elif [ -f pnpm-lock.yaml ]; then npm i -g pnpm && pnpm i --frozen-lockfile;   elif [ -f yarn.lock ]; then yarn install --frozen-lockfile;   else npm i; fi
+ ---> Running in 9676b00dc993
+npm warn deprecated rimraf@3.0.2: Rimraf versions prior to v4 are no longer supported
+npm warn deprecated inflight@1.0.6: This module is not supported, and leaks memory. Do not use it. Check out lru-cache if you want a good and tested way to coalesce async requests by a key value, which is much more comprehensive and powerful.
+npm warn deprecated eslint@8.57.1: This version is no longer supported. Please see https://eslint.org/version-support for other options.
+npm warn deprecated @humanwhocodes/object-schema@2.0.3: Use @eslint/object-schema instead
+npm warn deprecated glob@7.2.3: Glob versions prior to v9 are no longer supported
+npm warn deprecated @humanwhocodes/config-array@0.13.0: Use @eslint/config-array instead
+
+added 433 packages, and audited 434 packages in 14s
+
+154 packages are looking for funding
+  run `npm fund` for details
+
+2 vulnerabilities (1 low, 1 critical)
+
+To address all issues (including breaking changes), run:
+  npm audit fix --force
+
+Run `npm audit` for details.
+npm notice
+npm notice New major version of npm available! 10.8.2 -> 11.5.2
+npm notice Changelog: https://github.com/npm/cli/releases/tag/v11.5.2
+npm notice To update run: npm install -g npm@11.5.2
+npm notice
+Removing intermediate container 9676b00dc993
+ ---> 75aca9bc2cb6
+Step 9/26 : ENV NEXT_PUBLIC_API_BASE_URL=$NEXT_PUBLIC_API_BASE_URL     NEXT_PUBLIC_GIT_SHA=$GIT_SHA     NEXT_PUBLIC_BUILD_TIME=$BUILD_TIME     NEXT_PUBLIC_APP_VERSION=$APP_VERSION
+ ---> Running in e59a0d123675
+Removing intermediate container e59a0d123675
+ ---> f7a2277901cc
+Step 10/26 : COPY . .
+ ---> 56a182b79072
+Step 11/26 : RUN mkdir -p public
+ ---> Running in fd3d9ff8d2ce
+Removing intermediate container fd3d9ff8d2ce
+ ---> 84ab4453198f
+Step 12/26 : RUN npm run build
+ ---> Running in 9dd7d49b9e59
+
+> ai-maturity-web@0.1.0 build
+> next build
+
+Attention: Next.js now collects completely anonymous telemetry regarding usage.
+This information is used to shape Next.js' roadmap and prioritize features.
+You can learn more, including how to opt-out if you'd not like to participate in this anonymous program, by visiting the following URL:
+https://nextjs.org/telemetry
+
+  ▲ Next.js 14.2.5
+
+   Creating an optimized production build ...
+
+ ✓ Compiled successfully
+   Linting and checking validity of types ...
+Failed to compile.
+
+./lib/api.ts:24:20
+Type error: Property 'accessToken' does not exist on type 'Session'.
+
+  22 |       const session = await auth();
+  23 |       
+> 24 |       if (session?.accessToken) {
+     |                    ^
+  25 |         headers["Authorization"] = `Bearer ${session.accessToken}`;
+  26 |         return headers;
+  27 |       }
+The command '/bin/sh -c npm run build' returned a non-zero code: 1
+2025/08/16 17:27:41 Container failed during run: build. No retries remaining.
+failed to run step ID: build: exit status 1
+
+Run ID: cx3b failed after 1m13s. Error: failed during run, err: exit status 1
+ERROR: Run failed

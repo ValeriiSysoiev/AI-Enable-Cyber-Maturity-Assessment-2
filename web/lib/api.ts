@@ -14,34 +14,71 @@ function getAuthHeaders(): Record<string, string> {
   return headers;
 }
 
-// Authenticated fetch wrapper
+// Default timeout for API requests (30 seconds)
+const DEFAULT_TIMEOUT = 30000;
+
+// Authenticated fetch wrapper with timeout support
 export async function apiFetch(url: string, options: RequestInit = {}) {
   const authHeaders = getAuthHeaders();
   
-  const response = await fetch(`${BASE}${url}`, {
-    ...options,
-    headers: {
-      ...authHeaders,
-      ...options.headers,
-    },
-  });
+  // Create abort controller for timeout
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), options.timeout || DEFAULT_TIMEOUT);
   
-  if (!response.ok) {
-    const error = await response.json().catch(() => ({ detail: "Request failed" }));
-    throw new Error(error.detail || `Request failed: ${response.status}`);
+  try {
+    const response = await fetch(`${BASE}${url}`, {
+      ...options,
+      signal: controller.signal,
+      headers: {
+        ...authHeaders,
+        ...options.headers,
+      },
+    });
+    
+    clearTimeout(timeoutId);
+    
+    if (!response.ok) {
+      const error = await response.json().catch(() => ({ detail: "Request failed" }));
+      throw new Error(error.detail || `Request failed: ${response.status}`);
+    }
+    
+    return response.json();
+  } catch (error) {
+    clearTimeout(timeoutId);
+    
+    if (error.name === 'AbortError') {
+      throw new Error('Request timeout - please try again');
+    }
+    
+    throw error;
   }
-  
-  return response.json();
 }
 
 export async function fetchPreset(id: string) {
+  // Create abort controller for timeout
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), DEFAULT_TIMEOUT);
+  
   try {
-    const res = await fetch(`${BASE}/presets/${id}`, { cache: "no-store" });
+    const res = await fetch(`${BASE}/presets/${id}`, { 
+      cache: "no-store",
+      signal: controller.signal
+    });
+    
+    clearTimeout(timeoutId);
+    
     if (!res.ok) {
       throw new Error(`Preset ${id} not found`);
     }
     return res.json();
   } catch (error) {
+    clearTimeout(timeoutId);
+    
+    if (error.name === 'AbortError') {
+      console.error("Preset fetch timeout:", id);
+      throw new Error('Request timeout - please try again');
+    }
+    
     console.error("Error fetching preset:", error);
     throw error;
   }

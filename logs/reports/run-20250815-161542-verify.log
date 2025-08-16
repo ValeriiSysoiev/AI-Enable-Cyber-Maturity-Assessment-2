@@ -1,0 +1,44 @@
+[1;33m=== Live Application Verification ===[0m
+Admin Email: va.sysoiev@audit3a.com
+Preset File: imports/preset_cscm_v3.json
+Log file: logs/reports/run-20250815-161542-verify.log
+Started: Fri Aug 15 16:15:42 MDT 2025
+
+[1;33m1. Discovering application URLs...[0m
+WARNING: The behavior of this command has been altered by the following extension: containerapp
+WARNING: The behavior of this command has been altered by the following extension: containerapp
+API URL: https://api-aaa-demo.bravewater-3d70a706.canadacentral.azurecontainerapps.io
+Web URL: https://web-aaa-demo.bravewater-3d70a706.canadacentral.azurecontainerapps.io
+[1;33m2. Testing basic endpoints...[0m
+Testing API health...
+[0;32m✓ API health: {"status":"ok"}[0m
+Testing API docs...
+[0;32m✓ API docs: HTTP 200[0m
+[1;33m3. Testing CORS preflight...[0m
+Testing CORS preflight to POST /presets/upload...
+CORS preflight response headers (first 40 lines):
+HTTP/2 200 
+date: Fri, 15 Aug 2025 22:15:47 GMT
+server: uvicorn
+vary: Origin
+access-control-allow-methods: DELETE, GET, HEAD, OPTIONS, PATCH, POST, PUT
+access-control-max-age: 600
+access-control-allow-credentials: true
+access-control-allow-origin: https://web-aaa-demo.bravewater-3d70a706.canadacentral.azurecontainerapps.io
+access-control-allow-headers: X-User-Email,X-Engagement-ID,Content-Type
+content-length: 2
+content-type: text/plain; charset=utf-8
+
+OK
+[0;32m✓ CORS preflight passed[0m
+[1;33m4. Testing preset upload via web proxy...[0m
+Uploading imports/preset_cscm_v3.json via web app proxy...
+Upload response: HTTP 200
+Response body: {"id":"cscm-v3","name":"Cyber Security Capability Model v3","version":"3.0"}
+[0;32m✓ Preset upload successful (HTTP 200)[0m
+[1;33m5. Creating test engagement via web proxy...[0m
+[0;32m✓ Engagement created: 1b9275d4-eaea-42a7-a6f0-ce3f6c0ee6c4[0m
+[1;33m6. Adding self as engagement lead via web proxy...[0m
+[1;33m⚠ Failed to add as lead (HTTP 422) - continuing[0m
+[1;33m7. Creating CSCM v3 assessment via web proxy...[0m
+[0;31m✗ Assessment creation failed (HTTP 422): {"detail":[{"type":"missing","loc":["header","X-Engagement-ID"],"msg":"Field required","input":null}]}[0m
