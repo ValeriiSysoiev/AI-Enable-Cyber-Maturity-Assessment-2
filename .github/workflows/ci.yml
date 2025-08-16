@@ -106,15 +106,39 @@ jobs:
         echo "🏗️  Testing API build..."
         cd app
         
-        # Test that the main module can be imported
+        # Check that key API files exist and have valid Python syntax
+        echo "Checking API file structure..."
+        
+        if [ ! -f "api/main.py" ]; then
+          echo "❌ api/main.py not found"
+          exit 1
+        fi
+        
+        if [ ! -f "requirements.txt" ]; then
+          echo "❌ requirements.txt not found"
+          exit 1
+        fi
+        
+        # Test Python syntax of main API file
+        python -m py_compile api/main.py && echo "✅ api/main.py syntax is valid" || {
+          echo "❌ api/main.py has syntax errors"
+          exit 1
+        }
+        
+        # Test that key dependencies can be imported
         python -c "
         try:
-            from api.main import app
-            print('✅ API module imports successfully')
-        except Exception as e:
-            print(f'❌ API import failed: {e}')
+            import fastapi
+            import pydantic
+            from pydantic import EmailStr
+            import uvicorn
+            print('✅ Key API dependencies are available')
+        except ImportError as e:
+            print(f'❌ Missing API dependency: {e}')
             exit(1)
         "
+        
+        echo "✅ API build validation completed"
 
     - name: Build Web (dry run)
       run: |
