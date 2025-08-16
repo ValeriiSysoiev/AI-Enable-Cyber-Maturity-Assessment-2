@@ -1,0 +1,1140 @@
+[1;33m=== Live Release Pipeline ===[0m
+Subscription: 10233675-d493-4a97-9c81-4001e353a7bb
+Resource Group: rg-aaa-demo
+ACR: acraaademo9lyu53
+Log file: logs/reports/run-20250815-171037-release.log
+
+[1;33m1. Setting subscription context...[0m
+Git SHA: 8064b777
+Build Time: 2025-08-15T23:10:38Z
+App Version: 0.2.0
+WARNING: The behavior of this command has been altered by the following extension: containerapp
+WARNING: The behavior of this command has been altered by the following extension: containerapp
+API URL: https://api-aaa-demo.bravewater-3d70a706.canadacentral.azurecontainerapps.io
+Web URL: https://web-aaa-demo.bravewater-3d70a706.canadacentral.azurecontainerapps.io
+[1;33m2. Building and pushing API image...[0m
+Building API image: ai-maturity-api:v202508151710-8064b777
+WARNING: Packing source code into tar to upload...
+WARNING: Uploading archived source code from '/var/folders/zf/6z4j2b5x3hbcj3ntw022m4mr0000gn/T/build_archive_ceef65f04e3846c0a775f6e0d98e73d9.tar.gz'...
+WARNING: Sending context (139.089 KiB) to registry: acraaademo9lyu53...
+WARNING: Queued a build with ID: cx2m
+WARNING: Waiting for an agent...
+2025/08/15 23:10:46 Downloading source code...
+2025/08/15 23:10:47 Finished downloading source code
+2025/08/15 23:10:47 Using acb_vol_97510f05-0b59-4b3f-8ca3-396b5fce27ca as the home volume
+2025/08/15 23:10:47 Setting up Docker configuration...
+2025/08/15 23:10:48 Successfully set up Docker configuration
+2025/08/15 23:10:48 Logging in to registry: acraaademo9lyu53.azurecr.io
+2025/08/15 23:10:49 Successfully logged into acraaademo9lyu53.azurecr.io
+2025/08/15 23:10:49 Executing step ID: build. Timeout(sec): 28800, Working directory: '', Network: ''
+2025/08/15 23:10:49 Scanning for dependencies...
+2025/08/15 23:10:49 Successfully scanned dependencies
+2025/08/15 23:10:49 Launching container with name: build
+Sending build context to Docker daemon  585.2kB
+Step 1/12 : FROM python:3.11-slim
+3.11-slim: Pulling from library/python
+396b1da7636e: Pulling fs layer
+fcec5a125fd8: Pulling fs layer
+a27cb4be7017: Pulling fs layer
+1961ca026b04: Pulling fs layer
+1961ca026b04: Waiting
+fcec5a125fd8: Download complete
+a27cb4be7017: Verifying Checksum
+a27cb4be7017: Download complete
+396b1da7636e: Download complete
+1961ca026b04: Verifying Checksum
+1961ca026b04: Download complete
+396b1da7636e: Pull complete
+fcec5a125fd8: Pull complete
+a27cb4be7017: Pull complete
+1961ca026b04: Pull complete
+Digest: sha256:9e885f8239c31f8429448f933638dd13037c9119e2a362aeebdd37ec3bee7c85
+Status: Downloaded newer image for python:3.11-slim
+ ---> 2ba2e944f9cd
+Step 2/12 : ARG GIT_SHA=unknown
+ ---> Running in 2675fc7f854e
+Removing intermediate container 2675fc7f854e
+ ---> 821045233828
+Step 3/12 : ARG BUILD_TIME=unknown
+ ---> Running in 60864880aeb8
+Removing intermediate container 60864880aeb8
+ ---> d66daaabe1bf
+Step 4/12 : ARG APP_VERSION=0.1.0
+ ---> Running in 98fef78bfa31
+Removing intermediate container 98fef78bfa31
+ ---> f04c1ede0b52
+Step 5/12 : WORKDIR /workdir
+ ---> Running in a1fe1e3d952d
+Removing intermediate container a1fe1e3d952d
+ ---> 88fa3513cdd0
+Step 6/12 : ENV PYTHONDONTWRITEBYTECODE=1     PYTHONUNBUFFERED=1     PYTHONPATH=/workdir     GIT_SHA=${GIT_SHA}     BUILD_TIME=${BUILD_TIME}     APP_VERSION=${APP_VERSION}
+ ---> Running in 812f543a12cb
+Removing intermediate container 812f543a12cb
+ ---> 357bc788ad5d
+Step 7/12 : COPY requirements.txt .
+ ---> cdcd5be19bdd
+Step 8/12 : RUN pip install --no-cache-dir -r requirements.txt
+ ---> Running in 6223ca2790b3
+Collecting fastapi>=0.115 (from -r requirements.txt (line 1))
+  Downloading fastapi-0.116.1-py3-none-any.whl.metadata (28 kB)
+Collecting uvicorn>=0.30 (from uvicorn[standard]>=0.30->-r requirements.txt (line 2))
+  Downloading uvicorn-0.35.0-py3-none-any.whl.metadata (6.5 kB)
+Collecting sqlmodel>=0.0.16 (from -r requirements.txt (line 3))
+  Downloading sqlmodel-0.0.24-py3-none-any.whl.metadata (10 kB)
+Collecting pydantic>=2.7 (from pydantic[email]>=2.7->-r requirements.txt (line 4))
+  Downloading pydantic-2.11.7-py3-none-any.whl.metadata (67 kB)
+     ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 68.0/68.0 kB 17.9 MB/s eta 0:00:00
+Collecting python-multipart>=0.0.6 (from -r requirements.txt (line 5))
+  Downloading python_multipart-0.0.20-py3-none-any.whl.metadata (1.8 kB)
+Collecting azure-storage-blob>=12.19 (from -r requirements.txt (line 6))
+  Downloading azure_storage_blob-12.26.0-py3-none-any.whl.metadata (26 kB)
+Collecting azure-identity>=1.17 (from -r requirements.txt (line 7))
+  Downloading azure_identity-1.24.0-py3-none-any.whl.metadata (86 kB)
+     ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 86.0/86.0 kB 388.8 MB/s eta 0:00:00
+Collecting azure-cosmos>=4.5.0 (from -r requirements.txt (line 8))
+  Downloading azure_cosmos-4.9.0-py3-none-any.whl.metadata (80 kB)
+     ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 80.8/80.8 kB 393.3 MB/s eta 0:00:00
+Collecting python-dotenv>=1.0 (from -r requirements.txt (line 9))
+  Downloading python_dotenv-1.1.1-py3-none-any.whl.metadata (24 kB)
+Collecting openai<2.0.0,>=1.30.0 (from -r requirements.txt (line 10))
+  Downloading openai-1.99.9-py3-none-any.whl.metadata (29 kB)
+Collecting pypdf>=4.2.0 (from -r requirements.txt (line 11))
+  Downloading pypdf-6.0.0-py3-none-any.whl.metadata (7.1 kB)
+Collecting python-docx>=1.1.2 (from -r requirements.txt (line 12))
+  Downloading python_docx-1.2.0-py3-none-any.whl.metadata (2.0 kB)
+Collecting requests (from -r requirements.txt (line 14))
+  Downloading requests-2.32.4-py3-none-any.whl.metadata (4.9 kB)
+Collecting python-jose[cryptography] (from -r requirements.txt (line 13))
+  Downloading python_jose-3.5.0-py2.py3-none-any.whl.metadata (5.5 kB)
+Collecting starlette<0.48.0,>=0.40.0 (from fastapi>=0.115->-r requirements.txt (line 1))
+  Downloading starlette-0.47.2-py3-none-any.whl.metadata (6.2 kB)
+Collecting typing-extensions>=4.8.0 (from fastapi>=0.115->-r requirements.txt (line 1))
+  Downloading typing_extensions-4.14.1-py3-none-any.whl.metadata (3.0 kB)
+Collecting click>=7.0 (from uvicorn>=0.30->uvicorn[standard]>=0.30->-r requirements.txt (line 2))
+  Downloading click-8.2.1-py3-none-any.whl.metadata (2.5 kB)
+Collecting h11>=0.8 (from uvicorn>=0.30->uvicorn[standard]>=0.30->-r requirements.txt (line 2))
+  Downloading h11-0.16.0-py3-none-any.whl.metadata (8.3 kB)
+Collecting SQLAlchemy<2.1.0,>=2.0.14 (from sqlmodel>=0.0.16->-r requirements.txt (line 3))
+  Downloading sqlalchemy-2.0.43-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata (9.6 kB)
+Collecting annotated-types>=0.6.0 (from pydantic>=2.7->pydantic[email]>=2.7->-r requirements.txt (line 4))
+  Downloading annotated_types-0.7.0-py3-none-any.whl.metadata (15 kB)
+Collecting pydantic-core==2.33.2 (from pydantic>=2.7->pydantic[email]>=2.7->-r requirements.txt (line 4))
+  Downloading pydantic_core-2.33.2-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata (6.8 kB)
+Collecting typing-inspection>=0.4.0 (from pydantic>=2.7->pydantic[email]>=2.7->-r requirements.txt (line 4))
+  Downloading typing_inspection-0.4.1-py3-none-any.whl.metadata (2.6 kB)
+Collecting azure-core>=1.30.0 (from azure-storage-blob>=12.19->-r requirements.txt (line 6))
+  Downloading azure_core-1.35.0-py3-none-any.whl.metadata (44 kB)
+     ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 44.4/44.4 kB 297.3 MB/s eta 0:00:00
+Collecting cryptography>=2.1.4 (from azure-storage-blob>=12.19->-r requirements.txt (line 6))
+  Downloading cryptography-45.0.6-cp311-abi3-manylinux_2_34_x86_64.whl.metadata (5.7 kB)
+Collecting isodate>=0.6.1 (from azure-storage-blob>=12.19->-r requirements.txt (line 6))
+  Downloading isodate-0.7.2-py3-none-any.whl.metadata (11 kB)
+Collecting msal>=1.30.0 (from azure-identity>=1.17->-r requirements.txt (line 7))
+  Downloading msal-1.33.0-py3-none-any.whl.metadata (11 kB)
+Collecting msal-extensions>=1.2.0 (from azure-identity>=1.17->-r requirements.txt (line 7))
+  Downloading msal_extensions-1.3.1-py3-none-any.whl.metadata (7.8 kB)
+Collecting anyio<5,>=3.5.0 (from openai<2.0.0,>=1.30.0->-r requirements.txt (line 10))
+  Downloading anyio-4.10.0-py3-none-any.whl.metadata (4.0 kB)
+Collecting distro<2,>=1.7.0 (from openai<2.0.0,>=1.30.0->-r requirements.txt (line 10))
+  Downloading distro-1.9.0-py3-none-any.whl.metadata (6.8 kB)
+Collecting httpx<1,>=0.23.0 (from openai<2.0.0,>=1.30.0->-r requirements.txt (line 10))
+  Downloading httpx-0.28.1-py3-none-any.whl.metadata (7.1 kB)
+Collecting jiter<1,>=0.4.0 (from openai<2.0.0,>=1.30.0->-r requirements.txt (line 10))
+  Downloading jiter-0.10.0-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata (5.2 kB)
+Collecting sniffio (from openai<2.0.0,>=1.30.0->-r requirements.txt (line 10))
+  Downloading sniffio-1.3.1-py3-none-any.whl.metadata (3.9 kB)
+Collecting tqdm>4 (from openai<2.0.0,>=1.30.0->-r requirements.txt (line 10))
+  Downloading tqdm-4.67.1-py3-none-any.whl.metadata (57 kB)
+     ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 57.7/57.7 kB 330.9 MB/s eta 0:00:00
+Collecting lxml>=3.1.0 (from python-docx>=1.1.2->-r requirements.txt (line 12))
+  Downloading lxml-6.0.0-cp311-cp311-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl.metadata (6.6 kB)
+Collecting ecdsa!=0.15 (from python-jose[cryptography]->-r requirements.txt (line 13))
+  Downloading ecdsa-0.19.1-py2.py3-none-any.whl.metadata (29 kB)
+Collecting rsa!=4.1.1,!=4.4,<5.0,>=4.0 (from python-jose[cryptography]->-r requirements.txt (line 13))
+  Downloading rsa-4.9.1-py3-none-any.whl.metadata (5.6 kB)
+Collecting pyasn1>=0.5.0 (from python-jose[cryptography]->-r requirements.txt (line 13))
+  Downloading pyasn1-0.6.1-py3-none-any.whl.metadata (8.4 kB)
+Collecting charset_normalizer<4,>=2 (from requests->-r requirements.txt (line 14))
+  Downloading charset_normalizer-3.4.3-cp311-cp311-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl.metadata (36 kB)
+Collecting idna<4,>=2.5 (from requests->-r requirements.txt (line 14))
+  Downloading idna-3.10-py3-none-any.whl.metadata (10 kB)
+Collecting urllib3<3,>=1.21.1 (from requests->-r requirements.txt (line 14))
+  Downloading urllib3-2.5.0-py3-none-any.whl.metadata (6.5 kB)
+Collecting certifi>=2017.4.17 (from requests->-r requirements.txt (line 14))
+  Downloading certifi-2025.8.3-py3-none-any.whl.metadata (2.4 kB)
+Collecting email-validator>=2.0.0 (from pydantic[email]>=2.7->-r requirements.txt (line 4))
+  Downloading email_validator-2.2.0-py3-none-any.whl.metadata (25 kB)
+Collecting httptools>=0.6.3 (from uvicorn[standard]>=0.30->-r requirements.txt (line 2))
+  Downloading httptools-0.6.4-cp311-cp311-manylinux_2_5_x86_64.manylinux1_x86_64.manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata (3.6 kB)
+Collecting pyyaml>=5.1 (from uvicorn[standard]>=0.30->-r requirements.txt (line 2))
+  Downloading PyYAML-6.0.2-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata (2.1 kB)
+Collecting uvloop>=0.15.1 (from uvicorn[standard]>=0.30->-r requirements.txt (line 2))
+  Downloading uvloop-0.21.0-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata (4.9 kB)
+Collecting watchfiles>=0.13 (from uvicorn[standard]>=0.30->-r requirements.txt (line 2))
+  Downloading watchfiles-1.1.0-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata (4.9 kB)
+Collecting websockets>=10.4 (from uvicorn[standard]>=0.30->-r requirements.txt (line 2))
+  Downloading websockets-15.0.1-cp311-cp311-manylinux_2_5_x86_64.manylinux1_x86_64.manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata (6.8 kB)
+Collecting six>=1.11.0 (from azure-core>=1.30.0->azure-storage-blob>=12.19->-r requirements.txt (line 6))
+  Downloading six-1.17.0-py2.py3-none-any.whl.metadata (1.7 kB)
+Collecting cffi>=1.14 (from cryptography>=2.1.4->azure-storage-blob>=12.19->-r requirements.txt (line 6))
+  Downloading cffi-1.17.1-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata (1.5 kB)
+Collecting dnspython>=2.0.0 (from email-validator>=2.0.0->pydantic[email]>=2.7->-r requirements.txt (line 4))
+  Downloading dnspython-2.7.0-py3-none-any.whl.metadata (5.8 kB)
+Collecting httpcore==1.* (from httpx<1,>=0.23.0->openai<2.0.0,>=1.30.0->-r requirements.txt (line 10))
+  Downloading httpcore-1.0.9-py3-none-any.whl.metadata (21 kB)
+Collecting PyJWT<3,>=1.0.0 (from PyJWT[crypto]<3,>=1.0.0->msal>=1.30.0->azure-identity>=1.17->-r requirements.txt (line 7))
+  Downloading PyJWT-2.10.1-py3-none-any.whl.metadata (4.0 kB)
+Collecting greenlet>=1 (from SQLAlchemy<2.1.0,>=2.0.14->sqlmodel>=0.0.16->-r requirements.txt (line 3))
+  Downloading greenlet-3.2.4-cp311-cp311-manylinux_2_24_x86_64.manylinux_2_28_x86_64.whl.metadata (4.1 kB)
+Collecting pycparser (from cffi>=1.14->cryptography>=2.1.4->azure-storage-blob>=12.19->-r requirements.txt (line 6))
+  Downloading pycparser-2.22-py3-none-any.whl.metadata (943 bytes)
+Downloading fastapi-0.116.1-py3-none-any.whl (95 kB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 95.6/95.6 kB 261.6 MB/s eta 0:00:00
+Downloading uvicorn-0.35.0-py3-none-any.whl (66 kB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 66.4/66.4 kB 361.3 MB/s eta 0:00:00
+Downloading sqlmodel-0.0.24-py3-none-any.whl (28 kB)
+Downloading pydantic-2.11.7-py3-none-any.whl (444 kB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 444.8/444.8 kB 101.5 MB/s eta 0:00:00
+Downloading pydantic_core-2.33.2-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (2.0 MB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 2.0/2.0 MB 268.5 MB/s eta 0:00:00
+Downloading python_multipart-0.0.20-py3-none-any.whl (24 kB)
+Downloading azure_storage_blob-12.26.0-py3-none-any.whl (412 kB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 412.9/412.9 kB 402.7 MB/s eta 0:00:00
+Downloading azure_identity-1.24.0-py3-none-any.whl (187 kB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 187.9/187.9 kB 429.5 MB/s eta 0:00:00
+Downloading azure_cosmos-4.9.0-py3-none-any.whl (303 kB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 303.2/303.2 kB 357.6 MB/s eta 0:00:00
+Downloading python_dotenv-1.1.1-py3-none-any.whl (20 kB)
+Downloading openai-1.99.9-py3-none-any.whl (786 kB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 786.8/786.8 kB 303.6 MB/s eta 0:00:00
+Downloading pypdf-6.0.0-py3-none-any.whl (310 kB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 310.5/310.5 kB 402.9 MB/s eta 0:00:00
+Downloading python_docx-1.2.0-py3-none-any.whl (252 kB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 253.0/253.0 kB 76.9 MB/s eta 0:00:00
+Downloading requests-2.32.4-py3-none-any.whl (64 kB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 64.8/64.8 kB 372.4 MB/s eta 0:00:00
+Downloading annotated_types-0.7.0-py3-none-any.whl (13 kB)
+Downloading anyio-4.10.0-py3-none-any.whl (107 kB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 107.2/107.2 kB 381.0 MB/s eta 0:00:00
+Downloading azure_core-1.35.0-py3-none-any.whl (210 kB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 210.7/210.7 kB 414.8 MB/s eta 0:00:00
+Downloading certifi-2025.8.3-py3-none-any.whl (161 kB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 161.2/161.2 kB 416.6 MB/s eta 0:00:00
+Downloading charset_normalizer-3.4.3-cp311-cp311-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl (150 kB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 150.3/150.3 kB 272.4 MB/s eta 0:00:00
+Downloading click-8.2.1-py3-none-any.whl (102 kB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 102.2/102.2 kB 284.1 MB/s eta 0:00:00
+Downloading cryptography-45.0.6-cp311-abi3-manylinux_2_34_x86_64.whl (4.5 MB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 4.5/4.5 MB 243.6 MB/s eta 0:00:00
+Downloading distro-1.9.0-py3-none-any.whl (20 kB)
+Downloading ecdsa-0.19.1-py2.py3-none-any.whl (150 kB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 150.6/150.6 kB 327.5 MB/s eta 0:00:00
+Downloading email_validator-2.2.0-py3-none-any.whl (33 kB)
+Downloading h11-0.16.0-py3-none-any.whl (37 kB)
+Downloading httptools-0.6.4-cp311-cp311-manylinux_2_5_x86_64.manylinux1_x86_64.manylinux_2_17_x86_64.manylinux2014_x86_64.whl (459 kB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 459.8/459.8 kB 399.7 MB/s eta 0:00:00
+Downloading httpx-0.28.1-py3-none-any.whl (73 kB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 73.5/73.5 kB 333.9 MB/s eta 0:00:00
+Downloading httpcore-1.0.9-py3-none-any.whl (78 kB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 78.8/78.8 kB 371.6 MB/s eta 0:00:00
+Downloading idna-3.10-py3-none-any.whl (70 kB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 70.4/70.4 kB 339.6 MB/s eta 0:00:00
+Downloading isodate-0.7.2-py3-none-any.whl (22 kB)
+Downloading jiter-0.10.0-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (352 kB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 352.2/352.2 kB 330.2 MB/s eta 0:00:00
+Downloading lxml-6.0.0-cp311-cp311-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl (5.2 MB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 5.2/5.2 MB 364.7 MB/s eta 0:00:00
+Downloading msal-1.33.0-py3-none-any.whl (116 kB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 116.9/116.9 kB 349.5 MB/s eta 0:00:00
+Downloading msal_extensions-1.3.1-py3-none-any.whl (20 kB)
+Downloading pyasn1-0.6.1-py3-none-any.whl (83 kB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 83.1/83.1 kB 333.9 MB/s eta 0:00:00
+Downloading PyYAML-6.0.2-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (762 kB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 763.0/763.0 kB 429.5 MB/s eta 0:00:00
+Downloading rsa-4.9.1-py3-none-any.whl (34 kB)
+Downloading sniffio-1.3.1-py3-none-any.whl (10 kB)
+Downloading sqlalchemy-2.0.43-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (3.3 MB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 3.3/3.3 MB 222.6 MB/s eta 0:00:00
+Downloading starlette-0.47.2-py3-none-any.whl (72 kB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 73.0/73.0 kB 242.2 MB/s eta 0:00:00
+Downloading tqdm-4.67.1-py3-none-any.whl (78 kB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 78.5/78.5 kB 321.8 MB/s eta 0:00:00
+Downloading typing_extensions-4.14.1-py3-none-any.whl (43 kB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 43.9/43.9 kB 331.8 MB/s eta 0:00:00
+Downloading typing_inspection-0.4.1-py3-none-any.whl (14 kB)
+Downloading urllib3-2.5.0-py3-none-any.whl (129 kB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 129.8/129.8 kB 295.7 MB/s eta 0:00:00
+Downloading uvloop-0.21.0-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (4.0 MB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 4.0/4.0 MB 255.3 MB/s eta 0:00:00
+Downloading watchfiles-1.1.0-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (453 kB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 453.1/453.1 kB 454.4 MB/s eta 0:00:00
+Downloading websockets-15.0.1-cp311-cp311-manylinux_2_5_x86_64.manylinux1_x86_64.manylinux_2_17_x86_64.manylinux2014_x86_64.whl (182 kB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 182.3/182.3 kB 361.4 MB/s eta 0:00:00
+Downloading python_jose-3.5.0-py2.py3-none-any.whl (34 kB)
+Downloading cffi-1.17.1-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (467 kB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 467.2/467.2 kB 443.8 MB/s eta 0:00:00
+Downloading dnspython-2.7.0-py3-none-any.whl (313 kB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 313.6/313.6 kB 276.8 MB/s eta 0:00:00
+Downloading greenlet-3.2.4-cp311-cp311-manylinux_2_24_x86_64.manylinux_2_28_x86_64.whl (587 kB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 587.7/587.7 kB 484.9 MB/s eta 0:00:00
+Downloading PyJWT-2.10.1-py3-none-any.whl (22 kB)
+Downloading six-1.17.0-py2.py3-none-any.whl (11 kB)
+Downloading pycparser-2.22-py3-none-any.whl (117 kB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 117.6/117.6 kB 342.0 MB/s eta 0:00:00
+Installing collected packages: websockets, uvloop, urllib3, typing-extensions, tqdm, sniffio, six, pyyaml, python-multipart, python-dotenv, pypdf, PyJWT, pycparser, pyasn1, lxml, jiter, isodate, idna, httptools, h11, greenlet, dnspython, distro, click, charset_normalizer, certifi, annotated-types, uvicorn, typing-inspection, SQLAlchemy, rsa, requests, python-docx, pydantic-core, httpcore, email-validator, ecdsa, cffi, anyio, watchfiles, starlette, python-jose, pydantic, httpx, cryptography, azure-core, sqlmodel, openai, fastapi, azure-storage-blob, azure-cosmos, msal, msal-extensions, azure-identity
+Successfully installed PyJWT-2.10.1 SQLAlchemy-2.0.43 annotated-types-0.7.0 anyio-4.10.0 azure-core-1.35.0 azure-cosmos-4.9.0 azure-identity-1.24.0 azure-storage-blob-12.26.0 certifi-2025.8.3 cffi-1.17.1 charset_normalizer-3.4.3 click-8.2.1 cryptography-45.0.6 distro-1.9.0 dnspython-2.7.0 ecdsa-0.19.1 email-validator-2.2.0 fastapi-0.116.1 greenlet-3.2.4 h11-0.16.0 httpcore-1.0.9 httptools-0.6.4 httpx-0.28.1 idna-3.10 isodate-0.7.2 jiter-0.10.0 lxml-6.0.0 msal-1.33.0 msal-extensions-1.3.1 openai-1.99.9 pyasn1-0.6.1 pycparser-2.22 pydantic-2.11.7 pydantic-core-2.33.2 pypdf-6.0.0 python-docx-1.2.0 python-dotenv-1.1.1 python-jose-3.5.0 python-multipart-0.0.20 pyyaml-6.0.2 requests-2.32.4 rsa-4.9.1 six-1.17.0 sniffio-1.3.1 sqlmodel-0.0.24 starlette-0.47.2 tqdm-4.67.1 typing-extensions-4.14.1 typing-inspection-0.4.1 urllib3-2.5.0 uvicorn-0.35.0 uvloop-0.21.0 watchfiles-1.1.0 websockets-15.0.1
+WARNING: Running pip as the 'root' user can result in broken permissions and conflicting behaviour with the system package manager. It is recommended to use a virtual environment instead: https://pip.pypa.io/warnings/venv
+
+[notice] A new release of pip is available: 24.0 -> 25.2
+[notice] To update, run: pip install --upgrade pip
+Removing intermediate container 6223ca2790b3
+ ---> d3d10aedc025
+Step 9/12 : COPY . ./app/
+ ---> 8976fdee452a
+Step 10/12 : RUN mkdir -p data/presets data/engagements
+ ---> Running in e88fd3f3bc46
+Removing intermediate container e88fd3f3bc46
+ ---> 319a16065cef
+Step 11/12 : EXPOSE 8000
+ ---> Running in 9afe17d29c48
+Removing intermediate container 9afe17d29c48
+ ---> 4c7224c49878
+Step 12/12 : CMD ["python", "-m", "uvicorn", "app.api.main:app", "--host", "0.0.0.0", "--port", "8000"]
+ ---> Running in e372ddcb89b6
+Removing intermediate container e372ddcb89b6
+ ---> f6cddcffbbf1
+Successfully built f6cddcffbbf1
+Successfully tagged acraaademo9lyu53.azurecr.io/ai-maturity-api:v202508151710-8064b777
+Successfully tagged acraaademo9lyu53.azurecr.io/ai-maturity-api:latest
+2025/08/15 23:11:21 Successfully executed container: build
+2025/08/15 23:11:21 Executing step ID: push. Timeout(sec): 3600, Working directory: '', Network: ''
+2025/08/15 23:11:21 Pushing image: acraaademo9lyu53.azurecr.io/ai-maturity-api:v202508151710-8064b777, attempt 1
+The push refers to repository [acraaademo9lyu53.azurecr.io/ai-maturity-api]
+671d138894c0: Preparing
+8d30e9b4f852: Preparing
+4072b53d4bc5: Preparing
+7f769f07e640: Preparing
+453429b9d4b1: Preparing
+41a3f3e0352a: Preparing
+027e5044d8c1: Preparing
+a0f52cec0ae9: Preparing
+e6a3842ebc7f: Preparing
+41a3f3e0352a: Waiting
+027e5044d8c1: Waiting
+a0f52cec0ae9: Waiting
+e6a3842ebc7f: Waiting
+7f769f07e640: Pushed
+453429b9d4b1: Pushed
+41a3f3e0352a: Layer already exists
+671d138894c0: Pushed
+027e5044d8c1: Layer already exists
+a0f52cec0ae9: Layer already exists
+e6a3842ebc7f: Pushed
+8d30e9b4f852: Pushed
+4072b53d4bc5: Pushed
+v202508151710-8064b777: digest: sha256:3e8047830044b827eeefca5b74d66cec2ec5d028471ec1d90ae2e7337372466a size: 2201
+2025/08/15 23:11:32 Successfully pushed image: acraaademo9lyu53.azurecr.io/ai-maturity-api:v202508151710-8064b777
+2025/08/15 23:11:32 Pushing image: acraaademo9lyu53.azurecr.io/ai-maturity-api:latest, attempt 1
+The push refers to repository [acraaademo9lyu53.azurecr.io/ai-maturity-api]
+671d138894c0: Preparing
+8d30e9b4f852: Preparing
+4072b53d4bc5: Preparing
+7f769f07e640: Preparing
+453429b9d4b1: Preparing
+41a3f3e0352a: Preparing
+027e5044d8c1: Preparing
+a0f52cec0ae9: Preparing
+e6a3842ebc7f: Preparing
+41a3f3e0352a: Waiting
+027e5044d8c1: Waiting
+a0f52cec0ae9: Waiting
+e6a3842ebc7f: Waiting
+671d138894c0: Layer already exists
+4072b53d4bc5: Layer already exists
+8d30e9b4f852: Layer already exists
+7f769f07e640: Layer already exists
+453429b9d4b1: Layer already exists
+027e5044d8c1: Layer already exists
+41a3f3e0352a: Layer already exists
+e6a3842ebc7f: Layer already exists
+a0f52cec0ae9: Layer already exists
+latest: digest: sha256:3e8047830044b827eeefca5b74d66cec2ec5d028471ec1d90ae2e7337372466a size: 2201
+2025/08/15 23:11:33 Successfully pushed image: acraaademo9lyu53.azurecr.io/ai-maturity-api:latest
+2025/08/15 23:11:33 Step ID: build marked as successful (elapsed time in seconds: 32.058335)
+2025/08/15 23:11:33 Populating digests for step ID: build...
+2025/08/15 23:11:35 Successfully populated digests for step ID: build
+2025/08/15 23:11:35 Step ID: push marked as successful (elapsed time in seconds: 12.256616)
+2025/08/15 23:11:35 The following dependencies were found:
+2025/08/15 23:11:35 
+- image:
+    registry: acraaademo9lyu53.azurecr.io
+    repository: ai-maturity-api
+    tag: v202508151710-8064b777
+    digest: sha256:3e8047830044b827eeefca5b74d66cec2ec5d028471ec1d90ae2e7337372466a
+  runtime-dependency:
+    registry: registry.hub.docker.com
+    repository: library/python
+    tag: 3.11-slim
+    digest: sha256:9e885f8239c31f8429448f933638dd13037c9119e2a362aeebdd37ec3bee7c85
+  git: {}
+- image:
+    registry: acraaademo9lyu53.azurecr.io
+    repository: ai-maturity-api
+    tag: latest
+    digest: sha256:3e8047830044b827eeefca5b74d66cec2ec5d028471ec1d90ae2e7337372466a
+  runtime-dependency:
+    registry: registry.hub.docker.com
+    repository: library/python
+    tag: 3.11-slim
+    digest: sha256:9e885f8239c31f8429448f933638dd13037c9119e2a362aeebdd37ec3bee7c85
+  git: {}
+
+
+Run ID: cx2m was successful after 49s
+[0;32m✓ API image built: acraaademo9lyu53.azurecr.io/ai-maturity-api:v202508151710-8064b777[0m
+[1;33m3. Building and pushing Web image...[0m
+Building Web image: ai-maturity-web:v202508151711-8064b777
+WARNING: Packing source code into tar to upload...
+WARNING: Uploading archived source code from '/var/folders/zf/6z4j2b5x3hbcj3ntw022m4mr0000gn/T/build_archive_60e4a4d8e21b44eea2afb268b952636d.tar.gz'...
+WARNING: Sending context (94.024 MiB) to registry: acraaademo9lyu53...
+WARNING: Queued a build with ID: cx2n
+WARNING: Waiting for an agent...
+2025/08/15 23:12:33 Downloading source code...
+2025/08/15 23:12:38 Finished downloading source code
+2025/08/15 23:12:38 Using acb_vol_95df03f1-b7f1-417f-8f2c-a58425baacc0 as the home volume
+2025/08/15 23:12:38 Setting up Docker configuration...
+2025/08/15 23:12:39 Successfully set up Docker configuration
+2025/08/15 23:12:39 Logging in to registry: acraaademo9lyu53.azurecr.io
+2025/08/15 23:12:40 Successfully logged into acraaademo9lyu53.azurecr.io
+2025/08/15 23:12:40 Executing step ID: build. Timeout(sec): 28800, Working directory: '', Network: ''
+2025/08/15 23:12:40 Scanning for dependencies...
+2025/08/15 23:12:40 Successfully scanned dependencies
+2025/08/15 23:12:40 Launching container with name: build
+Sending build context to Docker daemon  434.7kB
+Step 1/26 : FROM node:20-alpine AS builder
+20-alpine: Pulling from library/node
+9824c27679d3: Pulling fs layer
+8c59d92d6fc9: Pulling fs layer
+54225bd60196: Pulling fs layer
+a9e48ad1219d: Pulling fs layer
+a9e48ad1219d: Waiting
+54225bd60196: Verifying Checksum
+54225bd60196: Download complete
+9824c27679d3: Verifying Checksum
+9824c27679d3: Download complete
+9824c27679d3: Pull complete
+a9e48ad1219d: Verifying Checksum
+a9e48ad1219d: Download complete
+8c59d92d6fc9: Verifying Checksum
+8c59d92d6fc9: Download complete
+8c59d92d6fc9: Pull complete
+54225bd60196: Pull complete
+a9e48ad1219d: Pull complete
+Digest: sha256:df02558528d3d3d0d621f112e232611aecfee7cbc654f6b375765f72bb262799
+Status: Downloaded newer image for node:20-alpine
+ ---> 7cdef5a33192
+Step 2/26 : WORKDIR /app
+ ---> Running in 6cf9cf96028b
+Removing intermediate container 6cf9cf96028b
+ ---> 7f054b7d5dbd
+Step 3/26 : ARG GIT_SHA=unknown
+ ---> Running in a0074ad325f3
+Removing intermediate container a0074ad325f3
+ ---> 7cc00ae6e73a
+Step 4/26 : ARG BUILD_TIME=unknown
+ ---> Running in 3e29420a5779
+Removing intermediate container 3e29420a5779
+ ---> 66e75887c77c
+Step 5/26 : ARG APP_VERSION=0.1.0
+ ---> Running in 668df77a25df
+Removing intermediate container 668df77a25df
+ ---> d3e6e4439bf8
+Step 6/26 : ARG NEXT_PUBLIC_API_BASE_URL=""
+ ---> Running in d274ca453fff
+Removing intermediate container d274ca453fff
+ ---> 989eb8770853
+Step 7/26 : COPY package.json package-lock.json* pnpm-lock.yaml* yarn.lock* ./
+ ---> 0d58a212cbb5
+Step 8/26 : RUN   if [ -f package-lock.json ]; then npm ci;   elif [ -f pnpm-lock.yaml ]; then npm i -g pnpm && pnpm i --frozen-lockfile;   elif [ -f yarn.lock ]; then yarn install --frozen-lockfile;   else npm i; fi
+ ---> Running in aeb2cbcb3e6d
+npm warn deprecated rimraf@3.0.2: Rimraf versions prior to v4 are no longer supported
+npm warn deprecated inflight@1.0.6: This module is not supported, and leaks memory. Do not use it. Check out lru-cache if you want a good and tested way to coalesce async requests by a key value, which is much more comprehensive and powerful.
+npm warn deprecated eslint@8.57.1: This version is no longer supported. Please see https://eslint.org/version-support for other options.
+npm warn deprecated @humanwhocodes/object-schema@2.0.3: Use @eslint/object-schema instead
+npm warn deprecated @humanwhocodes/config-array@0.13.0: Use @eslint/config-array instead
+npm warn deprecated glob@7.2.3: Glob versions prior to v9 are no longer supported
+
+added 433 packages, and audited 434 packages in 18s
+
+154 packages are looking for funding
+  run `npm fund` for details
+
+2 vulnerabilities (1 low, 1 critical)
+
+To address all issues (including breaking changes), run:
+  npm audit fix --force
+
+Run `npm audit` for details.
+npm notice
+npm notice New major version of npm available! 10.8.2 -> 11.5.2
+npm notice Changelog: https://github.com/npm/cli/releases/tag/v11.5.2
+npm notice To update run: npm install -g npm@11.5.2
+npm notice
+Removing intermediate container aeb2cbcb3e6d
+ ---> 9e42ffd1b25c
+Step 9/26 : ENV NEXT_PUBLIC_API_BASE_URL=$NEXT_PUBLIC_API_BASE_URL     NEXT_PUBLIC_GIT_SHA=$GIT_SHA     NEXT_PUBLIC_BUILD_TIME=$BUILD_TIME     NEXT_PUBLIC_APP_VERSION=$APP_VERSION
+ ---> Running in c03418fa28ff
+Removing intermediate container c03418fa28ff
+ ---> 9af230ffd35f
+Step 10/26 : COPY . .
+ ---> 6fb03ffd91be
+Step 11/26 : RUN mkdir -p public
+ ---> Running in 57f17e994645
+Removing intermediate container 57f17e994645
+ ---> 3709572f241e
+Step 12/26 : RUN npm run build
+ ---> Running in 6817cc96b6d9
+
+> ai-maturity-web@0.1.0 build
+> next build
+
+Attention: Next.js now collects completely anonymous telemetry regarding usage.
+This information is used to shape Next.js' roadmap and prioritize features.
+You can learn more, including how to opt-out if you'd not like to participate in this anonymous program, by visiting the following URL:
+https://nextjs.org/telemetry
+
+  ▲ Next.js 14.2.5
+
+   Creating an optimized production build ...
+
+ ✓ Compiled successfully
+   Linting and checking validity of types ...
+   Collecting page data ...
+   Generating static pages (0/10) ...
+   Generating static pages (2/10) 
+   Generating static pages (4/10) 
+   Generating static pages (7/10) 
+ ✓ Generating static pages (10/10)
+   Finalizing page optimization ...
+   Collecting build traces ...
+
+Route (app)                              Size     First Load JS
+┌ ○ /_not-found                          875 B          88.3 kB
+├ ○ /admin/ops                           2.71 kB        97.8 kB
+├ ○ /admin/presets                       2.75 kB        90.2 kB
+├ ƒ /api/auth/[...nextauth]              0 B                0 B
+├ ƒ /api/proxy/[...path]                 0 B                0 B
+├ ƒ /assessment/[id]                     3.92 kB         186 kB
+├ ○ /assessment/draft                    3.28 kB        90.7 kB
+├ ○ /demo-orchestration                  2.74 kB        90.2 kB
+├ ƒ /e/[engagementId]/assessment/[id]    4.21 kB         186 kB
+├ ƒ /e/[engagementId]/dashboard          2.27 kB        97.4 kB
+├ ƒ /e/[engagementId]/demo               5.83 kB        93.3 kB
+├ ƒ /e/[engagementId]/new                4.09 kB        91.5 kB
+├ ○ /engagements                         2.89 kB        90.3 kB
+├ ○ /new                                 513 B            88 kB
+└ ○ /signin                              3.4 kB         90.8 kB
++ First Load JS shared by all            87.4 kB
+  ├ chunks/23-54fad2e341676bae.js        31.7 kB
+  ├ chunks/fd9d1056-6c516fe82b5bca75.js  53.6 kB
+  └ other shared chunks (total)          2.12 kB
+
+
+ƒ Middleware                             79.6 kB
+
+○  (Static)   prerendered as static content
+ƒ  (Dynamic)  server-rendered on demand
+
+Removing intermediate container 6817cc96b6d9
+ ---> 8597d5a48850
+Step 13/26 : FROM node:20-alpine AS runner
+20-alpine: Pulling from library/node
+Digest: sha256:df02558528d3d3d0d621f112e232611aecfee7cbc654f6b375765f72bb262799
+Status: Image is up to date for node:20-alpine
+ ---> 7cdef5a33192
+Step 14/26 : WORKDIR /app
+ ---> Using cache
+ ---> 7f054b7d5dbd
+Step 15/26 : ENV NODE_ENV=production
+ ---> Running in dc451260fc7e
+Removing intermediate container dc451260fc7e
+ ---> 2be431602ea5
+Step 16/26 : ARG GIT_SHA=unknown
+ ---> Running in d8ba65dbb572
+Removing intermediate container d8ba65dbb572
+ ---> 9fc2eef78840
+Step 17/26 : ARG BUILD_TIME=unknown
+ ---> Running in af3458583fab
+Removing intermediate container af3458583fab
+ ---> ba13a4411002
+Step 18/26 : ARG APP_VERSION=0.1.0
+ ---> Running in d47e0e466bdb
+Removing intermediate container d47e0e466bdb
+ ---> 5c344fac080c
+Step 19/26 : ARG NEXT_PUBLIC_API_BASE_URL=""
+ ---> Running in 42bd67f0298d
+Removing intermediate container 42bd67f0298d
+ ---> 1113d8ad0db9
+Step 20/26 : ENV NEXT_PUBLIC_API_BASE_URL=$NEXT_PUBLIC_API_BASE_URL     NEXT_PUBLIC_GIT_SHA=$GIT_SHA     NEXT_PUBLIC_BUILD_TIME=$BUILD_TIME     NEXT_PUBLIC_APP_VERSION=$APP_VERSION
+ ---> Running in b8cebdf9de17
+Removing intermediate container b8cebdf9de17
+ ---> d5c0a68c56a4
+Step 21/26 : COPY --from=builder /app/package.json ./
+ ---> 9333d64eec32
+Step 22/26 : COPY --from=builder /app/node_modules ./node_modules
+ ---> 00346c9e62ee
+Step 23/26 : COPY --from=builder /app/.next ./.next
+ ---> 049a16efeeb2
+Step 24/26 : COPY --from=builder /app/public ./public
+ ---> 39ff86d61d0e
+Step 25/26 : EXPOSE 3000
+ ---> Running in b698ec4ad6a4
+Removing intermediate container b698ec4ad6a4
+ ---> 5c890357a649
+Step 26/26 : CMD ["npm", "run", "start"]
+ ---> Running in 9f81c5777ad6
+Removing intermediate container 9f81c5777ad6
+ ---> d0a3ffbdb48a
+Successfully built d0a3ffbdb48a
+Successfully tagged acraaademo9lyu53.azurecr.io/ai-maturity-web:v202508151711-8064b777
+Successfully tagged acraaademo9lyu53.azurecr.io/ai-maturity-web:latest
+2025/08/15 23:14:30 Successfully executed container: build
+2025/08/15 23:14:30 Executing step ID: push. Timeout(sec): 3600, Working directory: '', Network: ''
+2025/08/15 23:14:30 Pushing image: acraaademo9lyu53.azurecr.io/ai-maturity-web:v202508151711-8064b777, attempt 1
+The push refers to repository [acraaademo9lyu53.azurecr.io/ai-maturity-web]
+08168d9644d0: Preparing
+4f6210de62ce: Preparing
+7fee302af078: Preparing
+91db268ba57b: Preparing
+14235240d8f2: Preparing
+eadc3b779d42: Preparing
+2e12e022f9bc: Preparing
+54e9a650f7b7: Preparing
+418dccb7d85a: Preparing
+eadc3b779d42: Waiting
+2e12e022f9bc: Waiting
+54e9a650f7b7: Waiting
+418dccb7d85a: Waiting
+91db268ba57b: Pushed
+14235240d8f2: Pushed
+08168d9644d0: Pushed
+54e9a650f7b7: Layer already exists
+eadc3b779d42: Layer already exists
+2e12e022f9bc: Layer already exists
+418dccb7d85a: Layer already exists
+4f6210de62ce: Pushed
+
+7fee302af078: Pushed
+v202508151711-8064b777: digest: sha256:8d9f44d7a529221f7ab31b8363b022ba26c34b34b9404c3d43e112c364ab2d2d size: 2204
+2025/08/15 23:14:52 Successfully pushed image: acraaademo9lyu53.azurecr.io/ai-maturity-web:v202508151711-8064b777
+2025/08/15 23:14:52 Pushing image: acraaademo9lyu53.azurecr.io/ai-maturity-web:latest, attempt 1
+The push refers to repository [acraaademo9lyu53.azurecr.io/ai-maturity-web]
+08168d9644d0: Preparing
+4f6210de62ce: Preparing
+7fee302af078: Preparing
+91db268ba57b: Preparing
+14235240d8f2: Preparing
+eadc3b779d42: Preparing
+2e12e022f9bc: Preparing
+54e9a650f7b7: Preparing
+418dccb7d85a: Preparing
+eadc3b779d42: Waiting
+2e12e022f9bc: Waiting
+54e9a650f7b7: Waiting
+418dccb7d85a: Waiting
+08168d9644d0: Layer already exists
+91db268ba57b: Layer already exists
+4f6210de62ce: Layer already exists
+7fee302af078: Layer already exists
+eadc3b779d42: Layer already exists
+2e12e022f9bc: Layer already exists
+14235240d8f2: Layer already exists
+54e9a650f7b7: Layer already exists
+418dccb7d85a: Layer already exists
+latest: digest: sha256:8d9f44d7a529221f7ab31b8363b022ba26c34b34b9404c3d43e112c364ab2d2d size: 2204
+2025/08/15 23:14:53 Successfully pushed image: acraaademo9lyu53.azurecr.io/ai-maturity-web:latest
+2025/08/15 23:14:53 Step ID: build marked as successful (elapsed time in seconds: 110.406951)
+2025/08/15 23:14:53 Populating digests for step ID: build...
+2025/08/15 23:14:55 Successfully populated digests for step ID: build
+2025/08/15 23:14:55 Step ID: push marked as successful (elapsed time in seconds: 23.048171)
+2025/08/15 23:14:55 The following dependencies were found:
+2025/08/15 23:14:55 
+- image:
+    registry: acraaademo9lyu53.azurecr.io
+    repository: ai-maturity-web
+    tag: v202508151711-8064b777
+    digest: sha256:8d9f44d7a529221f7ab31b8363b022ba26c34b34b9404c3d43e112c364ab2d2d
+  runtime-dependency:
+    registry: registry.hub.docker.com
+    repository: library/node
+    tag: 20-alpine
+    digest: sha256:df02558528d3d3d0d621f112e232611aecfee7cbc654f6b375765f72bb262799
+  git: {}
+- image:
+    registry: acraaademo9lyu53.azurecr.io
+    repository: ai-maturity-web
+    tag: latest
+    digest: sha256:8d9f44d7a529221f7ab31b8363b022ba26c34b34b9404c3d43e112c364ab2d2d
+  runtime-dependency:
+    registry: registry.hub.docker.com
+    repository: library/node
+    tag: 20-alpine
+    digest: sha256:df02558528d3d3d0d621f112e232611aecfee7cbc654f6b375765f72bb262799
+  git: {}
+
+
+Run ID: cx2n was successful after 2m23s
+[0;32m✓ Web image built: acraaademo9lyu53.azurecr.io/ai-maturity-web:v202508151711-8064b777[0m
+[1;33m4. Resolving secrets from Key Vault...[0m
+[0;32m✓ Cosmos connection string retrieved from Key Vault[0m
+[0;32m✓ AUTH_SHARED_SECRET retrieved from Key Vault[0m
+[1;33m5. Updating API Container App...[0m
+WARNING: The behavior of this command has been altered by the following extension: containerapp
+/ Running ..| Running ..\ Running ..- Running ../ Running ..| Running ..[K{
+  "id": "/subscriptions/10233675-d493-4a97-9c81-4001e353a7bb/resourceGroups/rg-aaa-demo/providers/Microsoft.App/containerapps/api-aaa-demo",
+  "identity": {
+    "type": "UserAssigned",
+    "userAssignedIdentities": {
+      "/subscriptions/10233675-d493-4a97-9c81-4001e353a7bb/resourcegroups/rg-aaa-demo/providers/Microsoft.ManagedIdentity/userAssignedIdentities/id-api-aaa-demo": {
+        "clientId": "886dc233-b219-4534-a49e-9aa32f10cd22",
+        "principalId": "0d3331d1-e5b7-433c-9292-971cb9c0f75a"
+      }
+    }
+  },
+  "location": "Canada Central",
+  "name": "api-aaa-demo",
+  "properties": {
+    "configuration": {
+      "activeRevisionsMode": "Single",
+      "dapr": null,
+      "identitySettings": [],
+      "ingress": {
+        "additionalPortMappings": null,
+        "allowInsecure": false,
+        "clientCertificateMode": null,
+        "corsPolicy": null,
+        "customDomains": null,
+        "exposedPort": 0,
+        "external": true,
+        "fqdn": "api-aaa-demo.bravewater-3d70a706.canadacentral.azurecontainerapps.io",
+        "ipSecurityRestrictions": null,
+        "stickySessions": null,
+        "targetPort": 8000,
+        "targetPortHttpScheme": null,
+        "traffic": [
+          {
+            "revisionName": "api-aaa-demo--0000022",
+            "weight": 100
+          }
+        ],
+        "transport": "Auto"
+      },
+      "maxInactiveRevisions": 100,
+      "registries": [
+        {
+          "identity": "/subscriptions/10233675-d493-4a97-9c81-4001e353a7bb/resourcegroups/rg-aaa-demo/providers/Microsoft.ManagedIdentity/userAssignedIdentities/id-api-aaa-demo",
+          "passwordSecretRef": "",
+          "server": "acraaademo9lyu53.azurecr.io",
+          "username": ""
+        }
+      ],
+      "revisionTransitionThreshold": null,
+      "runtime": null,
+      "secrets": [
+        {
+          "name": "acraaademo9lyu53azurecrio-acraaademo9lyu53"
+        }
+      ],
+      "service": null,
+      "targetLabel": ""
+    },
+    "customDomainVerificationId": "7A687C58CE3A6608763224D14B2138425F990DF97889C54C9BB9160C4CF301A2",
+    "delegatedIdentities": [],
+    "environmentId": "/subscriptions/10233675-d493-4a97-9c81-4001e353a7bb/resourceGroups/rg-aaa-demo/providers/Microsoft.App/managedEnvironments/aca-aaa-demo",
+    "eventStreamEndpoint": "https://canadacentral.azurecontainerapps.dev/subscriptions/10233675-d493-4a97-9c81-4001e353a7bb/resourceGroups/rg-aaa-demo/containerApps/api-aaa-demo/eventstream",
+    "latestReadyRevisionName": "api-aaa-demo--0000022",
+    "latestRevisionFqdn": "api-aaa-demo--0000027.bravewater-3d70a706.canadacentral.azurecontainerapps.io",
+    "latestRevisionName": "api-aaa-demo--0000027",
+    "managedEnvironmentId": "/subscriptions/10233675-d493-4a97-9c81-4001e353a7bb/resourceGroups/rg-aaa-demo/providers/Microsoft.App/managedEnvironments/aca-aaa-demo",
+    "outboundIpAddresses": [
+      "52.237.61.48"
+    ],
+    "patchingMode": "Automatic",
+    "provisioningState": "Succeeded",
+    "runningStatus": "Running",
+    "template": {
+      "containers": [
+        {
+          "env": [
+            {
+              "name": "USE_MANAGED_IDENTITY"
+            },
+            {
+              "name": "AZURE_STORAGE_ACCOUNT"
+            },
+            {
+              "name": "AZURE_STORAGE_CONTAINER"
+            },
+            {
+              "name": "ADMIN_EMAILS"
+            },
+            {
+              "name": "API_ALLOWED_ORIGINS"
+            },
+            {
+              "name": "GIT_SHA"
+            },
+            {
+              "name": "BUILD_TIME"
+            },
+            {
+              "name": "APP_VERSION"
+            },
+            {
+              "name": "DATA_BACKEND"
+            },
+            {
+              "name": "COSMOS_CONNSTR"
+            },
+            {
+              "name": "COSMOS_DB_NAME"
+            },
+            {
+              "name": "STORAGE_MODE"
+            },
+            {
+              "name": "AUTH_MODE"
+            },
+            {
+              "name": "AUTH_SHARED_SECRET"
+            }
+          ],
+          "image": "acraaademo9lyu53.azurecr.io/ai-maturity-api:v202508151710-8064b777",
+          "imageType": "ContainerImage",
+          "name": "api-aaa-demo",
+          "resources": {
+            "cpu": 0.25,
+            "ephemeralStorage": "1Gi",
+            "memory": "0.5Gi"
+          }
+        }
+      ],
+      "initContainers": null,
+      "revisionSuffix": "",
+      "scale": {
+        "cooldownPeriod": 300,
+        "maxReplicas": 10,
+        "minReplicas": 1,
+        "pollingInterval": 30,
+        "rules": null
+      },
+      "serviceBinds": null,
+      "terminationGracePeriodSeconds": null,
+      "volumes": null
+    },
+    "workloadProfileName": null
+  },
+  "resourceGroup": "rg-aaa-demo",
+  "systemData": {
+    "createdAt": "2025-08-14T01:34:04.3459184",
+    "createdBy": "dc900018-e548-4d1f-b416-a7a67310b1a5",
+    "createdByType": "Application",
+    "lastModifiedAt": "2025-08-15T23:15:03.8682751",
+    "lastModifiedBy": "va.sysoiev@audit3a.com",
+    "lastModifiedByType": "User"
+  },
+  "type": "Microsoft.App/containerApps"
+}
+WARNING: The behavior of this command has been altered by the following extension: containerapp
+"Single"
+[0;32m✓ API Container App updated[0m
+[1;33m6. Updating Web Container App...[0m
+WARNING: The behavior of this command has been altered by the following extension: containerapp
+/ Running ..| Running ..\ Running ..- Running ../ Running ..| Running ..[K{
+  "id": "/subscriptions/10233675-d493-4a97-9c81-4001e353a7bb/resourceGroups/rg-aaa-demo/providers/Microsoft.App/containerapps/web-aaa-demo",
+  "identity": {
+    "type": "UserAssigned",
+    "userAssignedIdentities": {
+      "/subscriptions/10233675-d493-4a97-9c81-4001e353a7bb/resourcegroups/rg-aaa-demo/providers/Microsoft.ManagedIdentity/userAssignedIdentities/id-web-aaa-demo": {
+        "clientId": "4ae2275b-eec0-4b8b-bd56-ce165d11d97d",
+        "principalId": "50116b4e-e659-40cf-bec9-f299fafc3490"
+      }
+    }
+  },
+  "location": "Canada Central",
+  "name": "web-aaa-demo",
+  "properties": {
+    "configuration": {
+      "activeRevisionsMode": "Single",
+      "dapr": null,
+      "identitySettings": [],
+      "ingress": {
+        "additionalPortMappings": null,
+        "allowInsecure": false,
+        "clientCertificateMode": null,
+        "corsPolicy": null,
+        "customDomains": null,
+        "exposedPort": 0,
+        "external": true,
+        "fqdn": "web-aaa-demo.bravewater-3d70a706.canadacentral.azurecontainerapps.io",
+        "ipSecurityRestrictions": null,
+        "stickySessions": null,
+        "targetPort": 3000,
+        "targetPortHttpScheme": null,
+        "traffic": [
+          {
+            "latestRevision": true,
+            "weight": 100
+          }
+        ],
+        "transport": "Auto"
+      },
+      "maxInactiveRevisions": 100,
+      "registries": [
+        {
+          "identity": "/subscriptions/10233675-d493-4a97-9c81-4001e353a7bb/resourcegroups/rg-aaa-demo/providers/Microsoft.ManagedIdentity/userAssignedIdentities/id-web-aaa-demo",
+          "passwordSecretRef": "",
+          "server": "acraaademo9lyu53.azurecr.io",
+          "username": ""
+        }
+      ],
+      "revisionTransitionThreshold": null,
+      "runtime": null,
+      "secrets": [
+        {
+          "name": "acraaademo9lyu53azurecrio-acraaademo9lyu53"
+        }
+      ],
+      "service": null,
+      "targetLabel": ""
+    },
+    "customDomainVerificationId": "7A687C58CE3A6608763224D14B2138425F990DF97889C54C9BB9160C4CF301A2",
+    "delegatedIdentities": [],
+    "environmentId": "/subscriptions/10233675-d493-4a97-9c81-4001e353a7bb/resourceGroups/rg-aaa-demo/providers/Microsoft.App/managedEnvironments/aca-aaa-demo",
+    "eventStreamEndpoint": "https://canadacentral.azurecontainerapps.dev/subscriptions/10233675-d493-4a97-9c81-4001e353a7bb/resourceGroups/rg-aaa-demo/containerApps/web-aaa-demo/eventstream",
+    "latestReadyRevisionName": "web-aaa-demo--0000017",
+    "latestRevisionFqdn": "web-aaa-demo--0000018.bravewater-3d70a706.canadacentral.azurecontainerapps.io",
+    "latestRevisionName": "web-aaa-demo--0000018",
+    "managedEnvironmentId": "/subscriptions/10233675-d493-4a97-9c81-4001e353a7bb/resourceGroups/rg-aaa-demo/providers/Microsoft.App/managedEnvironments/aca-aaa-demo",
+    "outboundIpAddresses": [
+      "52.237.61.48"
+    ],
+    "patchingMode": "Automatic",
+    "provisioningState": "Succeeded",
+    "runningStatus": "Running",
+    "template": {
+      "containers": [
+        {
+          "env": [
+            {
+              "name": "NEXT_PUBLIC_API_BASE"
+            },
+            {
+              "name": "NEXT_PUBLIC_AUTH_PROVIDER"
+            },
+            {
+              "name": "NEXT_PUBLIC_GIT_SHA"
+            },
+            {
+              "name": "NEXT_PUBLIC_BUILD_TIME"
+            },
+            {
+              "name": "NEXT_PUBLIC_APP_VERSION"
+            },
+            {
+              "name": "NEXT_PUBLIC_API_URL"
+            },
+            {
+              "name": "AUTH_MODE"
+            },
+            {
+              "name": "NEXT_PUBLIC_AUTH_MODE"
+            },
+            {
+              "name": "NEXTAUTH_SECRET"
+            },
+            {
+              "name": "AUTH_SHARED_SECRET"
+            }
+          ],
+          "image": "acraaademo9lyu53.azurecr.io/ai-maturity-web:v202508151711-8064b777",
+          "imageType": "ContainerImage",
+          "name": "web-aaa-demo",
+          "resources": {
+            "cpu": 0.25,
+            "ephemeralStorage": "1Gi",
+            "memory": "0.5Gi"
+          }
+        }
+      ],
+      "initContainers": null,
+      "revisionSuffix": "",
+      "scale": {
+        "cooldownPeriod": 300,
+        "maxReplicas": 10,
+        "minReplicas": 1,
+        "pollingInterval": 30,
+        "rules": null
+      },
+      "serviceBinds": null,
+      "terminationGracePeriodSeconds": null,
+      "volumes": null
+    },
+    "workloadProfileName": null
+  },
+  "resourceGroup": "rg-aaa-demo",
+  "systemData": {
+    "createdAt": "2025-08-14T01:34:26.9579328",
+    "createdBy": "dc900018-e548-4d1f-b416-a7a67310b1a5",
+    "createdByType": "Application",
+    "lastModifiedAt": "2025-08-15T23:15:24.5800619",
+    "lastModifiedBy": "va.sysoiev@audit3a.com",
+    "lastModifiedByType": "User"
+  },
+  "type": "Microsoft.App/containerApps"
+}
+WARNING: The behavior of this command has been altered by the following extension: containerapp
+"Single"
+[0;32m✓ Web Container App updated[0m
+[1;33m7. Waiting for deployments to settle...[0m
+[1;33m8. Checking health endpoints...[0m
+Checking API health...
+[0;32m✓ API health check passed[0m
+Checking API docs...
+[0;32m✓ API docs accessible[0m
+Checking Web app...
+[0;31m✗ Web app not accessible[0m
+[1;33m9. Container App revision status:[0m
+
+API revisions:
+Name                   Active    TrafficWeight    HealthState    CreatedTime
+---------------------  --------  ---------------  -------------  -------------------------
+api-aaa-demo--0000022  True      100              Healthy        2025-08-15T18:28:58+00:00
+api-aaa-demo--0000027  True      0                Unhealthy      2025-08-15T23:15:11+00:00
+
+Web revisions:
+Name                   Active    TrafficWeight    HealthState    CreatedTime
+---------------------  --------  ---------------  -------------  -------------------------
+web-aaa-demo--0000017  True      0                Healthy        2025-08-15T22:14:55+00:00
+web-aaa-demo--0000018  True      100              Healthy        2025-08-15T23:15:31+00:00
+
+[0;32m=== Release Complete ===[0m
+
+[1;33mDeployed Images:[0m
+API: acraaademo9lyu53.azurecr.io/ai-maturity-api:v202508151710-8064b777
+Web: acraaademo9lyu53.azurecr.io/ai-maturity-web:v202508151711-8064b777
+
+[1;33mApplication URLs:[0m
+API: https://api-aaa-demo.bravewater-3d70a706.canadacentral.azurecontainerapps.io
+Web: https://web-aaa-demo.bravewater-3d70a706.canadacentral.azurecontainerapps.io
+
+[1;33mHealth Check URLs:[0m
+API Health: https://api-aaa-demo.bravewater-3d70a706.canadacentral.azurecontainerapps.io/health
+API Docs: https://api-aaa-demo.bravewater-3d70a706.canadacentral.azurecontainerapps.io/docs
+API Version: https://api-aaa-demo.bravewater-3d70a706.canadacentral.azurecontainerapps.io/version
+
+[1;33mReports Generated:[0m
+Release log: logs/reports/run-20250815-171037-release.log
+Summary: logs/reports/run-20250815-171037-summary.md
+
+[0;32m✓ Both apps running with single revision mode and min replicas = 1[0m
+
+[1;33mRunning automatic verification...[0m
+[1;33m=== Live Application Verification ===[0m
+Admin Email: va.sysoiev@audit3a.com
+Preset File: imports/preset_cscm_v3.json
+Log file: logs/reports/run-20250815-171617-verify.log
+Started: Fri Aug 15 17:16:17 MDT 2025
+
+[1;33m1. Discovering application URLs...[0m
+WARNING: The behavior of this command has been altered by the following extension: containerapp
+WARNING: The behavior of this command has been altered by the following extension: containerapp
+API URL: https://api-aaa-demo.bravewater-3d70a706.canadacentral.azurecontainerapps.io
+Web URL: https://web-aaa-demo.bravewater-3d70a706.canadacentral.azurecontainerapps.io
+[1;33m2. Testing basic endpoints...[0m
+Testing API health...
+[0;32m✓ API health: {"status":"ok"}[0m
+Testing API version...
+[1;33m⚠ API version endpoint may not be available: {"detail":"Not Found"}[0m
+Testing API docs...
+[0;32m✓ API docs: HTTP 200[0m
+Testing Web app...
+[0;31m✗ Web app failed: HTTP 404[0m
+Testing Web version...
+[1;33m⚠ Web proxy version may not be available: {"detail":"Not Found"}[0m
+Testing Admin Ops via Web proxy...
+[1;33m⚠ Admin Ops endpoint returned HTTP 404[0m
+[1;33m3. Testing CORS preflight...[0m
+Testing CORS preflight to POST /presets/upload...
+CORS preflight response headers (first 40 lines):
+HTTP/2 200 
+date: Fri, 15 Aug 2025 23:16:24 GMT
+server: uvicorn
+vary: Origin
+access-control-allow-methods: DELETE, GET, HEAD, OPTIONS, PATCH, POST, PUT
+access-control-max-age: 600
+access-control-allow-credentials: true
+access-control-allow-origin: https://web-aaa-demo.bravewater-3d70a706.canadacentral.azurecontainerapps.io
+access-control-allow-headers: X-User-Email,X-Engagement-ID,Content-Type
+content-length: 2
+content-type: text/plain; charset=utf-8
+
+OK
+[0;32m✓ CORS preflight passed[0m
+[1;33m4. Testing preset upload via web proxy...[0m
+Uploading imports/preset_cscm_v3.json via web app proxy...
+Upload response: HTTP 200
+Response body: {"id":"cscm-v3","name":"Cyber Security Capability Model v3","version":"3.0"}
+[0;32m✓ Preset upload successful (HTTP 200)[0m
+[1;33m5. Creating test engagement via web proxy...[0m
+[0;32m✓ Engagement created: d0f0c81a-adee-4c52-9a32-675f83c5242b[0m
+[1;33m6. Adding self as engagement lead via web proxy...[0m
+[1;33m⚠ Failed to add as lead (HTTP 422) - continuing[0m
+[1;33m7. Creating CSCM v3 assessment via web proxy...[0m
+[0;32m✓ Assessment created: 0c105fa6-df2d-4889-9c20-ef595474e8b1[0m
+[1;33m8. Testing analyze endpoint...[0m
+[1;33m⚠ Analyze endpoint returned HTTP 422 - may not be fully implemented[0m
+[1;33m9. Testing recommend endpoint...[0m
+[1;33m⚠ Recommend endpoint returned HTTP 400 - may not be fully implemented[0m
+
+[0;32m=== Live Verification Complete ===[0m
+
+[1;33mTest Results Summary:[0m
+✓ API Health Check: Passed
+✓ API Docs: Accessible
+✓ CORS Preflight: Configured
+✓ Preset Upload: Working
+✓ Engagement Creation: Working
+✓ Assessment Creation: Working
+
+[0;32m=== Verification Complete ===[0m
+
+[1;33mTest Results Summary:[0m
+✅ API Health Check
+✅ API Documentation
+✅ API Version Info
+✅ CORS Preflight
+✅ Preset Upload
+✅ Engagement Creation
+✅ Assessment Creation
+✅ AI Analysis
+✅ AI Recommendations
+
+[1;33mBrowser Deep Links:[0m
+📊 Engagement Dashboard: https://web-aaa-demo.bravewater-3d70a706.canadacentral.azurecontainerapps.io/e/d0f0c81a-adee-4c52-9a32-675f83c5242b/dashboard
+🆕 New Assessment: https://web-aaa-demo.bravewater-3d70a706.canadacentral.azurecontainerapps.io/e/d0f0c81a-adee-4c52-9a32-675f83c5242b/new
+⚙️  Admin Presets: https://web-aaa-demo.bravewater-3d70a706.canadacentral.azurecontainerapps.io/admin/presets
+🔧 Admin Ops: https://web-aaa-demo.bravewater-3d70a706.canadacentral.azurecontainerapps.io/admin/ops
+📋 Engagements: https://web-aaa-demo.bravewater-3d70a706.canadacentral.azurecontainerapps.io/engagements
+📖 API Docs: https://api-aaa-demo.bravewater-3d70a706.canadacentral.azurecontainerapps.io/docs
+
+[1;33mCreated Test Data:[0m
+Engagement ID: d0f0c81a-adee-4c52-9a32-675f83c5242b
+Assessment ID: 0c105fa6-df2d-4889-9c20-ef595474e8b1
+
+[1;33mReports Generated:[0m
+Verification log: logs/reports/run-20250815-171617-verify.log
+Summary: logs/reports/run-20250815-171617-verify-summary.md
+
+[0;32m✅ All critical paths verified successfully![0m
+scripts/verify_live.sh: line 319: COOKIE_JAR: unbound variable

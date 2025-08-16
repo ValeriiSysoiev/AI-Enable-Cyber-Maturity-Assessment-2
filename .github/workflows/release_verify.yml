@@ -1,0 +1,160 @@
+name: Release Verification
+
+on:
+  workflow_run:
+    workflows: ["Release Deployment"]
+    types:
+      - completed
+
+env:
+  API_ENDPOINT: ${{ secrets.API_ENDPOINT }}
+  WEB_ENDPOINT: ${{ secrets.WEB_ENDPOINT }}
+
+jobs:
+  verify-deployment:
+    runs-on: ubuntu-latest
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+
+    - name: Install dependencies
+      run: |
+        cd e2e
+        npm ci
+
+    - name: Wait for services to be ready
+      run: |
+        echo "Waiting for services to stabilize..."
+        sleep 30
+
+    - name: Verify API health
+      run: |
+        echo "Verifying API health..."
+        set -o pipefail
+        
+        # Make the verification request and capture exit code immediately
+        curl -f -s -o /dev/null -w "%{http_code}" "${{ env.API_ENDPOINT }}/health" || rc=$?
+        
+        # Use the captured exit code for decision making
+        if [ "${rc:-0}" -eq 0 ]; then
+          echo "API health check passed"
+        else
+          echo "API health check failed with exit code: ${rc:-0}"
+          exit 1
+        fi
+
+    - name: Verify WEB accessibility
+      run: |
+        echo "Verifying WEB accessibility..."
+        set -o pipefail
+        
+        # Make the verification request and capture exit code immediately
+        curl -f -s -o /dev/null -w "%{http_code}" "${{ env.WEB_ENDPOINT }}" || rc=$?
+        
+        # Use the captured exit code for decision making
+        if [ "${rc:-0}" -eq 0 ]; then
+          echo "WEB accessibility check passed"
+        else
+          echo "WEB accessibility check failed with exit code: ${rc:-0}"
+          exit 1
+        fi
+
+    - name: Run smoke tests
+      env:
+        WEB_URL: ${{ env.WEB_ENDPOINT }}
+        API_URL: ${{ env.API_ENDPOINT }}
+      run: |
+        echo "Running smoke tests..."
+        cd e2e
+        set -o pipefail
+        
+        # Run the smoke tests and capture exit code immediately
+        npm run test:smoke || rc=$?
+        
+        # Use the captured exit code for decision making
+        if [ "${rc:-0}" -eq 0 ]; then
+          echo "Smoke tests passed successfully"
+        else
+          echo "Smoke tests failed with exit code: ${rc:-0}"
+          exit 1
+        fi
+
+    - name: Run authentication tests
+      env:
+        WEB_URL: ${{ env.WEB_ENDPOINT }}
+        API_URL: ${{ env.API_ENDPOINT }}
+      run: |
+        echo "Running authentication tests..."
+        cd e2e
+        set -o pipefail
+        
+        # Run the auth tests and capture exit code immediately
+        npm run test:auth || rc=$?
+        
+        # Use the captured exit code for decision making
+        if [ "${rc:-0}" -eq 0 ]; then
+          echo "Authentication tests passed successfully"
+        else
+          echo "Authentication tests failed with exit code: ${rc:-0}"
+          exit 1
+        fi
+
+    - name: Performance baseline check
+      run: |
+        echo "Running performance baseline check..."
+        set -o pipefail
+        
+        # Simple response time check
+        response_time=$(curl -w "%{time_total}" -s -o /dev/null "${{ env.API_ENDPOINT }}/health") || rc=$?
+        
+        # Use the captured exit code for decision making
+        if [ "${rc:-0}" -eq 0 ]; then
+          echo "Performance check completed. Response time: ${response_time}s"
+          
+          # Check if response time is reasonable (less than 5 seconds)
+          if (( $(echo "$response_time < 5.0" | bc -l) )); then
+            echo "Performance baseline check passed"
+          else
+            echo "Performance baseline check failed - response time too high: ${response_time}s"
+            exit 1
+          fi
+        else
+          echo "Performance baseline check failed with exit code: ${rc:-0}"
+          exit 1
+        fi
+
+    - name: Verification summary
+      run: |
+        echo "=== Deployment Verification Summary ==="
+        echo "✅ API health check: PASSED"
+        echo "✅ WEB accessibility: PASSED"
+        echo "✅ Smoke tests: PASSED"
+        echo "✅ Authentication tests: PASSED"
+        echo "✅ Performance baseline: PASSED"
+        echo "=== All verification checks completed successfully ==="
+
+  notify-failure:
+    runs-on: ubuntu-latest
+    if: ${{ github.event.workflow_run.conclusion == 'failure' || failure() }}
+    needs: verify-deployment
+    
+    steps:
+    - name: Notify deployment failure
+      run: |
+        echo "=== Deployment Verification Failed ==="
+        echo "The deployment verification has failed."
+        echo "Please check the logs and consider rolling back if necessary."
+        echo "Workflow run: ${{ github.event.workflow_run.html_url }}"
+        
+        # In a real environment, you might want to:
+        # - Send notifications to Slack/Teams
+        # - Create an incident ticket
+        # - Trigger automatic rollback
+        exit 1

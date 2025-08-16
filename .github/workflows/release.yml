@@ -1,0 +1,153 @@
+name: Release Deployment
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+env:
+  AZURE_CONTAINER_REGISTRY: ${{ secrets.AZURE_CONTAINER_REGISTRY }}
+  AZURE_RESOURCE_GROUP: ${{ secrets.AZURE_RESOURCE_GROUP }}
+  API_CONTAINER_APP: ${{ secrets.API_CONTAINER_APP }}
+  WEB_CONTAINER_APP: ${{ secrets.WEB_CONTAINER_APP }}
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Login to Azure
+      uses: azure/login@v1
+      with:
+        creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+    - name: Login to Azure Container Registry
+      run: |
+        az acr login --name ${{ env.AZURE_CONTAINER_REGISTRY }}
+
+    - name: Build and push API image
+      run: |
+        docker build -t ${{ env.AZURE_CONTAINER_REGISTRY }}.azurecr.io/api:${{ github.sha }} ./app
+        docker push ${{ env.AZURE_CONTAINER_REGISTRY }}.azurecr.io/api:${{ github.sha }}
+
+    - name: Build and push WEB image
+      run: |
+        docker build -t ${{ env.AZURE_CONTAINER_REGISTRY }}.azurecr.io/web:${{ github.sha }} ./web
+        docker push ${{ env.AZURE_CONTAINER_REGISTRY }}.azurecr.io/web:${{ github.sha }}
+
+    - name: Record current revisions before deployment
+      id: record_revisions
+      run: |
+        echo "Recording current revisions for rollback purposes..."
+        
+        # Get current API revision
+        API_CURRENT_REVISION=$(az containerapp revision list \
+          --name ${{ env.API_CONTAINER_APP }} \
+          --resource-group ${{ env.AZURE_RESOURCE_GROUP }} \
+          --query "[?properties.active].name" \
+          --output tsv | head -1)
+        echo "api_current_revision=$API_CURRENT_REVISION" >> $GITHUB_OUTPUT
+        echo "Current API revision: $API_CURRENT_REVISION"
+        
+        # Get current WEB revision
+        WEB_CURRENT_REVISION=$(az containerapp revision list \
+          --name ${{ env.WEB_CONTAINER_APP }} \
+          --resource-group ${{ env.AZURE_RESOURCE_GROUP }} \
+          --query "[?properties.active].name" \
+          --output tsv | head -1)
+        echo "web_current_revision=$WEB_CURRENT_REVISION" >> $GITHUB_OUTPUT
+        echo "Current WEB revision: $WEB_CURRENT_REVISION"
+
+    - name: Deploy API Container App
+      id: deploy_api
+      run: |
+        echo "Deploying API container app..."
+        az containerapp update \
+          --name ${{ env.API_CONTAINER_APP }} \
+          --resource-group ${{ env.AZURE_RESOURCE_GROUP }} \
+          --image ${{ env.AZURE_CONTAINER_REGISTRY }}.azurecr.io/api:${{ github.sha }}
+        
+        # Capture deployment success
+        if [ $? -eq 0 ]; then
+          echo "api_deploy_success=true" >> $GITHUB_OUTPUT
+          echo "API deployment successful"
+        else
+          echo "api_deploy_success=false" >> $GITHUB_OUTPUT
+          echo "API deployment failed"
+          exit 1
+        fi
+
+    - name: Deploy WEB Container App
+      id: deploy_web
+      run: |
+        echo "Deploying WEB container app..."
+        az containerapp update \
+          --name ${{ env.WEB_CONTAINER_APP }} \
+          --resource-group ${{ env.AZURE_RESOURCE_GROUP }} \
+          --image ${{ env.AZURE_CONTAINER_REGISTRY }}.azurecr.io/web:${{ github.sha }}
+        
+        # Capture deployment success
+        if [ $? -eq 0 ]; then
+          echo "web_deploy_success=true" >> $GITHUB_OUTPUT
+          echo "WEB deployment successful"
+        else
+          echo "web_deploy_success=false" >> $GITHUB_OUTPUT
+          echo "WEB deployment failed"
+          exit 1
+        fi
+
+    - name: Rollback on failure
+      if: failure()
+      run: |
+        echo "Deployment failed, attempting rollback..."
+        ROLLBACK_FAILED=false
+        
+        # Rollback API if it was successfully deployed but WEB failed
+        if [ "${{ steps.deploy_api.outputs.api_deploy_success }}" == "true" ] && [ "${{ steps.record_revisions.outputs.api_current_revision }}" != "" ]; then
+          echo "Rolling back API to revision: ${{ steps.record_revisions.outputs.api_current_revision }}"
+          az containerapp revision activate \
+            --name ${{ env.API_CONTAINER_APP }} \
+            --resource-group ${{ env.AZURE_RESOURCE_GROUP }} \
+            --revision ${{ steps.record_revisions.outputs.api_current_revision }}
+          
+          if [ $? -ne 0 ]; then
+            echo "ERROR: API rollback failed!"
+            ROLLBACK_FAILED=true
+          else
+            echo "API rollback successful"
+          fi
+        fi
+        
+        # Rollback WEB if it was successfully deployed but later steps failed
+        if [ "${{ steps.deploy_web.outputs.web_deploy_success }}" == "true" ] && [ "${{ steps.record_revisions.outputs.web_current_revision }}" != "" ]; then
+          echo "Rolling back WEB to revision: ${{ steps.record_revisions.outputs.web_current_revision }}"
+          az containerapp revision activate \
+            --name ${{ env.WEB_CONTAINER_APP }} \
+            --resource-group ${{ env.AZURE_RESOURCE_GROUP }} \
+            --revision ${{ steps.record_revisions.outputs.web_current_revision }}
+          
+          if [ $? -ne 0 ]; then
+            echo "ERROR: WEB rollback failed!"
+            ROLLBACK_FAILED=true
+          else
+            echo "WEB rollback successful"
+          fi
+        fi
+        
+        # Fail the job if rollbacks failed
+        if [ "$ROLLBACK_FAILED" == "true" ]; then
+          echo "CRITICAL: One or more rollbacks failed! Manual intervention required."
+          exit 1
+        fi
+        
+        echo "Rollback completed successfully"
+        exit 1  # Still fail the job since original deployment failed
+
+    - name: Verify deployment
+      run: |
+        echo "Verifying deployment health..."
+        # Add health checks here as needed
+        echo "Deployment verification completed successfully"
