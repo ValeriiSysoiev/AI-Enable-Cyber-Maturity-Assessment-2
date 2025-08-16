@@ -51,7 +51,7 @@ export async function apiFetch(url: string, options: RequestInitWithTimeout = {}
   } catch (error) {
     clearTimeout(timeoutId);
     
-    if (error.name === 'AbortError') {
+    if (error instanceof Error && error.name === 'AbortError') {
       throw new Error('Request timeout - please try again');
     }
     
@@ -79,7 +79,7 @@ export async function fetchPreset(id: string) {
   } catch (error) {
     clearTimeout(timeoutId);
     
-    if (error.name === 'AbortError') {
+    if (error instanceof Error && error.name === 'AbortError') {
       console.error("Preset fetch timeout:", id);
       throw new Error('Request timeout - please try again');
     }
