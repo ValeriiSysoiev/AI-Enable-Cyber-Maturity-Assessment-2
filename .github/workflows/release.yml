@@ -12,8 +12,34 @@ env:
   WEB_CONTAINER_APP: ${{ secrets.WEB_CONTAINER_APP }}
 
 jobs:
+  check-credentials:
+    runs-on: ubuntu-latest
+    # Only run if Azure credentials are NOT configured
+    if: ${{ secrets.AZURE_CREDENTIALS == '' }}
+    
+    steps:
+    - name: Azure credentials not configured
+      run: |
+        echo "🔧 Azure Deployment Setup Required"
+        echo ""
+        echo "❌ AZURE_CREDENTIALS secret is not configured"
+        echo ""
+        echo "To enable Azure deployment, please configure the following secrets:"
+        echo "  - AZURE_CREDENTIALS (JSON with clientId, clientSecret, subscriptionId, tenantId)"
+        echo "  - AZURE_CONTAINER_REGISTRY"
+        echo "  - AZURE_RESOURCE_GROUP"
+        echo "  - API_CONTAINER_APP"
+        echo "  - WEB_CONTAINER_APP"
+        echo ""
+        echo "📚 For detailed setup instructions, see:"
+        echo "  .github/DEPLOYMENT_SETUP.md"
+        echo ""
+        echo "✅ CI validation will still run to test your code!"
+
   build-and-deploy:
     runs-on: ubuntu-latest
+    # Only run if Azure credentials are configured
+    if: ${{ secrets.AZURE_CREDENTIALS != '' }}
     
     steps:
     - name: Checkout code

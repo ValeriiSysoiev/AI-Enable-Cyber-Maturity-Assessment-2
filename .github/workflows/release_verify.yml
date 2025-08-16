@@ -13,7 +13,8 @@ env:
 jobs:
   verify-deployment:
     runs-on: ubuntu-latest
-    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    # Only run if the release workflow succeeded AND Azure credentials are configured
+    if: ${{ github.event.workflow_run.conclusion == 'success' && secrets.API_ENDPOINT != '' }}
     
     steps:
     - name: Checkout code
