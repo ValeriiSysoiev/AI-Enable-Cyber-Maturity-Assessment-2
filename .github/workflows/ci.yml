@@ -68,7 +68,15 @@ jobs:
       run: |
         echo "📦 Installing Web dependencies..."
         cd web
-        npm ci
+        
+        # Check if package-lock.json exists, use npm ci if available, otherwise npm install
+        if [ -f "package-lock.json" ]; then
+          echo "Using npm ci (package-lock.json found)"
+          npm ci
+        else
+          echo "Using npm install (package-lock.json not found)"
+          npm install
+        fi
 
     - name: Lint Python code
       run: |
