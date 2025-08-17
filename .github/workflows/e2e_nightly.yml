@@ -113,11 +113,22 @@ jobs:
         if [ -n "$WEB_URL" ]; then
           echo "Testing connectivity to: $WEB_URL"
           
-          # Test with timeout
-          if timeout 30 curl -f -s "$WEB_URL" > /dev/null; then
-            echo "✅ Target environment is accessible"
-          else
-            echo "❌ Target environment is not accessible"
+          # Test accessibility with retry logic
+          echo "Testing accessibility of $WEB_URL..."
+          success=false
+          for i in {1..10}; do
+            if curl -f -s --max-time 3 "$WEB_URL" > /dev/null 2>&1; then
+              echo "✅ Target environment is accessible (attempt $i)"
+              success=true
+              break
+            else
+              echo "Attempt $i/10: Environment not accessible, retrying in 3 seconds..."
+              sleep 3
+            fi
+          done
+          
+          if [ "$success" = false ]; then
+            echo "❌ Target environment is not accessible after 10 attempts"
             exit 1
           fi
         else
