@@ -361,13 +361,7 @@ export { EnterpriseDataGenerator } from './test-utils/data-generators';
 export type { 
   EnterpriseUserContext, 
   AADClaims, 
-  GDPRTestScenario,
-  EnterpriseTestData,
-  TenantData,
-  UserData,
-  EngagementData,
-  AADGroupData,
-  GDPRRequestData
+  GDPRTestScenario
 } from './test-utils/enterprise';
 export type {
   DocumentData,
