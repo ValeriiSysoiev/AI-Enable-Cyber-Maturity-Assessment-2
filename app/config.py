@@ -68,11 +68,94 @@ class StorageConfig(BaseModel):
     azure_storage_container: str = Field(default_factory=lambda: os.getenv("AZURE_STORAGE_CONTAINER", "documents"))
 
 
+class AADGroupsConfig(BaseModel):
+    """Azure Active Directory groups configuration"""
+    mode: str = Field(default_factory=lambda: os.getenv("AUTH_GROUPS_MODE", "disabled"))  # enabled|disabled
+    enabled: bool = Field(default_factory=lambda: os.getenv("AUTH_GROUPS_MODE", "disabled") == "enabled")
+    
+    # Microsoft Graph API configuration
+    tenant_id: Optional[str] = Field(default_factory=lambda: os.getenv("AAD_TENANT_ID"))
+    client_id: Optional[str] = Field(default_factory=lambda: os.getenv("AAD_CLIENT_ID"))
+    client_secret: Optional[str] = Field(default_factory=lambda: os.getenv("AAD_CLIENT_SECRET"))
+    
+    # Group to role mapping (JSON string)
+    group_map_json: str = Field(default_factory=lambda: os.getenv("AAD_GROUP_MAP_JSON", "{}"))
+    
+    # Caching configuration
+    cache_ttl_minutes: int = Field(default_factory=lambda: int(os.getenv("AAD_CACHE_TTL_MINUTES", "15")))
+    
+    # Security settings
+    require_tenant_isolation: bool = Field(default_factory=lambda: os.getenv("AAD_REQUIRE_TENANT_ISOLATION", "true").lower() == "true")
+    allowed_tenant_ids: list[str] = Field(default_factory=lambda: [
+        t.strip() for t in os.getenv("AAD_ALLOWED_TENANT_IDS", "").split(",") if t.strip()
+    ])
+
+
 class LoggingConfig(BaseModel):
     """Logging configuration"""
     level: str = Field(default_factory=lambda: os.getenv("LOG_LEVEL", "INFO"))
     format: str = Field(default_factory=lambda: os.getenv("LOG_FORMAT", "json"))
     correlation_id_header: str = Field(default_factory=lambda: os.getenv("CORRELATION_ID_HEADER", "X-Correlation-ID"))
+
+
+class CacheConfig(BaseModel):
+    """Cache configuration for in-process caching"""
+    # Presets cache (hot read optimization)
+    presets_max_size_mb: int = Field(default_factory=lambda: int(os.getenv("CACHE_PRESETS_MAX_SIZE_MB", "100")))
+    presets_ttl_seconds: int = Field(default_factory=lambda: int(os.getenv("CACHE_PRESETS_TTL_SECONDS", "3600")))  # 1 hour
+    presets_max_entries: int = Field(default_factory=lambda: int(os.getenv("CACHE_PRESETS_MAX_ENTRIES", "100")))
+    
+    # Framework metadata cache
+    framework_max_size_mb: int = Field(default_factory=lambda: int(os.getenv("CACHE_FRAMEWORK_MAX_SIZE_MB", "50")))
+    framework_ttl_seconds: int = Field(default_factory=lambda: int(os.getenv("CACHE_FRAMEWORK_TTL_SECONDS", "1800")))  # 30 minutes
+    framework_max_entries: int = Field(default_factory=lambda: int(os.getenv("CACHE_FRAMEWORK_MAX_ENTRIES", "50")))
+    
+    # User roles/groups cache (AAD integration)
+    user_roles_max_size_mb: int = Field(default_factory=lambda: int(os.getenv("CACHE_USER_ROLES_MAX_SIZE_MB", "20")))
+    user_roles_ttl_seconds: int = Field(default_factory=lambda: int(os.getenv("CACHE_USER_ROLES_TTL_SECONDS", "900")))  # 15 minutes
+    user_roles_max_entries: int = Field(default_factory=lambda: int(os.getenv("CACHE_USER_ROLES_MAX_ENTRIES", "1000")))
+    
+    # Assessment schemas cache
+    assessment_schemas_max_size_mb: int = Field(default_factory=lambda: int(os.getenv("CACHE_ASSESSMENT_SCHEMAS_MAX_SIZE_MB", "75")))
+    assessment_schemas_ttl_seconds: int = Field(default_factory=lambda: int(os.getenv("CACHE_ASSESSMENT_SCHEMAS_TTL_SECONDS", "3600")))  # 1 hour
+    assessment_schemas_max_entries: int = Field(default_factory=lambda: int(os.getenv("CACHE_ASSESSMENT_SCHEMAS_MAX_ENTRIES", "200")))
+    
+    # Document metadata cache
+    document_metadata_max_size_mb: int = Field(default_factory=lambda: int(os.getenv("CACHE_DOCUMENT_METADATA_MAX_SIZE_MB", "30")))
+    document_metadata_ttl_seconds: int = Field(default_factory=lambda: int(os.getenv("CACHE_DOCUMENT_METADATA_TTL_SECONDS", "600")))  # 10 minutes
+    document_metadata_max_entries: int = Field(default_factory=lambda: int(os.getenv("CACHE_DOCUMENT_METADATA_MAX_ENTRIES", "500")))
+    
+    # General cache settings
+    cleanup_interval_seconds: int = Field(default_factory=lambda: int(os.getenv("CACHE_CLEANUP_INTERVAL_SECONDS", "300")))  # 5 minutes
+    enabled: bool = Field(default_factory=lambda: os.getenv("CACHE_ENABLED", "true").lower() == "true")
+
+
+class PerformanceConfig(BaseModel):
+    """Performance monitoring and optimization configuration"""
+    # Request timing configuration
+    slow_request_threshold_ms: int = Field(default_factory=lambda: int(os.getenv("PERF_SLOW_REQUEST_THRESHOLD_MS", "1000")))
+    enable_request_timing: bool = Field(default_factory=lambda: os.getenv("PERF_ENABLE_REQUEST_TIMING", "true").lower() == "true")
+    
+    # Database query performance
+    slow_query_threshold_ms: int = Field(default_factory=lambda: int(os.getenv("PERF_SLOW_QUERY_THRESHOLD_MS", "500")))
+    enable_query_timing: bool = Field(default_factory=lambda: os.getenv("PERF_ENABLE_QUERY_TIMING", "true").lower() == "true")
+    
+    # Cache performance tracking
+    enable_cache_metrics: bool = Field(default_factory=lambda: os.getenv("PERF_ENABLE_CACHE_METRICS", "true").lower() == "true")
+    cache_metrics_interval_seconds: int = Field(default_factory=lambda: int(os.getenv("PERF_CACHE_METRICS_INTERVAL_SECONDS", "60")))
+    
+    # Response headers for debugging
+    include_timing_headers: bool = Field(default_factory=lambda: os.getenv("PERF_INCLUDE_TIMING_HEADERS", "true").lower() == "true")
+    include_cache_headers: bool = Field(default_factory=lambda: os.getenv("PERF_INCLUDE_CACHE_HEADERS", "false").lower() == "true")
+    
+    # Memory monitoring
+    enable_memory_monitoring: bool = Field(default_factory=lambda: os.getenv("PERF_ENABLE_MEMORY_MONITORING", "false").lower() == "true")
+    memory_check_interval_seconds: int = Field(default_factory=lambda: int(os.getenv("PERF_MEMORY_CHECK_INTERVAL_SECONDS", "300")))
+    
+    # Performance alerts
+    enable_performance_alerts: bool = Field(default_factory=lambda: os.getenv("PERF_ENABLE_ALERTS", "false").lower() == "true")
+    alert_slow_request_count_threshold: int = Field(default_factory=lambda: int(os.getenv("PERF_ALERT_SLOW_REQUEST_COUNT", "10")))
+    alert_time_window_minutes: int = Field(default_factory=lambda: int(os.getenv("PERF_ALERT_TIME_WINDOW_MINUTES", "5")))
 
 
 class AppConfig(BaseModel):
@@ -83,6 +166,9 @@ class AppConfig(BaseModel):
     rag: RAGConfig = Field(default_factory=RAGConfig)
     storage: StorageConfig = Field(default_factory=StorageConfig)
     logging: LoggingConfig = Field(default_factory=LoggingConfig)
+    aad_groups: AADGroupsConfig = Field(default_factory=AADGroupsConfig)
+    cache: CacheConfig = Field(default_factory=CacheConfig)
+    performance: PerformanceConfig = Field(default_factory=PerformanceConfig)
     
     # Admin settings
     admin_emails: list[str] = Field(default_factory=lambda: [
@@ -126,6 +212,52 @@ class AppConfig(BaseModel):
             "chunk_size": self.rag.chunk_size_tokens,
             "similarity_threshold": self.rag.similarity_threshold,
             "is_operational": self.is_rag_enabled()
+        }
+
+    def is_aad_groups_enabled(self) -> bool:
+        """Check if AAD groups integration is properly configured and enabled"""
+        return (
+            self.aad_groups.enabled
+            and self.aad_groups.mode == "enabled"
+            and bool(self.aad_groups.tenant_id)
+            and bool(self.aad_groups.client_id)
+            and bool(self.aad_groups.client_secret)
+        )
+
+    def validate_aad_config(self) -> tuple[bool, list[str]]:
+        """Validate AAD groups configuration"""
+        errors = []
+        
+        if self.aad_groups.enabled:
+            if not self.aad_groups.tenant_id:
+                errors.append("AAD_TENANT_ID is required when AUTH_GROUPS_MODE is enabled")
+            if not self.aad_groups.client_id:
+                errors.append("AAD_CLIENT_ID is required when AUTH_GROUPS_MODE is enabled")
+            if not self.aad_groups.client_secret:
+                errors.append("AAD_CLIENT_SECRET is required when AUTH_GROUPS_MODE is enabled")
+            
+            # Validate group mapping JSON
+            try:
+                import json
+                group_map = json.loads(self.aad_groups.group_map_json)
+                if not isinstance(group_map, dict):
+                    errors.append("AAD_GROUP_MAP_JSON must be a valid JSON object")
+            except json.JSONDecodeError:
+                errors.append("AAD_GROUP_MAP_JSON must be valid JSON")
+                
+        return len(errors) == 0, errors
+
+    def get_aad_status(self) -> dict:
+        """Get AAD groups configuration status for monitoring and debugging"""
+        return {
+            "mode": self.aad_groups.mode,
+            "enabled": self.aad_groups.enabled,
+            "tenant_id": self.aad_groups.tenant_id,
+            "client_configured": bool(self.aad_groups.client_id),
+            "cache_ttl_minutes": self.aad_groups.cache_ttl_minutes,
+            "require_tenant_isolation": self.aad_groups.require_tenant_isolation,
+            "allowed_tenant_count": len(self.aad_groups.allowed_tenant_ids),
+            "is_operational": self.is_aad_groups_enabled()
         }
 
 

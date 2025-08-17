@@ -85,6 +85,58 @@ export default defineConfig({
       use: { ...devices['Desktop Firefox'] },
     },
     
+    /* Enterprise Feature Tests */
+    {
+      name: 'enterprise-aad',
+      use: { 
+        ...devices['Desktop Chrome'],
+        storageState: 'e2e/auth/aad-session.json',
+      },
+      testMatch: '**/aad-groups.spec.ts',
+      dependencies: ['setup-enterprise'],
+    },
+    
+    {
+      name: 'enterprise-gdpr',
+      use: { 
+        ...devices['Desktop Chrome'],
+        storageState: 'e2e/auth/admin-session.json',
+      },
+      testMatch: '**/gdpr.spec.ts',
+      dependencies: ['setup-enterprise'],
+    },
+    
+    {
+      name: 'enterprise-performance',
+      use: { 
+        ...devices['Desktop Chrome'],
+        // Extended timeout for performance tests
+        timeout: 120_000,
+      },
+      testMatch: '**/performance.spec.ts',
+      dependencies: ['setup-enterprise'],
+    },
+    
+    {
+      name: 'enterprise-rbac',
+      use: { 
+        ...devices['Desktop Chrome'],
+        storageState: 'e2e/auth/multi-role-session.json',
+      },
+      testMatch: '**/rbac.spec.ts',
+      dependencies: ['setup-enterprise'],
+    },
+    
+    {
+      name: 'enterprise-admin',
+      use: { 
+        ...devices['Desktop Chrome'],
+        storageState: 'e2e/auth/admin-session.json',
+      },
+      testMatch: '**/admin-enterprise.spec.ts',
+      dependencies: ['setup-enterprise'],
+    },
+    
     /* Test AAD authentication flows */
     {
       name: 'aad-auth',
@@ -97,6 +149,47 @@ export default defineConfig({
       dependencies: ['setup-aad'],
     },
     
+    /* Enhanced Integration Tests */
+    {
+      name: 'integration-enterprise',
+      use: { 
+        ...devices['Desktop Chrome'],
+        // Extended timeout for integration tests
+        timeout: 90_000,
+      },
+      testMatch: '**/integration.spec.ts',
+      dependencies: ['setup-enterprise'],
+    },
+    
+    /* Cross-browser enterprise testing */
+    {
+      name: 'enterprise-firefox',
+      use: { 
+        ...devices['Desktop Firefox'],
+        timeout: 90_000,
+      },
+      testMatch: '**/aad-groups.spec.ts',
+      dependencies: ['setup-enterprise'],
+    },
+    
+    /* Load testing project */
+    {
+      name: 'load-testing',
+      use: { 
+        ...devices['Desktop Chrome'],
+        timeout: 300_000, // 5 minutes for load tests
+      },
+      testMatch: '**/load/*.spec.ts',
+      dependencies: ['setup-enterprise'],
+    },
+    
+    /* Setup project for enterprise features */
+    {
+      name: 'setup-enterprise',
+      testMatch: '**/enterprise-setup.spec.ts',
+      teardown: 'cleanup-enterprise',
+    },
+    
     /* Setup project for AAD authentication */
     {
       name: 'setup-aad',
@@ -104,7 +197,12 @@ export default defineConfig({
       teardown: 'cleanup-aad',
     },
     
-    /* Cleanup project */
+    /* Cleanup projects */
+    {
+      name: 'cleanup-enterprise',
+      testMatch: '**/enterprise-cleanup.spec.ts',
+    },
+    
     {
       name: 'cleanup-aad',
       testMatch: '**/auth-cleanup.spec.ts',

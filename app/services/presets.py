@@ -3,6 +3,8 @@ from pathlib import Path
 from typing import List, Dict, Any
 from fastapi import HTTPException
 from ..api.schemas import AssessmentPreset
+from .cache import get_cached, invalidate_cache_key, cache_manager
+from ..config import config
 
 BUNDLED: Dict[str, Path] = {}  # filled at startup with any bundled presets (e.g. cyber-for-ai.json)
 DATA_DIR = Path("data/presets")
@@ -24,7 +26,27 @@ def _slug(s: str) -> str:
     s = re.sub(r"[^a-z0-9]+", "-", s)
     return s.strip("-")[:40] or "preset"
 
-def list_presets() -> List[Dict[str, Any]]:
+async def list_presets() -> List[Dict[str, Any]]:
+    """List all available presets with caching for performance"""
+    if not config.cache.enabled:
+        return _list_presets_uncached()
+    
+    async def compute_presets_list():
+        return _list_presets_uncached()
+    
+    return await get_cached(
+        cache_name="presets",
+        key="presets_list",
+        factory=compute_presets_list,
+        ttl_seconds=config.cache.presets_ttl_seconds,
+        max_size_mb=config.cache.presets_max_size_mb,
+        max_entries=config.cache.presets_max_entries,
+        cleanup_interval_seconds=config.cache.cleanup_interval_seconds
+    )
+
+
+def _list_presets_uncached() -> List[Dict[str, Any]]:
+    """Internal uncached implementation of list_presets"""
     ensure_dirs()
     items: List[Dict[str, Any]] = []
 
@@ -62,7 +84,29 @@ def list_presets() -> List[Dict[str, Any]]:
         out[it["id"]] = it
     return list(out.values())
 
-def get_preset(preset_id: str) -> AssessmentPreset:
+async def get_preset(preset_id: str) -> AssessmentPreset:
+    """Get a specific preset with caching for performance"""
+    if not config.cache.enabled:
+        return _get_preset_uncached(preset_id)
+    
+    async def compute_preset():
+        return _get_preset_uncached(preset_id)
+    
+    cached_preset = await get_cached(
+        cache_name="presets",
+        key=f"preset_{preset_id}",
+        factory=compute_preset,
+        ttl_seconds=config.cache.presets_ttl_seconds,
+        max_size_mb=config.cache.presets_max_size_mb,
+        max_entries=config.cache.presets_max_entries,
+        cleanup_interval_seconds=config.cache.cleanup_interval_seconds
+    )
+    
+    return AssessmentPreset(**cached_preset) if isinstance(cached_preset, dict) else cached_preset
+
+
+def _get_preset_uncached(preset_id: str) -> AssessmentPreset:
+    """Internal uncached implementation of get_preset"""
     ensure_dirs()
     # uploaded takes precedence
     up = DATA_DIR / f"{preset_id}.json"
@@ -74,7 +118,8 @@ def get_preset(preset_id: str) -> AssessmentPreset:
         return AssessmentPreset(**_load_json(path))
     raise HTTPException(404, "Preset not found")
 
-def save_uploaded_preset(data: dict) -> AssessmentPreset:
+async def save_uploaded_preset(data: dict) -> AssessmentPreset:
+    """Save uploaded preset and invalidate related caches"""
     ensure_dirs()
     preset = AssessmentPreset(**data)
     
@@ -88,6 +133,12 @@ def save_uploaded_preset(data: dict) -> AssessmentPreset:
     
     with out.open("w", encoding="utf-8") as f:
         json.dump(preset.model_dump(), f, ensure_ascii=False, indent=2)
+    
+    # Invalidate caches when preset is saved
+    if config.cache.enabled:
+        await invalidate_cache_key("presets", f"preset_{preset.id}")
+        await invalidate_cache_key("presets", "presets_list")
+    
     return preset
 
 def _validate_safe_filename(filename: str) -> str:
