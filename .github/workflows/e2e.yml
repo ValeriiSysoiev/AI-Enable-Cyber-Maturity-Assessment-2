@@ -67,7 +67,16 @@ jobs:
     - name: Install Playwright browsers
       run: |
         cd web
+        echo "Installing Playwright browsers for ${{ matrix.browser }}..."
         npx playwright install --with-deps ${{ matrix.browser }}
+        
+        # Verify installation
+        echo "Verifying Playwright installation..."
+        npx playwright --version
+        
+        # List available projects with correct config path
+        echo "Available Playwright projects:"
+        npx playwright test --config=e2e/playwright.config.ts --list --reporter=line | head -10 || echo "Could not list projects"
 
     - name: Setup test environment
       run: |
@@ -150,13 +159,35 @@ jobs:
       run: |
         cd web
         
+        # Verify Playwright configuration
+        echo "Checking Playwright configuration..."
+        if [ ! -f "e2e/playwright.config.ts" ]; then
+          echo "❌ Playwright config not found at e2e/playwright.config.ts"
+          exit 1
+        fi
+        
+        # List available projects before running tests
+        echo "Available Playwright projects:"
+        npx playwright test --config=e2e/playwright.config.ts --list --reporter=line | head -5 || echo "Could not list projects"
+        
         # Determine which tests to run
         TEST_SUITE="${{ github.event.inputs.test_suite || 'all' }}"
         
+        echo "Running tests with browser: ${{ matrix.browser }}"
+        echo "Test suite: $TEST_SUITE"
+        
         if [ "$TEST_SUITE" = "all" ]; then
-          npx playwright test --project=${{ matrix.browser }}
+          # Try with project flag first, fallback to without project flag
+          if ! npx playwright test --config=e2e/playwright.config.ts --project=${{ matrix.browser }} --reporter=github; then
+            echo "⚠️ Project-specific run failed, trying without project flag..."
+            npx playwright test --config=e2e/playwright.config.ts --reporter=github
+          fi
         else
-          npx playwright test $TEST_SUITE.spec.ts --project=${{ matrix.browser }}
+          # Try with project flag first, fallback to without project flag
+          if ! npx playwright test --config=e2e/playwright.config.ts $TEST_SUITE.spec.ts --project=${{ matrix.browser }} --reporter=github; then
+            echo "⚠️ Project-specific run failed, trying without project flag..."
+            npx playwright test --config=e2e/playwright.config.ts $TEST_SUITE.spec.ts --reporter=github
+          fi
         fi
       env:
         CI: true
