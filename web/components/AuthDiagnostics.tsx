@@ -11,7 +11,7 @@ type LoadingState = "idle" | "loading" | "error" | "success";
 
 export default function AuthDiagnostics({ className = "" }: AuthDiagnosticsProps) {
   const [diagnostics, setDiagnostics] = useState<AuthDiagnosticsType | null>(null);
-  const [loadingState, setLoadingState] = useState<LoadingState>("idle");
+  const [loadingState, setLoadingState] = useState<"idle" | "loading" | "error" | "success">("idle");
   const [error, setError] = useState<string>("");
   const [lastRefresh, setLastRefresh] = useState<string>("");
 
