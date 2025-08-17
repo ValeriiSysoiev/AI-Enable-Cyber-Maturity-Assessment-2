@@ -10,8 +10,8 @@ from typing import Dict, Any, Optional
 from fastapi import APIRouter, Request
 from pydantic import BaseModel
 
-from ...config import config
-from ...services.rag_service import create_rag_service
+from config import config
+from services.rag_service import create_rag_service
 
 
 router = APIRouter(tags=["system"])
