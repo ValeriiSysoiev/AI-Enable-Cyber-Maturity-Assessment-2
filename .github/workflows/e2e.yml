@@ -98,23 +98,47 @@ jobs:
         cd web
         if [ "${{ vars.WEB_BASE_URL }}" = "" ]; then
           echo "Starting local application for testing..."
-          npm start &
+          
+          # Start the application and capture output (bind to all interfaces)
+          npx next start -H 0.0.0.0 -p 3000 > app.log 2>&1 &
           APP_PID=$!
           echo "Application started with PID: $APP_PID"
           
+          # Give the application a moment to initialize
+          sleep 3
+          
           # Wait for application to be ready with better error handling
           echo "Waiting for application to be ready..."
-          for i in {1..30}; do
-            if curl -f -s http://localhost:3000 >/dev/null 2>&1; then
-              echo "✅ Application is ready after ${i} attempts"
+          for i in {1..20}; do
+            # Try multiple connection methods
+            if curl -f -s --connect-timeout 5 --max-time 10 http://localhost:3000 >/dev/null 2>&1; then
+              echo "✅ Application is ready after ${i} attempts (curl success)"
               break
-            elif [ $i -eq 30 ]; then
-              echo "❌ Application failed to start after 60 seconds"
-              echo "Checking application logs..."
-              ps aux | grep node || true
+            elif curl -f -s --connect-timeout 5 --max-time 10 http://127.0.0.1:3000 >/dev/null 2>&1; then
+              echo "✅ Application is ready after ${i} attempts (127.0.0.1 success)"
+              break
+            elif netstat -tln | grep -q ":3000 "; then
+              echo "✅ Application is ready after ${i} attempts (port 3000 is listening)"
+              break
+            elif [ $i -eq 20 ]; then
+              echo "❌ Application failed to start after 40 seconds"
+              echo ""
+              echo "=== Debugging Information ==="
+              echo "Process status:"
+              ps aux | grep -E "(node|next)" | grep -v grep || echo "No node processes found"
+              echo ""
+              echo "Network status:"
+              netstat -tln | grep -E "(3000|LISTEN)" || echo "No listening ports found"
+              echo ""
+              echo "Application logs (last 20 lines):"
+              tail -20 app.log 2>/dev/null || echo "No application logs found"
+              echo ""
+              echo "Curl test results:"
+              curl -v http://localhost:3000 2>&1 | head -10 || echo "Curl failed"
+              echo "=========================="
               exit 1
             else
-              echo "Attempt $i/30: Application not ready yet, waiting 2 seconds..."
+              echo "Attempt $i/20: Application not ready yet, waiting 2 seconds..."
               sleep 2
             fi
           done
