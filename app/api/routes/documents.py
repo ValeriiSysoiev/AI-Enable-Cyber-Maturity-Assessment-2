@@ -8,9 +8,9 @@ from typing import Optional, Dict, Any, List
 from domain.repository import Repository
 from domain.models import Document
 from ..security import current_context, require_member, is_admin
-from util.files import safe_join, extract_text
-from services.rag import create_rag_service, IngestionStatus, SearchResult
-from config import config
+from ...util.files import safe_join, extract_text
+from ...services.rag import create_rag_service, IngestionStatus, SearchResult
+from ...config import config
 
 class DocumentPublic(BaseModel):
     """Public document model that excludes the filesystem path"""

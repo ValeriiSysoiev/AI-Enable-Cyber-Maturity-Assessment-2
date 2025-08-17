@@ -18,7 +18,7 @@ from domain.repository import InMemoryRepository
 from domain.file_repo import FileRepository
 from ai.llm import LLMClient
 from ai.orchestrator import Orchestrator
-from config import config
+from .config import config
 
 app = FastAPI(title="AI Maturity Tool API", version="0.1.0")
 
