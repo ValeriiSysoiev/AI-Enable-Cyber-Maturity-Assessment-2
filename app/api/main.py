@@ -13,14 +13,26 @@ from .db import create_db_and_tables, get_session
 from .models import Assessment, Answer
 from .schemas import AssessmentCreate, AssessmentResponse, AnswerUpsert, ScoreResponse, PillarScore
 from .scoring import compute_scores
-from .routes import assessments as assessments_router, orchestrations as orchestrations_router, engagements as engagements_router, documents, summary, presets as presets_router, version as version_router
+from .routes import assessments as assessments_router, orchestrations as orchestrations_router, engagements as engagements_router, documents, summary, presets as presets_router, version as version_router, admin_auth as admin_auth_router, gdpr as gdpr_router
 from domain.repository import InMemoryRepository
 from domain.file_repo import FileRepository
 from ai.llm import LLMClient
 from ai.orchestrator import Orchestrator
 from config import config
 
+# Import performance monitoring components
+from .middleware.performance import PerformanceTrackingMiddleware, CorrelationIDMiddleware
+from ..services.performance import start_performance_monitoring, stop_performance_monitoring
+from ..services.cache import cache_manager
+
 app = FastAPI(title="AI Maturity Tool API", version="0.1.0")
+
+# --- Performance and monitoring middleware (order matters) ---
+# 1. Correlation ID middleware (runs first to ensure correlation IDs are available)
+app.add_middleware(CorrelationIDMiddleware)
+
+# 2. Performance tracking middleware (runs after correlation ID is set)
+app.add_middleware(PerformanceTrackingMiddleware)
 
 # --- CORS configuration (env-driven) ---
 app.add_middleware(
@@ -29,11 +41,11 @@ app.add_middleware(
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],  # allow custom headers like X-User-Email, X-Engagement-ID, X-Correlation-ID
-    expose_headers=["Content-Disposition"],
+    expose_headers=["Content-Disposition", "X-Response-Time-MS", "X-Correlation-ID", "X-Cache-Hits", "X-Cache-Misses", "X-Cache-Hit-Rate"],
 )
 
 @app.on_event("startup")
-def on_startup():
+async def on_startup():
     # Configure logging
     logging.basicConfig(
         level=getattr(logging, config.logging.level.upper()),
@@ -45,6 +57,40 @@ def on_startup():
     # Wire up new domain dependencies
     app.state.repo = FileRepository()
     app.state.orchestrator = Orchestrator(LLMClient())
+    
+    # Initialize performance monitoring and caching
+    logger.info("Starting performance monitoring and cache services...")
+    
+    # Start cache cleanup tasks
+    if config.cache.enabled:
+        await cache_manager.start_all_cleanup()
+        logger.info(
+            "Cache services started",
+            extra={
+                "cache_enabled": config.cache.enabled,
+                "presets_ttl": config.cache.presets_ttl_seconds,
+                "framework_ttl": config.cache.framework_ttl_seconds,
+                "user_roles_ttl": config.cache.user_roles_ttl_seconds
+            }
+        )
+    else:
+        logger.info("Cache services disabled")
+    
+    # Start performance monitoring
+    if config.performance.enable_request_timing or config.performance.enable_query_timing:
+        await start_performance_monitoring()
+        logger.info(
+            "Performance monitoring started",
+            extra={
+                "request_timing": config.performance.enable_request_timing,
+                "query_timing": config.performance.enable_query_timing,
+                "slow_request_threshold_ms": config.performance.slow_request_threshold_ms,
+                "slow_query_threshold_ms": config.performance.slow_query_threshold_ms,
+                "alerts_enabled": config.performance.enable_performance_alerts
+            }
+        )
+    else:
+        logger.info("Performance monitoring disabled")
     
     # Validate RAG configuration if enabled
     if config.rag.enabled:
@@ -70,6 +116,31 @@ def on_startup():
     else:
         logger.info("RAG services disabled")
     
+    # Validate AAD configuration if enabled
+    if config.aad_groups.enabled:
+        is_valid, errors = config.validate_aad_config()
+        if not is_valid:
+            logger.warning(
+                "AAD groups is enabled but configuration is invalid",
+                extra={
+                    "errors": errors,
+                    "aad_enabled": config.aad_groups.enabled
+                }
+            )
+        else:
+            logger.info(
+                "AAD groups authentication configured and enabled",
+                extra={
+                    "tenant_id": config.aad_groups.tenant_id,
+                    "client_configured": bool(config.aad_groups.client_id),
+                    "cache_ttl_minutes": config.aad_groups.cache_ttl_minutes,
+                    "require_tenant_isolation": config.aad_groups.require_tenant_isolation,
+                    "allowed_tenants_count": len(config.aad_groups.allowed_tenant_ids)
+                }
+            )
+    else:
+        logger.info("AAD groups authentication disabled")
+    
     # Initialize preset service
     from services import presets as preset_service
     preset_service.ensure_dirs()
@@ -85,6 +156,85 @@ def on_startup():
         pass
 
 
+@app.on_event("shutdown")
+async def on_shutdown():
+    """Clean shutdown of performance monitoring and cache services"""
+    logger = logging.getLogger(__name__)
+    logger.info("Shutting down performance monitoring and cache services...")
+    
+    # Stop performance monitoring
+    try:
+        await stop_performance_monitoring()
+        logger.info("Performance monitoring stopped")
+    except Exception as e:
+        logger.error(f"Error stopping performance monitoring: {e}")
+    
+    # Stop cache cleanup tasks
+    try:
+        await cache_manager.stop_all_cleanup()
+        logger.info("Cache cleanup tasks stopped")
+    except Exception as e:
+        logger.error(f"Error stopping cache services: {e}")
+    
+    logger.info("Application shutdown complete")
+
+
+# Performance monitoring endpoint
+@app.get("/api/performance/metrics")
+async def get_performance_metrics(time_window_minutes: int = 60):
+    """Get performance metrics for monitoring and debugging"""
+    from ..services.performance import get_performance_statistics, get_recent_alerts
+    from ..services.cache import get_cache_metrics
+    
+    try:
+        # Get performance statistics
+        perf_stats = get_performance_statistics(time_window_minutes)
+        
+        # Get recent alerts
+        recent_alerts = get_recent_alerts(limit=20)
+        
+        # Get cache metrics
+        cache_metrics = get_cache_metrics()
+        
+        return {
+            "time_window_minutes": time_window_minutes,
+            "performance_statistics": {
+                "total_requests": perf_stats.total_requests,
+                "avg_response_time_ms": round(perf_stats.avg_response_time_ms, 2),
+                "p95_response_time_ms": round(perf_stats.p95_response_time_ms, 2),
+                "p99_response_time_ms": round(perf_stats.p99_response_time_ms, 2),
+                "slow_requests_count": perf_stats.slow_requests_count,
+                "total_db_queries": perf_stats.total_db_queries,
+                "avg_query_time_ms": round(perf_stats.avg_query_time_ms, 2),
+                "slow_queries_count": perf_stats.slow_queries_count,
+                "cache_hit_rate": round(perf_stats.cache_hit_rate, 2),
+                "memory_usage_mb": round(perf_stats.memory_usage_mb, 2),
+                "cpu_usage_percent": round(perf_stats.cpu_usage_percent, 2)
+            },
+            "cache_metrics": cache_metrics,
+            "recent_alerts": [
+                {
+                    "type": alert.alert_type,
+                    "message": alert.message,
+                    "severity": alert.severity,
+                    "timestamp": alert.timestamp.isoformat(),
+                    "correlation_id": alert.correlation_id
+                }
+                for alert in recent_alerts
+            ],
+            "configuration": {
+                "cache_enabled": config.cache.enabled,
+                "performance_monitoring_enabled": config.performance.enable_request_timing,
+                "slow_request_threshold_ms": config.performance.slow_request_threshold_ms,
+                "slow_query_threshold_ms": config.performance.slow_query_threshold_ms,
+                "alerts_enabled": config.performance.enable_performance_alerts
+            }
+        }
+    except Exception as e:
+        logger.error(f"Error retrieving performance metrics: {e}")
+        raise HTTPException(status_code=500, detail="Failed to retrieve performance metrics")
+
+
 
 app.include_router(assist_router)
 app.include_router(storage_router)
@@ -95,6 +245,8 @@ app.include_router(documents.router)
 app.include_router(summary.router)
 app.include_router(presets_router.router)
 app.include_router(version_router.router)
+app.include_router(admin_auth_router.router)
+app.include_router(gdpr_router.router)
 
 def load_preset(preset_id: str) -> dict:
     # Use new preset service for consistency
