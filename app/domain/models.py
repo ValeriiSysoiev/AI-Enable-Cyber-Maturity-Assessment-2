@@ -1,5 +1,5 @@
 from __future__ import annotations
-from typing import List, Optional, Literal
+from typing import List, Optional, Literal, Dict, Any
 from pydantic import BaseModel, Field
 from datetime import datetime, timezone
 import uuid
@@ -73,3 +73,29 @@ class Document(BaseModel):
     path: str  # absolute or repo-root relative path on disk
     uploaded_by: str
     uploaded_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+
+class EmbeddingDocument(BaseModel):
+    """Vector embedding document for RAG storage"""
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    engagement_id: str
+    doc_id: str  # Reference to original Document
+    chunk_id: str  # Unique identifier for this chunk
+    vector: List[float]  # Embedding vector
+    text: str  # Text content of the chunk
+    metadata: Dict[str, Any] = Field(default_factory=dict)  # Additional metadata
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    
+    # Chunk-specific metadata
+    chunk_index: int = 0
+    chunk_start: int = 0
+    chunk_end: int = 0
+    token_count: Optional[int] = None
+    
+    # Source document metadata
+    filename: str = ""
+    uploaded_by: str = ""
+    uploaded_at: Optional[datetime] = None
+    
+    # Embedding metadata
+    model: str = ""
+    embedding_created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))

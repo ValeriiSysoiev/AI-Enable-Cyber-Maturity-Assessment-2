@@ -25,9 +25,19 @@ jobs:
       with:
         node-version: '18'
 
+    - name: Setup Azure CLI
+      uses: azure/CLI@v1
+      with:
+        azcliversion: 2.50.0
+
+    - name: Azure Login
+      uses: azure/login@v1
+      with:
+        creds: ${{ secrets.AZURE_CREDENTIALS }}
+
     - name: Install dependencies
       run: |
-        cd e2e
+        cd web
         npm ci
 
     - name: Validate environment variables
@@ -92,43 +102,101 @@ jobs:
           exit 1
         fi
 
+    - name: Run comprehensive verification
+      run: |
+        echo "🔍 Running comprehensive deployment verification..."
+        chmod +x scripts/verify_live.sh
+        
+        # Run enhanced verification script
+        export DEPLOYMENT_VERIFICATION=true
+        export GITHUB_SHA=${{ github.sha }}
+        export RELEASE_VERIFICATION=true
+        
+        if ./scripts/verify_live.sh 2>&1 | tee verification-output.log; then
+          echo "✅ Infrastructure verification passed"
+        else
+          echo "❌ Infrastructure verification failed"
+          exit 1
+        fi
+
+    - name: Install Playwright browsers
+      run: |
+        cd web
+        npx playwright install --with-deps chromium
+
     - name: Run smoke tests
       env:
-        WEB_URL: ${{ env.WEB_ENDPOINT }}
-        API_URL: ${{ env.API_ENDPOINT }}
+        WEB_BASE_URL: ${{ env.WEB_ENDPOINT }}
+        API_BASE_URL: ${{ env.API_ENDPOINT }}
+        CI: true
       run: |
-        echo "Running smoke tests..."
-        cd e2e
-        set -o pipefail
+        echo "🧪 Running smoke tests..."
+        cd web
         
-        # Run the smoke tests and capture exit code immediately
-        npm run test:smoke || rc=$?
+        # Run smoke tests with production configuration
+        npx playwright test smoke.spec.ts --project=chromium --reporter=github
         
-        # Use the captured exit code for decision making
-        if [ "${rc:-0}" -eq 0 ]; then
-          echo "Smoke tests passed successfully"
+        if [ $? -eq 0 ]; then
+          echo "✅ Smoke tests passed"
         else
-          echo "Smoke tests failed with exit code: ${rc:-0}"
+          echo "❌ Smoke tests failed"
           exit 1
         fi
 
     - name: Run authentication tests
       env:
-        WEB_URL: ${{ env.WEB_ENDPOINT }}
-        API_URL: ${{ env.API_ENDPOINT }}
+        WEB_BASE_URL: ${{ env.WEB_ENDPOINT }}
+        API_BASE_URL: ${{ env.API_ENDPOINT }}
+        CI: true
       run: |
-        echo "Running authentication tests..."
-        cd e2e
-        set -o pipefail
+        echo "🔐 Running authentication tests..."
+        cd web
         
-        # Run the auth tests and capture exit code immediately
-        npm run test:auth || rc=$?
+        # Run auth tests with production configuration
+        npx playwright test auth.spec.ts --project=chromium --reporter=github
         
-        # Use the captured exit code for decision making
-        if [ "${rc:-0}" -eq 0 ]; then
-          echo "Authentication tests passed successfully"
+        if [ $? -eq 0 ]; then
+          echo "✅ Authentication tests passed"
         else
-          echo "Authentication tests failed with exit code: ${rc:-0}"
+          echo "❌ Authentication tests failed"
+          exit 1
+        fi
+
+    - name: Run evidence workflow tests
+      env:
+        WEB_BASE_URL: ${{ env.WEB_ENDPOINT }}
+        API_BASE_URL: ${{ env.API_ENDPOINT }}
+        CI: true
+      run: |
+        echo "📋 Running evidence workflow tests..."
+        cd web
+        
+        # Run evidence tests with production configuration
+        npx playwright test evidence.spec.ts --project=chromium --reporter=github --timeout=60000
+        
+        if [ $? -eq 0 ]; then
+          echo "✅ Evidence workflow tests passed"
+        else
+          echo "❌ Evidence workflow tests failed"
+          exit 1
+        fi
+
+    - name: Run integration tests
+      env:
+        WEB_BASE_URL: ${{ env.WEB_ENDPOINT }}
+        API_BASE_URL: ${{ env.API_ENDPOINT }}
+        CI: true
+      run: |
+        echo "🔗 Running integration tests..."
+        cd web
+        
+        # Run integration tests with production configuration
+        npx playwright test integration.spec.ts --project=chromium --reporter=github --timeout=90000
+        
+        if [ $? -eq 0 ]; then
+          echo "✅ Integration tests passed"
+        else
+          echo "❌ Integration tests failed"
           exit 1
         fi
 

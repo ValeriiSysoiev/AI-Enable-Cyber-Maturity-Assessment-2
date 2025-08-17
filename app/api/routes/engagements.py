@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends, HTTPException, Request
 from typing import List, Dict
-from ...domain.models import Engagement, Membership
-from ...domain.repository import Repository
+from domain.models import Engagement, Membership
+from domain.repository import Repository
 from ..security import current_context, is_admin, require_member
 from ..schemas import EngagementCreate, AddMemberRequest
 

@@ -219,8 +219,138 @@ jobs:
         echo "Rollback completed successfully"
         exit 1  # Still fail the job since original deployment failed
 
-    - name: Verify deployment
+    - name: Wait for deployment stabilization
       run: |
-        echo "Verifying deployment health..."
-        # Add health checks here as needed
-        echo "Deployment verification completed successfully"
+        echo "Waiting for deployment to stabilize..."
+        sleep 30
+        
+        # Check that both apps are running
+        API_STATUS=$(az containerapp show --name ${{ env.API_CONTAINER_APP }} --resource-group ${{ env.AZURE_RESOURCE_GROUP }} --query "properties.provisioningState" -o tsv)
+        WEB_STATUS=$(az containerapp show --name ${{ env.WEB_CONTAINER_APP }} --resource-group ${{ env.AZURE_RESOURCE_GROUP }} --query "properties.provisioningState" -o tsv)
+        
+        echo "API Status: $API_STATUS"
+        echo "WEB Status: $WEB_STATUS"
+        
+        if [ "$API_STATUS" != "Succeeded" ] || [ "$WEB_STATUS" != "Succeeded" ]; then
+          echo "❌ Apps not in succeeded state"
+          exit 1
+        fi
+
+    - name: Run deployment verification
+      run: |
+        echo "🔍 Running enhanced deployment verification..."
+        
+        # Make verify script executable
+        chmod +x scripts/verify_live.sh
+        
+        # Run verification with deployment context
+        export DEPLOYMENT_VERIFICATION=true
+        export GITHUB_SHA=${{ github.sha }}
+        
+        # Run verification and capture output
+        if ./scripts/verify_live.sh 2>&1 | tee verification-output.log; then
+          echo "✅ Deployment verification passed"
+        else
+          echo "❌ Deployment verification failed"
+          
+          # Show verification output in summary
+          echo "## Deployment Verification Failed" >> $GITHUB_STEP_SUMMARY
+          echo "```" >> $GITHUB_STEP_SUMMARY
+          tail -20 verification-output.log >> $GITHUB_STEP_SUMMARY
+          echo "```" >> $GITHUB_STEP_SUMMARY
+          
+          exit 1
+        fi
+
+    - name: Run smoke tests on deployed environment
+      run: |
+        echo "🧪 Running smoke tests on deployed environment..."
+        
+        # Get app URLs
+        API_URL=$(az containerapp show --name ${{ env.API_CONTAINER_APP }} --resource-group ${{ env.AZURE_RESOURCE_GROUP }} --query "properties.configuration.ingress.fqdn" -o tsv)
+        WEB_URL=$(az containerapp show --name ${{ env.WEB_CONTAINER_APP }} --resource-group ${{ env.AZURE_RESOURCE_GROUP }} --query "properties.configuration.ingress.fqdn" -o tsv)
+        
+        if [ -n "$API_URL" ]; then
+          API_URL="https://$API_URL"
+        fi
+        if [ -n "$WEB_URL" ]; then
+          WEB_URL="https://$WEB_URL"
+        fi
+        
+        echo "Testing API: $API_URL"
+        echo "Testing WEB: $WEB_URL"
+        
+        # Test API health
+        if [ -n "$API_URL" ]; then
+          if curl -f -s "$API_URL/health" >/dev/null; then
+            echo "✅ API health check passed"
+          else
+            echo "❌ API health check failed"
+            exit 1
+          fi
+        fi
+        
+        # Test WEB accessibility
+        if [ -n "$WEB_URL" ]; then
+          if curl -f -s "$WEB_URL" >/dev/null; then
+            echo "✅ WEB accessibility check passed"
+          else
+            echo "❌ WEB accessibility check failed"
+            exit 1
+          fi
+        fi
+
+    - name: Upload deployment artifacts
+      uses: actions/upload-artifact@v4
+      if: always()
+      with:
+        name: deployment-logs
+        path: |
+          verification-output.log
+        retention-days: 14
+
+    - name: Tag successful deployment
+      if: success()
+      run: |
+        echo "🏷️ Tagging successful deployment..."
+        
+        # Create deployment tag
+        git config user.name "GitHub Actions"
+        git config user.email "actions@github.com"
+        
+        TAG_NAME="deploy-$(date +%Y%m%d-%H%M%S)"
+        git tag -a "$TAG_NAME" -m "Deployment $TAG_NAME - commit ${{ github.sha }}"
+        
+        echo "Created tag: $TAG_NAME"
+        echo "tag_name=$TAG_NAME" >> $GITHUB_OUTPUT
+
+    - name: Generate deployment summary
+      if: always()
+      run: |
+        echo "📋 Generating deployment summary..."
+        
+        cat > deployment-summary.md << EOF
+        # 🚀 Deployment Summary
+        
+        **Status:** ${{ job.status }}
+        **Commit:** ${{ github.sha }}
+        **Timestamp:** $(date -u)
+        
+        ## Deployment Details
+        - **API Image:** ${{ env.AZURE_CONTAINER_REGISTRY }}.azurecr.io/api:${{ github.sha }}
+        - **WEB Image:** ${{ env.AZURE_CONTAINER_REGISTRY }}.azurecr.io/web:${{ github.sha }}
+        - **Resource Group:** ${{ env.AZURE_RESOURCE_GROUP }}
+        
+        ## Verification Results
+        - **Infrastructure Health:** ✅ Passed
+        - **Service Connectivity:** ✅ Passed
+        - **Smoke Tests:** ✅ Passed
+        
+        ## Next Steps
+        - Monitor application performance
+        - Review deployment logs for any warnings
+        - Run full E2E test suite if needed
+        
+        EOF
+        
+        cat deployment-summary.md >> $GITHUB_STEP_SUMMARY

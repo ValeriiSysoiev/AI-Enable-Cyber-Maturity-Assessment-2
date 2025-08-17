@@ -1,0 +1,305 @@
+name: E2E Testing
+
+on:
+  push:
+    branches: [ main, develop, phase* ]
+  pull_request:
+    branches: [ main ]
+  schedule:
+    # Run nightly tests at 2 AM UTC
+    - cron: '0 2 * * *'
+  workflow_dispatch:
+    inputs:
+      test_suite:
+        description: 'Test suite to run'
+        required: false
+        default: 'all'
+        type: choice
+        options:
+          - all
+          - smoke
+          - evidence
+          - auth
+          - integration
+      environment:
+        description: 'Environment to test against'
+        required: false
+        default: 'staging'
+        type: choice
+        options:
+          - staging
+          - production
+
+jobs:
+  e2e-tests:
+    timeout-minutes: 30
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        browser: [chromium, firefox]
+        include:
+          - browser: chromium
+            test-suite: smoke
+          - browser: chromium
+            test-suite: evidence
+          - browser: chromium
+            test-suite: auth
+          - browser: chromium
+            test-suite: integration
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+        cache: 'npm'
+        cache-dependency-path: web/package-lock.json
+
+    - name: Install dependencies
+      run: |
+        cd web
+        npm ci
+
+    - name: Install Playwright browsers
+      run: |
+        cd web
+        npx playwright install --with-deps ${{ matrix.browser }}
+
+    - name: Setup test environment
+      run: |
+        echo "Setting up E2E test environment..."
+        
+        # Create environment file for tests
+        cat > web/.env.test << EOF
+        NODE_ENV=test
+        WEB_BASE_URL=${{ vars.WEB_BASE_URL || 'http://localhost:3000' }}
+        API_BASE_URL=${{ vars.API_BASE_URL || 'http://localhost:8000' }}
+        AAD_CLIENT_ID=${{ vars.AAD_CLIENT_ID || '' }}
+        AAD_TENANT_ID=${{ vars.AAD_TENANT_ID || '' }}
+        EOF
+        
+        # Log environment (without secrets)
+        echo "Test environment configured:"
+        echo "WEB_BASE_URL: ${{ vars.WEB_BASE_URL || 'http://localhost:3000' }}"
+        echo "API_BASE_URL: ${{ vars.API_BASE_URL || 'http://localhost:8000' }}"
+        echo "AAD_CLIENT_ID: ${{ vars.AAD_CLIENT_ID && 'configured' || 'not configured' }}"
+
+    - name: Build application
+      run: |
+        cd web
+        npm run build
+
+    - name: Start application (if needed)
+      run: |
+        cd web
+        if [ "${{ vars.WEB_BASE_URL }}" = "" ]; then
+          echo "Starting local application for testing..."
+          npm start &
+          sleep 10
+          
+          # Wait for application to be ready
+          timeout 60 bash -c 'while ! curl -f http://localhost:3000 >/dev/null 2>&1; do sleep 2; done'
+        else
+          echo "Using remote application: ${{ vars.WEB_BASE_URL }}"
+        fi
+
+    - name: Run E2E tests
+      run: |
+        cd web
+        
+        # Determine which tests to run
+        TEST_SUITE="${{ github.event.inputs.test_suite || 'all' }}"
+        
+        if [ "$TEST_SUITE" = "all" ]; then
+          npx playwright test --project=${{ matrix.browser }}
+        else
+          npx playwright test $TEST_SUITE.spec.ts --project=${{ matrix.browser }}
+        fi
+      env:
+        CI: true
+        WEB_BASE_URL: ${{ vars.WEB_BASE_URL || 'http://localhost:3000' }}
+        API_BASE_URL: ${{ vars.API_BASE_URL || 'http://localhost:8000' }}
+        AAD_CLIENT_ID: ${{ vars.AAD_CLIENT_ID }}
+        AAD_TENANT_ID: ${{ vars.AAD_TENANT_ID }}
+
+    - name: Upload test results
+      uses: actions/upload-artifact@v4
+      if: always()
+      with:
+        name: playwright-results-${{ matrix.browser }}
+        path: |
+          web/test-results/
+          web/playwright-report/
+        retention-days: 30
+
+    - name: Upload test videos
+      uses: actions/upload-artifact@v4
+      if: failure()
+      with:
+        name: playwright-videos-${{ matrix.browser }}
+        path: web/test-results/**/*.webm
+        retention-days: 7
+
+    - name: Generate test summary
+      if: always()
+      run: |
+        cd web
+        
+        # Create test summary
+        echo "## E2E Test Results (${{ matrix.browser }})" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        
+        if [ -f "test-results/junit.xml" ]; then
+          # Parse JUnit XML for summary
+          TOTAL=$(grep -o 'tests="[0-9]*"' test-results/junit.xml | grep -o '[0-9]*' | head -1)
+          FAILURES=$(grep -o 'failures="[0-9]*"' test-results/junit.xml | grep -o '[0-9]*' | head -1)
+          
+          echo "- **Total Tests:** ${TOTAL:-0}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Failures:** ${FAILURES:-0}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Success Rate:** $(( (${TOTAL:-0} - ${FAILURES:-0}) * 100 / ${TOTAL:-1} ))%" >> $GITHUB_STEP_SUMMARY
+        fi
+        
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo "📊 [View detailed report](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }})" >> $GITHUB_STEP_SUMMARY
+
+  security-scan:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Run security scan
+      run: |
+        echo "🔒 Running security scans..."
+        
+        # Check for secrets in code
+        echo "Scanning for potential secrets..."
+        if git log --oneline -n 10 | grep -i -E "(password|secret|key|token)" && \
+           grep -r -i -E "(password|secret|key|token)" --include="*.ts" --include="*.js" --include="*.py" . | \
+           grep -v "example" | grep -v "test" | head -5; then
+          echo "⚠️ Potential secrets found in recent commits"
+          exit 1
+        fi
+        
+        # Check for vulnerable dependencies
+        echo "Checking for vulnerable dependencies..."
+        cd web
+        npm audit --audit-level moderate
+        
+        echo "✅ Security scan completed"
+
+    - name: Dependency vulnerability check
+      run: |
+        cd web
+        # Check for high/critical vulnerabilities
+        if npm audit --audit-level high --json | jq -e '.vulnerabilities | length > 0' 2>/dev/null; then
+          echo "❌ High/critical vulnerabilities found"
+          npm audit --audit-level high
+          exit 1
+        else
+          echo "✅ No high/critical vulnerabilities found"
+        fi
+
+  live-verification:
+    runs-on: ubuntu-latest
+    if: github.event_name == 'schedule' || github.event.inputs.environment == 'production'
+    needs: [e2e-tests]
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup Azure CLI
+      uses: azure/CLI@v1
+      with:
+        azcliversion: 2.50.0
+
+    - name: Azure Login
+      uses: azure/login@v1
+      with:
+        creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+    - name: Run live verification
+      run: |
+        echo "🔍 Running live infrastructure verification..."
+        chmod +x scripts/verify_live.sh
+        ./scripts/verify_live.sh
+      env:
+        AZURE_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
+        AZURE_CLIENT_SECRET: ${{ secrets.AZURE_CLIENT_SECRET }}
+        AZURE_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
+
+    - name: Upload verification logs
+      uses: actions/upload-artifact@v4
+      if: always()
+      with:
+        name: verification-logs
+        path: logs/
+        retention-days: 14
+
+  performance-baseline:
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+        cache: 'npm'
+        cache-dependency-path: web/package-lock.json
+
+    - name: Install dependencies
+      run: |
+        cd web
+        npm ci
+
+    - name: Run performance tests
+      run: |
+        cd web
+        echo "🚀 Running performance baseline tests..."
+        
+        # Run performance-focused E2E tests
+        npx playwright test --grep "performance|load time" --reporter=json > performance-results.json
+        
+        # Extract performance metrics
+        if [ -f "performance-results.json" ]; then
+          echo "Performance test results generated"
+        fi
+
+    - name: Upload performance results
+      uses: actions/upload-artifact@v4
+      if: always()
+      with:
+        name: performance-baseline
+        path: web/performance-results.json
+        retention-days: 90
+
+  notify-results:
+    runs-on: ubuntu-latest
+    needs: [e2e-tests, security-scan]
+    if: always() && (github.ref == 'refs/heads/main' || github.event_name == 'schedule')
+    
+    steps:
+    - name: Notify on failure
+      if: needs.e2e-tests.result == 'failure' || needs.security-scan.result == 'failure'
+      run: |
+        echo "🚨 E2E tests or security scan failed"
+        echo "Branch: ${{ github.ref }}"
+        echo "Commit: ${{ github.sha }}"
+        echo "Run: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+        
+        # In a real environment, this would send notifications to Slack, Teams, etc.
+
+    - name: Success notification
+      if: needs.e2e-tests.result == 'success' && needs.security-scan.result == 'success'
+      run: |
+        echo "✅ All E2E tests and security scans passed"
+        echo "System is verified and ready for deployment"
