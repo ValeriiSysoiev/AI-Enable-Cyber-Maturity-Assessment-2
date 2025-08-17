@@ -32,6 +32,10 @@ API_RESPONSE_THRESHOLD=5
 SEARCH_RESPONSE_THRESHOLD=3
 RAG_RESPONSE_THRESHOLD=10
 
+# Enterprise gates - critical pass criteria
+ENTERPRISE_GATES_ENABLED=${ENTERPRISE_GATES_ENABLED:-true}
+CRITICAL_PASS_REQUIRED=${CRITICAL_PASS_REQUIRED:-true}
+
 # Functions
 log_info() { echo -e "${BLUE}ℹ${NC} $1"; }
 log_success() { echo -e "${GREEN}✓${NC} $1"; }
@@ -761,7 +765,201 @@ test_container_app_config() {
     fi
 }
 
-# Enhanced main execution with Phase 6 verification
+# Test enterprise AAD groups functionality
+test_aad_groups() {
+    if [[ -z "$API_BASE_URL" ]]; then
+        log_warning "API base URL not available - skipping AAD groups tests"
+        return 0
+    fi
+    
+    log_info "Testing AAD groups functionality..."
+    
+    # Test admin auth diagnostics endpoint
+    local response_code
+    response_code=$(curl -s -o /dev/null -w "%{http_code}" \
+        "${API_BASE_URL}/admin/auth-diagnostics" || echo "000")
+    
+    if [[ "$response_code" == "200" ]]; then
+        log_success "AAD auth diagnostics endpoint accessible"
+    elif [[ "$response_code" == "401" || "$response_code" == "403" ]]; then
+        log_success "AAD auth diagnostics requires authentication (expected)"
+    elif [[ "$response_code" == "404" ]]; then
+        log_warning "AAD auth diagnostics endpoint not found"
+    else
+        log_warning "AAD auth diagnostics returned HTTP $response_code"
+    fi
+}
+
+# Test GDPR endpoints
+test_gdpr_endpoints() {
+    if [[ -z "$API_BASE_URL" ]]; then
+        log_warning "API base URL not available - skipping GDPR tests"
+        return 0
+    fi
+    
+    log_info "Testing GDPR endpoints..."
+    
+    # Test GDPR admin dashboard
+    local dashboard_code
+    dashboard_code=$(curl -s -o /dev/null -w "%{http_code}" \
+        "${API_BASE_URL}/gdpr/admin/dashboard" || echo "000")
+    
+    if [[ "$dashboard_code" == "200" ]]; then
+        log_success "GDPR admin dashboard accessible"
+    elif [[ "$dashboard_code" == "401" || "$dashboard_code" == "403" ]]; then
+        log_success "GDPR admin dashboard requires authentication (expected)"
+    elif [[ "$dashboard_code" == "404" ]]; then
+        log_warning "GDPR admin dashboard not found"
+    else
+        log_warning "GDPR admin dashboard returned HTTP $dashboard_code"
+    fi
+    
+    # Test background jobs endpoint
+    local jobs_code
+    jobs_code=$(curl -s -o /dev/null -w "%{http_code}" \
+        "${API_BASE_URL}/gdpr/admin/jobs" || echo "000")
+    
+    if [[ "$jobs_code" == "200" ]]; then
+        log_success "GDPR background jobs endpoint accessible"
+    elif [[ "$jobs_code" == "401" || "$jobs_code" == "403" ]]; then
+        log_success "GDPR background jobs requires authentication (expected)"
+    else
+        log_warning "GDPR background jobs returned HTTP $jobs_code"
+    fi
+}
+
+# Test performance monitoring endpoints
+test_performance_monitoring() {
+    if [[ -z "$API_BASE_URL" ]]; then
+        log_warning "API base URL not available - skipping performance tests"
+        return 0
+    fi
+    
+    log_info "Testing performance monitoring..."
+    
+    # Test performance metrics endpoint
+    local metrics_code
+    metrics_code=$(curl -s -o /dev/null -w "%{http_code}" \
+        "${API_BASE_URL}/api/performance/metrics" || echo "000")
+    
+    if [[ "$metrics_code" == "200" ]]; then
+        log_success "Performance metrics endpoint accessible"
+        
+        # Get cache metrics
+        local cache_metrics
+        cache_metrics=$(curl -s "${API_BASE_URL}/api/performance/metrics" 2>/dev/null || echo "")
+        
+        if echo "$cache_metrics" | grep -q "cache_hit_rate"; then
+            log_success "Cache metrics available"
+        else
+            log_warning "Cache metrics not found in response"
+        fi
+    elif [[ "$metrics_code" == "401" || "$metrics_code" == "403" ]]; then
+        log_success "Performance metrics requires authentication (expected)"
+    elif [[ "$metrics_code" == "404" ]]; then
+        log_warning "Performance metrics endpoint not found"
+    else
+        log_warning "Performance metrics returned HTTP $metrics_code"
+    fi
+}
+
+# Test caching functionality
+test_caching() {
+    if [[ -z "$API_BASE_URL" ]]; then
+        log_warning "API base URL not available - skipping cache tests"
+        return 0
+    fi
+    
+    log_info "Testing caching functionality..."
+    
+    # Test presets endpoint performance (should benefit from caching)
+    local start_time end_time duration
+    start_time=$(date +%s.%N)
+    
+    local response_code
+    response_code=$(curl -s -o /dev/null -w "%{http_code}" \
+        "${API_BASE_URL}/presets/" || echo "000")
+    
+    end_time=$(date +%s.%N)
+    duration=$(echo "$end_time - $start_time" | bc 2>/dev/null || echo "0")
+    
+    if [[ "$response_code" == "200" ]]; then
+        log_success "Presets endpoint responded in ${duration}s"
+        
+        # Second request should be faster (cached)
+        start_time=$(date +%s.%N)
+        curl -s -o /dev/null "${API_BASE_URL}/presets/" 2>/dev/null || true
+        end_time=$(date +%s.%N)
+        duration2=$(echo "$end_time - $start_time" | bc 2>/dev/null || echo "0")
+        
+        if (( $(echo "$duration2 < $duration" | bc -l) )); then
+            log_success "Second request faster (${duration2}s) - caching likely working"
+        else
+            log_info "Cache performance test inconclusive"
+        fi
+    else
+        log_warning "Presets endpoint returned HTTP $response_code"
+    fi
+}
+
+# Critical pass validation for enterprise features
+validate_critical_pass() {
+    if [[ "$CRITICAL_PASS_REQUIRED" != "true" ]]; then
+        log_info "Critical pass validation disabled"
+        return 0
+    fi
+    
+    log_info "Validating critical pass criteria..."
+    
+    local critical_failures=0
+    
+    # Check API health
+    if [[ -n "$API_BASE_URL" ]]; then
+        local health_code
+        health_code=$(curl -s -o /dev/null -w "%{http_code}" "${API_BASE_URL}/health" || echo "000")
+        if [[ "$health_code" != "200" ]]; then
+            log_error "CRITICAL: API health check failed (HTTP $health_code)"
+            ((critical_failures++))
+        fi
+    else
+        log_error "CRITICAL: API URL not configured"
+        ((critical_failures++))
+    fi
+    
+    # Check essential endpoints
+    local endpoints=("/presets/" "/docs")
+    for endpoint in "${endpoints[@]}"; do
+        if [[ -n "$API_BASE_URL" ]]; then
+            local endpoint_code
+            endpoint_code=$(curl -s -o /dev/null -w "%{http_code}" "${API_BASE_URL}${endpoint}" || echo "000")
+            if [[ "$endpoint_code" != "200" ]]; then
+                log_error "CRITICAL: Essential endpoint $endpoint failed (HTTP $endpoint_code)"
+                ((critical_failures++))
+            fi
+        fi
+    done
+    
+    # Check RAG if enabled
+    if [[ -n "$API_BASE_URL" ]]; then
+        local rag_response
+        rag_response=$(curl -s "${API_BASE_URL}/api/evidence/search" 2>/dev/null || echo "")
+        if [[ -z "$rag_response" ]]; then
+            log_warning "RAG service not responding (may be disabled)"
+        else
+            log_success "RAG service responsive"
+        fi
+    fi
+    
+    if [[ $critical_failures -gt 0 ]]; then
+        log_error "CRITICAL PASS FAILED: $critical_failures critical issues found"
+        return 1
+    else
+        log_success "CRITICAL PASS: All essential services operational"
+        return 0
+    fi
+}
+
+# Enhanced main execution with Phase 7 enterprise verification
 main() {
     echo "=== Live Infrastructure Verification ==="
     echo
@@ -784,6 +982,17 @@ main() {
     test_container_app_config
     
     echo
+    echo "=== Phase 7 Enterprise Features Verification ==="
+    if [[ "$ENTERPRISE_GATES_ENABLED" == "true" ]]; then
+        test_aad_groups
+        test_gdpr_endpoints
+        test_performance_monitoring
+        test_caching
+    else
+        log_info "Enterprise gates disabled - skipping Phase 7 tests"
+    fi
+    
+    echo
     echo "=== Service Connectivity Tests ==="
     test_search_connectivity
     test_api_connectivity
@@ -800,9 +1009,16 @@ main() {
     analyze_application_logs
     
     echo
+    echo "=== Critical Pass Validation ==="
+    if ! validate_critical_pass; then
+        log_error "VERIFICATION FAILED: Critical issues prevent production readiness"
+        exit 1
+    fi
+    
+    echo
     generate_summary
     
-    log_success "Phase 6 verification complete"
+    log_success "Phase 7 enterprise verification complete"
 }
 
 # Run if executed directly

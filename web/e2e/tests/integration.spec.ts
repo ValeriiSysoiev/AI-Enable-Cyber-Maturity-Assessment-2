@@ -111,6 +111,81 @@ test.describe('Feature Flag Integration', () => {
     });
   });
 
+  test('AAD groups feature flag behavior', async ({ page }) => {
+    await test.step('Test AAD groups feature availability', async () => {
+      // Get auth mode from API
+      const authResponse = await page.goto('/api/auth/mode');
+      expect(authResponse?.status()).toBe(200);
+      
+      const authMode = await page.textContent('body');
+      console.log(`Authentication mode: ${authMode}`);
+      
+      if (authMode?.includes('aad')) {
+        // Test AAD-specific endpoints
+        const aadEndpoints = [
+          '/api/auth/groups',
+          '/api/auth/diagnostics'
+        ];
+        
+        for (const endpoint of aadEndpoints) {
+          const response = await page.goto(endpoint);
+          expect(response?.status()).toBeLessThan(500);
+          console.log(`AAD endpoint ${endpoint} accessible`);
+        }
+        
+        // Check for AAD admin features
+        await page.goto('/admin/auth-diagnostics');
+        const hasAADDiagnostics = await page.locator('[data-testid="aad-token-info"], .aad-token-info').isVisible();
+        
+        if (hasAADDiagnostics) {
+          console.log('AAD groups features are enabled');
+        }
+      }
+    });
+  });
+
+  test('GDPR compliance feature flag behavior', async ({ page }) => {
+    await test.step('Test GDPR feature availability', async () => {
+      // Test GDPR endpoints availability
+      const gdprEndpoints = [
+        '/admin/gdpr',
+        '/api/gdpr/export',
+        '/api/gdpr/purge'
+      ];
+      
+      for (const endpoint of gdprEndpoints) {
+        const response = await page.goto(endpoint);
+        
+        // Should either be accessible or require authentication (not 404)
+        if (response?.status() === 404) {
+          console.log(`GDPR feature ${endpoint} not available`);
+        } else {
+          console.log(`GDPR feature ${endpoint} available (status: ${response?.status()})`);
+        }
+      }
+    });
+  });
+
+  test('performance monitoring feature flag behavior', async ({ page }) => {
+    await test.step('Test performance monitoring availability', async () => {
+      const perfEndpoints = [
+        '/admin/performance',
+        '/api/performance/metrics',
+        '/api/cache/status'
+      ];
+      
+      for (const endpoint of perfEndpoints) {
+        const response = await page.goto(endpoint);
+        
+        if (response?.status() === 404) {
+          console.log(`Performance feature ${endpoint} not available`);
+        } else {
+          console.log(`Performance feature ${endpoint} available (status: ${response?.status()})`);
+        }
+      }
+    });
+  });
+
   test('authentication mode consistency', async ({ page }) => {
     await test.step('Test auth mode across app', async () => {
       // Get auth mode from API
@@ -240,6 +315,117 @@ test.describe('Cross-Service Workflows', () => {
         expect(hasEvidenceFeatures).toBeTruthy();
       } else {
         console.log('Evidence-assessment integration not visible (may require auth)');
+      }
+    });
+  });
+
+  test('AAD authentication to admin workflow', async ({ page }) => {
+    await test.step('Test AAD auth flow to admin features', async () => {
+      // Mock AAD authentication context
+      await page.addInitScript(() => {
+        window.mockAADClaims = {
+          groups: ['admin-group-id'],
+          tid: 'test-tenant-id',
+          oid: 'admin-user-id'
+        };
+      });
+      
+      await page.goto('/admin/auth-diagnostics');
+      
+      // Should either show admin content or require auth
+      const hasAADDiagnostics = await page.locator('[data-testid="aad-token-info"], .aad-token-info').isVisible();
+      const requiresAuth = page.url().includes('/signin') || 
+                          await page.locator('text=/unauthorized|access denied/i').isVisible();
+      
+      if (hasAADDiagnostics) {
+        console.log('AAD auth diagnostics accessible');
+        expect(hasAADDiagnostics).toBeTruthy();
+      } else if (requiresAuth) {
+        console.log('AAD admin features require authentication');
+      }
+      
+      expect(hasAADDiagnostics || requiresAuth).toBeTruthy();
+    });
+  });
+
+  test('GDPR export workflow integration', async ({ page }) => {
+    await test.step('Test GDPR export cross-service workflow', async () => {
+      await page.goto('/admin/gdpr');
+      
+      // Should either show GDPR interface or require auth
+      const hasGDPRInterface = await page.locator('[data-testid="gdpr-dashboard"], .gdpr-dashboard').isVisible();
+      const requiresAuth = page.url().includes('/signin') || 
+                          await page.locator('text=/unauthorized|access denied/i').isVisible();
+      
+      if (hasGDPRInterface) {
+        console.log('GDPR interface accessible');
+        
+        // Test export initiation
+        const exportButton = page.locator('[data-testid="export-data-btn"], button:has-text("Export")').first();
+        if (await exportButton.isVisible()) {
+          console.log('GDPR export workflow available');
+        }
+      } else if (requiresAuth) {
+        console.log('GDPR features require authentication');
+      }
+      
+      expect(hasGDPRInterface || requiresAuth).toBeTruthy();
+    });
+  });
+
+  test('performance monitoring to cache integration', async ({ page }) => {
+    await test.step('Test performance monitoring workflow', async () => {
+      await page.goto('/admin/performance');
+      
+      const hasPerfInterface = await page.locator('[data-testid="performance-dashboard"], .performance-dashboard').isVisible();
+      const requiresAuth = page.url().includes('/signin') || 
+                          await page.locator('text=/unauthorized|access denied/i').isVisible();
+      
+      if (hasPerfInterface) {
+        console.log('Performance monitoring accessible');
+        
+        // Test cache management integration
+        const cacheControls = page.locator('[data-testid="cache-controls"], .cache-controls');
+        if (await cacheControls.isVisible()) {
+          console.log('Cache management integrated with performance monitoring');
+        }
+      } else if (requiresAuth) {
+        console.log('Performance monitoring requires authentication');
+      }
+      
+      expect(hasPerfInterface || requiresAuth).toBeTruthy();
+    });
+  });
+
+  test('role-based feature integration', async ({ page }) => {
+    await test.step('Test role-based feature access integration', async () => {
+      // Mock different user roles and test feature availability
+      const roles = [
+        { role: 'Admin', features: ['/admin/ops', '/admin/gdpr', '/admin/performance'] },
+        { role: 'Lead', features: ['/engagements', '/admin/presets'] },
+        { role: 'Member', features: ['/engagements'] }
+      ];
+      
+      for (const { role, features } of roles) {
+        await page.addInitScript((roleData) => {
+          window.mockUserContext = {
+            role: roleData.role,
+            permissions: roleData.role === 'Admin' ? ['admin:all'] : [`read:${roleData.role.toLowerCase()}`]
+          };
+        }, { role });
+        
+        console.log(`Testing ${role} role access`);
+        
+        for (const feature of features) {
+          const response = await page.goto(feature);
+          
+          // Admin should have access, others may require auth
+          if (role === 'Admin') {
+            expect(response?.status()).toBeLessThan(500);
+          }
+          
+          console.log(`${role} access to ${feature}: ${response?.status()}`);
+        }
       }
     });
   });

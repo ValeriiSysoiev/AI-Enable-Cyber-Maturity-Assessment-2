@@ -354,3 +354,22 @@ export async function safeAction<T>(
     return fallback;
   }
 }
+
+// Export enterprise utilities
+export { EnterpriseTestUtils } from './test-utils/enterprise';
+export { EnterpriseDataGenerator } from './test-utils/data-generators';
+export type { 
+  EnterpriseUserContext, 
+  AADClaims, 
+  GDPRTestScenario,
+  EnterpriseTestData,
+  TenantData,
+  UserData,
+  EngagementData,
+  AADGroupData,
+  GDPRRequestData
+} from './test-utils/enterprise';
+export type {
+  DocumentData,
+  AssessmentData
+} from './test-utils/data-generators';
