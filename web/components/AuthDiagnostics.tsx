@@ -11,7 +11,7 @@ type LoadingState = "idle" | "loading" | "error" | "success";
 
 export default function AuthDiagnostics({ className = "" }: AuthDiagnosticsProps) {
   const [diagnostics, setDiagnostics] = useState<AuthDiagnosticsType | null>(null);
-  const [loadingState, setLoadingState] = useState<"idle" | "loading" | "error" | "success">("idle");
+  const [loadingState, setLoadingState] = useState<LoadingState>("idle");
   const [error, setError] = useState<string>("");
   const [lastRefresh, setLastRefresh] = useState<string>("");
 
@@ -52,7 +52,7 @@ export default function AuthDiagnostics({ className = "" }: AuthDiagnosticsProps
     return mode === "aad" ? "Azure AD" : "Demo";
   };
 
-  if (loadingState === "loading") {
+  if (loadingState === ("loading" as LoadingState)) {
     return (
       <div className={`space-y-6 ${className}`}>
         <div className="animate-pulse">
@@ -109,10 +109,10 @@ export default function AuthDiagnostics({ className = "" }: AuthDiagnosticsProps
           )}
           <button
             onClick={loadDiagnostics}
-            disabled={loadingState === "loading"}
+            disabled={loadingState === ("loading" as LoadingState)}
             className="px-3 py-1 text-sm bg-blue-600 text-white rounded hover:bg-blue-700 disabled:opacity-50"
           >
-            {loadingState === "loading" ? "Refreshing..." : "Refresh"}
+            {loadingState === ("loading" as LoadingState) ? "Refreshing..." : "Refresh"}
           </button>
         </div>
       </div>
