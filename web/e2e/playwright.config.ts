@@ -40,9 +40,7 @@ export default defineConfig({
     /* Base URL to use in actions like `await page.goto('/')`. */
     baseURL: process.env.WEB_BASE_URL || 'http://localhost:3000',
     
-    /* API base URL for direct API testing */
-    // @ts-ignore - Custom property for API testing
-    apiBaseURL: process.env.API_BASE_URL || 'http://localhost:8000',
+    /* API base URL for direct API testing - handled via environment variables */
     
     /* Collect trace when retrying the failed test */
     trace: 'on-first-retry',
@@ -110,11 +108,10 @@ export default defineConfig({
       name: 'enterprise-performance',
       use: { 
         ...devices['Desktop Chrome'],
-        // Extended timeout for performance tests
-        timeout: 120_000,
       },
       testMatch: '**/performance.spec.ts',
       dependencies: ['setup-enterprise'],
+      timeout: 120_000, // Extended timeout for performance tests
     },
     
     {
