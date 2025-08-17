@@ -1,0 +1,407 @@
+name: Nightly E2E Tests
+
+on:
+  schedule:
+    # Run every night at 2 AM UTC
+    - cron: '0 2 * * *'
+  workflow_dispatch:
+    inputs:
+      comprehensive:
+        description: 'Run comprehensive test suite'
+        required: false
+        default: 'true'
+        type: boolean
+      environment:
+        description: 'Environment to test'
+        required: true
+        default: 'staging'
+        type: choice
+        options:
+          - staging
+          - production
+
+env:
+  ENVIRONMENT: ${{ github.event.inputs.environment || 'staging' }}
+
+jobs:
+  comprehensive-e2e:
+    timeout-minutes: 60
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        browser: [chromium, firefox, webkit]
+        device: [desktop, mobile]
+        include:
+          - browser: chromium
+            device: desktop
+            project: chromium
+          - browser: firefox
+            device: desktop
+            project: firefox
+          - browser: webkit
+            device: desktop
+            project: webkit
+          - browser: chromium
+            device: mobile
+            project: Mobile Chrome
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+        cache: 'npm'
+        cache-dependency-path: web/package-lock.json
+
+    - name: Install dependencies
+      run: |
+        cd web
+        npm ci
+
+    - name: Install Playwright browsers
+      run: |
+        cd web
+        npx playwright install --with-deps
+
+    - name: Setup comprehensive test environment
+      run: |
+        echo "Setting up comprehensive E2E test environment..."
+        
+        # Determine environment URLs
+        if [ "$ENVIRONMENT" = "production" ]; then
+          WEB_URL="${{ vars.PROD_WEB_URL }}"
+          API_URL="${{ vars.PROD_API_URL }}"
+        else
+          WEB_URL="${{ vars.STAGING_WEB_URL }}"
+          API_URL="${{ vars.STAGING_API_URL }}"
+        fi
+        
+        # Create comprehensive test config
+        cat > web/.env.nightly << EOF
+        NODE_ENV=test
+        CI=true
+        COMPREHENSIVE_TESTS=true
+        WEB_BASE_URL=${WEB_URL}
+        API_BASE_URL=${API_URL}
+        AAD_CLIENT_ID=${{ vars.AAD_CLIENT_ID }}
+        AAD_TENANT_ID=${{ vars.AAD_TENANT_ID }}
+        BROWSER=${{ matrix.browser }}
+        DEVICE=${{ matrix.device }}
+        EOF
+        
+        echo "Nightly test configuration:"
+        echo "Environment: $ENVIRONMENT"
+        echo "Browser: ${{ matrix.browser }}"
+        echo "Device: ${{ matrix.device }}"
+        echo "WEB_URL: ${WEB_URL}"
+        echo "API_URL: ${API_URL}"
+
+    - name: Pre-test health check
+      run: |
+        echo "🔍 Performing pre-test health check..."
+        
+        WEB_URL="${{ vars.STAGING_WEB_URL }}"
+        if [ "$ENVIRONMENT" = "production" ]; then
+          WEB_URL="${{ vars.PROD_WEB_URL }}"
+        fi
+        
+        # Check if target environment is accessible
+        if [ -n "$WEB_URL" ]; then
+          echo "Testing connectivity to: $WEB_URL"
+          
+          # Test with timeout
+          if timeout 30 curl -f -s "$WEB_URL" > /dev/null; then
+            echo "✅ Target environment is accessible"
+          else
+            echo "❌ Target environment is not accessible"
+            exit 1
+          fi
+        else
+          echo "⚠️ No target URL configured for $ENVIRONMENT"
+          exit 1
+        fi
+
+    - name: Run comprehensive E2E tests
+      run: |
+        cd web
+        
+        echo "🧪 Running comprehensive E2E test suite..."
+        
+        # Run all test suites with extended timeouts
+        npx playwright test \
+          --project=${{ matrix.project }} \
+          --timeout=120000 \
+          --retries=2 \
+          --workers=1 \
+          --reporter=html,junit,github
+      env:
+        CI: true
+        WEB_BASE_URL: ${{ vars.STAGING_WEB_URL }}
+        API_BASE_URL: ${{ vars.STAGING_API_URL }}
+        AAD_CLIENT_ID: ${{ vars.AAD_CLIENT_ID }}
+        AAD_TENANT_ID: ${{ vars.AAD_TENANT_ID }}
+
+    - name: Run stress tests
+      if: matrix.browser == 'chromium' && matrix.device == 'desktop'
+      run: |
+        cd web
+        
+        echo "🏋️ Running stress tests..."
+        
+        # Run performance and stress-focused tests
+        npx playwright test \
+          --grep "performance|stress|load" \
+          --project=chromium \
+          --timeout=180000 \
+          --workers=1
+
+    - name: Generate comprehensive report
+      if: always()
+      run: |
+        cd web
+        
+        echo "📊 Generating comprehensive test report..."
+        
+        # Create detailed summary
+        cat > nightly-summary-${{ matrix.browser }}-${{ matrix.device }}.md << EOF
+        # Nightly E2E Test Summary
+        
+        **Environment:** $ENVIRONMENT
+        **Browser:** ${{ matrix.browser }}
+        **Device:** ${{ matrix.device }}
+        **Date:** $(date -u)
+        **Commit:** ${{ github.sha }}
+        
+        ## Test Results
+        EOF
+        
+        if [ -f "test-results/junit.xml" ]; then
+          # Parse test results
+          TOTAL=$(grep -o 'tests="[0-9]*"' test-results/junit.xml | grep -o '[0-9]*' | head -1)
+          FAILURES=$(grep -o 'failures="[0-9]*"' test-results/junit.xml | grep -o '[0-9]*' | head -1)
+          ERRORS=$(grep -o 'errors="[0-9]*"' test-results/junit.xml | grep -o '[0-9]*' | head -1)
+          SKIPPED=$(grep -o 'skipped="[0-9]*"' test-results/junit.xml | grep -o '[0-9]*' | head -1)
+          
+          cat >> nightly-summary-${{ matrix.browser }}-${{ matrix.device }}.md << EOF
+        
+        - **Total Tests:** ${TOTAL:-0}
+        - **Passed:** $(( ${TOTAL:-0} - ${FAILURES:-0} - ${ERRORS:-0} - ${SKIPPED:-0} ))
+        - **Failed:** ${FAILURES:-0}
+        - **Errors:** ${ERRORS:-0}
+        - **Skipped:** ${SKIPPED:-0}
+        - **Success Rate:** $(( (${TOTAL:-0} - ${FAILURES:-0} - ${ERRORS:-0}) * 100 / ${TOTAL:-1} ))%
+        EOF
+        fi
+        
+        echo "" >> nightly-summary-${{ matrix.browser }}-${{ matrix.device }}.md
+        echo "## Environment Health" >> nightly-summary-${{ matrix.browser }}-${{ matrix.device }}.md
+        echo "- Target URL accessible: ✅" >> nightly-summary-${{ matrix.browser }}-${{ matrix.device }}.md
+        echo "- Authentication configured: ${{ vars.AAD_CLIENT_ID && '✅' || '⚠️' }}" >> nightly-summary-${{ matrix.browser }}-${{ matrix.device }}.md
+
+    - name: Upload comprehensive results
+      uses: actions/upload-artifact@v4
+      if: always()
+      with:
+        name: nightly-results-${{ matrix.browser }}-${{ matrix.device }}
+        path: |
+          web/test-results/
+          web/playwright-report/
+          web/nightly-summary-*.md
+        retention-days: 30
+
+    - name: Upload failure artifacts
+      uses: actions/upload-artifact@v4
+      if: failure()
+      with:
+        name: nightly-failures-${{ matrix.browser }}-${{ matrix.device }}
+        path: |
+          web/test-results/**/*.png
+          web/test-results/**/*.webm
+          web/test-results/**/*.har
+        retention-days: 14
+
+  cross-browser-compatibility:
+    timeout-minutes: 45
+    runs-on: ubuntu-latest
+    needs: [comprehensive-e2e]
+    if: always()
+    
+    steps:
+    - name: Download all test results
+      uses: actions/download-artifact@v4
+      with:
+        pattern: nightly-results-*
+        merge-multiple: true
+        path: ./all-results
+
+    - name: Generate compatibility report
+      run: |
+        echo "🔄 Generating cross-browser compatibility report..."
+        
+        cat > compatibility-report.md << EOF
+        # Cross-Browser Compatibility Report
+        
+        **Date:** $(date -u)
+        **Environment:** $ENVIRONMENT
+        **Commit:** ${{ github.sha }}
+        
+        ## Browser Test Results
+        
+        | Browser | Device | Status | Success Rate |
+        |---------|--------|--------|--------------|
+        EOF
+        
+        # Parse results from all browsers
+        for result_file in all-results/nightly-summary-*.md; do
+          if [ -f "$result_file" ]; then
+            browser=$(echo "$result_file" | sed 's/.*nightly-summary-\(.*\)-\(.*\)\.md/\1/')
+            device=$(echo "$result_file" | sed 's/.*nightly-summary-\(.*\)-\(.*\)\.md/\2/')
+            
+            # Extract success rate
+            success_rate=$(grep "Success Rate:" "$result_file" | sed 's/.*Success Rate:** \([0-9]*\)%.*/\1/' || echo "N/A")
+            
+            if [ "$success_rate" -ge 90 ] 2>/dev/null; then
+              status="✅ Pass"
+            elif [ "$success_rate" -ge 70 ] 2>/dev/null; then
+              status="⚠️ Warning"
+            else
+              status="❌ Fail"
+            fi
+            
+            echo "| $browser | $device | $status | ${success_rate}% |" >> compatibility-report.md
+          fi
+        done
+        
+        echo "" >> compatibility-report.md
+        echo "## Recommendations" >> compatibility-report.md
+        echo "- Review failed tests for browser-specific issues" >> compatibility-report.md
+        echo "- Consider implementing browser-specific workarounds" >> compatibility-report.md
+        echo "- Update test expectations for known browser differences" >> compatibility-report.md
+
+    - name: Upload compatibility report
+      uses: actions/upload-artifact@v4
+      with:
+        name: compatibility-report
+        path: compatibility-report.md
+        retention-days: 90
+
+  live-environment-health:
+    timeout-minutes: 20
+    runs-on: ubuntu-latest
+    if: always()
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup Azure CLI
+      uses: azure/CLI@v1
+      with:
+        azcliversion: 2.50.0
+
+    - name: Azure Login
+      uses: azure/login@v1
+      with:
+        creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+    - name: Run live verification
+      run: |
+        echo "🏥 Running live environment health check..."
+        chmod +x scripts/verify_live.sh
+        
+        # Run verification with detailed logging
+        ./scripts/verify_live.sh 2>&1 | tee verification-output.log
+        
+        # Create health summary
+        echo "## Environment Health Summary" > health-summary.md
+        echo "**Date:** $(date -u)" >> health-summary.md
+        echo "**Environment:** $ENVIRONMENT" >> health-summary.md
+        echo "" >> health-summary.md
+        
+        # Extract key metrics from verification
+        if grep -q "Verification complete" verification-output.log; then
+          echo "✅ **Overall Status:** Healthy" >> health-summary.md
+        else
+          echo "❌ **Overall Status:** Issues detected" >> health-summary.md
+        fi
+        
+        echo "" >> health-summary.md
+        echo "### Service Status" >> health-summary.md
+        grep -E "(✓|✗|⚠)" verification-output.log | head -20 >> health-summary.md
+      env:
+        AZURE_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
+        AZURE_CLIENT_SECRET: ${{ secrets.AZURE_CLIENT_SECRET }}
+        AZURE_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
+
+    - name: Upload health report
+      uses: actions/upload-artifact@v4
+      if: always()
+      with:
+        name: environment-health
+        path: |
+          verification-output.log
+          health-summary.md
+        retention-days: 30
+
+  notification:
+    runs-on: ubuntu-latest
+    needs: [comprehensive-e2e, cross-browser-compatibility, live-environment-health]
+    if: always()
+    
+    steps:
+    - name: Calculate overall status
+      id: status
+      run: |
+        echo "Calculating overall nightly test status..."
+        
+        E2E_STATUS="${{ needs.comprehensive-e2e.result }}"
+        COMPAT_STATUS="${{ needs.cross-browser-compatibility.result }}"
+        HEALTH_STATUS="${{ needs.live-environment-health.result }}"
+        
+        if [ "$E2E_STATUS" = "success" ] && [ "$COMPAT_STATUS" = "success" ] && [ "$HEALTH_STATUS" = "success" ]; then
+          echo "status=success" >> $GITHUB_OUTPUT
+          echo "message=All nightly tests passed successfully" >> $GITHUB_OUTPUT
+        elif [ "$E2E_STATUS" = "failure" ]; then
+          echo "status=failure" >> $GITHUB_OUTPUT
+          echo "message=E2E tests failed" >> $GITHUB_OUTPUT
+        else
+          echo "status=warning" >> $GITHUB_OUTPUT
+          echo "message=Some tests completed with warnings" >> $GITHUB_OUTPUT
+        fi
+
+    - name: Create summary report
+      run: |
+        cat > nightly-summary.md << EOF
+        # 🌙 Nightly Test Summary
+        
+        **Status:** ${{ steps.status.outputs.status }}
+        **Message:** ${{ steps.status.outputs.message }}
+        **Date:** $(date -u)
+        **Environment:** $ENVIRONMENT
+        **Commit:** ${{ github.sha }}
+        
+        ## Results Overview
+        - **E2E Tests:** ${{ needs.comprehensive-e2e.result }}
+        - **Compatibility:** ${{ needs.cross-browser-compatibility.result }}
+        - **Environment Health:** ${{ needs.live-environment-health.result }}
+        
+        ## Next Steps
+        - Review detailed reports in workflow artifacts
+        - Address any failing tests before next deployment
+        - Update test expectations if needed
+        
+        📊 [View Full Report](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }})
+        EOF
+        
+        cat nightly-summary.md >> $GITHUB_STEP_SUMMARY
+
+    - name: Upload final summary
+      uses: actions/upload-artifact@v4
+      with:
+        name: nightly-summary
+        path: nightly-summary.md
+        retention-days: 90

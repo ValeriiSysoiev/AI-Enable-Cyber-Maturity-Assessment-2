@@ -3,7 +3,7 @@ import re
 import email.utils
 from fastapi import Header, HTTPException, Depends
 from typing import Dict
-from ..domain.repository import Repository
+from domain.repository import Repository
 
 
 def is_admin(user_email: str) -> bool:
