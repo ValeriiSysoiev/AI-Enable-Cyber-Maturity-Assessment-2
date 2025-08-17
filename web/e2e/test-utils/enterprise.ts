@@ -1,6 +1,14 @@
 import { Page, expect } from '@playwright/test';
 import { TestLogger } from '../test-utils';
 
+// Extend window interface for testing
+declare global {
+  interface Window {
+    mockAADClaims?: any;
+    mockAuthMode?: string;
+  }
+}
+
 /**
  * Enterprise Test Utilities
  * Specialized utilities for testing enterprise features including AAD, GDPR, and performance features
