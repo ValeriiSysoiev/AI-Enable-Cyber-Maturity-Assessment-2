@@ -151,11 +151,10 @@ export default defineConfig({
       name: 'integration-enterprise',
       use: { 
         ...devices['Desktop Chrome'],
-        // Extended timeout for integration tests
-        timeout: 90_000,
       },
       testMatch: '**/integration.spec.ts',
       dependencies: ['setup-enterprise'],
+      timeout: 90_000, // Extended timeout for integration tests
     },
     
     /* Cross-browser enterprise testing */
@@ -163,10 +162,10 @@ export default defineConfig({
       name: 'enterprise-firefox',
       use: { 
         ...devices['Desktop Firefox'],
-        timeout: 90_000,
       },
       testMatch: '**/aad-groups.spec.ts',
       dependencies: ['setup-enterprise'],
+      timeout: 90_000,
     },
     
     /* Load testing project */
@@ -174,10 +173,10 @@ export default defineConfig({
       name: 'load-testing',
       use: { 
         ...devices['Desktop Chrome'],
-        timeout: 300_000, // 5 minutes for load tests
       },
       testMatch: '**/load/*.spec.ts',
       dependencies: ['setup-enterprise'],
+      timeout: 300_000, // 5 minutes for load tests
     },
     
     /* Setup project for enterprise features */
