@@ -3,7 +3,7 @@ import re
 import logging
 from typing import List, Optional
 from pydantic import BaseModel
-from app.domain.models import Finding, Recommendation, RunLog
+from domain.models import Finding, Recommendation, RunLog
 from .llm import LLMClient
 
 # Set up logger
