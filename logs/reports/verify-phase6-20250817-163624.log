@@ -1,0 +1,64 @@
+=== Live Infrastructure Verification ===
+
+[0;34mℹ[0m Verifying Azure CLI authentication...
+[0;32m✓[0m Authenticated to subscription: 10233675-d493-4a97-9c81-4001e353a7bb
+[0;34mℹ[0m Getting Terraform outputs...
+[0;32m✓[0m Retrieved terraform outputs
+[0;34mℹ[0m Verifying Resource Group: rg-aaa-demo
+[0;32m✓[0m Resource Group exists in location: canadacentral
+[0;34mℹ[0m Verifying Azure AI Search Service: search-aaa-demo
+[0;32m✓[0m Search service is running
+[1;33m⚠[0m Search index 'eng-docs' not found. Run bootstrap_search_index.sh to create it.
+[0;34mℹ[0m Search service tier: standard
+[0;34mℹ[0m Verifying Azure OpenAI Service: openai-aaa-demo
+[0;32m✓[0m OpenAI service is provisioned successfully
+[0;32m✓[0m Text embedding deployment is ready
+[0;34mℹ[0m Verifying Key Vault: kvaaademo6d2s8e
+[0;32m✓[0m Key Vault exists and is accessible
+[1;33m⚠[0m Secret 'search-admin-key' not found
+[1;33m⚠[0m Secret 'openai-key' not found
+[0;32m✓[0m Secret 'cosmos-connstr' exists
+[1;33m⚠[0m Secret 'aad-client-id' not found
+[1;33m⚠[0m Secret 'aad-client-secret' not found
+[1;33m⚠[0m Secret 'aad-tenant-id' not found
+[1;33m⚠[0m Secret 'nextauth-secret' not found
+[0;34mℹ[0m Verifying Storage Account: staaademo6jshgh
+[0;32m✓[0m Storage account is available
+[0;32m✓[0m Documents container exists
+[0;34mℹ[0m Verifying Cosmos DB: cosmos-aaa-demo
+[0;32m✓[0m Cosmos DB account is available
+[0;32m✓[0m Found databases: ai_maturity 
+[0;34mℹ[0m Verifying Container Apps Environment: aca-aaa-demo
+[0;32m✓[0m Container Apps environment is ready
+
+=== Phase 6 RAG and AAD Verification ===
+[0;34mℹ[0m Verifying monitoring and alerting setup...
+[1;33m⚠[0m Application Insights not found
+[0;32m✓[0m Log Analytics workspace found: log-aaademo-lna70f
+[0;34mℹ[0m Verifying RAG service prerequisites...
+[0;32m✓[0m Embeddings container exists for RAG storage
+[0;32m✓[0m Container 'assessments' exists
+[0;32m✓[0m Container 'documents' exists
+[0;32m✓[0m Container 'answers' exists
+[0;32m✓[0m Container 'engagements' exists
+[0;32m✓[0m Text embedding deployment is ready for RAG
+[0;34mℹ[0m Testing container app environment configuration...
+[0;32m✓[0m Environment configuration endpoint accessible
+[1;33m⚠[0m Managed identity not enabled - check container app configuration
+
+=== Phase 7 Enterprise Features Verification ===
+[0;34mℹ[0m Testing AAD groups functionality...
+[1;33m⚠[0m AAD auth diagnostics endpoint not found
+[0;34mℹ[0m Testing GDPR endpoints...
+[1;33m⚠[0m GDPR admin dashboard not found
+[1;33m⚠[0m GDPR background jobs returned HTTP 404
+[0;34mℹ[0m Testing performance monitoring...
+[1;33m⚠[0m Performance metrics endpoint not found
+[0;34mℹ[0m Testing caching functionality...
+[1;33m⚠[0m Presets endpoint returned HTTP 404
+
+=== Service Connectivity Tests ===
+[0;34mℹ[0m Testing search service connectivity...
+[1;33m⚠[0m Search service endpoint returned HTTP 401
+[0;34mℹ[0m Testing API connectivity: https://api-aaa-demo--0000034.bravewater-3d70a706.canadacentral.azurecontainerapps.io
+[0;31m✗[0m API health endpoint returned HTTP 404

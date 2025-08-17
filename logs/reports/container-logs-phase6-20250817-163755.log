@@ -1,0 +1,43 @@
+API Container Logs:
+{"TimeStamp": "2025-08-17T22:38:04.54236", "Log": "Connecting to the container 'api'..."}
+{"TimeStamp": "2025-08-17T22:38:04.59518", "Log": "Successfully Connected to container: 'api' [Revision: 'api-aaa-demo--0000040', Replica: 'api-aaa-demo--0000040-656dccd9cf-rxlr7']"}
+{"TimeStamp": "2025-08-17T22:36:49.8439438+00:00", "Log": "(most recent call last):"}
+{"TimeStamp": "2025-08-17T22:36:49.844005+00:00", "Log": "File \"<string>\", line 1, in <module>"}
+{"TimeStamp": "2025-08-17T22:36:49.8440139+00:00", "Log": "File \"/usr/local/lib/python3.11/site-packages/uvicorn/main.py\", line 580, in run"}
+{"TimeStamp": "2025-08-17T22:36:49.844111+00:00", "Log": "server.run()"}
+{"TimeStamp": "2025-08-17T22:36:49.8441213+00:00", "Log": "File \"/usr/local/lib/python3.11/site-packages/uvicorn/server.py\", line 67, in run"}
+{"TimeStamp": "2025-08-17T22:36:49.8442217+00:00", "Log": "return asyncio.run(self.serve(sockets=sockets))"}
+{"TimeStamp": "2025-08-17T22:36:49.8443047+00:00", "Log": "^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^"}
+{"TimeStamp": "2025-08-17T22:36:49.8443165+00:00", "Log": "File \"/usr/local/lib/python3.11/asyncio/runners.py\", line 190, in run"}
+{"TimeStamp": "2025-08-17T22:36:49.8444852+00:00", "Log": "return runner.run(main)"}
+{"TimeStamp": "2025-08-17T22:36:49.8445086+00:00", "Log": "^^^^^^^^^^^^^^^^"}
+{"TimeStamp": "2025-08-17T22:36:49.8445346+00:00", "Log": "File \"/usr/local/lib/python3.11/asyncio/runners.py\", line 118, in run"}
+{"TimeStamp": "2025-08-17T22:36:49.8446402+00:00", "Log": "return self._loop.run_until_complete(task)"}
+{"TimeStamp": "2025-08-17T22:36:49.8447212+00:00", "Log": "^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^"}
+{"TimeStamp": "2025-08-17T22:36:49.8447304+00:00", "Log": "File \"uvloop/loop.pyx\", line 1518, in uvloop.loop.Loop.run_until_complete"}
+{"TimeStamp": "2025-08-17T22:36:49.8448773+00:00", "Log": "File \"/usr/local/lib/python3.11/site-packages/uvicorn/server.py\", line 71, in serve"}
+{"TimeStamp": "2025-08-17T22:36:49.8449579+00:00", "Log": "await self._serve(sockets)"}
+{"TimeStamp": "2025-08-17T22:36:49.8449709+00:00", "Log": "File \"/usr/local/lib/python3.11/site-packages/uvicorn/server.py\", line 78, in _serve"}
+{"TimeStamp": "2025-08-17T22:36:49.8451197+00:00", "Log": "config.load()"}
+{"TimeStamp": "2025-08-17T22:36:49.8451272+00:00", "Log": "File \"/usr/local/lib/python3.11/site-packages/uvicorn/config.py\", line 436, in load"}
+{"TimeStamp": "2025-08-17T22:36:49.8452993+00:00", "Log": "self.loaded_app = import_from_string(self.app)"}
+{"TimeStamp": "2025-08-17T22:36:49.8454161+00:00", "Log": "^^^^^^^^^^^^^^^^^^^^^^^^^^^^"}
+{"TimeStamp": "2025-08-17T22:36:49.8454267+00:00", "Log": "File \"/usr/local/lib/python3.11/site-packages/uvicorn/importer.py\", line 19, in import_from_string"}
+{"TimeStamp": "2025-08-17T22:36:49.8455426+00:00", "Log": "module = importlib.import_module(module_str)"}
+{"TimeStamp": "2025-08-17T22:36:49.8456401+00:00", "Log": "^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^"}
+{"TimeStamp": "2025-08-17T22:36:49.8456482+00:00", "Log": "File \"/usr/local/lib/python3.11/importlib/__init__.py\", line 126, in import_module"}
+{"TimeStamp": "2025-08-17T22:36:49.8457811+00:00", "Log": "return _bootstrap._gcd_import(name[level:], package, level)"}
+{"TimeStamp": "2025-08-17T22:36:49.845904+00:00", "Log": "^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^"}
+{"TimeStamp": "2025-08-17T22:36:49.8459121+00:00", "Log": "File \"<frozen importlib._bootstrap>\", line 1204, in _gcd_import"}
+{"TimeStamp": "2025-08-17T22:36:49.8459164+00:00", "Log": "File \"<frozen importlib._bootstrap>\", line 1176, in _find_and_load"}
+{"TimeStamp": "2025-08-17T22:36:49.8459237+00:00", "Log": "File \"<frozen importlib._bootstrap>\", line 1147, in _find_and_load_unlocked"}
+{"TimeStamp": "2025-08-17T22:36:49.845931+00:00", "Log": "File \"<frozen importlib._bootstrap>\", line 690, in _load_unlocked"}
+{"TimeStamp": "2025-08-17T22:36:49.845935+00:00", "Log": "File \"<frozen importlib._bootstrap_external>\", line 940, in exec_module"}
+{"TimeStamp": "2025-08-17T22:36:49.8459422+00:00", "Log": "File \"<frozen importlib._bootstrap>\", line 241, in _call_with_frames_removed"}
+{"TimeStamp": "2025-08-17T22:36:49.8459473+00:00", "Log": "File \"/app/api/main.py\", line 16, in <module>"}
+{"TimeStamp": "2025-08-17T22:36:49.8460673+00:00", "Log": "from .routes import assessments as assessments_router, orchestrations as orchestrations_router, engagements as engagements_router, documents, summary, presets as presets_router, version as version_router, admin_auth as admin_auth_router, gdpr as gdpr_router"}
+{"TimeStamp": "2025-08-17T22:36:49.8460805+00:00", "Log": "File \"/app/api/routes/assessments.py\", line 5, in <module>"}
+{"TimeStamp": "2025-08-17T22:36:49.8461705+00:00", "Log": "from ..security import current_context, require_member"}
+{"TimeStamp": "2025-08-17T22:36:49.8461771+00:00", "Log": "File \"/app/api/security.py\", line 9, in <module>"}
+{"TimeStamp": "2025-08-17T22:36:49.8462564+00:00", "Log": "from config import config"}
+{"TimeStamp": "2025-08-17T22:36:49.8462665+00:00", "Log": "cannot import name 'config' from 'config' (unknown location)"}
