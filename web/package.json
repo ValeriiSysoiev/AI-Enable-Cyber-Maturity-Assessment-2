@@ -6,7 +6,16 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "test:e2e": "playwright test",
+    "test:e2e:ui": "playwright test --ui",
+    "test:e2e:headed": "playwright test --headed",
+    "test:e2e:smoke": "playwright test smoke.spec.ts",
+    "test:e2e:evidence": "playwright test evidence.spec.ts",
+    "test:e2e:auth": "playwright test auth.spec.ts",
+    "test:e2e:integration": "playwright test integration.spec.ts",
+    "test:e2e:rag": "playwright test rag.spec.ts",
+    "test:e2e:report": "playwright show-report"
   },
   "dependencies": {
     "next": "14.2.5",
@@ -22,6 +31,7 @@
     "postcss": "^8.4.0",
     "autoprefixer": "^10.4.0",
     "eslint": "^8.0.0",
-    "eslint-config-next": "14.2.5"
+    "eslint-config-next": "14.2.5",
+    "@playwright/test": "^1.40.0"
   }
 }

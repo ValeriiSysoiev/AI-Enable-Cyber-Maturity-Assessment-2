@@ -6,6 +6,10 @@ terraform {
       source  = "hashicorp/azurerm"
       version = "~> 4.0"
     }
+    azapi = {
+      source  = "azure/azapi"
+      version = "~> 1.15"
+    }
     random = {
       source  = "hashicorp/random"
       version = "~> 3.6"
@@ -21,6 +25,11 @@ provider "azurerm" {
   features {}
   resource_provider_registrations = "none"
 
+  subscription_id = var.subscription_id
+  tenant_id       = var.tenant_id
+}
+
+provider "azapi" {
   subscription_id = var.subscription_id
   tenant_id       = var.tenant_id
 }

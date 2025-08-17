@@ -3,7 +3,7 @@ from fastapi.responses import PlainTextResponse
 from datetime import datetime
 from typing import List
 
-from ...domain.repository import Repository
+from domain.repository import Repository
 from ..security import current_context, require_member
 from ..schemas import EngagementSummary, CountSummary, ActivityItem
 
