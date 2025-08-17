@@ -16,3 +16,11 @@ README.bak
 *.tfvars
 *.tfvars.json
 web/node_modules/
+
+# Next.js build artifacts
+web/.next/
+web/tsconfig.tsbuildinfo
+
+# Deployment logs
+logs/reports/*.log
+logs/reports/*.md
