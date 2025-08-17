@@ -228,7 +228,7 @@ export class EnterpriseTestUtils {
     improvement: number;
   }> {
     // Clear cache first
-    await this.page.goto('/api/cache/clear', { method: 'POST' });
+    await this.page.request.post('/api/cache/clear');
     
     // Measure cache miss
     const missStart = Date.now();
