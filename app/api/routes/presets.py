@@ -4,7 +4,7 @@ from typing import Any, Dict
 import json
 
 from ..security import current_context, require_admin
-from services import presets as svc
+from ...services import presets as svc
 from ..schemas import AssessmentPreset
 
 router = APIRouter(prefix="/presets", tags=["presets"])

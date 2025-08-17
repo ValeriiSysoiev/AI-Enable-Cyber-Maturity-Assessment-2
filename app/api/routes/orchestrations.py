@@ -7,9 +7,9 @@ from domain.models import Finding, Recommendation
 from domain.repository import Repository
 from ai.orchestrator import Orchestrator
 from ..security import current_context, require_member
-from util.files import extract_text
-from services.rag_service import create_rag_service
-from config import config
+from ...util.files import extract_text
+from ...services.rag_service import create_rag_service
+from ...config import config
 
 router = APIRouter(prefix="/orchestrations", tags=["orchestrations"])
 logger = logging.getLogger(__name__)
