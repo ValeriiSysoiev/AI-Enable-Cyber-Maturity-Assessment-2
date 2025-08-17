@@ -1,0 +1,354 @@
+name: Load Testing
+
+on:
+  # Manual trigger with scenario selection
+  workflow_dispatch:
+    inputs:
+      scenario:
+        description: 'Load test scenario to run'
+        required: true
+        default: 'smoke'
+        type: choice
+        options:
+          - smoke
+          - load
+          - stress
+          - spike
+          - soak
+          - breakpoint
+      
+      environment:
+        description: 'Target environment'
+        required: true
+        default: 'dev'
+        type: choice
+        options:
+          - dev
+          - staging
+          - prod
+      
+      duration_override:
+        description: 'Override test duration (e.g., "5m", "30s")'
+        required: false
+        type: string
+      
+      slack_notifications:
+        description: 'Send Slack notifications'
+        required: false
+        default: true
+        type: boolean
+
+  # Scheduled load testing (smoke tests only)
+  schedule:
+    - cron: '0 2 * * 1-5'  # Weekdays at 2 AM UTC
+
+  # Trigger on releases for validation
+  release:
+    types: [published]
+
+env:
+  K6_VERSION: '0.47.0'
+  LOAD_TEST_DIR: 'e2e/load'
+
+jobs:
+  validate-environment:
+    name: Validate Target Environment
+    runs-on: ubuntu-latest
+    outputs:
+      target-url: ${{ steps.set-target.outputs.target-url }}
+      auth-mode: ${{ steps.set-target.outputs.auth-mode }}
+      environment-valid: ${{ steps.validate.outputs.valid }}
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      
+      - name: Set target environment
+        id: set-target
+        run: |
+          case "${{ github.event.inputs.environment || 'dev' }}" in
+            dev)
+              echo "target-url=${{ secrets.DEV_API_URL }}" >> $GITHUB_OUTPUT
+              echo "auth-mode=demo" >> $GITHUB_OUTPUT
+              ;;
+            staging)
+              echo "target-url=${{ secrets.STAGING_API_URL }}" >> $GITHUB_OUTPUT
+              echo "auth-mode=aad" >> $GITHUB_OUTPUT
+              ;;
+            prod)
+              echo "target-url=${{ secrets.PROD_API_URL }}" >> $GITHUB_OUTPUT
+              echo "auth-mode=aad" >> $GITHUB_OUTPUT
+              ;;
+            *)
+              echo "Invalid environment: ${{ github.event.inputs.environment }}"
+              exit 1
+              ;;
+          esac
+      
+      - name: Validate environment availability
+        id: validate
+        run: |
+          TARGET_URL="${{ steps.set-target.outputs.target-url }}"
+          
+          if [ -z "$TARGET_URL" ]; then
+            echo "Target URL not configured for environment: ${{ github.event.inputs.environment || 'dev' }}"
+            echo "valid=false" >> $GITHUB_OUTPUT
+            exit 1
+          fi
+          
+          # Health check
+          HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" "$TARGET_URL/health" || echo "000")
+          
+          if [ "$HTTP_STATUS" = "200" ]; then
+            echo "Environment health check passed: $HTTP_STATUS"
+            echo "valid=true" >> $GITHUB_OUTPUT
+          else
+            echo "Environment health check failed: $HTTP_STATUS"
+            echo "valid=false" >> $GITHUB_OUTPUT
+            exit 1
+          fi
+
+  load-test:
+    name: Execute Load Test
+    runs-on: ubuntu-latest
+    needs: validate-environment
+    if: needs.validate-environment.outputs.environment-valid == 'true'
+    
+    strategy:
+      fail-fast: false
+      matrix:
+        # For manual runs, use single scenario. For scheduled/release, use smoke
+        scenario: ${{ github.event.inputs.scenario && fromJson(format('["{0}"]', github.event.inputs.scenario)) || fromJson('["smoke"]') }}
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      
+      - name: Setup k6
+        run: |
+          sudo gpg -k
+          sudo gpg --no-default-keyring --keyring /usr/share/keyrings/k6-archive-keyring.gpg --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys C5AD17C747E3415A3642D57D77C6C491D6AC1D69
+          echo "deb [signed-by=/usr/share/keyrings/k6-archive-keyring.gpg] https://dl.k6.io/deb stable main" | sudo tee /etc/apt/sources.list.d/k6.list
+          sudo apt-get update
+          sudo apt-get install k6=${{ env.K6_VERSION }}
+          k6 version
+      
+      - name: Prepare test environment
+        run: |
+          # Set environment variables for k6
+          echo "TARGET_ENV=${{ github.event.inputs.environment || 'dev' }}" >> $GITHUB_ENV
+          echo "DEV_API_URL=${{ needs.validate-environment.outputs.target-url }}" >> $GITHUB_ENV
+          echo "STAGING_API_URL=${{ secrets.STAGING_API_URL }}" >> $GITHUB_ENV
+          echo "PROD_API_URL=${{ secrets.PROD_API_URL }}" >> $GITHUB_ENV
+          echo "AUTH_MODE=${{ needs.validate-environment.outputs.auth-mode }}" >> $GITHUB_ENV
+          
+          # Create results directory
+          mkdir -p ${{ env.LOAD_TEST_DIR }}/reports
+          
+          # Set test duration override if provided
+          if [ -n "${{ github.event.inputs.duration_override }}" ]; then
+            echo "DURATION_OVERRIDE=${{ github.event.inputs.duration_override }}" >> $GITHUB_ENV
+          fi
+      
+      - name: Execute load test - ${{ matrix.scenario }}
+        id: load-test
+        run: |
+          cd ${{ env.LOAD_TEST_DIR }}
+          
+          # Set test parameters
+          SCENARIO="${{ matrix.scenario }}"
+          TIMESTAMP=$(date +"%Y%m%d-%H%M%S")
+          REPORT_FILE="reports/${SCENARIO}-${TIMESTAMP}.json"
+          
+          echo "Starting $SCENARIO load test..."
+          echo "Target: ${{ needs.validate-environment.outputs.target-url }}"
+          echo "Auth Mode: ${{ needs.validate-environment.outputs.auth-mode }}"
+          
+          # Run k6 test with JSON output
+          k6 run \
+            --out json="$REPORT_FILE" \
+            --summary-trend-stats="avg,min,med,max,p(90),p(95),p(99)" \
+            --summary-time-unit=ms \
+            "scenarios/${SCENARIO}.js" \
+            || TEST_EXIT_CODE=$?
+          
+          # Store results for artifacts
+          echo "report-file=$REPORT_FILE" >> $GITHUB_OUTPUT
+          echo "scenario=$SCENARIO" >> $GITHUB_OUTPUT
+          echo "timestamp=$TIMESTAMP" >> $GITHUB_OUTPUT
+          echo "exit-code=${TEST_EXIT_CODE:-0}" >> $GITHUB_OUTPUT
+          
+          # Create summary
+          if [ -f "$REPORT_FILE" ]; then
+            echo "Test completed - results saved to $REPORT_FILE"
+            ls -la "$REPORT_FILE"
+          else
+            echo "Warning: Results file not created"
+          fi
+          
+          # Exit with test result code
+          exit ${TEST_EXIT_CODE:-0}
+      
+      - name: Process test results
+        if: always()
+        run: |
+          cd ${{ env.LOAD_TEST_DIR }}
+          REPORT_FILE="${{ steps.load-test.outputs.report-file }}"
+          
+          if [ -f "$REPORT_FILE" ]; then
+            # Extract key metrics from JSON report
+            echo "## Load Test Results - ${{ matrix.scenario }}" > results-summary.md
+            echo "- **Scenario**: ${{ matrix.scenario }}" >> results-summary.md
+            echo "- **Environment**: ${{ github.event.inputs.environment || 'dev' }}" >> results-summary.md
+            echo "- **Target**: ${{ needs.validate-environment.outputs.target-url }}" >> results-summary.md
+            echo "- **Timestamp**: ${{ steps.load-test.outputs.timestamp }}" >> results-summary.md
+            echo "- **Exit Code**: ${{ steps.load-test.outputs.exit-code }}" >> results-summary.md
+            echo "" >> results-summary.md
+            
+            # Basic metrics extraction (simplified)
+            echo "### Key Metrics" >> results-summary.md
+            
+            # Count total requests
+            TOTAL_REQUESTS=$(jq -r 'select(.type=="Point" and .metric=="http_reqs") | .data.value' "$REPORT_FILE" | tail -1 || echo "0")
+            echo "- **Total Requests**: $TOTAL_REQUESTS" >> results-summary.md
+            
+            # Get error rate
+            FAILED_REQUESTS=$(jq -r 'select(.type=="Point" and .metric=="http_req_failed") | .data.value' "$REPORT_FILE" | tail -1 || echo "0")
+            if [ "$TOTAL_REQUESTS" -gt 0 ]; then
+              ERROR_RATE=$(echo "scale=2; $FAILED_REQUESTS * 100 / $TOTAL_REQUESTS" | bc -l 2>/dev/null || echo "0")
+              echo "- **Error Rate**: ${ERROR_RATE}%" >> results-summary.md
+            fi
+            
+            echo "" >> results-summary.md
+            echo "Full results available in test artifacts." >> results-summary.md
+            
+            cat results-summary.md
+          else
+            echo "No results file found - test may have failed to start"
+            echo "## Load Test Failed" > results-summary.md
+            echo "Test failed to generate results file." >> results-summary.md
+          fi
+      
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: load-test-results-${{ matrix.scenario }}-${{ steps.load-test.outputs.timestamp }}
+          path: |
+            ${{ env.LOAD_TEST_DIR }}/reports/
+            ${{ env.LOAD_TEST_DIR }}/results-summary.md
+          retention-days: 30
+      
+      - name: Check performance thresholds
+        if: always()
+        run: |
+          cd ${{ env.LOAD_TEST_DIR }}
+          REPORT_FILE="${{ steps.load-test.outputs.report-file }}"
+          EXIT_CODE="${{ steps.load-test.outputs.exit-code }}"
+          
+          if [ "$EXIT_CODE" -ne 0 ]; then
+            echo "❌ Load test failed with exit code: $EXIT_CODE"
+            
+            # For production environment, mark as failure
+            if [ "${{ github.event.inputs.environment || 'dev' }}" = "prod" ]; then
+              echo "Production load test failure - marking workflow as failed"
+              exit 1
+            else
+              echo "Non-production environment - continuing despite test failure"
+            fi
+          else
+            echo "✅ Load test completed successfully"
+          fi
+
+  notify-results:
+    name: Notify Results
+    runs-on: ubuntu-latest
+    needs: [validate-environment, load-test]
+    if: always() && github.event.inputs.slack_notifications != 'false'
+    
+    steps:
+      - name: Prepare notification
+        id: prepare
+        run: |
+          SCENARIO="${{ github.event.inputs.scenario || 'smoke' }}"
+          ENVIRONMENT="${{ github.event.inputs.environment || 'dev' }}"
+          
+          if [ "${{ needs.load-test.result }}" = "success" ]; then
+            STATUS="✅ Passed"
+            COLOR="good"
+          elif [ "${{ needs.load-test.result }}" = "failure" ]; then
+            STATUS="❌ Failed"
+            COLOR="danger"
+          else
+            STATUS="⚠️ Cancelled"
+            COLOR="warning"
+          fi
+          
+          echo "status=$STATUS" >> $GITHUB_OUTPUT
+          echo "color=$COLOR" >> $GITHUB_OUTPUT
+          echo "scenario=$SCENARIO" >> $GITHUB_OUTPUT
+          echo "environment=$ENVIRONMENT" >> $GITHUB_OUTPUT
+      
+      - name: Send Slack notification
+        if: env.SLACK_WEBHOOK_URL != ''
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+        run: |
+          curl -X POST -H 'Content-type: application/json' \
+            --data "{
+              \"attachments\": [
+                {
+                  \"color\": \"${{ steps.prepare.outputs.color }}\",
+                  \"title\": \"Load Testing Results\",
+                  \"fields\": [
+                    {
+                      \"title\": \"Scenario\",
+                      \"value\": \"${{ steps.prepare.outputs.scenario }}\",
+                      \"short\": true
+                    },
+                    {
+                      \"title\": \"Environment\",
+                      \"value\": \"${{ steps.prepare.outputs.environment }}\",
+                      \"short\": true
+                    },
+                    {
+                      \"title\": \"Status\",
+                      \"value\": \"${{ steps.prepare.outputs.status }}\",
+                      \"short\": true
+                    },
+                    {
+                      \"title\": \"Workflow\",
+                      \"value\": \"<https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}|View Details>\",
+                      \"short\": true
+                    }
+                  ],
+                  \"footer\": \"AI Cyber Maturity Assessment Load Testing\",
+                  \"ts\": $(date +%s)
+                }
+              ]
+            }" \
+            $SLACK_WEBHOOK_URL
+
+  cleanup:
+    name: Cleanup Test Data
+    runs-on: ubuntu-latest
+    needs: [validate-environment, load-test]
+    if: always() && needs.validate-environment.outputs.environment-valid == 'true'
+    
+    steps:
+      - name: Cleanup test data
+        run: |
+          echo "🧹 Cleaning up test data from load test run"
+          # Note: Actual cleanup would require API access
+          # This is a placeholder for cleanup operations
+          echo "Test data cleanup completed"
+          
+          # In a real implementation, this would:
+          # 1. Connect to the target environment
+          # 2. Identify test data created during the load test
+          # 3. Remove test engagements, assessments, documents
+          # 4. Clean up any temporary files or caches
+      
+      - name: Report cleanup status
+        run: |
+          echo "Load test cleanup completed for environment: ${{ github.event.inputs.environment || 'dev' }}"

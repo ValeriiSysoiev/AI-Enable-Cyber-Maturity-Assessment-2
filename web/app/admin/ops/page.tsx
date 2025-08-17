@@ -83,8 +83,22 @@ export default function AdminOpsPage() {
     <div className="p-6 space-y-6">
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-semibold">Admin Operations</h1>
-        <div className="text-sm text-gray-500">
-          User: {auth.user?.name} • Mode: {auth.mode.mode === 'aad' ? 'Azure AD' : 'Demo'}
+        <div className="flex items-center space-x-4">
+          <a 
+            href="/admin/auth" 
+            className="px-3 py-1 text-sm bg-gray-100 text-gray-700 rounded hover:bg-gray-200 border"
+          >
+            Auth Diagnostics
+          </a>
+          <a 
+            href="/admin/gdpr" 
+            className="px-3 py-1 text-sm bg-blue-50 text-blue-700 rounded hover:bg-blue-100 border border-blue-200"
+          >
+            GDPR Management
+          </a>
+          <div className="text-sm text-gray-500">
+            User: {auth.user?.name} • Mode: {auth.mode.mode === 'aad' ? 'Azure AD' : 'Demo'}
+          </div>
         </div>
       </div>
 

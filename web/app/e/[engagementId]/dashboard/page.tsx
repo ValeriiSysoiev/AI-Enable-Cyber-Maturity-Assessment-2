@@ -7,13 +7,14 @@ import DocumentsPanel from "@/components/DocumentsPanel";
 import EvidenceSearch from "@/components/EvidenceSearch";
 import AnalysisWithEvidence from "@/components/AnalysisWithEvidence";
 import { useRequireAuth } from "@/components/AuthProvider";
+import { isAdmin } from "@/lib/auth";
 
 export default function DashboardPage() {
   const { engagementId } = useParams<{ engagementId: string }>();
   const router = useRouter();
   const [sum, setSum] = useState<EngagementSummary | null>(null);
   const [err, setErr] = useState<string>("");
-  const [activeTab, setActiveTab] = useState<'overview' | 'documents' | 'evidence' | 'analysis'>('overview');
+  const [activeTab, setActiveTab] = useState<'overview' | 'documents' | 'evidence' | 'analysis' | 'gdpr'>('overview');
   
   // Require authentication
   const auth = useRequireAuth();
@@ -48,6 +49,11 @@ export default function DashboardPage() {
           <a className="px-3 py-1 border rounded" href={reportMdUrl(engagementId)} target="_blank">Export Markdown</a>
           <Link className="px-3 py-1 border rounded" href={`/e/${engagementId}/demo`}>Open Demo</Link>
           <Link className="px-3 py-1 border rounded" href={`/e/${engagementId}/demo#docs`}>Docs</Link>
+          {isAdmin() && (
+            <Link className="px-3 py-1 border rounded bg-blue-50 text-blue-700 hover:bg-blue-100" href={`/e/${engagementId}/gdpr`}>
+              GDPR
+            </Link>
+          )}
         </div>
       </div>
 

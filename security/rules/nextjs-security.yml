@@ -1,0 +1,320 @@
+rules:
+  - id: nextjs-api-key-in-client
+    pattern-either:
+      - pattern: |
+          const API_KEY = "..."
+      - pattern: |
+          const apiKey = "..."
+      - pattern: |
+          process.env.API_KEY
+      - pattern: |
+          process.env.SECRET_KEY
+    paths:
+      include:
+        - "web/app/**/*.tsx"
+        - "web/app/**/*.ts"
+        - "web/components/**/*.tsx"
+        - "web/components/**/*.ts"
+      exclude:
+        - "web/app/api/**/*"
+    message: API key or secret exposed in client-side code
+    languages: [typescript, javascript]
+    severity: ERROR
+    metadata:
+      category: security
+      subcategory: secrets
+      technology: nextjs
+      cwe: "CWE-798: Use of Hard-coded Credentials"
+
+  - id: nextjs-xss-dangerouslysetinnerhtml
+    pattern: |
+      dangerouslySetInnerHTML={{__html: $HTML}}
+    pattern-not-inside:
+      - pattern: |
+          dangerouslySetInnerHTML={{__html: sanitize($HTML)}}
+      - pattern: |
+          dangerouslySetInnerHTML={{__html: DOMPurify.sanitize($HTML)}}
+    message: Potential XSS vulnerability - sanitize HTML before rendering
+    languages: [typescript, javascript]
+    severity: ERROR
+    metadata:
+      category: security
+      subcategory: xss
+      technology: nextjs
+      cwe: "CWE-79: Cross-site Scripting"
+
+  - id: nextjs-insecure-eval
+    pattern-either:
+      - pattern: eval(...)
+      - pattern: Function(...)
+      - pattern: setTimeout("...", ...)
+      - pattern: setInterval("...", ...)
+    message: Use of eval() or similar functions can lead to code injection
+    languages: [typescript, javascript]
+    severity: ERROR
+    metadata:
+      category: security
+      subcategory: injection
+      technology: nextjs
+      cwe: "CWE-95: Code Injection"
+
+  - id: nextjs-missing-csrf-protection
+    pattern: |
+      export async function $METHOD(request: NextRequest) {
+          ...
+      }
+    pattern-not-inside:
+      - pattern: |
+          export async function $METHOD(request: NextRequest) {
+              ...
+              const csrfToken = ...
+              ...
+          }
+      - pattern: |
+          export async function $METHOD(request: NextRequest) {
+              ...
+              verifyCSRF(...)
+              ...
+          }
+    paths:
+      include:
+        - "web/app/api/**/*.ts"
+    message: API route missing CSRF protection for state-changing operations
+    languages: [typescript]
+    severity: WARNING
+    metadata:
+      category: security
+      subcategory: csrf
+      technology: nextjs
+
+  - id: nextjs-insecure-redirect
+    pattern-either:
+      - pattern: |
+          redirect($URL)
+      - pattern: |
+          window.location.href = $URL
+      - pattern: |
+          window.location.replace($URL)
+    pattern-not-inside:
+      - pattern: |
+          if ($URL.startsWith("/")) {
+              ...
+          }
+      - pattern: |
+          if (isValidRedirectUrl($URL)) {
+              ...
+          }
+    message: Unvalidated redirect - potential open redirect vulnerability
+    languages: [typescript, javascript]
+    severity: WARNING
+    metadata:
+      category: security
+      subcategory: redirect
+      technology: nextjs
+      cwe: "CWE-601: Open Redirect"
+
+  - id: nextjs-missing-input-validation
+    pattern: |
+      export async function $METHOD(request: NextRequest) {
+          const $DATA = await request.json()
+          ...
+      }
+    pattern-not-inside:
+      - pattern: |
+          export async function $METHOD(request: NextRequest) {
+              const $DATA = await request.json()
+              if (!$DATA || ...) {
+                  ...
+              }
+              ...
+          }
+      - pattern: |
+          export async function $METHOD(request: NextRequest) {
+              const $DATA = await request.json()
+              const validated = validate($DATA)
+              ...
+          }
+    paths:
+      include:
+        - "web/app/api/**/*.ts"
+    message: API route missing input validation
+    languages: [typescript]
+    severity: WARNING
+    metadata:
+      category: security
+      subcategory: validation
+      technology: nextjs
+
+  - id: nextjs-sql-injection-template
+    pattern-either:
+      - pattern: |
+          `SELECT * FROM users WHERE id = ${$ID}`
+      - pattern: |
+          `INSERT INTO table VALUES (${$VALUE})`
+      - pattern: |
+          `UPDATE table SET column = ${$VALUE}`
+      - pattern: |
+          `DELETE FROM table WHERE id = ${$ID}`
+    message: Potential SQL injection via template literals
+    languages: [typescript, javascript]
+    severity: ERROR
+    metadata:
+      category: security
+      subcategory: injection
+      technology: nextjs
+      cwe: "CWE-89: SQL Injection"
+
+  - id: nextjs-weak-session-config
+    pattern-either:
+      - pattern: |
+          session: {
+              ...
+              strategy: "jwt",
+              maxAge: ...,
+              ...
+          }
+      - pattern: |
+          cookies: {
+              ...
+              secure: false,
+              ...
+          }
+    paths:
+      include:
+        - "**/auth.ts"
+        - "**/auth.js"
+        - "**/next-auth.config.*"
+    message: Weak session configuration detected
+    languages: [typescript, javascript]
+    severity: WARNING
+    metadata:
+      category: security
+      subcategory: session
+      technology: nextjs
+
+  - id: nextjs-missing-content-security-policy
+    pattern: |
+      export default function $COMPONENT(...) {
+          return (
+              <html>
+                  <head>
+                      ...
+                  </head>
+                  ...
+              </html>
+          )
+      }
+    pattern-not-inside:
+      - pattern: |
+          <meta httpEquiv="Content-Security-Policy" content="..." />
+    paths:
+      include:
+        - "web/app/layout.tsx"
+    message: Missing Content Security Policy in main layout
+    languages: [typescript, javascript]
+    severity: INFO
+    metadata:
+      category: security
+      subcategory: csp
+      technology: nextjs
+
+  - id: nextjs-console-log-sensitive-data
+    pattern-either:
+      - pattern: |
+          console.log(..., password, ...)
+      - pattern: |
+          console.log(..., token, ...)
+      - pattern: |
+          console.log(..., secret, ...)
+      - pattern: |
+          console.log(..., apiKey, ...)
+    message: Console logging may expose sensitive data
+    languages: [typescript, javascript]
+    severity: WARNING
+    metadata:
+      category: security
+      subcategory: logging
+      technology: nextjs
+
+  - id: nextjs-unsafe-target-blank
+    pattern: |
+      <a href="..." target="_blank">
+    pattern-not:
+      - pattern: |
+          <a href="..." target="_blank" rel="noopener noreferrer">
+    message: target="_blank" without rel="noopener noreferrer" is unsafe
+    languages: [typescript, javascript]
+    severity: WARNING
+    metadata:
+      category: security
+      subcategory: link
+      technology: nextjs
+
+  - id: nextjs-missing-auth-check
+    pattern: |
+      export default function $PAGE(...) {
+          ...
+      }
+    pattern-not-inside:
+      - pattern: |
+          export default function $PAGE(...) {
+              const { data: session } = useSession()
+              if (!session) {
+                  ...
+              }
+              ...
+          }
+      - pattern: |
+          export default function $PAGE(...) {
+              const session = await getServerSession(...)
+              if (!session) {
+                  ...
+              }
+              ...
+          }
+    paths:
+      include:
+        - "web/app/**/page.tsx"
+        - "web/app/e/**/page.tsx"
+      exclude:
+        - "web/app/signin/page.tsx"
+        - "web/app/page.tsx"
+    message: Protected page missing authentication check
+    languages: [typescript]
+    severity: WARNING
+    metadata:
+      category: security
+      subcategory: authentication
+      technology: nextjs
+
+  - id: nextjs-insecure-cookie-settings
+    pattern-either:
+      - pattern: |
+          cookies().set($NAME, $VALUE, { secure: false })
+      - pattern: |
+          cookies().set($NAME, $VALUE, { httpOnly: false })
+      - pattern: |
+          cookies().set($NAME, $VALUE, { sameSite: "none" })
+    message: Insecure cookie configuration
+    languages: [typescript, javascript]
+    severity: WARNING
+    metadata:
+      category: security
+      subcategory: cookies
+      technology: nextjs
+
+  - id: nextjs-client-side-secrets
+    pattern-either:
+      - pattern: |
+          const $VAR = process.env.NEXT_PUBLIC_SECRET_...
+      - pattern: |
+          const $VAR = process.env.NEXT_PUBLIC_API_SECRET
+      - pattern: |
+          const $VAR = process.env.NEXT_PUBLIC_PRIVATE_KEY
+    message: Secret exposed through NEXT_PUBLIC_ environment variable
+    languages: [typescript, javascript]
+    severity: ERROR
+    metadata:
+      category: security
+      subcategory: secrets
+      technology: nextjs
