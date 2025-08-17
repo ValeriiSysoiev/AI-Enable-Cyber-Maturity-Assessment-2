@@ -6,6 +6,7 @@ declare global {
   interface Window {
     mockAADClaims?: any;
     mockAuthMode?: string;
+    mockUserContext?: any;
   }
 }
 
