@@ -5,6 +5,7 @@ from sqlmodel import Session, select
 from pathlib import Path
 import json
 import os
+import logging
 from typing import List, Dict
 from .assist import router as assist_router
 from .storage import router as storage_router
@@ -12,39 +13,65 @@ from .db import create_db_and_tables, get_session
 from .models import Assessment, Answer
 from .schemas import AssessmentCreate, AssessmentResponse, AnswerUpsert, ScoreResponse, PillarScore
 from .scoring import compute_scores
-from .routes import assessments as assessments_router, orchestrations as orchestrations_router, engagements as engagements_router, documents, summary, presets as presets_router
-from ..domain.repository import InMemoryRepository
-from ..domain.file_repo import FileRepository
-from ..ai.llm import LLMClient
-from ..ai.orchestrator import Orchestrator
+from .routes import assessments as assessments_router, orchestrations as orchestrations_router, engagements as engagements_router, documents, summary, presets as presets_router, version as version_router
+from domain.repository import InMemoryRepository
+from domain.file_repo import FileRepository
+from ai.llm import LLMClient
+from ai.orchestrator import Orchestrator
+from config import config
 
 app = FastAPI(title="AI Maturity Tool API", version="0.1.0")
 
 # --- CORS configuration (env-driven) ---
-_origins_env = os.getenv("API_ALLOWED_ORIGINS", "")
-_origins = [o.strip() for o in _origins_env.split(",") if o.strip()]
-if not _origins:
-    # Dev-safe fallback; prod will set explicit origin(s) via release script
-    _origins = ["*"]
-
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=_origins,
+    allow_origins=config.allowed_origins,
     allow_credentials=True,
     allow_methods=["*"],
-    allow_headers=["*"],  # allow custom headers like X-User-Email, X-Engagement-ID
+    allow_headers=["*"],  # allow custom headers like X-User-Email, X-Engagement-ID, X-Correlation-ID
     expose_headers=["Content-Disposition"],
 )
 
 @app.on_event("startup")
 def on_startup():
+    # Configure logging
+    logging.basicConfig(
+        level=getattr(logging, config.logging.level.upper()),
+        format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+    )
+    logger = logging.getLogger(__name__)
+    
     create_db_and_tables()
     # Wire up new domain dependencies
     app.state.repo = FileRepository()
     app.state.orchestrator = Orchestrator(LLMClient())
     
+    # Validate RAG configuration if enabled
+    if config.rag.enabled:
+        is_valid, errors = config.validate_azure_config()
+        if not is_valid:
+            logger.warning(
+                "RAG is enabled but configuration is invalid",
+                extra={
+                    "errors": errors,
+                    "rag_enabled": config.rag.enabled
+                }
+            )
+        else:
+            logger.info(
+                "RAG services configured and enabled",
+                extra={
+                    "azure_openai_endpoint": config.azure_openai.endpoint,
+                    "azure_search_endpoint": config.azure_search.endpoint,
+                    "search_index": config.azure_search.index_name,
+                    "embedding_model": config.azure_openai.embedding_model
+                }
+            )
+    else:
+        logger.info("RAG services disabled")
+    
     # Initialize preset service
-    from ..services import presets as preset_service
+    from services import presets as preset_service
     preset_service.ensure_dirs()
     # register bundled presets if present
     try:
@@ -67,10 +94,11 @@ app.include_router(engagements_router.router)
 app.include_router(documents.router)
 app.include_router(summary.router)
 app.include_router(presets_router.router)
+app.include_router(version_router.router)
 
 def load_preset(preset_id: str) -> dict:
     # Use new preset service for consistency
-    from ..services import presets as preset_service
+    from services import presets as preset_service
     try:
         preset = preset_service.get_preset(preset_id)
         return preset.model_dump()
@@ -81,9 +109,7 @@ def load_preset(preset_id: str) -> dict:
             raise FileNotFoundError(preset_path) from e
         return json.loads(preset_path.read_text(encoding="utf-8"))
 
-@app.get("/health")
-def health():
-    return {"status": "ok"}
+# Health endpoint moved to version router
 
 
 @app.post("/assessments", response_model=AssessmentResponse)
