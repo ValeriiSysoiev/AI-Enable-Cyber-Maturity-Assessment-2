@@ -259,6 +259,73 @@ The application now includes demo authentication for accessing protected pages:
 - [ ] Create assessment history and dashboard views
 - [ ] Persist evidence URLs with assessments in database
 
+### S4 Features (Sprint 4)
+
+Sprint S4 introduces workshop management, NIST CSF 2.0 framework integration, and chat-based assessment assistance:
+
+#### Workshop Management Routes
+```
+POST /workshops                      # Create workshop session
+GET  /workshops/{id}                 # Get workshop details
+POST /workshops/{id}/consent         # Grant/revoke participant consent
+GET  /workshops/{id}/consent         # Check consent status
+POST /workshops/{id}/minutes         # Generate draft meeting minutes
+PUT  /workshops/{id}/minutes         # Update draft minutes
+POST /workshops/{id}/minutes/publish # Publish immutable minutes
+GET  /workshops/{id}/minutes/{version} # Retrieve minutes version
+```
+
+#### NIST CSF 2.0 Integration Routes  
+```
+GET  /csf/functions                  # List 6 CSF functions (Govern, Identify, etc)
+GET  /csf/functions/{id}/categories  # Categories for specific function  
+GET  /csf/categories/{id}/subcategories # Subcategories with examples
+POST /assessments/{id}/csf/grid      # Save grid-based assessment data
+GET  /assessments/{id}/csf/gaps      # Generate gap analysis report
+GET  /csf/seed                       # Local development CSF test data
+```
+
+#### Chat Command Routes
+```  
+POST /chat/assess                    # AI-assisted assessment questions
+POST /chat/evidence                  # Evidence analysis and suggestions
+POST /chat/gaps                      # Gap analysis and recommendations
+POST /chat/shell                     # Administrative shell commands (Admin only)
+```
+
+**Local CSF Seed Data Usage:**
+For development and testing, the system provides local CSF 2.0 seed data:
+```bash
+# Load CSF development data
+curl http://localhost:8000/csf/seed
+
+# Example response includes all 6 functions with categories and subcategories
+# Supports offline development without external NIST dependencies
+```
+
+**Comprehensive E2E Tests:**
+Run complete end-to-end tests covering S4 features:
+```bash
+# Run S4 workshop tests  
+cd web && npm run e2e:workshops
+
+# Run CSF grid assessment tests
+cd web && npm run e2e:csf
+
+# Run chat command tests (requires Admin role)
+cd web && npm run e2e:chat
+
+# Run all S4 features
+cd web && npm run e2e:s4
+```
+
+**Service Bus Fallback Behavior:**
+S4 features implement graceful degradation when Azure Service Bus is unavailable:
+- **Workshops:** Direct HTTP calls with async task queuing fallback
+- **Minutes:** Synchronous processing with background retry mechanisms  
+- **CSF Processing:** Local caching with periodic refresh attempts
+- **Chat Commands:** Immediate response mode with best-effort async tasks
+
 ### Configuration
 
 #### Frontend Configuration
