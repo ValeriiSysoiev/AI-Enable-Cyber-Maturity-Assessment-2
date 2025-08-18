@@ -160,6 +160,22 @@ class PerformanceConfig(BaseModel):
     alert_time_window_minutes: int = Field(default_factory=lambda: int(os.getenv("PERF_ALERT_TIME_WINDOW_MINUTES", "5")))
 
 
+class ServiceBusConfig(BaseModel):
+    """Azure Service Bus configuration for message queuing"""
+    namespace: Optional[str] = Field(default_factory=lambda: os.getenv("SERVICE_BUS_NAMESPACE"))
+    connection_string: Optional[str] = Field(default_factory=lambda: os.getenv("SERVICE_BUS_CONN_STRING"))
+    
+    # Queue configuration
+    default_topic_name: str = Field(default_factory=lambda: os.getenv("SERVICE_BUS_DEFAULT_TOPIC", "orchestration"))
+    max_retries: int = Field(default_factory=lambda: int(os.getenv("SERVICE_BUS_MAX_RETRIES", "3")))
+    retry_delay_seconds: int = Field(default_factory=lambda: int(os.getenv("SERVICE_BUS_RETRY_DELAY", "5")))
+    message_ttl_seconds: int = Field(default_factory=lambda: int(os.getenv("SERVICE_BUS_MESSAGE_TTL", "3600")))
+    
+    def is_configured(self) -> bool:
+        """Check if Service Bus is properly configured"""
+        return bool(self.namespace and self.connection_string)
+
+
 class AppConfig(BaseModel):
     """Main application configuration"""
     azure_openai: AzureOpenAIConfig = Field(default_factory=AzureOpenAIConfig)
@@ -171,6 +187,7 @@ class AppConfig(BaseModel):
     aad_groups: AADGroupsConfig = Field(default_factory=AADGroupsConfig)
     cache: CacheConfig = Field(default_factory=CacheConfig)
     performance: PerformanceConfig = Field(default_factory=PerformanceConfig)
+    service_bus: ServiceBusConfig = Field(default_factory=ServiceBusConfig)
     
     # Admin settings
     admin_emails: list[str] = Field(default_factory=lambda: [
