@@ -175,3 +175,29 @@ class CSFFunction(BaseModel):
     title: str
     description: str
     categories: List[CSFCategory] = Field(default_factory=list)
+
+class ConsentRecord(BaseModel):
+    """Attendee consent record for workshops"""
+    by: str  # User who gave consent (typically same as attendee email)
+    user_id: str  # User ID who gave consent
+    timestamp: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+
+class WorkshopAttendee(BaseModel):
+    """Workshop attendee information"""
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    user_id: str  # User identifier
+    email: str
+    role: str  # attendee role in workshop
+    consent: Optional[ConsentRecord] = None
+
+class Workshop(BaseModel):
+    """Workshop for engagement activities requiring consent"""
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    engagement_id: str
+    title: str
+    start_ts: Optional[datetime] = None
+    attendees: List[WorkshopAttendee] = Field(default_factory=list)
+    created_by: str
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    started: bool = False
+    started_at: Optional[datetime] = None

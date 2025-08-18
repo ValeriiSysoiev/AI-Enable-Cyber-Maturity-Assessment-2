@@ -115,9 +115,14 @@ export default function TopNav() {
                 New Assessment
               </Link>
               {engagementId && (
-                <Link href={`/e/${engagementId}/dashboard`} className="text-sm hover:text-blue-600">
-                  Dashboard
-                </Link>
+                <>
+                  <Link href={`/e/${engagementId}/dashboard`} className="text-sm hover:text-blue-600">
+                    Dashboard
+                  </Link>
+                  <Link href={`/e/${engagementId}/workshops`} className="text-sm hover:text-blue-600">
+                    Workshops
+                  </Link>
+                </>
               )}
             </div>
           </div>
