@@ -29,18 +29,25 @@ Used by `.github/workflows/release.yml` workflow for production deployments.
 ### Optional Secrets
 - **`PRODUCTION_AUTH_BEARER`** - Authentication token for production verification tests
 
-## Staging Deployment Secrets
+## Staging Deployment Variables
 
 Used by `.github/workflows/deploy_staging.yml` workflow for staging deployments.
 
-### Required Secrets
-- **`AZURE_CONTAINER_REGISTRY_STAGING`** - Staging ACR name (without .azurecr.io suffix)
-- **`AZURE_RESOURCE_GROUP_STAGING`** - Staging resource group name
-- **`API_CONTAINER_APP_STAGING`** - Staging API container app name
-- **`WEB_CONTAINER_APP_STAGING`** - Staging web container app name
+### Required Environment Variables (vars.*)
+- **`AZURE_RESOURCE_GROUP_STAGING`** - Staging resource group name (e.g., "rg-cybermat-stg")
+- **`WEB_CONTAINER_APP_STAGING`** - Staging web App Service name (e.g., "web-cybermat-stg")
+- **`API_CONTAINER_APP_STAGING`** - Staging API Container Apps name (e.g., "api-cybermat-stg")
+- **`VERIFY_WEB_BASE_URL`** - Web verification URL (e.g., "https://web-cybermat-stg.azurewebsites.net")
+- **`VERIFY_API_BASE_URL`** - API verification URL (e.g., "https://api-cybermat-stg.azurecontainerapps.io")
 
-### Optional Secrets
+### Optional Environment Variables (vars.*)
+- **`AZURE_CONTAINER_REGISTRY_STAGING`** - Staging ACR name (without .azurecr.io suffix) - enables API image builds
 - **`STAGING_AUTH_BEARER`** - Authentication token for staging verification tests
+
+### Infrastructure Architecture
+- **WEB**: Deployed to Azure App Service (uses `azure/webapps-deploy@v3`)
+- **API**: Deployed to Azure Container Apps (requires ACR for image builds)
+- **ACR**: Optional - API deployment skipped gracefully if not configured
 
 ## Legacy Authentication (Deprecated)
 
