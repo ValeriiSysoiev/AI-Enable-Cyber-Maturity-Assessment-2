@@ -115,3 +115,41 @@ class EmbeddingDocument(BaseModel):
     # Embedding metadata
     model: str = ""
     embedding_created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+
+
+class ServiceBusMessage(BaseModel):
+    """Service Bus message for orchestration queuing"""
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    type: str  # Message type for routing (e.g., "ingest", "minutes", "score")
+    payload: Dict[str, Any]  # Message payload
+    correlation_id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    
+    # Retry handling
+    retry_count: int = 0
+    max_retries: int = 3
+    
+    # Dead letter queue support
+    is_dead_lettered: bool = False
+    dead_letter_reason: Optional[str] = None
+    
+    # Processing metadata
+    processed_at: Optional[datetime] = None
+    processed_by: Optional[str] = None
+    
+    # Engagement context
+    engagement_id: Optional[str] = None
+    user_email: Optional[str] = None
+
+
+class QueueConfig(BaseModel):
+    """Queue configuration with DLQ support"""
+    name: str
+    max_delivery_count: int = 3
+    ttl_seconds: int = 3600  # 1 hour
+    enable_dead_letter_queue: bool = True
+    dead_letter_queue_name: str = Field(default_factory=lambda: "")
+    
+    def __post_init__(self):
+        if not self.dead_letter_queue_name and self.enable_dead_letter_queue:
+            self.dead_letter_queue_name = f"{self.name}-dlq"

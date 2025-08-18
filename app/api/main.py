@@ -7,6 +7,7 @@ import json
 import os
 import logging
 from typing import List, Dict
+from datetime import datetime, timezone
 from .assist import router as assist_router
 from .storage import router as storage_router
 from .db import create_db_and_tables, get_session
@@ -140,6 +141,39 @@ async def on_startup():
             )
     else:
         logger.info("AAD groups authentication disabled")
+    
+    # Initialize Service Bus
+    if config.service_bus.is_configured():
+        logger.info(
+            "Service Bus configured - using Azure Service Bus",
+            namespace=config.service_bus.namespace,
+            max_retries=config.service_bus.max_retries
+        )
+        
+        # Send test message to verify connectivity
+        try:
+            from services.service_bus import ServiceBusProducer
+            producer = ServiceBusProducer()
+            test_payload = {
+                "test": True,
+                "timestamp": datetime.now(timezone.utc).isoformat(),
+                "service": "api_startup"
+            }
+            await producer.send_message(
+                topic="health",
+                message_type="startup_test",
+                payload=test_payload,
+                idempotency_key=f"startup-{datetime.now(timezone.utc).isoformat()}"
+            )
+            logger.info("Service Bus test message sent successfully")
+        except Exception as e:
+            logger.error(f"Failed to send Service Bus test message: {e}")
+    else:
+        logger.warning(
+            "Service Bus configuration not found - using in-memory queue fallback",
+            namespace_configured=bool(config.service_bus.namespace),
+            connection_string_configured=bool(config.service_bus.connection_string)
+        )
     
     # Initialize preset service
     from services import presets as preset_service

@@ -24,3 +24,6 @@ azure-cosmos>=4.5.0
 
 # Performance monitoring dependencies
 psutil>=5.9.0
+
+# Service Bus messaging dependencies
+azure-servicebus>=7.12.0
