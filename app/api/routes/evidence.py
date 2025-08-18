@@ -13,6 +13,8 @@ from pydantic import BaseModel, Field
 from security.deps import get_current_user, require_role
 from domain.models import Evidence
 from security.secret_provider import get_secret
+from services.evidence_processing import EvidenceProcessor
+from repos.cosmos_repository import create_cosmos_repository
 
 logger = logging.getLogger(__name__)
 
@@ -272,12 +274,59 @@ async def complete_evidence_upload(
         raise HTTPException(status_code=403, detail="Access denied: not a member of this engagement")
     
     try:
-        # TODO: Implement actual blob verification and checksum computation
-        # For now, use a mock checksum
-        server_checksum = "mock-sha256-checksum"
+        # Initialize evidence processor and repository
+        processor = EvidenceProcessor(correlation_id)
+        repository = create_cosmos_repository(correlation_id)
         
-        # TODO: Implement PII detection heuristics
-        pii_detected = False
+        # Verify blob exists and get actual size
+        blob_exists, actual_size = await processor.verify_blob_exists(request.blob_path)
+        if not blob_exists:
+            logger.warning(
+                "Blob not found for evidence completion",
+                extra={
+                    "correlation_id": correlation_id,
+                    "blob_path": request.blob_path
+                }
+            )
+            raise HTTPException(status_code=404, detail="Uploaded file not found")
+        
+        # Validate size matches
+        if abs(actual_size - request.size_bytes) > 1024:  # Allow 1KB tolerance
+            logger.warning(
+                "Size mismatch in evidence completion",
+                extra={
+                    "correlation_id": correlation_id,
+                    "reported_size": request.size_bytes,
+                    "actual_size": actual_size
+                }
+            )
+            raise HTTPException(
+                status_code=422, 
+                detail=f"Size mismatch: reported {request.size_bytes}, actual {actual_size}"
+            )
+        
+        # Compute server-side checksum
+        server_checksum = await processor.compute_checksum(request.blob_path)
+        if not server_checksum:
+            raise HTTPException(status_code=500, detail="Failed to compute file checksum")
+        
+        # Validate client checksum if provided
+        if request.client_checksum and request.client_checksum.lower() != server_checksum.lower():
+            logger.warning(
+                "Checksum mismatch in evidence completion",
+                extra={
+                    "correlation_id": correlation_id,
+                    "client_checksum": request.client_checksum,
+                    "server_checksum": server_checksum[:16] + "..."
+                }
+            )
+            raise HTTPException(
+                status_code=422,
+                detail="Checksum mismatch: file may be corrupted"
+            )
+        
+        # Detect PII
+        pii_detected = await processor.detect_pii(request.blob_path, request.mime_type)
         
         # Create Evidence record
         evidence = Evidence(
@@ -285,25 +334,32 @@ async def complete_evidence_upload(
             blob_path=request.blob_path,
             filename=request.filename,
             checksum_sha256=server_checksum,
-            size=request.size_bytes,
+            size=actual_size,
             mime_type=request.mime_type,
             uploaded_by=user_email,
             pii_flag=pii_detected
         )
         
-        # TODO: Save to repository
+        # Save to repository
+        stored_evidence = await repository.store_evidence(evidence)
         
         logger.info(
             "Evidence record created",
             extra={
                 "correlation_id": correlation_id,
-                "evidence_id": evidence.id,
-                "checksum": server_checksum,
-                "pii_flag": pii_detected
+                "evidence_id": stored_evidence.id,
+                "checksum": server_checksum[:16] + "...",
+                "pii_flag": pii_detected,
+                "size": actual_size
             }
         )
         
-        return {"evidence_id": evidence.id, "checksum": server_checksum, "pii_flag": pii_detected}
+        return {
+            "evidence_id": stored_evidence.id, 
+            "checksum": server_checksum, 
+            "pii_flag": pii_detected,
+            "size": actual_size
+        }
         
     except Exception as e:
         logger.error(
@@ -345,19 +401,41 @@ async def list_evidence(
         )
         raise HTTPException(status_code=403, detail="Access denied: not a member of this engagement")
     
-    # TODO: Implement actual repository query
-    # For now, return empty list
-    logger.info(
-        "Evidence list request",
-        extra={
-            "correlation_id": correlation_id,
-            "engagement_id": engagement_id,
-            "page": page,
-            "page_size": page_size
-        }
-    )
-    
-    return []
+    try:
+        # Initialize repository
+        repository = create_cosmos_repository(correlation_id)
+        
+        # Get evidence list with pagination
+        evidence_list, total_count = await repository.list_evidence(
+            engagement_id=engagement_id,
+            page=page,
+            page_size=page_size
+        )
+        
+        logger.info(
+            "Evidence list request completed",
+            extra={
+                "correlation_id": correlation_id,
+                "engagement_id": engagement_id,
+                "page": page,
+                "page_size": page_size,
+                "total_count": total_count,
+                "returned_count": len(evidence_list)
+            }
+        )
+        
+        return evidence_list
+        
+    except Exception as e:
+        logger.error(
+            "Failed to list evidence",
+            extra={
+                "correlation_id": correlation_id,
+                "engagement_id": engagement_id,
+                "error": str(e)
+            }
+        )
+        raise HTTPException(status_code=500, detail="Failed to retrieve evidence list")
 
 @router.post("/{evidence_id}/links")
 async def link_evidence(
@@ -374,17 +452,76 @@ async def link_evidence(
     correlation_id = current_user.get("correlation_id")
     user_email = current_user["email"]
     
-    logger.info(
-        "Evidence link request",
-        extra={
-            "correlation_id": correlation_id,
-            "user_email": user_email,
-            "evidence_id": evidence_id,
-            "item_type": request.item_type,
-            "item_id": request.item_id
+    try:
+        # Initialize repository
+        repository = create_cosmos_repository(correlation_id)
+        
+        # Get existing evidence to verify ownership and get current links
+        evidence = await repository.get_evidence(evidence_id, "")  # We'll need engagement_id for this
+        if not evidence:
+            raise HTTPException(status_code=404, detail="Evidence not found")
+        
+        # Check engagement membership for the evidence
+        is_member = await _check_engagement_membership(user_email, evidence.engagement_id)
+        if not is_member:
+            logger.warning(
+                "Evidence link denied - not a member",
+                extra={
+                    "correlation_id": correlation_id,
+                    "user_email": user_email,
+                    "evidence_id": evidence_id,
+                    "engagement_id": evidence.engagement_id
+                }
+            )
+            raise HTTPException(status_code=403, detail="Access denied: not a member of this engagement")
+        
+        # Add new link to existing links
+        new_link = {"item_type": request.item_type, "item_id": request.item_id}
+        updated_links = evidence.linked_items.copy()
+        
+        # Check if link already exists
+        if new_link not in updated_links:
+            updated_links.append(new_link)
+            
+            # Update evidence record
+            success = await repository.update_evidence_links(
+                evidence_id, 
+                evidence.engagement_id, 
+                updated_links
+            )
+            
+            if not success:
+                raise HTTPException(status_code=500, detail="Failed to update evidence links")
+        
+        logger.info(
+            "Evidence link created",
+            extra={
+                "correlation_id": correlation_id,
+                "user_email": user_email,
+                "evidence_id": evidence_id,
+                "item_type": request.item_type,
+                "item_id": request.item_id,
+                "total_links": len(updated_links)
+            }
+        )
+        
+        return {
+            "message": "Link created", 
+            "evidence_id": evidence_id, 
+            "item_type": request.item_type, 
+            "item_id": request.item_id,
+            "total_links": len(updated_links)
         }
-    )
-    
-    # TODO: Implement actual linking logic
-    # For now, return success
-    return {"message": "Link created", "evidence_id": evidence_id, "item_type": request.item_type, "item_id": request.item_id}
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(
+            "Failed to link evidence",
+            extra={
+                "correlation_id": correlation_id,
+                "evidence_id": evidence_id,
+                "error": str(e)
+            }
+        )
+        raise HTTPException(status_code=500, detail="Failed to create evidence link")

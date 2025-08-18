@@ -14,7 +14,7 @@ import json
 import logging
 import os
 from datetime import datetime, timezone, timedelta
-from typing import Dict, List, Optional, Any, Union
+from typing import Dict, List, Optional, Any, Union, Tuple
 
 from azure.cosmos import CosmosClient, PartitionKey
 from azure.cosmos.exceptions import CosmosResourceNotFoundError, CosmosHttpResponseError
@@ -22,7 +22,7 @@ from azure.identity import DefaultAzureCredential
 
 from domain.models import (
     Assessment, Question, Response, Finding, Recommendation, RunLog,
-    Engagement, Membership, Document, EmbeddingDocument
+    Engagement, Membership, Document, EmbeddingDocument, Evidence
 )
 from domain.repository import Repository
 from api.schemas.gdpr import BackgroundJob, AuditLogEntry, TTLPolicy
@@ -180,6 +180,10 @@ class CosmosRepository(Repository):
             "embeddings": {
                 "partition_key": "/engagement_id",
                 "ttl": 31536000  # 1 year TTL for embeddings
+            },
+            "evidence": {
+                "partition_key": "/engagement_id",
+                "ttl": None  # No TTL for evidence data
             }
         }
         
@@ -770,6 +774,143 @@ class CosmosRepository(Repository):
                 extra={
                     "correlation_id": self.correlation_id,
                     "engagement_id": engagement_id,
+                    "error": str(e)
+                }
+            )
+            raise
+    
+    # Evidence methods
+    async def store_evidence(self, evidence: Evidence) -> Evidence:
+        """Store evidence record in Cosmos DB"""
+        try:
+            evidence_dict = evidence.model_dump()
+            evidence_dict["id"] = evidence.id
+            
+            stored_item = await self._upsert_item("evidence", evidence_dict)
+            
+            logger.info(
+                "Evidence record stored",
+                extra={
+                    "correlation_id": self.correlation_id,
+                    "evidence_id": evidence.id,
+                    "engagement_id": evidence.engagement_id,
+                    "filename": evidence.filename
+                }
+            )
+            
+            return Evidence(**stored_item)
+            
+        except Exception as e:
+            logger.error(
+                "Failed to store evidence record",
+                extra={
+                    "correlation_id": self.correlation_id,
+                    "evidence_id": evidence.id,
+                    "error": str(e)
+                }
+            )
+            raise
+    
+    async def get_evidence(self, evidence_id: str, engagement_id: str) -> Optional[Evidence]:
+        """Get evidence record by ID"""
+        try:
+            item = await self._get_item("evidence", evidence_id, engagement_id)
+            return Evidence(**item) if item else None
+            
+        except Exception as e:
+            logger.error(
+                "Failed to get evidence record",
+                extra={
+                    "correlation_id": self.correlation_id,
+                    "evidence_id": evidence_id,
+                    "error": str(e)
+                }
+            )
+            raise
+    
+    async def list_evidence(
+        self,
+        engagement_id: str,
+        page: int = 1,
+        page_size: int = 50
+    ) -> Tuple[List[Evidence], int]:
+        """List evidence for an engagement with pagination"""
+        try:
+            # Count query
+            count_query = "SELECT VALUE COUNT(1) FROM c WHERE c.engagement_id = @engagement_id"
+            count_results = await self._query_items(
+                "evidence", 
+                count_query, 
+                [{"name": "@engagement_id", "value": engagement_id}]
+            )
+            total_count = count_results[0] if count_results else 0
+            
+            # Data query with pagination
+            offset = (page - 1) * page_size
+            data_query = f"SELECT * FROM c WHERE c.engagement_id = @engagement_id ORDER BY c.uploaded_at DESC OFFSET {offset} LIMIT {page_size}"
+            items = await self._query_items(
+                "evidence",
+                data_query,
+                [{"name": "@engagement_id", "value": engagement_id}]
+            )
+            
+            evidence_list = [Evidence(**item) for item in items]
+            
+            logger.info(
+                "Listed evidence for engagement",
+                extra={
+                    "correlation_id": self.correlation_id,
+                    "engagement_id": engagement_id,
+                    "page": page,
+                    "page_size": page_size,
+                    "total_count": total_count,
+                    "returned_count": len(evidence_list)
+                }
+            )
+            
+            return evidence_list, total_count
+            
+        except Exception as e:
+            logger.error(
+                "Failed to list evidence",
+                extra={
+                    "correlation_id": self.correlation_id,
+                    "engagement_id": engagement_id,
+                    "error": str(e)
+                }
+            )
+            raise
+    
+    async def update_evidence_links(self, evidence_id: str, engagement_id: str, linked_items: List[Dict[str, str]]) -> bool:
+        """Update evidence links to assessment items"""
+        try:
+            # Get existing evidence
+            evidence_item = await self._get_item("evidence", evidence_id, engagement_id)
+            if not evidence_item:
+                return False
+            
+            # Update linked items
+            evidence_item["linked_items"] = linked_items
+            
+            await self._upsert_item("evidence", evidence_item)
+            
+            logger.info(
+                "Updated evidence links",
+                extra={
+                    "correlation_id": self.correlation_id,
+                    "evidence_id": evidence_id,
+                    "link_count": len(linked_items)
+                }
+            )
+            
+            return True
+            
+        except Exception as e:
+            logger.error(
+                "Failed to update evidence links",
+                extra={
+                    "correlation_id": self.correlation_id,
+                    "evidence_id": evidence_id,
                     "error": str(e)
                 }
             )
