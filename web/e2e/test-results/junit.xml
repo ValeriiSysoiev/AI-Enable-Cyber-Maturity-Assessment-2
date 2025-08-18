@@ -1,301 +1,78 @@
-<testsuites id="" name="" tests="27" failures="5" skipped="17" errors="0" time="14.808591">
-<testsuite name="engagements.spec.ts" timestamp="2025-08-18T02:40:33.855Z" hostname="chromium" tests="9" failures="5" skipped="1" time="60.377" errors="0">
-<testcase name="Engagements Page - SSR Guards › unauthenticated user redirects to signin" classname="engagements.spec.ts" time="0.858">
+<testsuites id="" name="" tests="18" failures="0" skipped="18" errors="0" time="0.08109499999999997">
+<testsuite name="csf-grid.spec.ts" timestamp="2025-08-18T15:10:56.557Z" hostname="chromium" tests="6" failures="0" skipped="6" time="0" errors="0">
+<testcase name="CSF 2.0 Grid Assessment › CSF grid renders correctly with all functions" classname="csf-grid.spec.ts" time="0">
+<skipped>
+</skipped>
 </testcase>
-<testcase name="Engagements Page - SSR Guards › authenticated user can access engagements" classname="engagements.spec.ts" time="1.289">
+<testcase name="CSF 2.0 Grid Assessment › function expansion and collapse functionality" classname="csf-grid.spec.ts" time="0">
+<skipped>
+</skipped>
 </testcase>
-<testcase name="Engagements Page - SSR Guards › engagements list renders correctly" classname="engagements.spec.ts" time="11.658">
-<failure message="engagements.spec.ts:36:7 engagements list renders correctly" type="FAILURE">
-<![CDATA[  [chromium] › engagements.spec.ts:36:7 › Engagements Page - SSR Guards › engagements list renders correctly 
-
-    Error: Timed out 10000ms waiting for expect(locator).toHaveCount(expected)
-
-    Locator: locator('.bg-white.shadow.rounded-lg')
-    Expected: 3
-    Received: 0
-    Call log:
-      - Expect "toHaveCount" with timeout 10000ms
-      - waiting for locator('.bg-white.shadow.rounded-lg')
-        14 × locator resolved to 0 elements
-           - unexpected value "0"
-
-
-      44 |     
-      45 |     // Check for engagement cards
-    > 46 |     await expect(page.locator('.bg-white.shadow.rounded-lg')).toHaveCount(3);
-         |                                                               ^
-      47 |     
-      48 |     // Check for specific engagement
-      49 |     await expect(page.locator('text=Cybersecurity Maturity Assessment')).toBeVisible();
-        at /Users/valsysoiev/AI-Enable-Cyber-Maturity-Assessment-2/web/e2e/tests/engagements.spec.ts:46:63
-
-    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
-    ../test-results/engagements-Engagements-Pa-46525-ents-list-renders-correctly-chromium/test-failed-1.png
-    ────────────────────────────────────────────────────────────────────────────────────────────────
-
-    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
-    ../test-results/engagements-Engagements-Pa-46525-ents-list-renders-correctly-chromium/video.webm
-    ────────────────────────────────────────────────────────────────────────────────────────────────
-
-    Error Context: ../test-results/engagements-Engagements-Pa-46525-ents-list-renders-correctly-chromium/error-context.md
-]]>
-</failure>
-<system-out>
-<![CDATA[
-[[ATTACHMENT|engagements-Engagements-Pa-46525-ents-list-renders-correctly-chromium/test-failed-1.png]]
-
-[[ATTACHMENT|engagements-Engagements-Pa-46525-ents-list-renders-correctly-chromium/video.webm]]
-
-[[ATTACHMENT|engagements-Engagements-Pa-46525-ents-list-renders-correctly-chromium/error-context.md]]
-]]>
-</system-out>
+<testcase name="CSF 2.0 Grid Assessment › subcategory selection and details panel" classname="csf-grid.spec.ts" time="0">
+<skipped>
+</skipped>
 </testcase>
-<testcase name="Engagements Page - SSR Guards › empty state displays when no engagements" classname="engagements.spec.ts" time="11.65">
-<failure message="engagements.spec.ts:59:7 empty state displays when no engagements" type="FAILURE">
-<![CDATA[  [chromium] › engagements.spec.ts:59:7 › Engagements Page - SSR Guards › empty state displays when no engagements 
-
-    Error: Timed out 10000ms waiting for expect(locator).toBeVisible()
-
-    Locator: locator('text=Need help?')
-    Expected: visible
-    Received: <element(s) not found>
-    Call log:
-      - Expect "toBeVisible" with timeout 10000ms
-      - waiting for locator('text=Need help?')
-
-
-      67 |     
-      68 |     // Check help section is visible
-    > 69 |     await expect(page.locator('text=Need help?')).toBeVisible();
-         |                                                   ^
-      70 |     await expect(page.locator('text=Request access to additional engagements')).toBeVisible();
-      71 |   });
-      72 |
-        at /Users/valsysoiev/AI-Enable-Cyber-Maturity-Assessment-2/web/e2e/tests/engagements.spec.ts:69:51
-
-    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
-    ../test-results/engagements-Engagements-Pa-ceddf-isplays-when-no-engagements-chromium/test-failed-1.png
-    ────────────────────────────────────────────────────────────────────────────────────────────────
-
-    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
-    ../test-results/engagements-Engagements-Pa-ceddf-isplays-when-no-engagements-chromium/video.webm
-    ────────────────────────────────────────────────────────────────────────────────────────────────
-
-    Error Context: ../test-results/engagements-Engagements-Pa-ceddf-isplays-when-no-engagements-chromium/error-context.md
-]]>
-</failure>
-<system-out>
-<![CDATA[
-[[ATTACHMENT|engagements-Engagements-Pa-ceddf-isplays-when-no-engagements-chromium/test-failed-1.png]]
-
-[[ATTACHMENT|engagements-Engagements-Pa-ceddf-isplays-when-no-engagements-chromium/video.webm]]
-
-[[ATTACHMENT|engagements-Engagements-Pa-ceddf-isplays-when-no-engagements-chromium/error-context.md]]
-]]>
-</system-out>
+<testcase name="CSF 2.0 Grid Assessment › responsive design validation" classname="csf-grid.spec.ts" time="0">
+<skipped>
+</skipped>
 </testcase>
-<testcase name="Engagements Page - SSR Guards › engagement links navigate correctly" classname="engagements.spec.ts" time="11.654">
-<failure message="engagements.spec.ts:73:7 engagement links navigate correctly" type="FAILURE">
-<![CDATA[  [chromium] › engagements.spec.ts:73:7 › Engagements Page - SSR Guards › engagement links navigate correctly 
-
-    Error: Timed out 10000ms waiting for expect(locator).toBeVisible()
-
-    Locator: locator('text=View Dashboard').first()
-    Expected: visible
-    Received: <element(s) not found>
-    Call log:
-      - Expect "toBeVisible" with timeout 10000ms
-      - waiting for locator('text=View Dashboard').first()
-
-
-      81 |     // Click on View Dashboard link
-      82 |     const dashboardLink = page.locator('text=View Dashboard').first();
-    > 83 |     await expect(dashboardLink).toBeVisible();
-         |                                 ^
-      84 |     
-      85 |     // Verify link has correct href
-      86 |     const href = await dashboardLink.evaluate(el => {
-        at /Users/valsysoiev/AI-Enable-Cyber-Maturity-Assessment-2/web/e2e/tests/engagements.spec.ts:83:33
-
-    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
-    ../test-results/engagements-Engagements-Pa-c7807-nt-links-navigate-correctly-chromium/test-failed-1.png
-    ────────────────────────────────────────────────────────────────────────────────────────────────
-
-    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
-    ../test-results/engagements-Engagements-Pa-c7807-nt-links-navigate-correctly-chromium/video.webm
-    ────────────────────────────────────────────────────────────────────────────────────────────────
-
-    Error Context: ../test-results/engagements-Engagements-Pa-c7807-nt-links-navigate-correctly-chromium/error-context.md
-]]>
-</failure>
-<system-out>
-<![CDATA[
-[[ATTACHMENT|engagements-Engagements-Pa-c7807-nt-links-navigate-correctly-chromium/test-failed-1.png]]
-
-[[ATTACHMENT|engagements-Engagements-Pa-c7807-nt-links-navigate-correctly-chromium/video.webm]]
-
-[[ATTACHMENT|engagements-Engagements-Pa-c7807-nt-links-navigate-correctly-chromium/error-context.md]]
-]]>
-</system-out>
+<testcase name="CSF 2.0 Grid Assessment › error handling and loading states" classname="csf-grid.spec.ts" time="0">
+<skipped>
+</skipped>
 </testcase>
-<testcase name="Engagements Page - SSR Guards › loading state displays during data fetch" classname="engagements.spec.ts" time="11.651">
-<failure message="engagements.spec.ts:93:7 loading state displays during data fetch" type="FAILURE">
-<![CDATA[  [chromium] › engagements.spec.ts:93:7 › Engagements Page - SSR Guards › loading state displays during data fetch 
-
-    Error: Timed out 10000ms waiting for expect(locator).toContainText(expected)
-
-    Locator: locator('h1')
-    Expected string: "My Engagements"
-    Received: <element(s) not found>
-    Call log:
-      - Expect "toContainText" with timeout 10000ms
-      - waiting for locator('h1')
-
-
-      102 |     
-      103 |     // Verify final content loads
-    > 104 |     await expect(page.locator('h1')).toContainText('My Engagements');
-          |                                      ^
-      105 |   });
-      106 |
-      107 |   test('403 page displays for insufficient permissions', async ({ page }) => {
-        at /Users/valsysoiev/AI-Enable-Cyber-Maturity-Assessment-2/web/e2e/tests/engagements.spec.ts:104:38
-
-    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
-    ../test-results/engagements-Engagements-Pa-d728e--displays-during-data-fetch-chromium/test-failed-1.png
-    ────────────────────────────────────────────────────────────────────────────────────────────────
-
-    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
-    ../test-results/engagements-Engagements-Pa-d728e--displays-during-data-fetch-chromium/video.webm
-    ────────────────────────────────────────────────────────────────────────────────────────────────
-
-    Error Context: ../test-results/engagements-Engagements-Pa-d728e--displays-during-data-fetch-chromium/error-context.md
-]]>
-</failure>
-<system-out>
-<![CDATA[
-[[ATTACHMENT|engagements-Engagements-Pa-d728e--displays-during-data-fetch-chromium/test-failed-1.png]]
-
-[[ATTACHMENT|engagements-Engagements-Pa-d728e--displays-during-data-fetch-chromium/video.webm]]
-
-[[ATTACHMENT|engagements-Engagements-Pa-d728e--displays-during-data-fetch-chromium/error-context.md]]
-]]>
-</system-out>
-</testcase>
-<testcase name="Engagements Page - SSR Guards › 403 page displays for insufficient permissions" classname="engagements.spec.ts" time="0.573">
-</testcase>
-<testcase name="Accessibility › engagements page meets WCAG standards" classname="engagements.spec.ts" time="0.594">
-<failure message="engagements.spec.ts:122:7 engagements page meets WCAG standards" type="FAILURE">
-<![CDATA[  [chromium] › engagements.spec.ts:122:7 › Accessibility › engagements page meets WCAG standards ───
-
-    Error: expect(received).toBe(expected) // Object.is equality
-
-    Expected: 1
-    Received: 0
-
-      130 |     // Check for proper heading hierarchy
-      131 |     const h1 = await page.locator('h1').count();
-    > 132 |     expect(h1).toBe(1);
-          |                ^
-      133 |     
-      134 |     // Check for proper ARIA labels on interactive elements
-      135 |     const links = await page.locator('a').all();
-        at /Users/valsysoiev/AI-Enable-Cyber-Maturity-Assessment-2/web/e2e/tests/engagements.spec.ts:132:16
-
-    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
-    ../test-results/engagements-Accessibility--b1be5-s-page-meets-WCAG-standards-chromium/test-failed-1.png
-    ────────────────────────────────────────────────────────────────────────────────────────────────
-
-    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
-    ../test-results/engagements-Accessibility--b1be5-s-page-meets-WCAG-standards-chromium/video.webm
-    ────────────────────────────────────────────────────────────────────────────────────────────────
-
-    Error Context: ../test-results/engagements-Accessibility--b1be5-s-page-meets-WCAG-standards-chromium/error-context.md
-]]>
-</failure>
-<system-out>
-<![CDATA[
-[[ATTACHMENT|engagements-Accessibility--b1be5-s-page-meets-WCAG-standards-chromium/test-failed-1.png]]
-
-[[ATTACHMENT|engagements-Accessibility--b1be5-s-page-meets-WCAG-standards-chromium/video.webm]]
-
-[[ATTACHMENT|engagements-Accessibility--b1be5-s-page-meets-WCAG-standards-chromium/error-context.md]]
-]]>
-</system-out>
-</testcase>
-<testcase name="Accessibility › empty state is accessible" classname="engagements.spec.ts" time="10.45">
+<testcase name="CSF 2.0 Grid Assessment › performance and memoization validation" classname="csf-grid.spec.ts" time="0">
 <skipped>
 </skipped>
 </testcase>
 </testsuite>
-<testsuite name="engagements.spec.ts" timestamp="2025-08-18T02:40:33.855Z" hostname="Mobile Chrome" tests="9" failures="0" skipped="7" time="9.653" errors="0">
-<testcase name="Engagements Page - SSR Guards › unauthenticated user redirects to signin" classname="engagements.spec.ts" time="0.427">
-</testcase>
-<testcase name="Engagements Page - SSR Guards › authenticated user can access engagements" classname="engagements.spec.ts" time="0.583">
-</testcase>
-<testcase name="Engagements Page - SSR Guards › engagements list renders correctly" classname="engagements.spec.ts" time="8.643">
+<testsuite name="csf-grid.spec.ts" timestamp="2025-08-18T15:10:56.557Z" hostname="Mobile Chrome" tests="6" failures="0" skipped="6" time="0" errors="0">
+<testcase name="CSF 2.0 Grid Assessment › CSF grid renders correctly with all functions" classname="csf-grid.spec.ts" time="0">
 <skipped>
 </skipped>
 </testcase>
-<testcase name="Engagements Page - SSR Guards › empty state displays when no engagements" classname="engagements.spec.ts" time="0">
+<testcase name="CSF 2.0 Grid Assessment › function expansion and collapse functionality" classname="csf-grid.spec.ts" time="0">
 <skipped>
 </skipped>
 </testcase>
-<testcase name="Engagements Page - SSR Guards › engagement links navigate correctly" classname="engagements.spec.ts" time="0">
+<testcase name="CSF 2.0 Grid Assessment › subcategory selection and details panel" classname="csf-grid.spec.ts" time="0">
 <skipped>
 </skipped>
 </testcase>
-<testcase name="Engagements Page - SSR Guards › loading state displays during data fetch" classname="engagements.spec.ts" time="0">
+<testcase name="CSF 2.0 Grid Assessment › responsive design validation" classname="csf-grid.spec.ts" time="0">
 <skipped>
 </skipped>
 </testcase>
-<testcase name="Engagements Page - SSR Guards › 403 page displays for insufficient permissions" classname="engagements.spec.ts" time="0">
+<testcase name="CSF 2.0 Grid Assessment › error handling and loading states" classname="csf-grid.spec.ts" time="0">
 <skipped>
 </skipped>
 </testcase>
-<testcase name="Accessibility › engagements page meets WCAG standards" classname="engagements.spec.ts" time="0">
-<skipped>
-</skipped>
-</testcase>
-<testcase name="Accessibility › empty state is accessible" classname="engagements.spec.ts" time="0">
+<testcase name="CSF 2.0 Grid Assessment › performance and memoization validation" classname="csf-grid.spec.ts" time="0">
 <skipped>
 </skipped>
 </testcase>
 </testsuite>
-<testsuite name="engagements.spec.ts" timestamp="2025-08-18T02:40:33.855Z" hostname="firefox" tests="9" failures="0" skipped="9" time="0" errors="0">
-<testcase name="Engagements Page - SSR Guards › unauthenticated user redirects to signin" classname="engagements.spec.ts" time="0">
+<testsuite name="csf-grid.spec.ts" timestamp="2025-08-18T15:10:56.557Z" hostname="firefox" tests="6" failures="0" skipped="6" time="0" errors="0">
+<testcase name="CSF 2.0 Grid Assessment › CSF grid renders correctly with all functions" classname="csf-grid.spec.ts" time="0">
 <skipped>
 </skipped>
 </testcase>
-<testcase name="Engagements Page - SSR Guards › authenticated user can access engagements" classname="engagements.spec.ts" time="0">
+<testcase name="CSF 2.0 Grid Assessment › function expansion and collapse functionality" classname="csf-grid.spec.ts" time="0">
 <skipped>
 </skipped>
 </testcase>
-<testcase name="Engagements Page - SSR Guards › engagements list renders correctly" classname="engagements.spec.ts" time="0">
+<testcase name="CSF 2.0 Grid Assessment › subcategory selection and details panel" classname="csf-grid.spec.ts" time="0">
 <skipped>
 </skipped>
 </testcase>
-<testcase name="Engagements Page - SSR Guards › empty state displays when no engagements" classname="engagements.spec.ts" time="0">
+<testcase name="CSF 2.0 Grid Assessment › responsive design validation" classname="csf-grid.spec.ts" time="0">
 <skipped>
 </skipped>
 </testcase>
-<testcase name="Engagements Page - SSR Guards › engagement links navigate correctly" classname="engagements.spec.ts" time="0">
+<testcase name="CSF 2.0 Grid Assessment › error handling and loading states" classname="csf-grid.spec.ts" time="0">
 <skipped>
 </skipped>
 </testcase>
-<testcase name="Engagements Page - SSR Guards › loading state displays during data fetch" classname="engagements.spec.ts" time="0">
-<skipped>
-</skipped>
-</testcase>
-<testcase name="Engagements Page - SSR Guards › 403 page displays for insufficient permissions" classname="engagements.spec.ts" time="0">
-<skipped>
-</skipped>
-</testcase>
-<testcase name="Accessibility › engagements page meets WCAG standards" classname="engagements.spec.ts" time="0">
-<skipped>
-</skipped>
-</testcase>
-<testcase name="Accessibility › empty state is accessible" classname="engagements.spec.ts" time="0">
+<testcase name="CSF 2.0 Grid Assessment › performance and memoization validation" classname="csf-grid.spec.ts" time="0">
 <skipped>
 </skipped>
 </testcase>
