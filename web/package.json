@@ -13,6 +13,7 @@
     "test:e2e:smoke": "playwright test smoke.spec.ts",
     "test:e2e:evidence": "playwright test evidence.spec.ts",
     "test:e2e:auth": "playwright test auth.spec.ts",
+    "test:e2e:engagements": "playwright test engagements.spec.ts",
     "test:e2e:integration": "playwright test integration.spec.ts",
     "test:e2e:rag": "playwright test rag.spec.ts",
     "test:e2e:report": "playwright show-report"
