@@ -27,6 +27,7 @@ from domain.models import (
 from domain.repository import Repository
 from api.schemas.gdpr import BackgroundJob, AuditLogEntry, TTLPolicy
 from config import config
+from security.secret_provider import get_secret
 
 logger = logging.getLogger(__name__)
 
@@ -48,7 +49,8 @@ class CosmosRepository(Repository):
             # Use managed identity for authentication
             credential = DefaultAzureCredential()
             
-            # Get Cosmos DB configuration
+            # Get Cosmos DB configuration from secret provider (async operation)
+            # For now, fall back to environment variables - will be updated in subsequent methods
             cosmos_endpoint = os.getenv("COSMOS_ENDPOINT")
             cosmos_database = os.getenv("COSMOS_DATABASE", "cybermaturity")
             
@@ -64,7 +66,7 @@ class CosmosRepository(Repository):
             self.database = self.client.get_database_client(cosmos_database)
             
             logger.info(
-                "Initialized Cosmos DB repository",
+                "Initialized Cosmos DB repository (will upgrade to secret provider)",
                 extra={
                     "correlation_id": self.correlation_id,
                     "endpoint": cosmos_endpoint,
@@ -75,6 +77,52 @@ class CosmosRepository(Repository):
         except Exception as e:
             logger.error(
                 "Failed to initialize Cosmos DB repository",
+                extra={
+                    "correlation_id": self.correlation_id,
+                    "error": str(e)
+                }
+            )
+            raise
+    
+    async def _initialize_client_async(self):
+        """Initialize Cosmos DB client with secret provider (async version)"""
+        try:
+            # Use managed identity for authentication
+            credential = DefaultAzureCredential()
+            
+            # Get Cosmos DB configuration from secret provider
+            cosmos_endpoint = await get_secret("cosmos-endpoint", self.correlation_id)
+            cosmos_database = await get_secret("cosmos-database", self.correlation_id)
+            
+            # Fallback to environment variables for local development
+            if not cosmos_endpoint:
+                cosmos_endpoint = os.getenv("COSMOS_ENDPOINT")
+            if not cosmos_database:
+                cosmos_database = os.getenv("COSMOS_DATABASE", "cybermaturity")
+            
+            if not cosmos_endpoint:
+                raise ValueError("COSMOS_ENDPOINT secret or environment variable is required")
+            
+            self.client = CosmosClient(
+                url=cosmos_endpoint,
+                credential=credential
+            )
+            
+            # Get or create database
+            self.database = self.client.get_database_client(cosmos_database)
+            
+            logger.info(
+                "Initialized Cosmos DB repository with secret provider",
+                extra={
+                    "correlation_id": self.correlation_id,
+                    "endpoint": cosmos_endpoint,
+                    "database": cosmos_database
+                }
+            )
+            
+        except Exception as e:
+            logger.error(
+                "Failed to initialize Cosmos DB repository with secret provider",
                 extra={
                     "correlation_id": self.correlation_id,
                     "error": str(e)

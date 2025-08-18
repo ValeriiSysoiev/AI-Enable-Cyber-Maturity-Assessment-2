@@ -2,39 +2,94 @@ from __future__ import annotations
 import os
 import logging
 import time
-from typing import List, Dict, Any
+import asyncio
+from typing import List, Dict, Any, Optional
 
-USE_MOCK = not (os.getenv("AZURE_OPENAI_ENDPOINT") and os.getenv("AZURE_OPENAI_API_KEY") and os.getenv("AZURE_OPENAI_DEPLOYMENT"))
+from security.secret_provider import get_secret
+
+USE_MOCK = None  # Will be determined asynchronously
 
 # Set up logger
 logger = logging.getLogger(__name__)
 
-if not USE_MOCK:
+# Global client instance - will be initialized asynchronously
+_client: Optional['AzureOpenAI'] = None
+_model: Optional[str] = None
+_client_initialized = False
+
+async def _initialize_client(correlation_id: Optional[str] = None) -> bool:
+    """Initialize OpenAI client with secret provider"""
+    global _client, _model, USE_MOCK, _client_initialized
+    
+    if _client_initialized:
+        return not USE_MOCK
+    
     try:
-        from openai import AzureOpenAI, APIError, APIConnectionError, RateLimitError
-        _client = AzureOpenAI(
-            api_key=os.getenv("AZURE_OPENAI_API_KEY"),
-            api_version=os.getenv("AZURE_OPENAI_API_VERSION", "2024-02-01"),
-            azure_endpoint=os.getenv("AZURE_OPENAI_ENDPOINT"),
-        )
-        _model = os.getenv("AZURE_OPENAI_DEPLOYMENT")
+        # Get secrets using secret provider
+        endpoint = await get_secret("azure-openai-endpoint", correlation_id)
+        api_key = await get_secret("azure-openai-api-key", correlation_id)
+        deployment = await get_secret("azure-openai-deployment", correlation_id)
+        
+        # Fallback to environment variables for local development
+        if not endpoint:
+            endpoint = os.getenv("AZURE_OPENAI_ENDPOINT")
+        if not api_key:
+            api_key = os.getenv("AZURE_OPENAI_API_KEY")
+        if not deployment:
+            deployment = os.getenv("AZURE_OPENAI_DEPLOYMENT")
+        
+        USE_MOCK = not (endpoint and api_key and deployment)
+        
+        if not USE_MOCK:
+            from openai import AzureOpenAI, APIError, APIConnectionError, RateLimitError
+            _client = AzureOpenAI(
+                api_key=api_key,
+                api_version=os.getenv("AZURE_OPENAI_API_VERSION", "2024-02-01"),
+                azure_endpoint=endpoint,
+            )
+            _model = deployment
+            
+            logger.info(
+                "Initialized OpenAI client with secret provider",
+                extra={"correlation_id": correlation_id, "endpoint": endpoint}
+            )
+        else:
+            logger.info(
+                "Using mock LLM client - secrets not available",
+                extra={"correlation_id": correlation_id}
+            )
+        
+        _client_initialized = True
+        return not USE_MOCK
+        
     except (ImportError, ModuleNotFoundError) as e:
         logger.error(f"Failed to import OpenAI client: {e}", exc_info=True)
         USE_MOCK = True
+        _client_initialized = True
+        return False
     except RuntimeError as e:
         logger.error(f"Runtime error initializing OpenAI client: {e}", exc_info=True)
         USE_MOCK = True
+        _client_initialized = True
+        return False
     except Exception as e:
         logger.exception(f"Unexpected error initializing OpenAI client: {e}")
         USE_MOCK = True
+        _client_initialized = True
+        return False
 
 class LLMError(Exception):
     """Custom exception for LLM-related errors"""
     pass
 
 class LLMClient:
-    def generate(self, system: str, user: str) -> str:
-        if USE_MOCK:
+    def __init__(self, correlation_id: Optional[str] = None):
+        self.correlation_id = correlation_id
+    
+    async def generate(self, system: str, user: str) -> str:
+        # Ensure client is initialized
+        await _initialize_client(self.correlation_id)
+        if USE_MOCK or not _client:
             # Simple deterministic stub for demos
             return (
                 "Findings:\n"
