@@ -294,6 +294,28 @@ UPLOAD_SAS_TTL_MINUTES=15
 
 If Azure Storage is not configured, the `/uploads/sas` endpoint returns HTTP 501.
 
+### Local Development with Azurite
+
+For local evidence upload testing without Azure Storage:
+
+1. **Install and start Azurite:**
+   ```bash
+   npm install -g azurite
+   azurite --silent --location ./azurite-data --blobPort 10000
+   ```
+
+2. **Configure local storage in `app/.env`:**
+   ```env
+   AZURE_STORAGE_CONNECTION_STRING="DefaultEndpointsProtocol=http;AccountName=devstoreaccount1;AccountKey=Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw==;BlobEndpoint=http://127.0.0.1:10000/devstoreaccount1"
+   AZURE_STORAGE_CONTAINER=evidence
+   UPLOAD_SAS_TTL_MINUTES=15
+   ```
+
+3. **Create container:**
+   ```bash
+   az storage container create --name evidence --connection-string "DefaultEndpointsProtocol=http;AccountName=devstoreaccount1;AccountKey=Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw==;BlobEndpoint=http://127.0.0.1:10000/devstoreaccount1"
+   ```
+
 ### Running Both Services Together
 
 1. **Terminal 1 - Backend:**
@@ -310,9 +332,15 @@ If Azure Storage is not configured, the `/uploads/sas` endpoint returns HTTP 501
    npm run dev
    ```
 
-3. **Access the application:**
+3. **Terminal 3 - Azurite (optional for uploads):**
+   ```bash
+   azurite --silent --location ./azurite-data
+   ```
+
+4. **Access the application:**
    - Frontend: http://localhost:3000
    - API Docs: http://localhost:8000/docs
+   - Azurite Explorer: Use Azure Storage Explorer to view local blobs
 
 ### Workflow Example
 
@@ -405,6 +433,85 @@ Once RBAC permissions are granted, switch from ACR admin credentials to Managed 
    ```
 
 After these steps, the Container Apps will use their Managed Identities to pull images from ACR and the API will use its identity for Azure Storage operations.
+
+---
+
+## Verify Live Environment
+
+After deployment, verify the environment health and configuration:
+
+```bash
+# Run comprehensive verification
+scripts/verify_live.sh
+
+# Check specific components
+scripts/verify_live.sh --api-only
+scripts/verify_live.sh --web-only
+scripts/verify_live.sh --storage-only
+```
+
+**Verification Checks:**
+- ✅ API health and authentication
+- ✅ Web application accessibility
+- ✅ Storage SAS token generation
+- ✅ Database connectivity
+- ✅ CORS configuration
+- ✅ Security headers
+
+**Common Issues:**
+- **SAS 501:** Storage not configured - check Azure Storage connection
+- **CORS errors:** Verify allowed origins in Container App settings
+- **Auth failures:** Ensure JWT configuration matches between services
+
+---
+
+## Staging Deployment Quickstart
+
+Deploy to a staging environment for testing:
+
+1. **Prerequisites:**
+   ```bash
+   # Set staging environment
+   export ENVIRONMENT=staging
+   export RESOURCE_GROUP=rg-aaa-staging
+   export ACR_NAME=acraaastaging
+   ```
+
+2. **Deploy infrastructure:**
+   ```bash
+   # Create resource group
+   az group create -n $RESOURCE_GROUP -l eastus2
+   
+   # Deploy with staging configuration
+   scripts/deploy_mvp.sh --env staging
+   ```
+
+3. **Configure secrets:**
+   ```bash
+   # Set required secrets
+   az keyvault secret set --vault-name kv-aaa-staging \
+     --name storage-key --value "$(az storage account keys list \
+     -n staaastaging --query '[0].value' -o tsv)"
+   ```
+
+4. **Deploy applications:**
+   ```bash
+   # Build and deploy
+   scripts/build_acr_tasks.sh
+   scripts/deploy_containerapps.sh
+   ```
+
+5. **Verify deployment:**
+   ```bash
+   scripts/verify_live.sh --env staging
+   ```
+
+**Staging Features:**
+- Isolated resource group
+- Separate storage account
+- Independent Key Vault
+- Test data isolation
+- Lower SKU tiers for cost optimization
 
 ---
 
