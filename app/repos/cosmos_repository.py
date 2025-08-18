@@ -829,22 +829,24 @@ class CosmosRepository(Repository):
             raise
     
     async def get_evidence_by_id(self, evidence_id: str) -> Optional[Evidence]:
-        """Get evidence record by ID without requiring engagement_id"""
+        """Get evidence record by ID without requiring engagement_id (cross-partition lookup)"""
         try:
-            container = self.containers["evidence"]
-            
             # Query for the evidence by id across all partitions
             query = "SELECT * FROM c WHERE c.id = @evidence_id"
             parameters = [{"name": "@evidence_id", "value": evidence_id}]
             
-            items = container.query_items(
-                query=query,
-                parameters=parameters,
-                enable_cross_partition_query=True
+            # Use async query with cross-partition support
+            items = await asyncio.to_thread(
+                lambda: list(self.containers["evidence"].query_items(
+                    query=query,
+                    parameters=parameters,
+                    enable_cross_partition_query=True
+                ))
             )
             
-            # Get the first (and should be only) result
-            for item in items:
+            # Return the first (and should be only) result
+            if items:
+                item = items[0]
                 logger.info(
                     "Evidence record retrieved by ID",
                     extra={
