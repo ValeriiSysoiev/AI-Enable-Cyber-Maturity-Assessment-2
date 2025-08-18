@@ -154,6 +154,186 @@ X-Correlation-ID: uuid-v4
 4. ✅ Role extraction and validation
 5. ✅ Engagement-scoped permissions
 
+## Secret Management
+
+### SecretProvider Architecture
+
+**Implementation:** Unified secret management interface  
+**Location:** `/app/security/secret_provider.py`
+
+The application uses a SecretProvider pattern to abstract secret retrieval from multiple sources with automatic fallbacks and production security controls.
+
+**Provider Types:**
+
+| Provider | Use Case | Authentication |
+|----------|----------|----------------|
+| **LocalEnvProvider** | Development/Testing | Environment variables |
+| **KeyVaultProvider** | Production | Azure Managed Identity |
+
+### Secret Provider Interface
+
+```python
+class SecretProvider(ABC):
+    @abstractmethod
+    async def get_secret(self, secret_name: str) -> Optional[str]:
+        """Get secret value by name"""
+        pass
+    
+    @abstractmethod
+    async def health_check(self) -> Dict[str, Any]:
+        """Check provider health and connectivity"""
+        pass
+```
+
+### Development Configuration
+
+**LocalEnvProvider Implementation:**
+- ✅ Reads from environment variables
+- ✅ Converts kebab-case to UPPER_SNAKE_CASE
+- ✅ Correlation ID logging
+- ✅ Health checks with secret inventory
+
+**Environment Variable Pattern:**
+```bash
+# Secret name: "azure-openai-api-key"
+# Environment variable: "AZURE_OPENAI_API_KEY"
+export AZURE_OPENAI_API_KEY="your-development-key"
+```
+
+### Production Configuration
+
+**KeyVaultProvider Implementation:**
+- ✅ Azure Key Vault integration
+- ✅ Managed Identity authentication
+- ✅ 15-minute secret caching
+- ✅ Automatic retry and fallback
+- ✅ Health monitoring
+
+**Required Environment Variables:**
+```bash
+USE_KEYVAULT=true
+AZURE_KEYVAULT_URL=https://your-vault.vault.azure.net/
+```
+
+**Key Vault Secret Naming Convention:**
+```
+azure-openai-api-key        # Azure OpenAI API key
+azure-openai-endpoint       # Azure OpenAI endpoint URL
+azure-search-api-key        # Azure Search API key
+azure-search-endpoint       # Azure Search endpoint URL
+cosmos-endpoint             # Cosmos DB endpoint URL
+cosmos-database             # Cosmos DB database name
+azure-storage-account       # Storage account name
+azure-storage-key           # Storage account key
+aad-client-secret           # AAD client secret
+```
+
+### Security Controls
+
+**Secret Protection:**
+- ✅ No secrets in source code or configuration files
+- ✅ Environment variable fallbacks for development
+- ✅ Managed Identity for production (no API keys)
+- ✅ Automatic secret rotation support
+- ✅ Correlation ID audit trails
+
+**Access Controls:**
+```json
+{
+  "timestamp": "2025-08-18T10:30:45.123Z",
+  "level": "INFO",
+  "service": "api",
+  "message": "Retrieved secret from Key Vault",
+  "correlation_id": "uuid-v4",
+  "secret_name": "azure-openai-api-key",
+  "vault_url": "https://vault.azure.net/",
+  "cache_hit": false
+}
+```
+
+**Caching Security:**
+- 🔒 In-memory only (no disk persistence)
+- 🔒 15-minute TTL maximum
+- 🔒 Process-scoped (no cross-process sharing)
+- 🔒 Automatic cleanup on expiration
+
+### Factory Pattern
+
+**SecretProviderFactory Configuration:**
+```python
+# Automatic provider selection based on environment
+provider = SecretProviderFactory.create_provider(correlation_id)
+
+# Production: USE_KEYVAULT=true + AZURE_KEYVAULT_URL set
+# → KeyVaultProvider with Managed Identity
+
+# Development: No Key Vault configuration
+# → LocalEnvProvider with environment variables
+
+# Fallback: Key Vault fails to initialize
+# → LocalEnvProvider with warning logged
+```
+
+### Integration Examples
+
+**Application Configuration:**
+```python
+# Load secrets asynchronously
+config_with_secrets = await config.load_secrets_async(correlation_id)
+
+# Use in service initialization
+llm_client = LLMClient(correlation_id)
+await llm_client.generate(system, user)  # Uses secret provider internally
+```
+
+**Health Monitoring:**
+```python
+# Check secret provider health
+health = await health_check_secrets(correlation_id)
+# Returns: provider type, status, secret inventory, cache metrics
+```
+
+### Security Testing
+
+**Test Coverage:**
+- ✅ Secret retrieval (found/not found)
+- ✅ Environment variable conversion
+- ✅ Key Vault fallback scenarios
+- ✅ Health check functionality
+- ✅ Provider factory selection logic
+- ✅ Correlation ID propagation
+
+**Mock Testing for Key Vault:**
+```python
+@patch('security.secret_provider.SecretClient')
+async def test_keyvault_provider_success(mock_client):
+    provider = KeyVaultProvider("https://test.vault.azure.net/")
+    result = await provider.get_secret("test-secret")
+    assert result == "secret-value"
+```
+
+### Production Deployment
+
+**Infrastructure Requirements:**
+1. **Azure Key Vault:** Secret storage with access policies
+2. **Managed Identity:** Application authentication to Key Vault
+3. **Key Vault Access Policy:** Grant "Get" and "List" permissions
+4. **Network Security:** Key Vault firewall rules if required
+
+**Deployment Checklist:**
+- [ ] Key Vault created with appropriate access policies
+- [ ] Managed Identity assigned to application
+- [ ] All required secrets stored in Key Vault
+- [ ] Environment variables set for Key Vault URL
+- [ ] Health checks pass for secret provider
+- [ ] Monitoring alerts configured for secret access failures
+
+**Secret Rotation Support:**
+- ✅ Automatic cache expiration (15 minutes)
+- ✅ Health checks detect stale secrets
+- ✅ Graceful fallback to environment variables
+- ✅ Audit logging for rotation events
+
 ## Data Protection
 
 ### Input Validation
@@ -297,7 +477,7 @@ test('insufficient permissions shows 403', async ({ page }) => {
 ### Data Security
 
 - [ ] **Encryption at Rest:** Database and file encryption
-- [ ] **Key Management:** Azure Key Vault integration
+- [x] **Key Management:** Azure Key Vault integration (SecretProvider implemented)
 - [ ] **Data Classification:** PII identification and protection
 - [ ] **Backup Security:** Encrypted backups with access controls
 

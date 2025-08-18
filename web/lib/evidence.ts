@@ -11,7 +11,16 @@ import type {
   RAGSearchRequest,
   RAGSearchResponse,
   RAGAnalysisRequest,
-  RAGAnalysisResponse
+  RAGAnalysisResponse,
+  Evidence,
+  SASRequest,
+  SASResponse,
+  CompleteRequest,
+  CompleteResponse,
+  LinkRequest,
+  LinkResponse,
+  UnlinkResponse,
+  EvidenceListResponse
 } from "@/types/evidence";
 
 // Evidence search endpoints
@@ -275,4 +284,154 @@ export async function enhancedAnalyzeWithEvidence(
       processing_time_ms: undefined
     };
   }
+}
+
+// Evidence Upload and Management API Methods
+
+// Generate SAS token for evidence upload
+export async function generateEvidenceSAS(request: SASRequest): Promise<SASResponse> {
+  const response = await fetch("/api/proxy/evidence/sas", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(request),
+  });
+  
+  if (!response.ok) {
+    const error = await response.json().catch(() => ({ detail: "SAS generation failed" }));
+    throw new Error(error.detail || `SAS generation failed: ${response.status}`);
+  }
+  
+  return response.json();
+}
+
+// Complete evidence upload after file upload
+export async function completeEvidenceUpload(request: CompleteRequest): Promise<CompleteResponse> {
+  const response = await fetch("/api/proxy/evidence/complete", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(request),
+  });
+  
+  if (!response.ok) {
+    const error = await response.json().catch(() => ({ detail: "Upload completion failed" }));
+    throw new Error(error.detail || `Upload completion failed: ${response.status}`);
+  }
+  
+  return response.json();
+}
+
+// List evidence for an engagement with pagination
+export async function listEvidence(
+  engagementId: string,
+  page: number = 1,
+  pageSize: number = 50
+): Promise<EvidenceListResponse> {
+  const params = new URLSearchParams({
+    engagement_id: engagementId,
+    page: page.toString(),
+    page_size: pageSize.toString(),
+  });
+  
+  const response = await fetch(`/api/proxy/evidence?${params}`);
+  
+  if (!response.ok) {
+    const error = await response.json().catch(() => ({ detail: "Failed to list evidence" }));
+    throw new Error(error.detail || `Failed to list evidence: ${response.status}`);
+  }
+  
+  const data = await response.json();
+  
+  // Extract pagination info from headers
+  const total = parseInt(response.headers.get('X-Total-Count') || '0');
+  const currentPage = parseInt(response.headers.get('X-Page') || '1');
+  const pageSizeHeader = parseInt(response.headers.get('X-Page-Size') || '50');
+  const totalPages = parseInt(response.headers.get('X-Total-Pages') || '1');
+  const hasNext = response.headers.get('X-Has-Next') === 'true';
+  const hasPrevious = response.headers.get('X-Has-Previous') === 'true';
+  
+  return {
+    data,
+    total,
+    page: currentPage,
+    page_size: pageSizeHeader,
+    total_pages: totalPages,
+    has_next: hasNext,
+    has_previous: hasPrevious,
+  };
+}
+
+// Link evidence to an assessment item
+export async function linkEvidence(evidenceId: string, request: LinkRequest): Promise<LinkResponse> {
+  const response = await fetch(`/api/proxy/evidence/${evidenceId}/links`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(request),
+  });
+  
+  if (!response.ok) {
+    const error = await response.json().catch(() => ({ detail: "Evidence linking failed" }));
+    throw new Error(error.detail || `Evidence linking failed: ${response.status}`);
+  }
+  
+  return response.json();
+}
+
+// Unlink evidence from an assessment item
+export async function unlinkEvidence(evidenceId: string, linkId: string): Promise<UnlinkResponse> {
+  const response = await fetch(`/api/proxy/evidence/${evidenceId}/links/${linkId}`, {
+    method: "DELETE",
+  });
+  
+  if (!response.ok) {
+    const error = await response.json().catch(() => ({ detail: "Evidence unlinking failed" }));
+    throw new Error(error.detail || `Evidence unlinking failed: ${response.status}`);
+  }
+  
+  return response.json();
+}
+
+// Utility function to upload file to Azure Storage with SAS URL
+export async function uploadFileToAzure(sasUrl: string, file: File): Promise<void> {
+  const response = await fetch(sasUrl, {
+    method: "PUT",
+    headers: {
+      "x-ms-blob-type": "BlockBlob",
+      "Content-Type": file.type || "application/octet-stream",
+    },
+    body: file,
+  });
+  
+  if (!response.ok) {
+    throw new Error(`Azure upload failed: ${response.statusText}`);
+  }
+}
+
+// Compute client-side checksum (SHA-256) for file integrity
+export async function computeFileChecksum(file: File): Promise<string> {
+  const buffer = await file.arrayBuffer();
+  const hashBuffer = await crypto.subtle.digest('SHA-256', buffer);
+  const hashArray = Array.from(new Uint8Array(hashBuffer));
+  const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+  return hashHex;
+}
+
+// Format file size for display
+export function formatFileSize(bytes: number): string {
+  if (bytes === 0) return '0 B';
+  const k = 1024;
+  const sizes = ['B', 'KB', 'MB', 'GB'];
+  const i = Math.floor(Math.log(bytes) / Math.log(k));
+  return parseFloat((bytes / Math.pow(k, i)).toFixed(1)) + ' ' + sizes[i];
+}
+
+// Get file icon based on MIME type
+export function getFileIcon(mimeType: string): string {
+  if (mimeType.startsWith('image/')) return '🖼️';
+  if (mimeType.includes('pdf')) return '📄';
+  if (mimeType.includes('word') || mimeType.includes('document')) return '📝';
+  if (mimeType.includes('excel') || mimeType.includes('spreadsheet')) return '📊';
+  if (mimeType.includes('powerpoint') || mimeType.includes('presentation')) return '📽️';
+  if (mimeType.startsWith('text/')) return '📄';
+  if (mimeType.includes('zip') || mimeType.includes('archive')) return '📦';
+  return '📄';
 }
