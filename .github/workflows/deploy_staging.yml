@@ -26,6 +26,7 @@ jobs:
   deploy-staging:
     runs-on: ubuntu-latest
     timeout-minutes: 45
+    environment: staging
     
     steps:
     - name: Checkout code
