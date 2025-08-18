@@ -1,0 +1,164 @@
+name: Live Infrastructure Verification
+
+on:
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Target environment'
+        required: true
+        default: 'staging'
+        type: choice
+        options:
+          - staging
+          - production
+      auth_bearer:
+        description: 'Authentication bearer token (optional)'
+        required: false
+        type: string
+  workflow_call:
+    inputs:
+      environment:
+        description: 'Target environment'
+        required: true
+        default: 'staging'
+        type: string
+      api_base_url:
+        description: 'API base URL'
+        required: true
+        type: string
+      web_base_url:
+        description: 'Web base URL'
+        required: true
+        type: string
+    secrets:
+      AUTH_BEARER:
+        description: 'Authentication bearer token'
+        required: false
+
+env:
+  API_BASE_URL: ${{ inputs.api_base_url || secrets.API_ENDPOINT }}
+  WEB_BASE_URL: ${{ inputs.web_base_url || secrets.WEB_ENDPOINT }}
+  AUTH_BEARER: ${{ inputs.auth_bearer || secrets.AUTH_BEARER }}
+
+jobs:
+  verify-live:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    environment: ${{ inputs.environment }}
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Validate environment variables
+      run: |
+        echo "Validating required environment variables..."
+        
+        missing_vars=()
+        
+        if [ -z "${{ env.API_BASE_URL }}" ]; then
+          missing_vars+=("API_BASE_URL")
+        fi
+        
+        if [ -z "${{ env.WEB_BASE_URL }}" ]; then
+          missing_vars+=("WEB_BASE_URL")
+        fi
+        
+        if [ ${#missing_vars[@]} -ne 0 ]; then
+          echo "❌ Missing required variables:"
+          printf '  - %s\n' "${missing_vars[@]}"
+          echo ""
+          echo "Please configure these in your environment or secrets."
+          exit 1
+        fi
+        
+        echo "✅ Required environment variables are configured"
+        echo "API_BASE_URL: ${{ env.API_BASE_URL }}"
+        echo "WEB_BASE_URL: ${{ env.WEB_BASE_URL }}"
+        echo "AUTH_BEARER: ${{ env.AUTH_BEARER && 'configured' || 'not provided' }}"
+
+    - name: Wait for services to stabilize
+      run: |
+        echo "Waiting for services to stabilize..."
+        sleep 15
+
+    - name: Run S3 verification script
+      timeout-minutes: 10
+      run: |
+        echo "🔍 Running S3 standardized verification..."
+        chmod +x scripts/verify_live.sh
+        
+        # Set environment for script
+        export API_BASE_URL="${{ env.API_BASE_URL }}"
+        export WEB_BASE_URL="${{ env.WEB_BASE_URL }}"
+        export AUTH_BEARER="${{ env.AUTH_BEARER }}"
+        export VERIFICATION_MODE="ci"
+        export GITHUB_SHA="${{ github.sha }}"
+        
+        # Run verification with bounded execution
+        if timeout 8m ./scripts/verify_live.sh 2>&1 | tee verification-output.log; then
+          echo "✅ S3 verification passed"
+          exit_code=0
+        else
+          exit_code=$?
+          echo "❌ S3 verification failed with exit code: $exit_code"
+          
+          # Show last 20 lines of output for debugging
+          echo ""
+          echo "=== Last 20 lines of verification output ==="
+          tail -20 verification-output.log || echo "No output available"
+          echo "============================================"
+          
+          exit $exit_code
+        fi
+
+    - name: Upload verification results
+      uses: actions/upload-artifact@v4
+      if: always()
+      with:
+        name: verification-results-${{ inputs.environment }}-${{ github.run_number }}
+        path: |
+          verification-output.log
+        retention-days: 14
+
+    - name: Verification summary
+      if: always()
+      run: |
+        echo "## Live Verification Summary" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo "- **Environment:** ${{ inputs.environment }}" >> $GITHUB_STEP_SUMMARY
+        echo "- **API URL:** ${{ env.API_BASE_URL }}" >> $GITHUB_STEP_SUMMARY
+        echo "- **Web URL:** ${{ env.WEB_BASE_URL }}" >> $GITHUB_STEP_SUMMARY
+        echo "- **Timestamp:** $(date -u)" >> $GITHUB_STEP_SUMMARY
+        echo "- **Commit:** ${{ github.sha }}" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        
+        if [ -f "verification-output.log" ]; then
+          # Extract summary from log
+          if grep -q "S3 Verification Summary Report" verification-output.log; then
+            echo "### Verification Results" >> $GITHUB_STEP_SUMMARY
+            echo '```' >> $GITHUB_STEP_SUMMARY
+            sed -n '/S3 Verification Summary Report/,/====/p' verification-output.log >> $GITHUB_STEP_SUMMARY
+            echo '```' >> $GITHUB_STEP_SUMMARY
+          fi
+        fi
+
+  notify-failure:
+    runs-on: ubuntu-latest
+    if: failure()
+    needs: verify-live
+    
+    steps:
+    - name: Notify verification failure
+      run: |
+        echo "=== Live Verification Failed ==="
+        echo "Environment: ${{ inputs.environment }}"
+        echo "The live infrastructure verification has failed."
+        echo "Please check the logs and investigate immediately."
+        echo "Workflow run: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+        
+        # In a real environment, you might want to:
+        # - Send notifications to Slack/Teams
+        # - Create an incident ticket
+        # - Alert on-call engineers
+        exit 1
