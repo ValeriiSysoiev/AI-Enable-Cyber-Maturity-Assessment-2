@@ -14,7 +14,7 @@ import json
 import logging
 import os
 from datetime import datetime, timezone, timedelta
-from typing import Dict, List, Optional, Any, Union, Tuple
+from typing import Dict, List, Optional, Any, Union
 
 from azure.cosmos import CosmosClient, PartitionKey
 from azure.cosmos.exceptions import CosmosResourceNotFoundError, CosmosHttpResponseError
@@ -22,12 +22,12 @@ from azure.identity import DefaultAzureCredential
 
 from domain.models import (
     Assessment, Question, Response, Finding, Recommendation, RunLog,
-    Engagement, Membership, Document, EmbeddingDocument, Evidence
+    Engagement, Membership, Document, EmbeddingDocument, Workshop,
+    WorkshopAttendee, ConsentRecord
 )
 from domain.repository import Repository
 from api.schemas.gdpr import BackgroundJob, AuditLogEntry, TTLPolicy
 from config import config
-from security.secret_provider import get_secret
 
 logger = logging.getLogger(__name__)
 
@@ -49,8 +49,7 @@ class CosmosRepository(Repository):
             # Use managed identity for authentication
             credential = DefaultAzureCredential()
             
-            # Get Cosmos DB configuration from secret provider (async operation)
-            # For now, fall back to environment variables - will be updated in subsequent methods
+            # Get Cosmos DB configuration
             cosmos_endpoint = os.getenv("COSMOS_ENDPOINT")
             cosmos_database = os.getenv("COSMOS_DATABASE", "cybermaturity")
             
@@ -66,7 +65,7 @@ class CosmosRepository(Repository):
             self.database = self.client.get_database_client(cosmos_database)
             
             logger.info(
-                "Initialized Cosmos DB repository (will upgrade to secret provider)",
+                "Initialized Cosmos DB repository",
                 extra={
                     "correlation_id": self.correlation_id,
                     "endpoint": cosmos_endpoint,
@@ -77,52 +76,6 @@ class CosmosRepository(Repository):
         except Exception as e:
             logger.error(
                 "Failed to initialize Cosmos DB repository",
-                extra={
-                    "correlation_id": self.correlation_id,
-                    "error": str(e)
-                }
-            )
-            raise
-    
-    async def _initialize_client_async(self):
-        """Initialize Cosmos DB client with secret provider (async version)"""
-        try:
-            # Use managed identity for authentication
-            credential = DefaultAzureCredential()
-            
-            # Get Cosmos DB configuration from secret provider
-            cosmos_endpoint = await get_secret("cosmos-endpoint", self.correlation_id)
-            cosmos_database = await get_secret("cosmos-database", self.correlation_id)
-            
-            # Fallback to environment variables for local development
-            if not cosmos_endpoint:
-                cosmos_endpoint = os.getenv("COSMOS_ENDPOINT")
-            if not cosmos_database:
-                cosmos_database = os.getenv("COSMOS_DATABASE", "cybermaturity")
-            
-            if not cosmos_endpoint:
-                raise ValueError("COSMOS_ENDPOINT secret or environment variable is required")
-            
-            self.client = CosmosClient(
-                url=cosmos_endpoint,
-                credential=credential
-            )
-            
-            # Get or create database
-            self.database = self.client.get_database_client(cosmos_database)
-            
-            logger.info(
-                "Initialized Cosmos DB repository with secret provider",
-                extra={
-                    "correlation_id": self.correlation_id,
-                    "endpoint": cosmos_endpoint,
-                    "database": cosmos_database
-                }
-            )
-            
-        except Exception as e:
-            logger.error(
-                "Failed to initialize Cosmos DB repository with secret provider",
                 extra={
                     "correlation_id": self.correlation_id,
                     "error": str(e)
@@ -181,9 +134,9 @@ class CosmosRepository(Repository):
                 "partition_key": "/engagement_id",
                 "ttl": 31536000  # 1 year TTL for embeddings
             },
-            "evidence": {
+            "workshops": {
                 "partition_key": "/engagement_id",
-                "ttl": None  # No TTL for evidence data
+                "ttl": None  # No TTL for workshop data
             }
         }
         
@@ -733,7 +686,7 @@ class CosmosRepository(Repository):
             # Delete from all containers
             containers_to_clean = [
                 "engagements", "memberships", "assessments", "documents", 
-                "runlogs", "embeddings"
+                "runlogs", "embeddings", "workshops"
             ]
             
             for container_name in containers_to_clean:
@@ -774,6 +727,162 @@ class CosmosRepository(Repository):
                 extra={
                     "correlation_id": self.correlation_id,
                     "engagement_id": engagement_id,
+                    "error": str(e)
+                }
+            )
+            raise
+    
+    # Workshop methods
+    async def create_workshop(self, workshop: Workshop) -> Workshop:
+        """Create a new workshop"""
+        try:
+            workshop_dict = workshop.model_dump()
+            workshop_dict["id"] = workshop.id
+            
+            stored_item = await self._upsert_item("workshops", workshop_dict)
+            return Workshop(**stored_item)
+            
+        except Exception as e:
+            logger.error(
+                f"Failed to create workshop: {str(e)}",
+                extra={
+                    "correlation_id": self.correlation_id,
+                    "workshop_id": workshop.id,
+                    "engagement_id": workshop.engagement_id,
+                    "error": str(e)
+                }
+            )
+            raise
+    
+    async def get_workshop(self, workshop_id: str, engagement_id: str) -> Optional[Workshop]:
+        """Get workshop by ID"""
+        try:
+            item = await self._get_item("workshops", workshop_id, engagement_id)
+            return Workshop(**item) if item else None
+            
+        except Exception as e:
+            logger.error(
+                f"Failed to get workshop: {str(e)}",
+                extra={
+                    "correlation_id": self.correlation_id,
+                    "workshop_id": workshop_id,
+                    "engagement_id": engagement_id,
+                    "error": str(e)
+                }
+            )
+            raise
+    
+    async def list_workshops(
+        self,
+        engagement_id: str,
+        page: int = 1,
+        page_size: int = 50
+    ) -> tuple[List[Workshop], int]:
+        """List workshops for an engagement with pagination"""
+        try:
+            # Count query
+            count_query = "SELECT VALUE COUNT(1) FROM c WHERE c.engagement_id = @engagement_id"
+            count_params = [{"name": "@engagement_id", "value": engagement_id}]
+            count_results = await self._query_items("workshops", count_query, count_params)
+            total_count = count_results[0] if count_results else 0
+            
+            # Data query with pagination
+            offset = (page - 1) * page_size
+            data_query = f"SELECT * FROM c WHERE c.engagement_id = @engagement_id ORDER BY c.created_at DESC OFFSET {offset} LIMIT {page_size}"
+            items = await self._query_items("workshops", data_query, count_params)
+            
+            workshops = [Workshop(**item) for item in items]
+            
+            return workshops, total_count
+            
+        except Exception as e:
+            logger.error(
+                f"Failed to list workshops: {str(e)}",
+                extra={
+                    "correlation_id": self.correlation_id,
+                    "engagement_id": engagement_id,
+                    "error": str(e)
+                }
+            )
+            raise
+    
+    async def update_workshop_consent(
+        self,
+        workshop_id: str,
+        engagement_id: str,
+        attendee_id: str,
+        consent: ConsentRecord
+    ) -> Workshop:
+        """Update attendee consent for a workshop"""
+        try:
+            # Get existing workshop
+            workshop = await self.get_workshop(workshop_id, engagement_id)
+            if not workshop:
+                raise ValueError(f"Workshop {workshop_id} not found")
+            
+            # Find and update attendee consent
+            attendee_found = False
+            for attendee in workshop.attendees:
+                if attendee.id == attendee_id:
+                    attendee.consent = consent
+                    attendee_found = True
+                    break
+            
+            if not attendee_found:
+                raise ValueError(f"Attendee {attendee_id} not found in workshop")
+            
+            # Update workshop in database
+            workshop_dict = workshop.model_dump()
+            workshop_dict["id"] = workshop.id
+            
+            stored_item = await self._upsert_item("workshops", workshop_dict)
+            return Workshop(**stored_item)
+            
+        except Exception as e:
+            logger.error(
+                f"Failed to update workshop consent: {str(e)}",
+                extra={
+                    "correlation_id": self.correlation_id,
+                    "workshop_id": workshop_id,
+                    "attendee_id": attendee_id,
+                    "error": str(e)
+                }
+            )
+            raise
+    
+    async def start_workshop(self, workshop_id: str, engagement_id: str) -> Workshop:
+        """Start a workshop if all attendees have given consent"""
+        try:
+            # Get existing workshop
+            workshop = await self.get_workshop(workshop_id, engagement_id)
+            if not workshop:
+                raise ValueError(f"Workshop {workshop_id} not found")
+            
+            if workshop.started:
+                raise ValueError("Workshop already started")
+            
+            # Check that all attendees have consent
+            for attendee in workshop.attendees:
+                if not attendee.consent:
+                    raise ValueError(f"Attendee {attendee.email} has not given consent")
+            
+            # Update workshop as started
+            workshop.started = True
+            workshop.started_at = datetime.now(timezone.utc)
+            
+            # Update workshop in database
+            workshop_dict = workshop.model_dump()
+            workshop_dict["id"] = workshop.id
+            
+            stored_item = await self._upsert_item("workshops", workshop_dict)
+            return Workshop(**stored_item)
+            
+        except Exception as e:
+            logger.error(
+                f"Failed to start workshop: {str(e)}",
+                extra={
+                    "correlation_id": self.correlation_id,
+                    "workshop_id": workshop_id,
                     "error": str(e)
                 }
             )
@@ -828,94 +937,26 @@ class CosmosRepository(Repository):
             )
             raise
     
-    async def get_evidence_by_id(self, evidence_id: str) -> Optional[Evidence]:
-        """Get evidence record by ID without requiring engagement_id (cross-partition lookup)"""
-        try:
-            # Query for the evidence by id across all partitions
-            query = "SELECT * FROM c WHERE c.id = @evidence_id"
-            parameters = [{"name": "@evidence_id", "value": evidence_id}]
-            
-            # Use async query with cross-partition support
-            items = await asyncio.to_thread(
-                lambda: list(self.containers["evidence"].query_items(
-                    query=query,
-                    parameters=parameters,
-                    enable_cross_partition_query=True
-                ))
-            )
-            
-            # Return the first (and should be only) result
-            if items:
-                item = items[0]
-                logger.info(
-                    "Evidence record retrieved by ID",
-                    extra={
-                        "correlation_id": self.correlation_id,
-                        "evidence_id": evidence_id,
-                        "engagement_id": item.get("engagement_id")
-                    }
-                )
-                return Evidence(**item)
-            
-            logger.warning(
-                "Evidence record not found",
-                extra={
-                    "correlation_id": self.correlation_id,
-                    "evidence_id": evidence_id
-                }
-            )
-            return None
-            
-        except Exception as e:
-            logger.error(
-                "Failed to get evidence record by ID",
-                extra={
-                    "correlation_id": self.correlation_id,
-                    "evidence_id": evidence_id,
-                    "error": str(e)
-                }
-            )
-            raise
-    
     async def list_evidence(
         self,
         engagement_id: str,
         page: int = 1,
         page_size: int = 50
-    ) -> Tuple[List[Evidence], int]:
+    ) -> tuple[List[Evidence], int]:
         """List evidence for an engagement with pagination"""
         try:
             # Count query
             count_query = "SELECT VALUE COUNT(1) FROM c WHERE c.engagement_id = @engagement_id"
-            count_results = await self._query_items(
-                "evidence", 
-                count_query, 
-                [{"name": "@engagement_id", "value": engagement_id}]
-            )
+            count_params = [{"name": "@engagement_id", "value": engagement_id}]
+            count_results = await self._query_items("evidence", count_query, count_params)
             total_count = count_results[0] if count_results else 0
             
             # Data query with pagination
             offset = (page - 1) * page_size
             data_query = f"SELECT * FROM c WHERE c.engagement_id = @engagement_id ORDER BY c.uploaded_at DESC OFFSET {offset} LIMIT {page_size}"
-            items = await self._query_items(
-                "evidence",
-                data_query,
-                [{"name": "@engagement_id", "value": engagement_id}]
-            )
+            items = await self._query_items("evidence", data_query, count_params)
             
             evidence_list = [Evidence(**item) for item in items]
-            
-            logger.info(
-                "Listed evidence for engagement",
-                extra={
-                    "correlation_id": self.correlation_id,
-                    "engagement_id": engagement_id,
-                    "page": page,
-                    "page_size": page_size,
-                    "total_count": total_count,
-                    "returned_count": len(evidence_list)
-                }
-            )
             
             return evidence_list, total_count
             
@@ -925,41 +966,6 @@ class CosmosRepository(Repository):
                 extra={
                     "correlation_id": self.correlation_id,
                     "engagement_id": engagement_id,
-                    "error": str(e)
-                }
-            )
-            raise
-    
-    async def update_evidence_links(self, evidence_id: str, engagement_id: str, linked_items: List[Dict[str, str]]) -> bool:
-        """Update evidence links to assessment items"""
-        try:
-            # Get existing evidence
-            evidence_item = await self._get_item("evidence", evidence_id, engagement_id)
-            if not evidence_item:
-                return False
-            
-            # Update linked items
-            evidence_item["linked_items"] = linked_items
-            
-            await self._upsert_item("evidence", evidence_item)
-            
-            logger.info(
-                "Updated evidence links",
-                extra={
-                    "correlation_id": self.correlation_id,
-                    "evidence_id": evidence_id,
-                    "link_count": len(linked_items)
-                }
-            )
-            
-            return True
-            
-        except Exception as e:
-            logger.error(
-                "Failed to update evidence links",
-                extra={
-                    "correlation_id": self.correlation_id,
-                    "evidence_id": evidence_id,
                     "error": str(e)
                 }
             )

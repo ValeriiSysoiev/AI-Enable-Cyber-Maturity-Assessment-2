@@ -10,6 +10,16 @@ from .assessment import (
     EngagementCreate,
     AddMemberRequest
 )
+from .workshop import (
+    WorkshopCreateRequest,
+    WorkshopResponse,
+    ConsentRequest,
+    AttendeeRequest,
+    AttendeeResponse,
+    ConsentResponse,
+    WorkshopListResponse,
+    StartWorkshopResponse
+)
 
 __all__ = [
     "CountSummary",
@@ -25,5 +35,13 @@ __all__ = [
     "ScoreResponse",
     "PillarScore",
     "EngagementCreate",
-    "AddMemberRequest"
+    "AddMemberRequest",
+    "WorkshopCreateRequest",
+    "WorkshopResponse",
+    "ConsentRequest",
+    "AttendeeRequest",
+    "AttendeeResponse",
+    "ConsentResponse",
+    "WorkshopListResponse",
+    "StartWorkshopResponse"
 ]
