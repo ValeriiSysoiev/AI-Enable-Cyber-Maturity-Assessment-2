@@ -79,13 +79,7 @@ test.describe('Authentication Flow', () => {
 });
 
 test.describe('AAD Integration', () => {
-  test.skip(({ }, testInfo) => {
-    const hasAADConfig = process.env.AAD_CLIENT_ID && process.env.AAD_TENANT_ID;
-    if (!hasAADConfig) {
-      testInfo.annotations.push({ type: 'condition', description: 'AAD not configured' });
-    }
-    return !hasAADConfig;
-  });
+  test.skip(!process.env.AAD_CLIENT_ID || !process.env.AAD_TENANT_ID, 'AAD not configured');
 
   test('AAD signin flow initiation', async ({ page }) => {
     await test.step('Navigate to AAD signin', async () => {
@@ -103,7 +97,7 @@ test.describe('AAD Integration', () => {
         expect(page.url()).toContain('login.microsoftonline.com');
         console.log('Successfully redirected to AAD login');
       } else {
-        test.skip('AAD signin not available');
+        test.skip(true, 'AAD signin not available');
       }
     });
   });

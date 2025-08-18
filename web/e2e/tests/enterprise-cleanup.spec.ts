@@ -13,7 +13,7 @@ cleanup('cleanup enterprise test data', async ({ page }, testInfo) => {
 
   try {
     // Clear any test data from the system
-    await page.goto('/api/test/cleanup', { method: 'POST' });
+    await page.request.post('/api/test/cleanup');
     logger.info('Test data cleanup API called');
   } catch (error) {
     logger.info('Test data cleanup API not available');
@@ -21,7 +21,7 @@ cleanup('cleanup enterprise test data', async ({ page }, testInfo) => {
 
   try {
     // Clear caches
-    await page.goto('/api/cache/clear', { method: 'POST' });
+    await page.request.post('/api/cache/clear');
     logger.info('Cache cleared');
   } catch (error) {
     logger.info('Cache clear not available');
@@ -29,7 +29,7 @@ cleanup('cleanup enterprise test data', async ({ page }, testInfo) => {
 
   try {
     // Reset performance metrics
-    await page.goto('/api/performance/reset', { method: 'POST' });
+    await page.request.post('/api/performance/reset');
     logger.info('Performance metrics reset');
   } catch (error) {
     logger.info('Performance reset not available');

@@ -324,7 +324,7 @@ test.describe('AAD Group Sync and Caching', () => {
 
       await test.step('Test cache invalidation', async () => {
         // Force cache invalidation
-        await page.goto('/api/auth/invalidate-group-cache', { method: 'POST' });
+        await page.request.post('/api/auth/invalidate-group-cache');
         
         // Next call should be slower (cache miss)
         const postInvalidationTime = await perfMonitor.measureAction('post_invalidation_call', async () => {

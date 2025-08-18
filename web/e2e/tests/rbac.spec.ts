@@ -335,8 +335,7 @@ test.describe('Role Escalation Prevention', () => {
         });
         
         // Try to modify own role through API manipulation
-        const roleChangeResponse = await page.goto('/api/users/member-user/role', {
-          method: 'PATCH',
+        const roleChangeResponse = await page.request.patch('/api/users/member-user/role', {
           data: { role: 'Admin' }
         });
         
