@@ -7,7 +7,7 @@ import uuid
 import logging
 from datetime import datetime, timedelta
 from typing import Optional, List
-from fastapi import APIRouter, HTTPException, Depends, Query
+from fastapi import APIRouter, HTTPException, Depends, Query, Response
 from pydantic import BaseModel, Field
 
 from security.deps import get_current_user, require_role
@@ -374,6 +374,7 @@ async def complete_evidence_upload(
 
 @router.get("", response_model=List[Evidence])
 async def list_evidence(
+    response: Response,
     engagement_id: str = Query(..., description="Engagement ID"),
     page: int = Query(1, ge=1, description="Page number"),
     page_size: int = Query(50, ge=1, le=100, description="Items per page"),
@@ -412,6 +413,15 @@ async def list_evidence(
             page_size=page_size
         )
         
+        # Add pagination headers
+        total_pages = (total_count + page_size - 1) // page_size
+        response.headers["X-Total-Count"] = str(total_count)
+        response.headers["X-Page"] = str(page)
+        response.headers["X-Page-Size"] = str(page_size)
+        response.headers["X-Total-Pages"] = str(total_pages)
+        response.headers["X-Has-Next"] = str(page < total_pages).lower()
+        response.headers["X-Has-Previous"] = str(page > 1).lower()
+        
         logger.info(
             "Evidence list request completed",
             extra={
@@ -420,6 +430,7 @@ async def list_evidence(
                 "page": page,
                 "page_size": page_size,
                 "total_count": total_count,
+                "total_pages": total_pages,
                 "returned_count": len(evidence_list)
             }
         )
@@ -457,7 +468,8 @@ async def link_evidence(
         repository = create_cosmos_repository(correlation_id)
         
         # Get existing evidence to verify ownership and get current links
-        evidence = await repository.get_evidence(evidence_id, "")  # We'll need engagement_id for this
+        # Note: We don't have engagement_id here, so we'll need to get it from the evidence record
+        evidence = await repository.get_evidence_by_id(evidence_id)
         if not evidence:
             raise HTTPException(status_code=404, detail="Evidence not found")
         
@@ -525,3 +537,129 @@ async def link_evidence(
             }
         )
         raise HTTPException(status_code=500, detail="Failed to create evidence link")
+
+@router.delete("/{evidence_id}/links/{link_id}")
+async def unlink_evidence(
+    evidence_id: str,
+    link_id: str,
+    current_user: dict = Depends(get_current_user),
+    _: None = Depends(require_role(["Member", "LEM", "Admin"]))
+):
+    """
+    Remove a link between evidence and an assessment item.
+    
+    link_id format: "{item_type}:{item_id}"
+    """
+    correlation_id = current_user.get("correlation_id")
+    user_email = current_user["email"]
+    
+    logger.info(
+        "Evidence unlink request",
+        extra={
+            "correlation_id": correlation_id,
+            "user_email": user_email,
+            "evidence_id": evidence_id,
+            "link_id": link_id
+        }
+    )
+    
+    try:
+        # Parse link_id format: "item_type:item_id"
+        if ":" not in link_id:
+            raise HTTPException(
+                status_code=400, 
+                detail="Invalid link_id format. Expected: 'item_type:item_id'"
+            )
+        
+        item_type, item_id = link_id.split(":", 1)
+        target_link = {"item_type": item_type, "item_id": item_id}
+        
+        # Initialize repository
+        repository = create_cosmos_repository(correlation_id)
+        
+        # Get existing evidence to verify ownership and get current links
+        evidence = await repository.get_evidence_by_id(evidence_id)
+        if not evidence:
+            raise HTTPException(status_code=404, detail="Evidence not found")
+        
+        # Check engagement membership for the evidence
+        is_member = await _check_engagement_membership(user_email, evidence.engagement_id)
+        if not is_member:
+            logger.warning(
+                "Evidence unlink denied - not a member",
+                extra={
+                    "correlation_id": correlation_id,
+                    "user_email": user_email,
+                    "evidence_id": evidence_id,
+                    "engagement_id": evidence.engagement_id
+                }
+            )
+            raise HTTPException(status_code=403, detail="Access denied: not a member of this engagement")
+        
+        # Remove link from existing links
+        updated_links = evidence.linked_items.copy()
+        link_found = False
+        
+        # Find and remove the matching link
+        for i, link in enumerate(updated_links):
+            if link.get("item_type") == item_type and link.get("item_id") == item_id:
+                updated_links.pop(i)
+                link_found = True
+                break
+        
+        if not link_found:
+            logger.warning(
+                "Evidence link not found for removal",
+                extra={
+                    "correlation_id": correlation_id,
+                    "evidence_id": evidence_id,
+                    "item_type": item_type,
+                    "item_id": item_id,
+                    "existing_links": len(evidence.linked_items)
+                }
+            )
+            raise HTTPException(status_code=404, detail="Evidence link not found")
+        
+        # Update evidence record
+        success = await repository.update_evidence_links(
+            evidence_id, 
+            evidence.engagement_id, 
+            updated_links
+        )
+        
+        if not success:
+            raise HTTPException(status_code=500, detail="Failed to update evidence links")
+        
+        logger.info(
+            "Evidence link removed",
+            extra={
+                "correlation_id": correlation_id,
+                "user_email": user_email,
+                "evidence_id": evidence_id,
+                "item_type": item_type,
+                "item_id": item_id,
+                "remaining_links": len(updated_links)
+            }
+        )
+        
+        return {
+            "message": "Link removed", 
+            "evidence_id": evidence_id, 
+            "item_type": item_type, 
+            "item_id": item_id,
+            "remaining_links": len(updated_links)
+        }
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(
+            "Failed to unlink evidence",
+            extra={
+                "correlation_id": correlation_id,
+                "evidence_id": evidence_id,
+                "link_id": link_id,
+                "error": str(e)
+            }
+        )
+        raise HTTPException(status_code=500, detail="Failed to remove evidence link")

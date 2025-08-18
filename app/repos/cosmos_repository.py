@@ -828,6 +828,53 @@ class CosmosRepository(Repository):
             )
             raise
     
+    async def get_evidence_by_id(self, evidence_id: str) -> Optional[Evidence]:
+        """Get evidence record by ID without requiring engagement_id"""
+        try:
+            container = self.containers["evidence"]
+            
+            # Query for the evidence by id across all partitions
+            query = "SELECT * FROM c WHERE c.id = @evidence_id"
+            parameters = [{"name": "@evidence_id", "value": evidence_id}]
+            
+            items = container.query_items(
+                query=query,
+                parameters=parameters,
+                enable_cross_partition_query=True
+            )
+            
+            # Get the first (and should be only) result
+            for item in items:
+                logger.info(
+                    "Evidence record retrieved by ID",
+                    extra={
+                        "correlation_id": self.correlation_id,
+                        "evidence_id": evidence_id,
+                        "engagement_id": item.get("engagement_id")
+                    }
+                )
+                return Evidence(**item)
+            
+            logger.warning(
+                "Evidence record not found",
+                extra={
+                    "correlation_id": self.correlation_id,
+                    "evidence_id": evidence_id
+                }
+            )
+            return None
+            
+        except Exception as e:
+            logger.error(
+                "Failed to get evidence record by ID",
+                extra={
+                    "correlation_id": self.correlation_id,
+                    "evidence_id": evidence_id,
+                    "error": str(e)
+                }
+            )
+            raise
+    
     async def list_evidence(
         self,
         engagement_id: str,
