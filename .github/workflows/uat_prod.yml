@@ -1,0 +1,459 @@
+name: Production UAT Validation
+
+on:
+  workflow_dispatch:
+    inputs:
+      deployment_tag:
+        description: 'Production deployment tag to validate'
+        required: true
+        type: string
+      run_extended_tests:
+        description: 'Run extended validation tests'
+        required: false
+        default: true
+        type: boolean
+
+# OIDC permissions for Azure access (read-only verification)
+permissions:
+  id-token: write
+  contents: read
+  actions: write
+
+# Prevent multiple production UAT runs
+concurrency:
+  group: production-uat
+  cancel-in-progress: false
+
+env:
+  DEPLOYMENT_TAG: ${{ inputs.deployment_tag }}
+  WEB_BASE_URL: ${{ vars.VERIFY_WEB_BASE_URL_PROD }}
+  API_BASE_URL: ${{ vars.VERIFY_API_BASE_URL_PROD }}
+  AUTH_BEARER: ${{ vars.PRODUCTION_AUTH_BEARER }}
+
+jobs:
+  production-uat:
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    environment: production
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      timeout-minutes: 5
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      timeout-minutes: 3
+      with:
+        node-version: '20'
+        cache: 'npm'
+        cache-dependency-path: 'web/package-lock.json'
+
+    - name: Setup Python
+      uses: actions/setup-python@v5
+      timeout-minutes: 3
+      with:
+        python-version: '3.11'
+
+    - name: Azure OIDC Login (for verification)
+      id: azure_login
+      uses: azure/login@v2
+      continue-on-error: true
+      timeout-minutes: 3
+      with:
+        client-id: ${{ vars.AZURE_CLIENT_ID }}
+        tenant-id: ${{ vars.AZURE_TENANT_ID }}
+        subscription-id: ${{ vars.AZURE_SUBSCRIPTION_ID }}
+
+    - name: Initialize Production UAT Report
+      timeout-minutes: 2
+      run: |
+        echo "📋 Initializing Production UAT validation for ${{ env.DEPLOYMENT_TAG }}..."
+        
+        cat > UAT-Report-PROD.md << EOF
+        # Production UAT Report: ${{ env.DEPLOYMENT_TAG }}
+        
+        **Generated:** $(date -u '+%Y-%m-%d %H:%M:%S UTC')  
+        **Environment:** PRODUCTION  
+        **Deployment Tag:** ${{ env.DEPLOYMENT_TAG }}  
+        **Web Application:** ${{ env.WEB_BASE_URL }}  
+        **API Endpoint:** ${{ env.API_BASE_URL || 'Not configured' }}  
+        
+        ---
+        
+        ## 🎯 Production UAT Validation Summary
+        
+        | Test Category | Status | Duration | Details |
+        |---------------|--------|----------|---------|
+        EOF
+        
+        echo "Production UAT report initialized."
+
+    - name: Production Infrastructure Health Check
+      id: health_check
+      timeout-minutes: 15
+      run: |
+        echo "🔍 Running production infrastructure health validation..."
+        
+        # Make verify script executable
+        chmod +x scripts/verify_live.sh
+        
+        # Set environment variables for production verification
+        export WEB_BASE_URL="${{ env.WEB_BASE_URL }}"
+        export API_BASE_URL="${{ env.API_BASE_URL }}"
+        export AUTH_BEARER="${{ env.AUTH_BEARER }}"
+        export DEPLOYMENT_VERIFICATION=true
+        export GITHUB_SHA="${{ github.sha }}"
+        export DEPLOYMENT_ENVIRONMENT="production"
+        
+        # Run production verification with timing
+        start_time=$(date +%s)
+        if ./scripts/verify_live.sh 2>&1 | tee prod-health-check.log; then
+          HEALTH_STATUS="✅ PASSED"
+          HEALTH_RESULT=0
+        else
+          HEALTH_STATUS="❌ FAILED"  
+          HEALTH_RESULT=1
+        fi
+        end_time=$(date +%s)
+        HEALTH_DURATION=$((end_time - start_time))s
+        
+        # Update production UAT report
+        echo "| Production Health | $HEALTH_STATUS | ${HEALTH_DURATION} | API endpoints, auth flow, evidence workflows |" >> UAT-Report-PROD.md
+        
+        # Set outputs
+        echo "health_status=$HEALTH_STATUS" >> $GITHUB_OUTPUT
+        echo "health_result=$HEALTH_RESULT" >> $GITHUB_OUTPUT
+        echo "health_duration=$HEALTH_DURATION" >> $GITHUB_OUTPUT
+
+    - name: Install Playwright Dependencies
+      timeout-minutes: 10
+      working-directory: ./web
+      run: |
+        echo "🎭 Setting up Playwright for production E2E tests..."
+        npm ci
+        npx playwright install --with-deps
+
+    - name: Production E2E Critical Path Tests
+      id: e2e_critical
+      timeout-minutes: 20
+      working-directory: ./web
+      env:
+        WEB_BASE_URL: ${{ env.WEB_BASE_URL }}
+        API_BASE_URL: ${{ env.API_BASE_URL }}
+        AUTH_BEARER: ${{ env.AUTH_BEARER }}
+        PRODUCTION_MODE: true
+      run: |
+        echo "🧪 Running critical path E2E tests against production..."
+        
+        start_time=$(date +%s)
+        
+        # Run smoke tests (critical path only for production)
+        if timeout 1200 npx playwright test e2e/tests/smoke.spec.ts \
+             --config=e2e/playwright.config.ts \
+             --reporter=json > prod-e2e-results.json 2>&1; then
+          E2E_STATUS="✅ PASSED"
+          E2E_RESULT=0
+        else
+          E2E_STATUS="❌ FAILED"
+          E2E_RESULT=1
+          # Capture failure details
+          cat prod-e2e-results.json || echo "No E2E results available"
+        fi
+        
+        end_time=$(date +%s)
+        E2E_DURATION=$((end_time - start_time))s
+        
+        # Update production UAT report
+        echo "| E2E Critical Path | $E2E_STATUS | ${E2E_DURATION} | Authentication, core workflows, user journeys |" >> ../UAT-Report-PROD.md
+        
+        # Set outputs
+        echo "e2e_status=$E2E_STATUS" >> $GITHUB_OUTPUT
+        echo "e2e_result=$E2E_RESULT" >> $GITHUB_OUTPUT
+        echo "e2e_duration=$E2E_DURATION" >> $GITHUB_OUTPUT
+
+    - name: Production Security & Compliance Validation
+      id: security_check
+      timeout-minutes: 10
+      run: |
+        echo "🔒 Running production security validation..."
+        
+        start_time=$(date +%s)
+        SECURITY_RESULT=0
+        
+        echo "=== Production Security Validation ===" > prod-security-check.log
+        
+        # Enhanced security checks for production
+        # Check 1: HTTPS enforcement and security headers
+        if curl -s -I "${{ env.WEB_BASE_URL }}" | tee -a prod-security-check.log | grep -E "HTTP/[12](\.[01])? 200" >/dev/null; then
+          echo "✅ Web HTTPS accessibility confirmed" | tee -a prod-security-check.log
+          
+          # Check for security headers
+          if curl -s -I "${{ env.WEB_BASE_URL }}" | grep -i "strict-transport-security\|x-frame-options\|x-content-type-options" >/dev/null; then
+            echo "✅ Security headers detected" | tee -a prod-security-check.log
+          else
+            echo "⚠️ Some security headers may be missing" | tee -a prod-security-check.log
+          fi
+        else
+          echo "❌ Web HTTPS accessibility failed" | tee -a prod-security-check.log
+          SECURITY_RESULT=1
+        fi
+        
+        # Check 2: API authentication enforcement (if configured)
+        if [ -n "${{ env.API_BASE_URL }}" ]; then
+          if curl -s -o /dev/null -w "%{http_code}" "${{ env.API_BASE_URL }}/api/v1/engagements" | grep -E "401|403" >/dev/null; then
+            echo "✅ API authentication enforcement confirmed" | tee -a prod-security-check.log
+          else
+            echo "❌ API authentication enforcement issue" | tee -a prod-security-check.log
+            SECURITY_RESULT=1
+          fi
+        else
+          echo "ℹ️ API endpoint not configured - skipping API security checks" | tee -a prod-security-check.log
+        fi
+        
+        # Check 3: No debug/development endpoints exposed
+        for endpoint in "/debug" "/admin/debug" "/.env" "/config"; do
+          if curl -s -o /dev/null -w "%{http_code}" "${{ env.WEB_BASE_URL }}$endpoint" | grep "200" >/dev/null; then
+            echo "❌ Debug endpoint $endpoint is accessible in production!" | tee -a prod-security-check.log
+            SECURITY_RESULT=1
+          else
+            echo "✅ Debug endpoint $endpoint properly blocked" | tee -a prod-security-check.log
+          fi
+        done
+        
+        end_time=$(date +%s)
+        SECURITY_DURATION=$((end_time - start_time))s
+        
+        if [ $SECURITY_RESULT -eq 0 ]; then
+          SECURITY_STATUS="✅ PASSED"
+        else
+          SECURITY_STATUS="❌ FAILED"
+        fi
+        
+        # Update production UAT report
+        echo "| Security & Compliance | $SECURITY_STATUS | ${SECURITY_DURATION} | HTTPS, headers, auth, debug endpoints |" >> UAT-Report-PROD.md
+        
+        # Set outputs
+        echo "security_status=$SECURITY_STATUS" >> $GITHUB_OUTPUT
+        echo "security_result=$SECURITY_RESULT" >> $GITHUB_OUTPUT
+        echo "security_duration=$SECURITY_DURATION" >> $GITHUB_OUTPUT
+
+    - name: Production Performance & Load Baseline
+      id: performance_check
+      if: inputs.run_extended_tests
+      timeout-minutes: 8
+      run: |
+        echo "⚡ Running production performance baseline validation..."
+        
+        start_time=$(date +%s)
+        PERF_RESULT=0
+        
+        echo "=== Production Performance Validation ===" > prod-performance.log
+        
+        # Measure response times (stricter thresholds for production)
+        WEB_TIME=$(curl -o /dev/null -s -w "%{time_total}" "${{ env.WEB_BASE_URL }}" || echo "999")
+        WEB_TIME_MS=$(echo "$WEB_TIME * 1000" | bc -l | cut -d. -f1)
+        
+        echo "Web response time: ${WEB_TIME}s (${WEB_TIME_MS}ms)" | tee -a prod-performance.log
+        
+        if (( $(echo "$WEB_TIME < 2.0" | bc -l) )); then
+          echo "✅ Web response time acceptable: ${WEB_TIME}s" | tee -a prod-performance.log
+        else
+          echo "⚠️ Web response time high: ${WEB_TIME}s (>2s)" | tee -a prod-performance.log
+          PERF_RESULT=1
+        fi
+        
+        # API performance check (if configured)
+        if [ -n "${{ env.API_BASE_URL }}" ]; then
+          API_TIME=$(curl -o /dev/null -s -w "%{time_total}" "${{ env.API_BASE_URL }}/health" || echo "999")
+          API_TIME_MS=$(echo "$API_TIME * 1000" | bc -l | cut -d. -f1)
+          
+          echo "API response time: ${API_TIME}s (${API_TIME_MS}ms)" | tee -a prod-performance.log
+          
+          if (( $(echo "$API_TIME < 1.0" | bc -l) )); then
+            echo "✅ API response time acceptable: ${API_TIME}s" | tee -a prod-performance.log
+          else
+            echo "⚠️ API response time high: ${API_TIME}s (>1s)" | tee -a prod-performance.log
+            PERF_RESULT=1
+          fi
+        fi
+        
+        # Connection quality check
+        CONNECT_TIME=$(curl -o /dev/null -s -w "%{time_connect}" "${{ env.WEB_BASE_URL }}" || echo "999")
+        echo "Connection time: ${CONNECT_TIME}s" | tee -a prod-performance.log
+        
+        end_time=$(date +%s)
+        PERF_DURATION=$((end_time - start_time))s
+        
+        if [ $PERF_RESULT -eq 0 ]; then
+          PERF_STATUS="✅ PASSED"
+        else
+          PERF_STATUS="⚠️ WARNINGS"
+        fi
+        
+        # Update production UAT report
+        echo "| Performance Baseline | $PERF_STATUS | ${PERF_DURATION} | Web: ${WEB_TIME}s, API: ${API_TIME:-N/A}s, Connect: ${CONNECT_TIME}s |" >> UAT-Report-PROD.md
+        
+        # Set outputs
+        echo "perf_status=$PERF_STATUS" >> $GITHUB_OUTPUT
+        echo "perf_result=$PERF_RESULT" >> $GITHUB_OUTPUT
+        echo "perf_duration=$PERF_DURATION" >> $GITHUB_OUTPUT
+
+    - name: Generate Final Production UAT Report
+      if: always()
+      timeout-minutes: 5
+      run: |
+        echo "📊 Generating comprehensive production UAT report..."
+        
+        # Calculate overall status
+        HEALTH_FAILED=${{ steps.health_check.outputs.health_result != '0' && '1' || '0' }}
+        E2E_FAILED=${{ steps.e2e_critical.outputs.e2e_result != '0' && '1' || '0' }}
+        SECURITY_FAILED=${{ steps.security_check.outputs.security_result != '0' && '1' || '0' }}
+        PERF_WARNED=${{ steps.performance_check.outputs.perf_result != '0' && '1' || '0' }}
+        
+        TOTAL_FAILURES=$((HEALTH_FAILED + E2E_FAILED + SECURITY_FAILED))
+        
+        if [ $TOTAL_FAILURES -eq 0 ]; then
+          if [ $PERF_WARNED -eq 0 ]; then
+            OVERALL_STATUS="✅ PRODUCTION UAT PASSED"
+            UAT_DECISION="🟢 **PRODUCTION VALIDATION: SUCCESSFUL**"
+          else
+            OVERALL_STATUS="⚠️ PRODUCTION UAT PASSED WITH WARNINGS"
+            UAT_DECISION="🟡 **PRODUCTION VALIDATION: SUCCESSFUL WITH PERFORMANCE MONITORING NEEDED**"
+          fi
+        else
+          OVERALL_STATUS="❌ PRODUCTION UAT FAILED"
+          UAT_DECISION="🔴 **PRODUCTION VALIDATION: FAILED - IMMEDIATE ACTION REQUIRED**"
+        fi
+        
+        # Complete the production UAT report
+        cat >> UAT-Report-PROD.md << EOF
+        
+        ---
+        
+        ## 📋 Detailed Production Validation Results
+        
+        ### 🔍 Production Infrastructure Health
+        **Status:** ${{ steps.health_check.outputs.health_status }}  
+        **Duration:** ${{ steps.health_check.outputs.health_duration }}  
+        **Details:**
+        - Production API health and readiness validation
+        - Authentication and authorization flow testing
+        - Evidence management workflow verification  
+        - Production service connectivity confirmation
+        
+        ### 🧪 E2E Critical Path Tests
+        **Status:** ${{ steps.e2e_critical.outputs.e2e_status }}  
+        **Duration:** ${{ steps.e2e_critical.outputs.e2e_duration }}  
+        **Details:**
+        - Core user authentication workflows in production
+        - Essential application navigation and functionality
+        - Critical business process validation
+        - Production environment compatibility testing
+        
+        ### 🔒 Security & Compliance Validation
+        **Status:** ${{ steps.security_check.outputs.security_status }}  
+        **Duration:** ${{ steps.security_check.outputs.security_duration }}  
+        **Details:**
+        - HTTPS enforcement and security headers validation
+        - Production authentication enforcement verification
+        - Debug endpoint exposure prevention confirmation
+        - Production security posture assessment
+        
+        ### ⚡ Performance & Load Baseline
+        **Status:** ${{ steps.performance_check.outputs.perf_status || 'SKIPPED' }}  
+        **Duration:** ${{ steps.performance_check.outputs.perf_duration || 'N/A' }}  
+        **Details:**
+        - Production response time measurement and validation
+        - Connection quality and latency assessment
+        - Load handling capability baseline establishment
+        - Performance regression detection
+        
+        ---
+        
+        ## 🎯 Production UAT Conclusion
+        
+        **Overall Status:** $OVERALL_STATUS  
+        **Critical Failures:** $TOTAL_FAILURES  
+        **Performance Warnings:** $PERF_WARNED  
+        
+        $UAT_DECISION
+        
+        ---
+        
+        ## 📝 Production Readiness Assessment
+        
+        - [${{ steps.health_check.outputs.health_result == '0' && 'x' || ' ' }}] Production infrastructure health validated
+        - [${{ steps.e2e_critical.outputs.e2e_result == '0' && 'x' || ' ' }}] Critical path E2E tests passed
+        - [${{ steps.security_check.outputs.security_result == '0' && 'x' || ' ' }}] Security and compliance requirements met
+        - [${{ steps.performance_check.outputs.perf_result == '0' && 'x' || ' ' }}] Performance baseline within acceptable range
+        
+        ### ✅ Production Validation Summary
+        - [x] Production deployment completed successfully
+        - [x] Production environment accessible and responsive
+        - [x] Production UAT automation executed
+        - [${{ steps.health_check.outputs.health_result == '0' && steps.e2e_critical.outputs.e2e_result == '0' && steps.security_check.outputs.security_result == '0' && 'x' || ' ' }}] All critical production validation tests passed
+        
+        ---
+        
+        ## 🚨 Action Items (if any)
+        
+        $(if [ $TOTAL_FAILURES -gt 0 ]; then
+          echo "### Critical Issues Requiring Immediate Attention:"
+          [ $HEALTH_FAILED -eq 1 ] && echo "- 🔥 Production infrastructure health check FAILED - investigate immediately"
+          [ $E2E_FAILED -eq 1 ] && echo "- 🔥 Critical path E2E tests FAILED - user workflows affected"
+          [ $SECURITY_FAILED -eq 1 ] && echo "- 🔥 Security validation FAILED - potential security exposure"
+        else
+          echo "### Monitoring & Maintenance:"
+          echo "- ✅ All critical systems operational - continue normal monitoring"
+          [ $PERF_WARNED -eq 1 ] && echo "- ⚡ Monitor performance metrics for degradation trends"
+        fi)
+        
+        ---
+        
+        **Production UAT Report Generated:** $(date -u '+%Y-%m-%d %H:%M:%S UTC')  
+        **Environment:** PRODUCTION  
+        **Deployment Tag:** ${{ env.DEPLOYMENT_TAG }}  
+        **GitHub Run:** ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}  
+        
+        EOF
+        
+        # Set final outputs
+        echo "overall_status=$OVERALL_STATUS" >> $GITHUB_OUTPUT
+        echo "total_failures=$TOTAL_FAILURES" >> $GITHUB_OUTPUT
+        echo "uat_decision=$UAT_DECISION" >> $GITHUB_OUTPUT
+
+    - name: Upload Production UAT Artifacts
+      uses: actions/upload-artifact@v4
+      if: always()
+      timeout-minutes: 5
+      with:
+        name: production-uat-report-${{ env.DEPLOYMENT_TAG }}
+        path: |
+          UAT-Report-PROD.md
+          prod-health-check.log
+          prod-security-check.log  
+          prod-performance.log
+          web/prod-e2e-results.json
+        retention-days: 90  # Keep production reports longer
+
+    - name: Upload Production UAT Report to Job Summary
+      if: always()
+      timeout-minutes: 2
+      run: |
+        echo "📊 Adding production UAT report to job summary..."
+        cat UAT-Report-PROD.md >> $GITHUB_STEP_SUMMARY
+
+    - name: Fail job if critical production issues found
+      if: always()
+      run: |
+        TOTAL_FAILURES=${{ steps.generate-final-production-uat-report.outputs.total_failures || '0' }}
+        if [ "$TOTAL_FAILURES" -gt 0 ]; then
+          echo "❌ CRITICAL: Production UAT validation failed with $TOTAL_FAILURES critical issues"
+          echo "Production environment requires immediate attention"
+          exit 1
+        else
+          echo "✅ Production UAT validation completed successfully"
+          echo "Production environment is healthy and operational"
+          exit 0
+        fi

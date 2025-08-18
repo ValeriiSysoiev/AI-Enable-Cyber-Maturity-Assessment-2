@@ -16,18 +16,24 @@ Required for secure, passwordless authentication to Azure using OpenID Connect.
 2. Configure GitHub repository secrets with the above values
 3. Assign necessary Azure RBAC permissions to the service principal
 
-## Production Deployment Secrets
+## Production Deployment Variables
 
-Used by `.github/workflows/release.yml` workflow for production deployments.
+Used by `.github/workflows/deploy_production.yml` and `.github/workflows/uat_prod.yml` workflows.
 
-### Required Secrets
-- **`AZURE_CONTAINER_REGISTRY`** - Production ACR name (without .azurecr.io suffix)
-- **`AZURE_RESOURCE_GROUP`** - Production resource group name
-- **`API_CONTAINER_APP`** - Production API container app name
-- **`WEB_CONTAINER_APP`** - Production web container app name
+### Required Environment Variables (vars.*)
+- **`AZURE_CLIENT_ID`** - Azure App Registration client ID for production OIDC authentication
+- **`AZURE_TENANT_ID`** - Azure Active Directory tenant ID  
+- **`AZURE_SUBSCRIPTION_ID`** - Production Azure subscription ID
+- **`AZURE_RESOURCE_GROUP_PRODUCTION`** - Production resource group name (e.g., "rg-cybermat-prd")
+- **`WEB_APP_PRODUCTION`** - Production web App Service name (e.g., "web-cybermat-prd")
+- **`API_CONTAINER_APP_PRODUCTION`** - Production API Container Apps name (e.g., "api-cybermat-prd")
+- **`VERIFY_WEB_BASE_URL_PROD`** - Web verification URL (e.g., "https://web-cybermat-prd.azurewebsites.net")
 
-### Optional Secrets
+### Optional Environment Variables (vars.*)
+- **`VERIFY_API_BASE_URL_PROD`** - API verification URL (leave unset if Container Apps not provisioned)
+- **`AZURE_CONTAINER_REGISTRY_PRODUCTION`** - Production ACR name (without .azurecr.io suffix) - enables API image builds
 - **`PRODUCTION_AUTH_BEARER`** - Authentication token for production verification tests
+- **`DEPLOY_API_PROD`** - Set to 'false' to skip API deployment even if configured
 
 ## Staging Deployment Variables
 
