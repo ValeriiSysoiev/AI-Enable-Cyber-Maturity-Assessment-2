@@ -17,14 +17,19 @@ interface MockUser {
 // Mock authentication check for demo
 async function getDemoUser(): Promise<MockUser | null> {
   // In production, this would use getServerSession from NextAuth
-  // For S1 demo, we'll use a simple email-based auth
-  const headersList = headers();
-  const correlationId = headersList.get('x-correlation-id') || crypto.randomUUID();
+  // For S1 demo, we'll use a simple cookie/localStorage-based auth
+  const { cookies } = await import('next/headers');
+  const cookieStore = cookies();
+  const userEmail = cookieStore.get('demo-email')?.value;
   
-  // For demo purposes, check if user has signed in (would be stored in session/cookie)
-  // This is a placeholder - in production use NextAuth getServerSession
+  // If no email in cookies, user is not authenticated
+  if (!userEmail) {
+    return null;
+  }
+  
+  // For demo purposes, return mock user with the email
   return {
-    email: 'demo-user@example.com',
+    email: userEmail,
     roles: ['Member'],
     name: 'Demo User'
   };
