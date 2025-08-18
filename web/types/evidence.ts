@@ -140,3 +140,92 @@ export interface AuthContext {
   isLoading: boolean;
   error?: string;
 }
+
+// Evidence Upload and Management Types
+export interface Evidence {
+  id: string;
+  engagement_id: string;
+  blob_path: string;
+  filename: string;
+  checksum_sha256: string;
+  size: number;
+  mime_type: string;
+  uploaded_by: string;
+  uploaded_at: string;
+  pii_flag: boolean;
+  linked_items: EvidenceLink[];
+}
+
+export interface EvidenceLink {
+  item_type: string;
+  item_id: string;
+}
+
+export interface SASRequest {
+  engagement_id: string;
+  filename: string;
+  mime_type: string;
+  size_bytes: number;
+}
+
+export interface SASResponse {
+  upload_url: string;
+  blob_path: string;
+  expires_at: string;
+  max_size: number;
+  allowed_types: string[];
+}
+
+export interface CompleteRequest {
+  engagement_id: string;
+  blob_path: string;
+  filename: string;
+  mime_type: string;
+  size_bytes: number;
+  client_checksum?: string;
+}
+
+export interface CompleteResponse {
+  evidence_id: string;
+  checksum: string;
+  pii_flag: boolean;
+  size: number;
+}
+
+export interface LinkRequest {
+  item_type: string;
+  item_id: string;
+}
+
+export interface LinkResponse {
+  message: string;
+  evidence_id: string;
+  item_type: string;
+  item_id: string;
+  total_links: number;
+}
+
+export interface UnlinkResponse {
+  message: string;
+  evidence_id: string;
+  item_type: string;
+  item_id: string;
+  remaining_links: number;
+}
+
+export interface EvidenceListResponse {
+  data: Evidence[];
+  total: number;
+  page: number;
+  page_size: number;
+  total_pages: number;
+  has_next: boolean;
+  has_previous: boolean;
+}
+
+export interface UploadState {
+  status: 'idle' | 'generating_sas' | 'uploading' | 'completing' | 'completed' | 'error';
+  progress: number;
+  error?: string;
+  evidence?: Evidence;
+}
