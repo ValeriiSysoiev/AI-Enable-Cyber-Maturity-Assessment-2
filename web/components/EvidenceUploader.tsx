@@ -185,7 +185,18 @@ export default function EvidenceUploader({ onUploadComplete, className = "" }: E
   return (
     <div className={`space-y-4 ${className}`}>
       {/* File Selection */}
-      <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-gray-400 transition-colors">
+      <div 
+        className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-gray-400 transition-colors"
+        role="button"
+        tabIndex={isUploading ? -1 : 0}
+        aria-label="File upload area"
+        onKeyDown={(e) => {
+          if ((e.key === 'Enter' || e.key === ' ') && !isUploading) {
+            e.preventDefault();
+            fileInputRef.current?.click();
+          }
+        }}
+      >
         <input
           ref={fileInputRef}
           type="file"
@@ -205,6 +216,7 @@ export default function EvidenceUploader({ onUploadComplete, className = "" }: E
               onClick={() => fileInputRef.current?.click()}
               disabled={isUploading}
               className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 disabled:opacity-50"
+              aria-label="Choose file to upload"
             >
               Choose File
             </button>
@@ -242,8 +254,15 @@ export default function EvidenceUploader({ onUploadComplete, className = "" }: E
 
       {/* Upload Progress */}
       {isUploading && (
-        <div className="space-y-2">
-          <div className="w-full bg-gray-200 rounded-full h-2">
+        <div className="space-y-2" role="status" aria-live="polite">
+          <div 
+            className="w-full bg-gray-200 rounded-full h-2"
+            role="progressbar"
+            aria-valuenow={uploadState.progress}
+            aria-valuemin={0}
+            aria-valuemax={100}
+            aria-label="Upload progress"
+          >
             <div 
               className="bg-blue-600 h-2 rounded-full transition-all duration-300"
               style={{ width: `${uploadState.progress}%` }}
@@ -257,10 +276,14 @@ export default function EvidenceUploader({ onUploadComplete, className = "" }: E
 
       {/* Status Messages */}
       {uploadState.status !== 'idle' && !isUploading && (
-        <div className={`text-sm text-center ${getStatusColor()}`}>
+        <div 
+          className={`text-sm text-center ${getStatusColor()}`}
+          role={uploadState.status === 'error' ? 'alert' : 'status'}
+          aria-live={uploadState.status === 'error' ? 'assertive' : 'polite'}
+        >
           {getStatusMessage()}
           {uploadState.status === 'completed' && uploadState.evidence?.pii_flag && (
-            <div className="text-orange-600 mt-2">
+            <div className="text-orange-600 mt-2" role="alert">
               ⚠️ Potential PII detected in this file
             </div>
           )}

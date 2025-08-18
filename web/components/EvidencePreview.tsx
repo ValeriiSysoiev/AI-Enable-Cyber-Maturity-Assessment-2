@@ -57,15 +57,26 @@ export default function EvidencePreview({
     const isImage = evidence.mime_type.startsWith('image/');
     const isPDF = evidence.mime_type.includes('pdf');
     const isText = evidence.mime_type.startsWith('text/');
+    const isDocument = evidence.mime_type.includes('document') || evidence.mime_type.includes('word');
+    const isSpreadsheet = evidence.mime_type.includes('sheet') || evidence.mime_type.includes('excel');
+    const isPresentation = evidence.mime_type.includes('presentation') || evidence.mime_type.includes('powerpoint');
 
     if (isImage) {
       return (
-        <div className="flex items-center justify-center h-64 bg-gray-50 rounded border-2 border-dashed border-gray-300">
-          <div className="text-center">
+        <div className="bg-gray-50 rounded-lg border-2 border-dashed border-gray-300 p-6">
+          <div className="text-center mb-4">
             <div className="text-4xl mb-2">🖼️</div>
-            <div className="text-sm text-gray-600">Image Preview</div>
+            <div className="text-sm font-medium text-gray-700">Image File</div>
             <div className="text-xs text-gray-500 mt-1">
-              Preview functionality coming soon
+              Visual content preview - Enhanced viewer coming soon
+            </div>
+          </div>
+          <div className="bg-white rounded p-4 border">
+            <div className="text-xs text-gray-600 space-y-1">
+              <div><strong>Type:</strong> {evidence.mime_type}</div>
+              <div><strong>Resolution:</strong> Preview will show actual dimensions</div>
+              <div><strong>Color Space:</strong> Will display color profile information</div>
+              <div><strong>Usage:</strong> Can be linked to assessment questions for evidence</div>
             </div>
           </div>
         </div>
@@ -74,12 +85,90 @@ export default function EvidencePreview({
 
     if (isPDF) {
       return (
-        <div className="flex items-center justify-center h-64 bg-gray-50 rounded border-2 border-dashed border-gray-300">
-          <div className="text-center">
+        <div className="bg-gray-50 rounded-lg border-2 border-dashed border-gray-300 p-6">
+          <div className="text-center mb-4">
             <div className="text-4xl mb-2">📄</div>
-            <div className="text-sm text-gray-600">PDF Document</div>
+            <div className="text-sm font-medium text-gray-700">PDF Document</div>
             <div className="text-xs text-gray-500 mt-1">
-              PDF viewer coming soon
+              Document viewer with text search - Enhanced PDF viewer coming soon
+            </div>
+          </div>
+          <div className="bg-white rounded p-4 border space-y-3">
+            <div className="text-xs text-gray-600">
+              <div><strong>Features Coming:</strong></div>
+              <ul className="list-disc list-inside mt-1 space-y-1">
+                <li>Page-by-page navigation</li>
+                <li>Text search and highlighting</li>
+                <li>Zoom and pan controls</li>
+                <li>Annotation and markup tools</li>
+                <li>Direct citation linking</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      );
+    }
+
+    if (isDocument) {
+      return (
+        <div className="bg-gray-50 rounded-lg border-2 border-dashed border-gray-300 p-6">
+          <div className="text-center mb-4">
+            <div className="text-4xl mb-2">📝</div>
+            <div className="text-sm font-medium text-gray-700">Word Document</div>
+            <div className="text-xs text-gray-500 mt-1">
+              Rich document viewer with formatting - Enhanced viewer coming soon
+            </div>
+          </div>
+          <div className="bg-white rounded p-4 border">
+            <div className="text-xs text-gray-600 space-y-2">
+              <div><strong>Content Preview:</strong> Will show formatted text, tables, and images</div>
+              <div><strong>Search:</strong> Full-text search with context highlighting</div>
+              <div><strong>Navigation:</strong> Section and heading-based navigation</div>
+              <div><strong>Linking:</strong> Link specific paragraphs to assessment items</div>
+            </div>
+          </div>
+        </div>
+      );
+    }
+
+    if (isSpreadsheet) {
+      return (
+        <div className="bg-gray-50 rounded-lg border-2 border-dashed border-gray-300 p-6">
+          <div className="text-center mb-4">
+            <div className="text-4xl mb-2">📊</div>
+            <div className="text-sm font-medium text-gray-700">Spreadsheet</div>
+            <div className="text-xs text-gray-500 mt-1">
+              Interactive data viewer - Enhanced spreadsheet viewer coming soon
+            </div>
+          </div>
+          <div className="bg-white rounded p-4 border">
+            <div className="text-xs text-gray-600 space-y-2">
+              <div><strong>Data View:</strong> Will display worksheets with filtering and sorting</div>
+              <div><strong>Charts:</strong> Embedded charts and graphs will be rendered</div>
+              <div><strong>Export:</strong> Extract specific data ranges for evidence</div>
+              <div><strong>Analysis:</strong> Quick statistics and data validation</div>
+            </div>
+          </div>
+        </div>
+      );
+    }
+
+    if (isPresentation) {
+      return (
+        <div className="bg-gray-50 rounded-lg border-2 border-dashed border-gray-300 p-6">
+          <div className="text-center mb-4">
+            <div className="text-4xl mb-2">🎯</div>
+            <div className="text-sm font-medium text-gray-700">Presentation</div>
+            <div className="text-xs text-gray-500 mt-1">
+              Slide viewer with thumbnails - Enhanced presentation viewer coming soon
+            </div>
+          </div>
+          <div className="bg-white rounded p-4 border">
+            <div className="text-xs text-gray-600 space-y-2">
+              <div><strong>Slides:</strong> Will show thumbnail grid and slide-by-slide view</div>
+              <div><strong>Content:</strong> Text extraction and image preview</div>
+              <div><strong>Navigation:</strong> Quick jump to specific slides</div>
+              <div><strong>Evidence:</strong> Link individual slides to assessment questions</div>
             </div>
           </div>
         </div>
@@ -88,12 +177,20 @@ export default function EvidencePreview({
 
     if (isText) {
       return (
-        <div className="flex items-center justify-center h-64 bg-gray-50 rounded border-2 border-dashed border-gray-300">
-          <div className="text-center">
+        <div className="bg-gray-50 rounded-lg border-2 border-dashed border-gray-300 p-6">
+          <div className="text-center mb-4">
             <div className="text-4xl mb-2">📄</div>
-            <div className="text-sm text-gray-600">Text Document</div>
+            <div className="text-sm font-medium text-gray-700">Text Document</div>
             <div className="text-xs text-gray-500 mt-1">
-              Text preview coming soon
+              Syntax-highlighted text viewer - Enhanced text viewer coming soon
+            </div>
+          </div>
+          <div className="bg-white rounded p-4 border">
+            <div className="text-xs text-gray-600 space-y-2">
+              <div><strong>Display:</strong> Will show formatted text with line numbers</div>
+              <div><strong>Search:</strong> Pattern matching and regex support</div>
+              <div><strong>Highlighting:</strong> Syntax highlighting for code files</div>
+              <div><strong>Selection:</strong> Quote specific lines for evidence</div>
             </div>
           </div>
         </div>
@@ -101,12 +198,20 @@ export default function EvidencePreview({
     }
 
     return (
-      <div className="flex items-center justify-center h-64 bg-gray-50 rounded border-2 border-dashed border-gray-300">
-        <div className="text-center">
+      <div className="bg-gray-50 rounded-lg border-2 border-dashed border-gray-300 p-6">
+        <div className="text-center mb-4">
           <div className="text-4xl mb-2">{getFileIcon(evidence.mime_type)}</div>
-          <div className="text-sm text-gray-600">File Preview</div>
+          <div className="text-sm font-medium text-gray-700">File Preview</div>
           <div className="text-xs text-gray-500 mt-1">
-            Preview not available for this file type
+            Specialized viewer for this file type - Enhanced preview coming soon
+          </div>
+        </div>
+        <div className="bg-white rounded p-4 border">
+          <div className="text-xs text-gray-600 space-y-2">
+            <div><strong>Type:</strong> {evidence.mime_type}</div>
+            <div><strong>Preview:</strong> Custom viewer will be developed for this file type</div>
+            <div><strong>Download:</strong> Full file access available through secure download</div>
+            <div><strong>Metadata:</strong> File properties and embedded information will be extracted</div>
           </div>
         </div>
       </div>
@@ -174,7 +279,17 @@ export default function EvidencePreview({
       </div>
 
       {/* Preview Content */}
-      {getPreviewContent()}
+      <div className="bg-white border rounded-lg">
+        <div className="border-b px-4 py-3">
+          <h4 className="font-medium text-gray-900">File Preview</h4>
+          <p className="text-sm text-gray-600 mt-1">
+            Preview capabilities are being enhanced. Current view shows file structure and planned features.
+          </p>
+        </div>
+        <div className="p-4">
+          {getPreviewContent()}
+        </div>
+      </div>
 
       {/* Links Section */}
       <div className="space-y-3">
