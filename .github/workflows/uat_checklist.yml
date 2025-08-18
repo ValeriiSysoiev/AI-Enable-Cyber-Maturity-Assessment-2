@@ -124,7 +124,7 @@ jobs:
 
     - name: Install Playwright Dependencies
       timeout-minutes: 8
-      working-directory: ./e2e
+      working-directory: ./web
       run: |
         echo "🎭 Setting up Playwright for E2E tests..."
         npm ci
@@ -133,7 +133,7 @@ jobs:
     - name: E2E Smoke Tests
       id: e2e_smoke
       timeout-minutes: 15
-      working-directory: ./e2e  
+      working-directory: ./web
       env:
         API_BASE_URL: ${{ env.API_BASE_URL }}
         WEB_BASE_URL: ${{ env.WEB_BASE_URL }}
@@ -142,7 +142,7 @@ jobs:
         echo "🧪 Running E2E smoke tests..."
         
         start_time=$(date +%s)
-        if timeout 900 npx playwright test smoke.spec.ts --config=playwright.config.ts --reporter=json > smoke-results.json 2>&1; then
+        if timeout 900 npx playwright test e2e/tests/smoke.spec.ts --config=e2e/playwright.config.ts --reporter=json > smoke-results.json 2>&1; then
           E2E_STATUS="✅ PASSED"
           E2E_RESULT=0
         else
@@ -379,7 +379,7 @@ jobs:
         path: |
           UAT-Report.md
           health-check.log
-          e2e/smoke-results.json
+          web/smoke-results.json
         retention-days: 30
 
     - name: Comment UAT Results (if PR context available)
