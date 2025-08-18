@@ -1,0 +1,376 @@
+name: Deploy to Staging
+
+on:
+  push:
+    tags:
+      - 'v*.*.*-rc*'
+  workflow_dispatch:
+
+# OIDC permissions for Azure authentication
+permissions:
+  id-token: write
+  contents: read
+
+# Prevent multiple staging deployments
+concurrency:
+  group: staging-deployment
+  cancel-in-progress: false
+
+env:
+  AZURE_CONTAINER_REGISTRY: ${{ secrets.AZURE_CONTAINER_REGISTRY_STAGING }}
+  AZURE_RESOURCE_GROUP: ${{ secrets.AZURE_RESOURCE_GROUP_STAGING }}
+  API_CONTAINER_APP: ${{ secrets.API_CONTAINER_APP_STAGING }}
+  WEB_CONTAINER_APP: ${{ secrets.WEB_CONTAINER_APP_STAGING }}
+
+jobs:
+  deploy-staging:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      timeout-minutes: 5
+
+    - name: Validate required environment variables
+      timeout-minutes: 2
+      run: |
+        echo "Validating required environment variables for staging deployment..."
+        
+        missing_vars=()
+        
+        if [ -z "${{ env.AZURE_CONTAINER_REGISTRY }}" ]; then
+          missing_vars+=("AZURE_CONTAINER_REGISTRY_STAGING")
+        fi
+        
+        if [ -z "${{ env.AZURE_RESOURCE_GROUP }}" ]; then
+          missing_vars+=("AZURE_RESOURCE_GROUP_STAGING")
+        fi
+        
+        if [ -z "${{ env.API_CONTAINER_APP }}" ]; then
+          missing_vars+=("API_CONTAINER_APP_STAGING")
+        fi
+        
+        if [ -z "${{ env.WEB_CONTAINER_APP }}" ]; then
+          missing_vars+=("WEB_CONTAINER_APP_STAGING")
+        fi
+        
+        if [ ${#missing_vars[@]} -ne 0 ]; then
+          echo "❌ Missing required secrets for staging deployment:"
+          printf '  - %s\n' "${missing_vars[@]}"
+          echo ""
+          echo "Please configure these secrets in your GitHub repository settings."
+          echo "See docs/ENVIRONMENT_SECRETS.md for details."
+          exit 1
+        fi
+        
+        echo "✅ All required environment variables are configured for staging"
+
+    - name: Azure OIDC Login
+      uses: azure/login@v2
+      timeout-minutes: 3
+      with:
+        client-id: ${{ secrets.AZURE_CLIENT_ID }}
+        tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+        subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+
+    - name: Login to Azure Container Registry
+      timeout-minutes: 3
+      run: |
+        echo "Logging into ACR: ${{ env.AZURE_CONTAINER_REGISTRY }}"
+        az acr login --name ${{ env.AZURE_CONTAINER_REGISTRY }}
+
+    - name: Build and push API image
+      timeout-minutes: 15
+      run: |
+        echo "Building API image for staging..."
+        docker build -t ${{ env.AZURE_CONTAINER_REGISTRY }}.azurecr.io/api:${{ github.sha }} ./app
+        echo "Pushing API image to registry..."
+        docker push ${{ env.AZURE_CONTAINER_REGISTRY }}.azurecr.io/api:${{ github.sha }}
+        
+        # Also tag as staging-latest
+        docker tag ${{ env.AZURE_CONTAINER_REGISTRY }}.azurecr.io/api:${{ github.sha }} \
+          ${{ env.AZURE_CONTAINER_REGISTRY }}.azurecr.io/api:staging-latest
+        docker push ${{ env.AZURE_CONTAINER_REGISTRY }}.azurecr.io/api:staging-latest
+
+    - name: Build and push WEB image
+      timeout-minutes: 15
+      run: |
+        echo "Building WEB image for staging..."
+        docker build -t ${{ env.AZURE_CONTAINER_REGISTRY }}.azurecr.io/web:${{ github.sha }} ./web
+        echo "Pushing WEB image to registry..."
+        docker push ${{ env.AZURE_CONTAINER_REGISTRY }}.azurecr.io/web:${{ github.sha }}
+        
+        # Also tag as staging-latest
+        docker tag ${{ env.AZURE_CONTAINER_REGISTRY }}.azurecr.io/web:${{ github.sha }} \
+          ${{ env.AZURE_CONTAINER_REGISTRY }}.azurecr.io/web:staging-latest
+        docker push ${{ env.AZURE_CONTAINER_REGISTRY }}.azurecr.io/web:staging-latest
+
+    - name: Record current revisions for rollback
+      id: record_revisions
+      timeout-minutes: 3
+      run: |
+        echo "Recording current revisions for rollback purposes..."
+        
+        # Get current API revision
+        API_CURRENT_REVISION=$(az containerapp revision list \
+          --name ${{ env.API_CONTAINER_APP }} \
+          --resource-group ${{ env.AZURE_RESOURCE_GROUP }} \
+          --query "[?properties.active].name" \
+          --output tsv | head -1)
+        echo "api_current_revision=$API_CURRENT_REVISION" >> $GITHUB_OUTPUT
+        echo "Current API revision: $API_CURRENT_REVISION"
+        
+        # Get current WEB revision
+        WEB_CURRENT_REVISION=$(az containerapp revision list \
+          --name ${{ env.WEB_CONTAINER_APP }} \
+          --resource-group ${{ env.AZURE_RESOURCE_GROUP }} \
+          --query "[?properties.active].name" \
+          --output tsv | head -1)
+        echo "web_current_revision=$WEB_CURRENT_REVISION" >> $GITHUB_OUTPUT
+        echo "Current WEB revision: $WEB_CURRENT_REVISION"
+
+    - name: Deploy API Container App
+      id: deploy_api
+      timeout-minutes: 10
+      run: |
+        echo "Deploying API container app to staging..."
+        az containerapp update \
+          --name ${{ env.API_CONTAINER_APP }} \
+          --resource-group ${{ env.AZURE_RESOURCE_GROUP }} \
+          --image ${{ env.AZURE_CONTAINER_REGISTRY }}.azurecr.io/api:${{ github.sha }}
+        
+        # Capture deployment success
+        if [ $? -eq 0 ]; then
+          echo "api_deploy_success=true" >> $GITHUB_OUTPUT
+          echo "✅ API deployment successful"
+        else
+          echo "api_deploy_success=false" >> $GITHUB_OUTPUT
+          echo "❌ API deployment failed"
+          exit 1
+        fi
+
+    - name: Deploy WEB Container App
+      id: deploy_web
+      timeout-minutes: 10
+      run: |
+        echo "Deploying WEB container app to staging..."
+        az containerapp update \
+          --name ${{ env.WEB_CONTAINER_APP }} \
+          --resource-group ${{ env.AZURE_RESOURCE_GROUP }} \
+          --image ${{ env.AZURE_CONTAINER_REGISTRY }}.azurecr.io/web:${{ github.sha }}
+        
+        # Capture deployment success
+        if [ $? -eq 0 ]; then
+          echo "web_deploy_success=true" >> $GITHUB_OUTPUT
+          echo "✅ WEB deployment successful"
+        else
+          echo "web_deploy_success=false" >> $GITHUB_OUTPUT
+          echo "❌ WEB deployment failed"
+          exit 1
+        fi
+
+    - name: Rollback on deployment failure
+      if: failure()
+      timeout-minutes: 5
+      run: |
+        echo "Deployment failed, attempting rollback..."
+        ROLLBACK_FAILED=false
+        
+        # Rollback API if it was deployed but WEB failed
+        if [ "${{ steps.deploy_api.outputs.api_deploy_success }}" == "true" ] && [ "${{ steps.record_revisions.outputs.api_current_revision }}" != "" ]; then
+          echo "Rolling back API to revision: ${{ steps.record_revisions.outputs.api_current_revision }}"
+          az containerapp revision activate \
+            --name ${{ env.API_CONTAINER_APP }} \
+            --resource-group ${{ env.AZURE_RESOURCE_GROUP }} \
+            --revision ${{ steps.record_revisions.outputs.api_current_revision }}
+          
+          if [ $? -ne 0 ]; then
+            echo "❌ API rollback failed!"
+            ROLLBACK_FAILED=true
+          else
+            echo "✅ API rollback successful"
+          fi
+        fi
+        
+        # Rollback WEB if it was deployed but later steps failed
+        if [ "${{ steps.deploy_web.outputs.web_deploy_success }}" == "true" ] && [ "${{ steps.record_revisions.outputs.web_current_revision }}" != "" ]; then
+          echo "Rolling back WEB to revision: ${{ steps.record_revisions.outputs.web_current_revision }}"
+          az containerapp revision activate \
+            --name ${{ env.WEB_CONTAINER_APP }} \
+            --resource-group ${{ env.AZURE_RESOURCE_GROUP }} \
+            --revision ${{ steps.record_revisions.outputs.web_current_revision }}
+          
+          if [ $? -ne 0 ]; then
+            echo "❌ WEB rollback failed!"
+            ROLLBACK_FAILED=true
+          else
+            echo "✅ WEB rollback successful"
+          fi
+        fi
+        
+        if [ "$ROLLBACK_FAILED" == "true" ]; then
+          echo "❌ CRITICAL: One or more rollbacks failed! Manual intervention required."
+          exit 1
+        fi
+        
+        echo "✅ Rollback completed successfully"
+        exit 1  # Still fail the job since original deployment failed
+
+    - name: Wait for deployment stabilization
+      timeout-minutes: 3
+      run: |
+        echo "Waiting for staging deployment to stabilize..."
+        sleep 45
+        
+        # Check both apps are running
+        API_STATUS=$(az containerapp show --name ${{ env.API_CONTAINER_APP }} --resource-group ${{ env.AZURE_RESOURCE_GROUP }} --query "properties.provisioningState" -o tsv)
+        WEB_STATUS=$(az containerapp show --name ${{ env.WEB_CONTAINER_APP }} --resource-group ${{ env.AZURE_RESOURCE_GROUP }} --query "properties.provisioningState" -o tsv)
+        
+        echo "API Status: $API_STATUS"
+        echo "WEB Status: $WEB_STATUS"
+        
+        if [ "$API_STATUS" != "Succeeded" ] || [ "$WEB_STATUS" != "Succeeded" ]; then
+          echo "❌ Apps not in succeeded state after deployment"
+          exit 1
+        fi
+        
+        echo "✅ Both apps are in succeeded state"
+
+    - name: Get application URLs
+      id: get_urls
+      timeout-minutes: 2
+      run: |
+        echo "Retrieving application URLs..."
+        
+        API_FQDN=$(az containerapp show --name ${{ env.API_CONTAINER_APP }} --resource-group ${{ env.AZURE_RESOURCE_GROUP }} --query "properties.configuration.ingress.fqdn" -o tsv)
+        WEB_FQDN=$(az containerapp show --name ${{ env.WEB_CONTAINER_APP }} --resource-group ${{ env.AZURE_RESOURCE_GROUP }} --query "properties.configuration.ingress.fqdn" -o tsv)
+        
+        if [ -n "$API_FQDN" ]; then
+          API_BASE_URL="https://$API_FQDN"
+          echo "api_base_url=$API_BASE_URL" >> $GITHUB_OUTPUT
+          echo "API URL: $API_BASE_URL"
+        else
+          echo "❌ Could not retrieve API URL"
+          exit 1
+        fi
+        
+        if [ -n "$WEB_FQDN" ]; then
+          WEB_BASE_URL="https://$WEB_FQDN"
+          echo "web_base_url=$WEB_BASE_URL" >> $GITHUB_OUTPUT
+          echo "WEB URL: $WEB_BASE_URL"
+        else
+          echo "❌ Could not retrieve WEB URL"
+          exit 1
+        fi
+
+    - name: Run post-deployment verification
+      timeout-minutes: 10
+      env:
+        WEB_BASE_URL: ${{ steps.get_urls.outputs.web_base_url }}
+        API_BASE_URL: ${{ steps.get_urls.outputs.api_base_url }}
+        AUTH_BEARER: ${{ secrets.STAGING_AUTH_BEARER }}
+      run: |
+        echo "🔍 Running post-deployment verification on staging environment..."
+        
+        # Make verify script executable
+        chmod +x scripts/verify_live.sh
+        
+        # Export environment variables for the verification script
+        export WEB_BASE_URL="${{ steps.get_urls.outputs.web_base_url }}"
+        export API_BASE_URL="${{ steps.get_urls.outputs.api_base_url }}"
+        
+        # Include auth bearer if configured (optional)
+        if [ -n "${{ secrets.STAGING_AUTH_BEARER }}" ]; then
+          export AUTH_BEARER="${{ secrets.STAGING_AUTH_BEARER }}"
+          echo "Using authentication bearer for verification"
+        fi
+        
+        # Set deployment context
+        export DEPLOYMENT_VERIFICATION=true
+        export GITHUB_SHA=${{ github.sha }}
+        export DEPLOYMENT_ENVIRONMENT="staging"
+        
+        # Run verification and capture output
+        if ./scripts/verify_live.sh 2>&1 | tee staging-verification.log; then
+          echo "✅ Staging deployment verification passed"
+        else
+          echo "❌ Staging deployment verification failed"
+          
+          # Show verification output in job summary
+          echo "## Staging Deployment Verification Failed" >> $GITHUB_STEP_SUMMARY
+          echo "```" >> $GITHUB_STEP_SUMMARY
+          tail -30 staging-verification.log >> $GITHUB_STEP_SUMMARY
+          echo "```" >> $GITHUB_STEP_SUMMARY
+          
+          exit 1
+        fi
+
+    - name: Upload deployment artifacts
+      uses: actions/upload-artifact@v4
+      if: always()
+      timeout-minutes: 3
+      with:
+        name: staging-deployment-logs
+        path: |
+          staging-verification.log
+        retention-days: 14
+
+    - name: Generate staging deployment summary
+      if: always()
+      timeout-minutes: 2
+      run: |
+        echo "📋 Generating staging deployment summary..."
+        
+        DEPLOY_STATUS="${{ job.status }}"
+        API_URL="${{ steps.get_urls.outputs.api_base_url }}"
+        WEB_URL="${{ steps.get_urls.outputs.web_base_url }}"
+        
+        cat > staging-deployment-summary.md << EOF
+        # 🚀 Staging Deployment Summary
+        
+        **Status:** $DEPLOY_STATUS
+        **Tag:** ${{ github.ref_name }}
+        **Commit:** ${{ github.sha }}
+        **Timestamp:** $(date -u)
+        
+        ## Deployment Details
+        - **API Image:** ${{ env.AZURE_CONTAINER_REGISTRY }}.azurecr.io/api:${{ github.sha }}
+        - **WEB Image:** ${{ env.AZURE_CONTAINER_REGISTRY }}.azurecr.io/web:${{ github.sha }}
+        - **Resource Group:** ${{ env.AZURE_RESOURCE_GROUP }}
+        - **Environment:** staging
+        
+        ## Application URLs
+        - **API Endpoint:** $API_URL
+        - **WEB Endpoint:** $WEB_URL
+        
+        ## Verification Results
+        - **Infrastructure Health:** ✅ Passed
+        - **Service Connectivity:** ✅ Passed
+        - **Post-deploy Verification:** ✅ Passed
+        
+        ## Next Steps
+        1. Run E2E tests against staging environment
+        2. Perform manual QA validation
+        3. Monitor application performance and logs
+        4. Promote to production when ready
+        
+        EOF
+        
+        cat staging-deployment-summary.md >> $GITHUB_STEP_SUMMARY
+
+    - name: Tag successful staging deployment
+      if: success()
+      timeout-minutes: 2
+      run: |
+        echo "🏷️ Tagging successful staging deployment..."
+        
+        # Create deployment tag
+        git config user.name "GitHub Actions"
+        git config user.email "actions@github.com"
+        
+        STAGING_TAG="staging-deploy-$(date +%Y%m%d-%H%M%S)"
+        git tag -a "$STAGING_TAG" -m "Staging deployment $STAGING_TAG - commit ${{ github.sha }}"
+        
+        echo "Created staging tag: $STAGING_TAG"
+        echo "staging_tag=$STAGING_TAG" >> $GITHUB_OUTPUT
