@@ -23,7 +23,7 @@ from azure.identity import DefaultAzureCredential
 from domain.models import (
     Assessment, Question, Response, Finding, Recommendation, RunLog,
     Engagement, Membership, Document, EmbeddingDocument, Workshop,
-    WorkshopAttendee, ConsentRecord
+    WorkshopAttendee, ConsentRecord, Minutes
 )
 from domain.repository import Repository
 from api.schemas.gdpr import BackgroundJob, AuditLogEntry, TTLPolicy
@@ -137,6 +137,10 @@ class CosmosRepository(Repository):
             "workshops": {
                 "partition_key": "/engagement_id",
                 "ttl": None  # No TTL for workshop data
+            },
+            "minutes": {
+                "partition_key": "/workshop_id",
+                "ttl": None  # No TTL for minutes data
             }
         }
         
@@ -966,6 +970,247 @@ class CosmosRepository(Repository):
                 extra={
                     "correlation_id": self.correlation_id,
                     "engagement_id": engagement_id,
+                    "error": str(e)
+                }
+            )
+            raise
+
+    # Minutes methods (async implementations for Cosmos DB)
+    def create_minutes(self, m: Minutes) -> Minutes:
+        """Create new minutes (sync wrapper)"""
+        return asyncio.run(self._create_minutes_async(m))
+    
+    def get_minutes(self, minutes_id: str) -> Optional[Minutes]:
+        """Get minutes by ID (sync wrapper)"""
+        # For sync interface, we need the workshop_id - this is a limitation of the sync interface
+        # In practice, this would be called through the async methods in the API routes
+        raise NotImplementedError("Use async get_minutes_async method with workshop_id")
+    
+    def update_minutes(self, m: Minutes) -> Minutes:
+        """Update existing minutes (sync wrapper)"""
+        return asyncio.run(self._update_minutes_async(m))
+    
+    def get_minutes_by_workshop(self, workshop_id: str) -> List[Minutes]:
+        """Get all minutes for a workshop (sync wrapper)"""
+        return asyncio.run(self._get_minutes_by_workshop_async(workshop_id))
+    
+    async def _create_minutes_async(self, m: Minutes) -> Minutes:
+        """Create new minutes"""
+        try:
+            minutes_dict = m.model_dump()
+            minutes_dict["id"] = m.id
+            
+            stored_item = await self._upsert_item("minutes", minutes_dict)
+            return Minutes(**stored_item)
+            
+        except Exception as e:
+            logger.error(
+                f"Failed to create minutes: {str(e)}",
+                extra={
+                    "correlation_id": self.correlation_id,
+                    "minutes_id": m.id,
+                    "workshop_id": m.workshop_id,
+                    "error": str(e)
+                }
+            )
+            raise
+    
+    async def get_minutes_async(self, minutes_id: str, workshop_id: str) -> Optional[Minutes]:
+        """Get minutes by ID"""
+        try:
+            item = await self._get_item("minutes", minutes_id, workshop_id)
+            return Minutes(**item) if item else None
+            
+        except Exception as e:
+            logger.error(
+                f"Failed to get minutes: {str(e)}",
+                extra={
+                    "correlation_id": self.correlation_id,
+                    "minutes_id": minutes_id,
+                    "workshop_id": workshop_id,
+                    "error": str(e)
+                }
+            )
+            raise
+    
+    async def _update_minutes_async(self, m: Minutes) -> Minutes:
+        """Update existing minutes"""
+        try:
+            minutes_dict = m.model_dump()
+            minutes_dict["id"] = m.id
+            
+            stored_item = await self._upsert_item("minutes", minutes_dict)
+            return Minutes(**stored_item)
+            
+        except Exception as e:
+            logger.error(
+                f"Failed to update minutes: {str(e)}",
+                extra={
+                    "correlation_id": self.correlation_id,
+                    "minutes_id": m.id,
+                    "workshop_id": m.workshop_id,
+                    "error": str(e)
+                }
+            )
+            raise
+    
+    async def _get_minutes_by_workshop_async(self, workshop_id: str) -> List[Minutes]:
+        """Get all minutes for a workshop"""
+        try:
+            query = "SELECT * FROM c WHERE c.workshop_id = @workshop_id ORDER BY c.created_at DESC"
+            parameters = [{"name": "@workshop_id", "value": workshop_id}]
+            
+            items = await self._query_items("minutes", query, parameters, workshop_id)
+            return [Minutes(**item) for item in items]
+            
+        except Exception as e:
+            logger.error(
+                f"Failed to get minutes by workshop: {str(e)}",
+                extra={
+                    "correlation_id": self.correlation_id,
+                    "workshop_id": workshop_id,
+                    "error": str(e)
+                }
+            )
+            raise
+    
+    def publish_minutes(self, minutes_id: str) -> Minutes:
+        """Publish minutes (compute hash, set status='published', publishedAt timestamp)"""
+        return asyncio.run(self._publish_minutes_async(minutes_id))
+    
+    async def _publish_minutes_async(self, minutes_id: str) -> Minutes:
+        """Publish minutes - async implementation"""
+        try:
+            # First, get the existing minutes to determine workshop_id
+            # We need to query by minutes_id across all workshops
+            query = "SELECT * FROM c WHERE c.id = @minutes_id"
+            parameters = [{"name": "@minutes_id", "value": minutes_id}]
+            
+            # Query without partition key - this requires cross-partition query
+            container = self.containers.get("minutes")
+            if not container:
+                raise ValueError("Minutes container not available")
+            
+            items = list(container.query_items(
+                query=query,
+                parameters=parameters,
+                enable_cross_partition_query=True
+            ))
+            
+            if not items:
+                raise ValueError(f"Minutes with ID {minutes_id} not found")
+            
+            minutes = Minutes(**items[0])
+            
+            # Validate that minutes are in draft state
+            if minutes.status != "draft":
+                raise ValueError(f"Can only publish draft minutes. Current status: {minutes.status}")
+            
+            # Compute content hash and update to published status
+            content_hash = minutes.compute_content_hash()
+            published_minutes = Minutes(
+                id=minutes.id,
+                workshop_id=minutes.workshop_id,
+                status="published",
+                sections=minutes.sections,
+                generated_by=minutes.generated_by,
+                published_at=datetime.now(timezone.utc),
+                content_hash=content_hash,
+                parent_id=minutes.parent_id,
+                created_at=minutes.created_at,
+                updated_by=minutes.updated_by
+            )
+            
+            # Store the published minutes
+            stored_item = await self._upsert_item("minutes", published_minutes.model_dump())
+            result_minutes = Minutes(**stored_item)
+            
+            logger.info(
+                "Successfully published minutes",
+                extra={
+                    "correlation_id": self.correlation_id,
+                    "minutes_id": minutes_id,
+                    "workshop_id": minutes.workshop_id,
+                    "content_hash": content_hash,
+                    "published_at": result_minutes.published_at
+                }
+            )
+            
+            return result_minutes
+            
+        except Exception as e:
+            logger.error(
+                f"Failed to publish minutes: {str(e)}",
+                extra={
+                    "correlation_id": self.correlation_id,
+                    "minutes_id": minutes_id,
+                    "error": str(e)
+                }
+            )
+            raise
+    
+    def create_new_version(self, parent_id: str, updated_by: str) -> Minutes:
+        """Create new version for editing published minutes"""
+        return asyncio.run(self._create_new_version_async(parent_id, updated_by))
+    
+    async def _create_new_version_async(self, parent_id: str, updated_by: str) -> Minutes:
+        """Create new version - async implementation"""
+        try:
+            # Get the parent minutes
+            query = "SELECT * FROM c WHERE c.id = @parent_id"
+            parameters = [{"name": "@parent_id", "value": parent_id}]
+            
+            container = self.containers.get("minutes")
+            if not container:
+                raise ValueError("Minutes container not available")
+            
+            items = list(container.query_items(
+                query=query,
+                parameters=parameters,
+                enable_cross_partition_query=True
+            ))
+            
+            if not items:
+                raise ValueError(f"Parent minutes with ID {parent_id} not found")
+            
+            parent_minutes = Minutes(**items[0])
+            
+            # Create new version as draft with parent reference
+            new_minutes = Minutes(
+                workshop_id=parent_minutes.workshop_id,
+                status="draft",
+                sections=parent_minutes.sections,  # Copy content from parent
+                generated_by="human",  # New version is human-created
+                published_at=None,
+                content_hash=None,  # No hash for drafts
+                parent_id=parent_id,  # Link to parent version
+                updated_by=updated_by
+            )
+            
+            # Store the new version
+            stored_item = await self._upsert_item("minutes", new_minutes.model_dump())
+            result_minutes = Minutes(**stored_item)
+            
+            logger.info(
+                "Successfully created new minutes version",
+                extra={
+                    "correlation_id": self.correlation_id,
+                    "new_minutes_id": result_minutes.id,
+                    "parent_id": parent_id,
+                    "workshop_id": result_minutes.workshop_id,
+                    "updated_by": updated_by
+                }
+            )
+            
+            return result_minutes
+            
+        except Exception as e:
+            logger.error(
+                f"Failed to create new minutes version: {str(e)}",
+                extra={
+                    "correlation_id": self.correlation_id,
+                    "parent_id": parent_id,
+                    "updated_by": updated_by,
                     "error": str(e)
                 }
             )
