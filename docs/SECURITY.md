@@ -154,186 +154,6 @@ X-Correlation-ID: uuid-v4
 4. ✅ Role extraction and validation
 5. ✅ Engagement-scoped permissions
 
-## Secret Management
-
-### SecretProvider Architecture
-
-**Implementation:** Unified secret management interface  
-**Location:** `/app/security/secret_provider.py`
-
-The application uses a SecretProvider pattern to abstract secret retrieval from multiple sources with automatic fallbacks and production security controls.
-
-**Provider Types:**
-
-| Provider | Use Case | Authentication |
-|----------|----------|----------------|
-| **LocalEnvProvider** | Development/Testing | Environment variables |
-| **KeyVaultProvider** | Production | Azure Managed Identity |
-
-### Secret Provider Interface
-
-```python
-class SecretProvider(ABC):
-    @abstractmethod
-    async def get_secret(self, secret_name: str) -> Optional[str]:
-        """Get secret value by name"""
-        pass
-    
-    @abstractmethod
-    async def health_check(self) -> Dict[str, Any]:
-        """Check provider health and connectivity"""
-        pass
-```
-
-### Development Configuration
-
-**LocalEnvProvider Implementation:**
-- ✅ Reads from environment variables
-- ✅ Converts kebab-case to UPPER_SNAKE_CASE
-- ✅ Correlation ID logging
-- ✅ Health checks with secret inventory
-
-**Environment Variable Pattern:**
-```bash
-# Secret name: "azure-openai-api-key"
-# Environment variable: "AZURE_OPENAI_API_KEY"
-export AZURE_OPENAI_API_KEY="your-development-key"
-```
-
-### Production Configuration
-
-**KeyVaultProvider Implementation:**
-- ✅ Azure Key Vault integration
-- ✅ Managed Identity authentication
-- ✅ 15-minute secret caching
-- ✅ Automatic retry and fallback
-- ✅ Health monitoring
-
-**Required Environment Variables:**
-```bash
-USE_KEYVAULT=true
-AZURE_KEYVAULT_URL=https://your-vault.vault.azure.net/
-```
-
-**Key Vault Secret Naming Convention:**
-```
-azure-openai-api-key        # Azure OpenAI API key
-azure-openai-endpoint       # Azure OpenAI endpoint URL
-azure-search-api-key        # Azure Search API key
-azure-search-endpoint       # Azure Search endpoint URL
-cosmos-endpoint             # Cosmos DB endpoint URL
-cosmos-database             # Cosmos DB database name
-azure-storage-account       # Storage account name
-azure-storage-key           # Storage account key
-aad-client-secret           # AAD client secret
-```
-
-### Security Controls
-
-**Secret Protection:**
-- ✅ No secrets in source code or configuration files
-- ✅ Environment variable fallbacks for development
-- ✅ Managed Identity for production (no API keys)
-- ✅ Automatic secret rotation support
-- ✅ Correlation ID audit trails
-
-**Access Controls:**
-```json
-{
-  "timestamp": "2025-08-18T10:30:45.123Z",
-  "level": "INFO",
-  "service": "api",
-  "message": "Retrieved secret from Key Vault",
-  "correlation_id": "uuid-v4",
-  "secret_name": "azure-openai-api-key",
-  "vault_url": "https://vault.azure.net/",
-  "cache_hit": false
-}
-```
-
-**Caching Security:**
-- 🔒 In-memory only (no disk persistence)
-- 🔒 15-minute TTL maximum
-- 🔒 Process-scoped (no cross-process sharing)
-- 🔒 Automatic cleanup on expiration
-
-### Factory Pattern
-
-**SecretProviderFactory Configuration:**
-```python
-# Automatic provider selection based on environment
-provider = SecretProviderFactory.create_provider(correlation_id)
-
-# Production: USE_KEYVAULT=true + AZURE_KEYVAULT_URL set
-# → KeyVaultProvider with Managed Identity
-
-# Development: No Key Vault configuration
-# → LocalEnvProvider with environment variables
-
-# Fallback: Key Vault fails to initialize
-# → LocalEnvProvider with warning logged
-```
-
-### Integration Examples
-
-**Application Configuration:**
-```python
-# Load secrets asynchronously
-config_with_secrets = await config.load_secrets_async(correlation_id)
-
-# Use in service initialization
-llm_client = LLMClient(correlation_id)
-await llm_client.generate(system, user)  # Uses secret provider internally
-```
-
-**Health Monitoring:**
-```python
-# Check secret provider health
-health = await health_check_secrets(correlation_id)
-# Returns: provider type, status, secret inventory, cache metrics
-```
-
-### Security Testing
-
-**Test Coverage:**
-- ✅ Secret retrieval (found/not found)
-- ✅ Environment variable conversion
-- ✅ Key Vault fallback scenarios
-- ✅ Health check functionality
-- ✅ Provider factory selection logic
-- ✅ Correlation ID propagation
-
-**Mock Testing for Key Vault:**
-```python
-@patch('security.secret_provider.SecretClient')
-async def test_keyvault_provider_success(mock_client):
-    provider = KeyVaultProvider("https://test.vault.azure.net/")
-    result = await provider.get_secret("test-secret")
-    assert result == "secret-value"
-```
-
-### Production Deployment
-
-**Infrastructure Requirements:**
-1. **Azure Key Vault:** Secret storage with access policies
-2. **Managed Identity:** Application authentication to Key Vault
-3. **Key Vault Access Policy:** Grant "Get" and "List" permissions
-4. **Network Security:** Key Vault firewall rules if required
-
-**Deployment Checklist:**
-- [ ] Key Vault created with appropriate access policies
-- [ ] Managed Identity assigned to application
-- [ ] All required secrets stored in Key Vault
-- [ ] Environment variables set for Key Vault URL
-- [ ] Health checks pass for secret provider
-- [ ] Monitoring alerts configured for secret access failures
-
-**Secret Rotation Support:**
-- ✅ Automatic cache expiration (15 minutes)
-- ✅ Health checks detect stale secrets
-- ✅ Graceful fallback to environment variables
-- ✅ Audit logging for rotation events
-
 ## Data Protection
 
 ### Input Validation
@@ -477,7 +297,7 @@ test('insufficient permissions shows 403', async ({ page }) => {
 ### Data Security
 
 - [ ] **Encryption at Rest:** Database and file encryption
-- [x] **Key Management:** Azure Key Vault integration (SecretProvider implemented)
+- [ ] **Key Management:** Azure Key Vault integration
 - [ ] **Data Classification:** PII identification and protection
 - [ ] **Backup Security:** Encrypted backups with access controls
 
@@ -488,104 +308,202 @@ test('insufficient permissions shows 403', async ({ page }) => {
 - [ ] **Audit Logging:** Immutable audit trails
 - [ ] **Incident Response:** Automated response procedures
 
+## S4 Security Enhancements (Sprint 4)
+
+### Consent Capture Policy and PII Guardrails
+
+**Workshop Consent Management**  
+**Location:** `/app/api/routes/workshops.py`
+
+**Consent Requirements:**
+- ✅ **Explicit Consent:** GDPR-compliant consent before any data collection
+- ✅ **Granular Permissions:** Separate consent for recording, minutes, and data processing
+- ✅ **Revocation Support:** Immediate consent withdrawal with data purge workflows
+- ✅ **Version Tracking:** Legal basis documentation with consent text versioning
+
+```python
+# Consent validation middleware
+async def validate_workshop_consent(workshop_id: str, user_id: str) -> ConsentStatus:
+    consent = await get_active_consent(workshop_id, user_id)
+    
+    if not consent or consent.expires_at < datetime.utcnow():
+        logger.warning("Workshop access denied - no valid consent", extra={
+            "workshop_id": workshop_id,
+            "user_id": user_id,
+            "consent_status": "expired_or_missing"
+        })
+        raise HTTPException(401, "Valid consent required")
+    
+    return consent
+```
+
+**PII Protection Controls:**
+```python
+# PII scrubbing for minutes generation
+def sanitize_workshop_content(content: str) -> str:
+    """Remove PII from workshop minutes before storage"""
+    patterns = [
+        r'\b\d{3}-\d{2}-\d{4}\b',           # SSN pattern
+        r'\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b',  # Email
+        r'\b\d{4}\s?\d{4}\s?\d{4}\s?\d{4}\b'  # Credit card pattern
+    ]
+    
+    sanitized = content
+    for pattern in patterns:
+        sanitized = re.sub(pattern, '[REDACTED]', sanitized)
+    
+    return sanitized
+```
+
+### Minutes Immutability and Audit Requirements
+
+**Immutable Storage Model**  
+**Implementation:** Cryptographic sealing with digital signatures
+
+```python
+class ImmutableMinutes:
+    """Cryptographically sealed meeting minutes"""
+    
+    async def publish_minutes(self, minutes: Minutes) -> PublishedMinutes:
+        # Generate content hash
+        content_hash = hashlib.sha256(minutes.content.encode()).hexdigest()
+        
+        # Create digital signature using HMAC-SHA256
+        signature = hmac.new(
+            key=self.signing_key,
+            msg=f"{minutes.id}:{content_hash}:{minutes.created_at}".encode(),
+            digestmod=hashlib.sha256
+        ).hexdigest()
+        
+        # Store immutable version
+        published = PublishedMinutes(
+            id=str(uuid4()),
+            workshop_id=minutes.workshop_id,
+            content_hash=content_hash,
+            digital_signature=signature,
+            published_at=datetime.utcnow(),
+            status="published"
+        )
+        
+        # Audit log
+        logger.info("Minutes published with cryptographic seal", extra={
+            "minutes_id": published.id,
+            "content_hash": content_hash,
+            "signature": signature[:8] + "...",  # Truncated for logs
+            "workshop_id": minutes.workshop_id
+        })
+        
+        return published
+```
+
+**Audit Trail Requirements:**
+- ✅ **Tamper Evidence:** Any modification attempt logs security alert
+- ✅ **Version History:** Complete chain of custody from draft to published
+- ✅ **Access Logging:** All minutes access logged with correlation IDs
+- ✅ **Retention Policy:** Automated archival based on legal requirements
+
+### Chat Command Authorization and Logging
+
+**Administrative Shell Access**  
+**Security Level:** Admin-only with enhanced logging
+
+```python
+@require_role("Admin") 
+async def execute_chat_shell_command(
+    command: ChatShellCommand,
+    current_user: User = Depends(get_current_user)
+) -> ChatResponse:
+    
+    # Security validation
+    if not await validate_shell_command_safety(command.command):
+        logger.error("Dangerous shell command blocked", extra={
+            "user_id": current_user.id,
+            "command": command.command[:50] + "...",
+            "risk_level": "HIGH",
+            "action": "BLOCKED"
+        })
+        raise HTTPException(403, "Command not permitted")
+    
+    # Execute with audit logging
+    start_time = time.time()
+    try:
+        result = await execute_safe_command(command.command)
+        
+        logger.info("Admin shell command executed", extra={
+            "user_id": current_user.id,
+            "command": command.command,
+            "execution_time_ms": int((time.time() - start_time) * 1000),
+            "status": "success",
+            "output_length": len(result)
+        })
+        
+        return ChatResponse(content=result, command_type="shell")
+        
+    except Exception as e:
+        logger.error("Shell command execution failed", extra={
+            "user_id": current_user.id,
+            "command": command.command,
+            "error": str(e),
+            "status": "failed"
+        })
+        raise HTTPException(500, "Command execution failed")
+```
+
+**Chat Security Controls:**
+
+| Control Type | Implementation | Purpose |
+|--------------|----------------|---------|
+| **Command Filtering** | Allowlist-based validation | Prevent dangerous operations |
+| **Rate Limiting** | 10 commands/minute per user | Prevent abuse and DoS |
+| **Audit Logging** | All commands logged with correlation ID | Security monitoring |
+| **Role Enforcement** | Admin-only for shell commands | Principle of least privilege |
+| **Content Filtering** | PII detection in chat responses | Data protection |
+
+**Chat Logging Pattern:**
+```json
+{
+  "timestamp": "2025-08-18T20:30:45.123Z",
+  "level": "INFO",
+  "service": "chat",
+  "message": "Chat command processed",
+  "correlation_id": "uuid-v4",
+  "user_id": "user123",
+  "user_role": "Admin",
+  "command_type": "shell|assess|evidence|gaps",
+  "command": "assessment analyze --engagement=eng001",
+  "execution_time_ms": 234,
+  "status": "success|failed|blocked",
+  "output_sanitized": true
+}
+```
+
 ## Security Contacts
 
 **Security Issues:** Report to repository security advisors  
 **Vulnerability Disclosure:** Follow responsible disclosure process  
 **Emergency Contact:** Escalate to team leads for critical issues
 
-## Evidence Upload Security
-
-### SAS Token Policy
-
-**Implementation:** Write-only Shared Access Signatures  
-**Location:** `/app/api/routes/sas_upload.py`
-
-**Security Configuration:**
-```python
-# SAS Token Generation
-permissions = BlobSasPermissions(
-    write=True,     # Allow write
-    create=True,    # Allow create
-    add=True,       # Allow append
-    read=False,     # DENY read
-    delete=False,   # DENY delete
-    list=False      # DENY list
-)
-```
-
-**Security Controls:**
-- ✅ **Write-Only Access:** No read, delete, or list permissions
-- ✅ **Short TTL:** 15-minute maximum token lifetime
-- ✅ **Unique Paths:** Engagement-scoped blob paths prevent cross-tenant access
-- ✅ **Audit Logging:** All SAS generation logged with correlation IDs
-
-### File Type Restrictions
-
-**Allowed MIME Types:**
-```python
-ALLOWED_MIME_TYPES = [
-    # Documents
-    'application/pdf',
-    'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-    'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-    'application/vnd.openxmlformats-officedocument.presentationml.presentation',
-    # Images
-    'image/jpeg',
-    'image/png',
-    'image/gif',
-    # Text
-    'text/plain',
-    'text/csv'
-]
-```
-
-**Validation Requirements:**
-- ✅ Client-side MIME type validation before upload
-- ✅ Server-side validation during SAS token request
-- ✅ Azure Storage content-type header enforcement
-- ✅ Rejection of executable and script file types
-
-### Upload Size Limits
-
-**Maximum File Sizes:**
-| File Type | Max Size | Rationale |
-|-----------|----------|-----------|
-| Documents | 50MB | Typical evidence documents |
-| Images | 10MB | Screenshots and diagrams |
-| CSV/Text | 5MB | Configuration and log files |
-
-**Enforcement:**
-- ✅ Client-side validation before upload attempt
-- ✅ API validation during SAS token generation
-- ✅ Azure Storage service-level limits
-- ✅ Monitoring alerts for unusual upload patterns
-
-### Secret Management
-
-**Storage Access Keys:**
-- ❌ **NEVER** commit storage keys to repository
-- ❌ **NEVER** log SAS tokens or connection strings
-- ❌ **NEVER** expose keys in error messages
-- ✅ Use Azure Key Vault for production secrets
-- ✅ Use Managed Identity where possible
-- ✅ Rotate storage keys quarterly
-- ✅ Monitor key usage for anomalies
-
 ## Compliance
 
 **Frameworks Supported:**
-- ✅ GDPR: Data protection and privacy controls
-- ✅ SOC 2: Security monitoring and audit trails
-- ✅ NIST: Security framework alignment
-- ✅ ISO 27001: Information security management
+- ✅ GDPR: Data protection and privacy controls, consent management
+- ✅ SOC 2: Security monitoring and audit trails, immutable logging
+- ✅ NIST: Security framework alignment with CSF 2.0 integration
+- ✅ ISO 27001: Information security management with workshop controls
 
 **Audit Support:**
 - ✅ Structured logging for audit trails
 - ✅ Role-based access documentation
 - ✅ Security test evidence
 - ✅ Correlation ID for request tracking
+- ✅ **S4 Enhancements:** Immutable minutes storage, consent audit trails, chat command logging
+
+**S4 Compliance Features:**
+- ✅ **GDPR Article 6:** Legal basis documentation for workshop data processing
+- ✅ **Right to be Forgotten:** Consent revocation triggers data purge workflows  
+- ✅ **Data Minimization:** PII scrubbing and content sanitization
+- ✅ **Audit Logging:** Immutable audit trails for all security-relevant events
 
 ---
 
-**Note:** This security implementation represents Sprint S1 baseline security with Phase 3 evidence upload enhancements. Additional security controls will be implemented in subsequent sprints based on production requirements and compliance needs.
+**Note:** This security implementation covers Sprint S1 baseline plus Sprint S4 enhancements. S4 introduces workshop consent management, immutable minutes storage, and administrative chat command security controls.
