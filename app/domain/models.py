@@ -74,6 +74,22 @@ class Document(BaseModel):
     uploaded_by: str
     uploaded_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
 
+class Evidence(BaseModel):
+    """Evidence file record with checksum and PII detection"""
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    engagement_id: str
+    blob_path: str  # Path in blob storage: engagements/{engagementId}/evidence/{uuid}/{filename}
+    filename: str
+    checksum_sha256: str  # Server-computed SHA-256 checksum
+    size: int  # File size in bytes
+    mime_type: str  # Content type
+    uploaded_by: str  # User email who uploaded
+    uploaded_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    pii_flag: bool = False  # True if PII heuristics detected potential PII
+    
+    # Optional links to assessment items (many-to-many)
+    linked_items: List[Dict[str, str]] = Field(default_factory=list)  # [{"itemType": "assessment", "itemId": "uuid"}]
+
 class EmbeddingDocument(BaseModel):
     """Vector embedding document for RAG storage"""
     id: str = Field(default_factory=lambda: str(uuid.uuid4()))

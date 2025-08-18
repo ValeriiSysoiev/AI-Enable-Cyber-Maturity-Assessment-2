@@ -1,4 +1,5 @@
 import os
+import asyncio
 from datetime import datetime, timedelta
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
@@ -6,42 +7,72 @@ from azure.storage.blob import BlobServiceClient, generate_blob_sas, BlobSasPerm
 from azure.identity import DefaultAzureCredential
 from dotenv import load_dotenv
 
+from security.secret_provider import get_secret
+
 # Load environment variables
 load_dotenv()
 
 router = APIRouter(prefix="/uploads", tags=["uploads"])
 
-# Configuration from environment
+# Configuration from environment (will be enhanced with secret provider)
 USE_MANAGED_IDENTITY = os.getenv("USE_MANAGED_IDENTITY", "false").lower() == "true"
-AZURE_STORAGE_ACCOUNT = os.getenv("AZURE_STORAGE_ACCOUNT")
-AZURE_STORAGE_KEY = os.getenv("AZURE_STORAGE_KEY")
-AZURE_STORAGE_CONNECTION_STRING = os.getenv("AZURE_STORAGE_CONNECTION_STRING")
-AZURE_STORAGE_CONTAINER = os.getenv("AZURE_STORAGE_CONTAINER", "docs")
 UPLOAD_SAS_TTL_MINUTES = int(os.getenv("UPLOAD_SAS_TTL_MINUTES", "15"))
+
+# Configuration will be loaded from secret provider
+AZURE_STORAGE_ACCOUNT = None
+AZURE_STORAGE_KEY = None
+AZURE_STORAGE_CONNECTION_STRING = None
+AZURE_STORAGE_CONTAINER = None
+
+async def _get_storage_config(correlation_id: str = None):
+    """Get storage configuration from secret provider"""
+    global AZURE_STORAGE_ACCOUNT, AZURE_STORAGE_KEY, AZURE_STORAGE_CONNECTION_STRING, AZURE_STORAGE_CONTAINER
+    
+    # Get secrets from secret provider
+    account = await get_secret("azure-storage-account", correlation_id)
+    key = await get_secret("azure-storage-key", correlation_id)
+    connection_string = await get_secret("azure-storage-connection-string", correlation_id)
+    container = await get_secret("azure-storage-container", correlation_id)
+    
+    # Fallback to environment variables for local development
+    AZURE_STORAGE_ACCOUNT = account or os.getenv("AZURE_STORAGE_ACCOUNT")
+    AZURE_STORAGE_KEY = key or os.getenv("AZURE_STORAGE_KEY")
+    AZURE_STORAGE_CONNECTION_STRING = connection_string or os.getenv("AZURE_STORAGE_CONNECTION_STRING")
+    AZURE_STORAGE_CONTAINER = container or os.getenv("AZURE_STORAGE_CONTAINER", "docs")
+    
+    return {
+        "account": AZURE_STORAGE_ACCOUNT,
+        "key": AZURE_STORAGE_KEY,
+        "connection_string": AZURE_STORAGE_CONNECTION_STRING,
+        "container": AZURE_STORAGE_CONTAINER
+    }
 
 class SasRequest(BaseModel):
     blob_name: str
     permissions: str = "cw"  # create, write
 
 @router.post("/sas")
-def generate_sas_token(request: SasRequest):
+async def generate_sas_token(request: SasRequest):
     """Generate a SAS token for blob upload. Returns 501 if Azure Storage is not configured."""
     
+    # Get storage configuration from secret provider
+    storage_config = await _get_storage_config()
+    
     # Check if storage is configured
-    if not AZURE_STORAGE_ACCOUNT:
+    if not storage_config["account"]:
         raise HTTPException(
             status_code=501, 
-            detail="Evidence uploads not configured. Set AZURE_STORAGE_ACCOUNT"
+            detail="Evidence uploads not configured. Set azure-storage-account secret or AZURE_STORAGE_ACCOUNT"
         )
     
     # Check authentication method
     if USE_MANAGED_IDENTITY:
         # Using Managed Identity (no keys needed)
         pass
-    elif not AZURE_STORAGE_KEY and not AZURE_STORAGE_CONNECTION_STRING:
+    elif not storage_config["key"] and not storage_config["connection_string"]:
         raise HTTPException(
             status_code=501, 
-            detail="Evidence uploads not configured. Set USE_MANAGED_IDENTITY=true or provide AZURE_STORAGE_KEY/CONNECTION_STRING"
+            detail="Evidence uploads not configured. Set USE_MANAGED_IDENTITY=true or provide azure-storage-key/connection-string secrets"
         )
     
     try:
@@ -61,7 +92,7 @@ def generate_sas_token(request: SasRequest):
         
         if USE_MANAGED_IDENTITY:
             # Use Managed Identity with user delegation key
-            account_url = f"https://{AZURE_STORAGE_ACCOUNT}.blob.core.windows.net"
+            account_url = f"https://{storage_config['account']}.blob.core.windows.net"
             blob_service_client = BlobServiceClient(
                 account_url=account_url,
                 credential=DefaultAzureCredential()
@@ -77,8 +108,8 @@ def generate_sas_token(request: SasRequest):
             
             # Generate user delegation SAS
             sas_token = generate_blob_sas(
-                account_name=AZURE_STORAGE_ACCOUNT,
-                container_name=AZURE_STORAGE_CONTAINER,
+                account_name=storage_config["account"],
+                container_name=storage_config["container"],
                 blob_name=request.blob_name,
                 user_delegation_key=user_delegation_key,
                 permission=sas_permissions,
@@ -88,12 +119,12 @@ def generate_sas_token(request: SasRequest):
             )
         else:
             # Use account key (existing logic)
-            if AZURE_STORAGE_KEY:
-                account_key = AZURE_STORAGE_KEY
-            elif AZURE_STORAGE_CONNECTION_STRING:
+            if storage_config["key"]:
+                account_key = storage_config["key"]
+            elif storage_config["connection_string"]:
                 # Extract key from connection string
                 import re
-                match = re.search(r'AccountKey=([^;]+)', AZURE_STORAGE_CONNECTION_STRING)
+                match = re.search(r'AccountKey=([^;]+)', storage_config["connection_string"])
                 if match:
                     account_key = match.group(1)
                 else:
@@ -103,8 +134,8 @@ def generate_sas_token(request: SasRequest):
             
             # Generate SAS token with account key
             sas_token = generate_blob_sas(
-                account_name=AZURE_STORAGE_ACCOUNT,
-                container_name=AZURE_STORAGE_CONTAINER,
+                account_name=storage_config["account"],
+                container_name=storage_config["container"],
                 blob_name=request.blob_name,
                 account_key=account_key,
                 permission=sas_permissions,
@@ -113,12 +144,12 @@ def generate_sas_token(request: SasRequest):
             )
         
         # Construct full SAS URL
-        sas_url = f"https://{AZURE_STORAGE_ACCOUNT}.blob.core.windows.net/{AZURE_STORAGE_CONTAINER}/{request.blob_name}?{sas_token}"
+        sas_url = f"https://{storage_config['account']}.blob.core.windows.net/{storage_config['container']}/{request.blob_name}?{sas_token}"
         
         return {
             "sasUrl": sas_url,
             "expiresIn": UPLOAD_SAS_TTL_MINUTES * 60,  # seconds
-            "container": AZURE_STORAGE_CONTAINER,
+            "container": storage_config["container"],
             "blobName": request.blob_name
         }
         

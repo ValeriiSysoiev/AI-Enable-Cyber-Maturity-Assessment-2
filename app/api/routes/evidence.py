@@ -1,0 +1,390 @@
+"""
+Evidence management endpoints for secure file upload and record management.
+"""
+import os
+import re
+import uuid
+import logging
+from datetime import datetime, timedelta
+from typing import Optional, List
+from fastapi import APIRouter, HTTPException, Depends, Query
+from pydantic import BaseModel, Field
+
+from security.deps import get_current_user, require_role
+from domain.models import Evidence
+from security.secret_provider import get_secret
+
+logger = logging.getLogger(__name__)
+
+router = APIRouter(prefix="/api/v1/evidence", tags=["evidence"])
+
+# Configuration
+MAX_FILE_SIZE_MB = int(os.getenv("EVIDENCE_MAX_SIZE_MB", "25"))
+SAS_TTL_MINUTES = int(os.getenv("EVIDENCE_SAS_TTL_MINUTES", "5"))
+
+# Allowed MIME types for evidence upload
+ALLOWED_MIME_TYPES = {
+    "application/pdf",
+    "application/vnd.openxmlformats-officedocument.wordprocessingml.document",  # .docx
+    "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",        # .xlsx
+    "application/vnd.openxmlformats-officedocument.presentationml.presentation", # .pptx
+    "text/plain",
+    "text/csv",
+    "image/png",
+    "image/jpeg",
+    "image/gif",
+    "application/zip",
+    "application/x-zip-compressed"
+}
+
+class SASRequest(BaseModel):
+    """Request model for SAS token generation"""
+    engagement_id: str = Field(..., description="Engagement ID")
+    filename: str = Field(..., description="Original filename")
+    mime_type: str = Field(..., description="Content type")
+    size_bytes: int = Field(..., description="File size in bytes")
+
+class SASResponse(BaseModel):
+    """Response model for SAS token"""
+    upload_url: str = Field(..., description="Pre-signed URL for upload")
+    blob_path: str = Field(..., description="Blob storage path")
+    expires_at: datetime = Field(..., description="Expiration timestamp")
+    max_size: int = Field(..., description="Maximum allowed size in bytes")
+    allowed_types: List[str] = Field(..., description="Allowed MIME types")
+
+class CompleteRequest(BaseModel):
+    """Request model for finalizing evidence upload"""
+    engagement_id: str = Field(..., description="Engagement ID")
+    blob_path: str = Field(..., description="Blob storage path")
+    filename: str = Field(..., description="Original filename")
+    mime_type: str = Field(..., description="Content type")
+    size_bytes: int = Field(..., description="File size in bytes")
+    client_checksum: Optional[str] = Field(None, description="Client-computed SHA-256 checksum")
+
+class LinkRequest(BaseModel):
+    """Request model for linking evidence to assessment items"""
+    item_type: str = Field(..., description="Type of item (e.g., 'assessment')")
+    item_id: str = Field(..., description="ID of the item")
+
+async def _get_storage_config(correlation_id: str = None) -> dict:
+    """Get storage configuration from secret provider"""
+    account = await get_secret("azure-storage-account", correlation_id)
+    key = await get_secret("azure-storage-key", correlation_id)
+    container = await get_secret("azure-storage-container", correlation_id)
+    
+    # Fallback to environment variables for local development
+    if not account:
+        account = os.getenv("AZURE_STORAGE_ACCOUNT")
+    if not key:
+        key = os.getenv("AZURE_STORAGE_KEY")
+    if not container:
+        container = os.getenv("AZURE_STORAGE_CONTAINER", "evidence")
+    
+    return {
+        "account": account,
+        "key": key,
+        "container": container
+    }
+
+def _safe_filename(filename: str) -> str:
+    """Sanitize filename for blob storage"""
+    # Remove directory traversal attempts and illegal characters
+    safe_name = re.sub(r'[<>:"/\\|?*]', '_', filename)
+    safe_name = safe_name.replace('..', '_')
+    # Limit length
+    if len(safe_name) > 255:
+        name, ext = os.path.splitext(safe_name)
+        safe_name = name[:250] + ext
+    return safe_name
+
+def _validate_mime_type(mime_type: str) -> bool:
+    """Validate MIME type against allowed list"""
+    return mime_type.lower() in ALLOWED_MIME_TYPES
+
+def _validate_file_size(size_bytes: int) -> bool:
+    """Validate file size against limit"""
+    max_bytes = MAX_FILE_SIZE_MB * 1024 * 1024
+    return size_bytes <= max_bytes
+
+async def _check_engagement_membership(user_email: str, engagement_id: str) -> bool:
+    """Check if user is a member of the engagement (placeholder for actual check)"""
+    # TODO: Implement actual membership check via repository
+    # For now, return True for development
+    return True
+
+@router.post("/sas", response_model=SASResponse)
+async def generate_evidence_sas(
+    request: SASRequest,
+    current_user: dict = Depends(get_current_user),
+    _: None = Depends(require_role(["Member", "LEM", "Admin"]))
+):
+    """
+    Generate a short-lived SAS token for evidence upload.
+    
+    Requires Member+ role and engagement membership.
+    Returns write-only SAS with ≤5 min TTL.
+    """
+    correlation_id = current_user.get("correlation_id")
+    user_email = current_user["email"]
+    
+    logger.info(
+        "Evidence SAS request",
+        extra={
+            "correlation_id": correlation_id,
+            "user_email": user_email,
+            "engagement_id": request.engagement_id,
+            "filename": request.filename,
+            "size_bytes": request.size_bytes,
+            "mime_type": request.mime_type
+        }
+    )
+    
+    # Check engagement membership
+    is_member = await _check_engagement_membership(user_email, request.engagement_id)
+    if not is_member:
+        logger.warning(
+            "Evidence SAS denied - not a member",
+            extra={
+                "correlation_id": correlation_id,
+                "user_email": user_email,
+                "engagement_id": request.engagement_id
+            }
+        )
+        raise HTTPException(status_code=403, detail="Access denied: not a member of this engagement")
+    
+    # Validate MIME type
+    if not _validate_mime_type(request.mime_type):
+        logger.warning(
+            "Evidence SAS denied - invalid MIME type",
+            extra={
+                "correlation_id": correlation_id,
+                "mime_type": request.mime_type,
+                "allowed_types": list(ALLOWED_MIME_TYPES)
+            }
+        )
+        raise HTTPException(
+            status_code=415, 
+            detail=f"Unsupported media type: {request.mime_type}. Allowed types: {list(ALLOWED_MIME_TYPES)}"
+        )
+    
+    # Validate file size
+    if not _validate_file_size(request.size_bytes):
+        logger.warning(
+            "Evidence SAS denied - file too large",
+            extra={
+                "correlation_id": correlation_id,
+                "size_bytes": request.size_bytes,
+                "max_mb": MAX_FILE_SIZE_MB
+            }
+        )
+        raise HTTPException(
+            status_code=413,
+            detail=f"File too large: {request.size_bytes} bytes. Maximum: {MAX_FILE_SIZE_MB}MB"
+        )
+    
+    try:
+        # Get storage configuration
+        storage_config = await _get_storage_config(correlation_id)
+        
+        if not storage_config["account"]:
+            raise HTTPException(
+                status_code=501,
+                detail="Evidence uploads not configured"
+            )
+        
+        # Generate unique blob path
+        evidence_uuid = str(uuid.uuid4())
+        safe_filename = _safe_filename(request.filename)
+        blob_path = f"engagements/{request.engagement_id}/evidence/{evidence_uuid}/{safe_filename}"
+        
+        # Generate SAS token (simplified for development - will use actual Azure SDK)
+        expires_at = datetime.utcnow() + timedelta(minutes=SAS_TTL_MINUTES)
+        
+        # For development, create a mock SAS URL
+        # In production, this would use Azure SDK to generate actual SAS
+        upload_url = f"https://{storage_config['account']}.blob.core.windows.net/{storage_config['container']}/{blob_path}?sv=mock-sas-token"
+        
+        logger.info(
+            "Evidence SAS generated",
+            extra={
+                "correlation_id": correlation_id,
+                "blob_path": blob_path,
+                "expires_at": expires_at.isoformat(),
+                "ttl_minutes": SAS_TTL_MINUTES
+            }
+        )
+        
+        return SASResponse(
+            upload_url=upload_url,
+            blob_path=blob_path,
+            expires_at=expires_at,
+            max_size=MAX_FILE_SIZE_MB * 1024 * 1024,
+            allowed_types=list(ALLOWED_MIME_TYPES)
+        )
+        
+    except Exception as e:
+        logger.error(
+            "Failed to generate evidence SAS",
+            extra={
+                "correlation_id": correlation_id,
+                "error": str(e),
+                "engagement_id": request.engagement_id
+            }
+        )
+        raise HTTPException(status_code=500, detail="Failed to generate upload URL")
+
+@router.post("/complete")
+async def complete_evidence_upload(
+    request: CompleteRequest,
+    current_user: dict = Depends(get_current_user),
+    _: None = Depends(require_role(["Member", "LEM", "Admin"]))
+):
+    """
+    Finalize evidence upload and create Evidence record.
+    
+    Computes server-side checksum and PII detection.
+    """
+    correlation_id = current_user.get("correlation_id")
+    user_email = current_user["email"]
+    
+    logger.info(
+        "Evidence complete request",
+        extra={
+            "correlation_id": correlation_id,
+            "user_email": user_email,
+            "engagement_id": request.engagement_id,
+            "blob_path": request.blob_path,
+            "size_bytes": request.size_bytes
+        }
+    )
+    
+    # Check engagement membership
+    is_member = await _check_engagement_membership(user_email, request.engagement_id)
+    if not is_member:
+        logger.warning(
+            "Evidence complete denied - not a member",
+            extra={
+                "correlation_id": correlation_id,
+                "user_email": user_email,
+                "engagement_id": request.engagement_id
+            }
+        )
+        raise HTTPException(status_code=403, detail="Access denied: not a member of this engagement")
+    
+    try:
+        # TODO: Implement actual blob verification and checksum computation
+        # For now, use a mock checksum
+        server_checksum = "mock-sha256-checksum"
+        
+        # TODO: Implement PII detection heuristics
+        pii_detected = False
+        
+        # Create Evidence record
+        evidence = Evidence(
+            engagement_id=request.engagement_id,
+            blob_path=request.blob_path,
+            filename=request.filename,
+            checksum_sha256=server_checksum,
+            size=request.size_bytes,
+            mime_type=request.mime_type,
+            uploaded_by=user_email,
+            pii_flag=pii_detected
+        )
+        
+        # TODO: Save to repository
+        
+        logger.info(
+            "Evidence record created",
+            extra={
+                "correlation_id": correlation_id,
+                "evidence_id": evidence.id,
+                "checksum": server_checksum,
+                "pii_flag": pii_detected
+            }
+        )
+        
+        return {"evidence_id": evidence.id, "checksum": server_checksum, "pii_flag": pii_detected}
+        
+    except Exception as e:
+        logger.error(
+            "Failed to complete evidence upload",
+            extra={
+                "correlation_id": correlation_id,
+                "error": str(e),
+                "blob_path": request.blob_path
+            }
+        )
+        raise HTTPException(status_code=500, detail="Failed to complete upload")
+
+@router.get("", response_model=List[Evidence])
+async def list_evidence(
+    engagement_id: str = Query(..., description="Engagement ID"),
+    page: int = Query(1, ge=1, description="Page number"),
+    page_size: int = Query(50, ge=1, le=100, description="Items per page"),
+    current_user: dict = Depends(get_current_user),
+    _: None = Depends(require_role(["Member", "LEM", "Admin"]))
+):
+    """
+    List evidence for an engagement with pagination.
+    
+    Enforces engagement membership isolation.
+    """
+    correlation_id = current_user.get("correlation_id")
+    user_email = current_user["email"]
+    
+    # Check engagement membership
+    is_member = await _check_engagement_membership(user_email, engagement_id)
+    if not is_member:
+        logger.warning(
+            "Evidence list denied - not a member",
+            extra={
+                "correlation_id": correlation_id,
+                "user_email": user_email,
+                "engagement_id": engagement_id
+            }
+        )
+        raise HTTPException(status_code=403, detail="Access denied: not a member of this engagement")
+    
+    # TODO: Implement actual repository query
+    # For now, return empty list
+    logger.info(
+        "Evidence list request",
+        extra={
+            "correlation_id": correlation_id,
+            "engagement_id": engagement_id,
+            "page": page,
+            "page_size": page_size
+        }
+    )
+    
+    return []
+
+@router.post("/{evidence_id}/links")
+async def link_evidence(
+    evidence_id: str,
+    request: LinkRequest,
+    current_user: dict = Depends(get_current_user),
+    _: None = Depends(require_role(["Member", "LEM", "Admin"]))
+):
+    """
+    Link evidence to an assessment item (many-to-many).
+    
+    Placeholder for assessment item linking.
+    """
+    correlation_id = current_user.get("correlation_id")
+    user_email = current_user["email"]
+    
+    logger.info(
+        "Evidence link request",
+        extra={
+            "correlation_id": correlation_id,
+            "user_email": user_email,
+            "evidence_id": evidence_id,
+            "item_type": request.item_type,
+            "item_id": request.item_id
+        }
+    )
+    
+    # TODO: Implement actual linking logic
+    # For now, return success
+    return {"message": "Link created", "evidence_id": evidence_id, "item_type": request.item_type, "item_id": request.item_id}

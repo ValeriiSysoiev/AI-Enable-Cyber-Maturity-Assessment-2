@@ -261,6 +261,51 @@ class AppConfig(BaseModel):
             "allowed_tenant_count": len(self.aad_groups.allowed_tenant_ids),
             "is_operational": self.is_aad_groups_enabled()
         }
+    
+    async def load_secrets_async(self, correlation_id: Optional[str] = None) -> 'AppConfig':
+        """Load configuration with secrets from SecretProvider"""
+        try:
+            from security.secret_provider import get_secret
+            
+            # Load Azure OpenAI secrets
+            azure_openai_endpoint = await get_secret("azure-openai-endpoint", correlation_id)
+            azure_openai_api_key = await get_secret("azure-openai-api-key", correlation_id)
+            
+            # Load Azure Search secrets
+            azure_search_endpoint = await get_secret("azure-search-endpoint", correlation_id)
+            azure_search_api_key = await get_secret("azure-search-api-key", correlation_id)
+            
+            # Load AAD secrets
+            aad_client_secret = await get_secret("aad-client-secret", correlation_id)
+            
+            # Create new config with secrets if available
+            updated_config = self.model_copy(deep=True)
+            
+            if azure_openai_endpoint:
+                updated_config.azure_openai.endpoint = azure_openai_endpoint
+            if azure_openai_api_key:
+                updated_config.azure_openai.api_key = azure_openai_api_key
+            if azure_search_endpoint:
+                updated_config.azure_search.endpoint = azure_search_endpoint
+            if azure_search_api_key:
+                updated_config.azure_search.api_key = azure_search_api_key
+            if aad_client_secret:
+                updated_config.aad_groups.client_secret = aad_client_secret
+            
+            return updated_config
+            
+        except ImportError:
+            # Secret provider not available, return current config
+            return self
+        except Exception as e:
+            # Log error but don't fail, return current config
+            import logging
+            logger = logging.getLogger(__name__)
+            logger.warning(
+                f"Failed to load secrets: {str(e)}",
+                extra={"correlation_id": correlation_id}
+            )
+            return self
 
 
 # Global configuration instance
