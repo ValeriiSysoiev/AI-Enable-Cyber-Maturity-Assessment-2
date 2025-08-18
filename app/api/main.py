@@ -14,7 +14,7 @@ from .db import create_db_and_tables, get_session
 from .models import Assessment, Answer
 from .schemas import AssessmentCreate, AssessmentResponse, AnswerUpsert, ScoreResponse, PillarScore
 from .scoring import compute_scores
-from .routes import assessments as assessments_router, orchestrations as orchestrations_router, engagements as engagements_router, documents, summary, presets as presets_router, version as version_router, admin_auth as admin_auth_router, gdpr as gdpr_router, admin_settings as admin_settings_router, evidence as evidence_router, csf as csf_router, workshops as workshops_router
+from .routes import assessments as assessments_router, orchestrations as orchestrations_router, engagements as engagements_router, documents, summary, presets as presets_router, version as version_router, admin_auth as admin_auth_router, gdpr as gdpr_router, admin_settings as admin_settings_router, evidence as evidence_router, csf as csf_router, workshops as workshops_router, minutes as minutes_router
 from domain.repository import InMemoryRepository
 from domain.file_repo import FileRepository
 from ai.llm import LLMClient
@@ -285,6 +285,7 @@ app.include_router(admin_settings_router.router)
 app.include_router(evidence_router.router)
 app.include_router(csf_router.router)
 app.include_router(workshops_router.router)
+app.include_router(minutes_router.router)
 
 def load_preset(preset_id: str) -> dict:
     # Use new preset service for consistency

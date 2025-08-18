@@ -2,7 +2,7 @@ from __future__ import annotations
 import threading
 import logging
 from typing import Dict, List, Optional
-from .models import Assessment, Question, Response, Finding, Recommendation, RunLog, Engagement, Membership, Document, Workshop, ConsentRecord
+from .models import Assessment, Question, Response, Finding, Recommendation, RunLog, Engagement, Membership, Document, Workshop, ConsentRecord, Minutes
 
 logger = logging.getLogger(__name__)
 
@@ -38,6 +38,14 @@ class Repository:
     async def list_workshops(self, engagement_id: str, page: int = 1, page_size: int = 50) -> tuple[List[Workshop], int]: ...
     async def update_workshop_consent(self, workshop_id: str, engagement_id: str, attendee_id: str, consent: ConsentRecord) -> Workshop: ...
     async def start_workshop(self, workshop_id: str, engagement_id: str) -> Workshop: ...
+    
+    # Minutes
+    def create_minutes(self, m: Minutes) -> Minutes: ...
+    def get_minutes(self, minutes_id: str) -> Optional[Minutes]: ...
+    def update_minutes(self, m: Minutes) -> Minutes: ...
+    def get_minutes_by_workshop(self, workshop_id: str) -> List[Minutes]: ...
+    def publish_minutes(self, minutes_id: str) -> Minutes: ...
+    def create_new_version(self, parent_id: str, updated_by: str) -> Minutes: ...
 
 class InMemoryRepository(Repository):
     def __init__(self):
@@ -50,6 +58,7 @@ class InMemoryRepository(Repository):
         self.engagements: Dict[str, Engagement] = {}
         self.memberships: Dict[str, Membership] = {}
         self.documents: Dict[str, Document] = {}
+        self.minutes: Dict[str, Minutes] = {}
         # Thread safety lock
         self._lock = threading.RLock()
 
@@ -207,3 +216,80 @@ class InMemoryRepository(Repository):
             # Always remove document from memory even if file deletion failed
             del self.documents[doc_id]
             return True
+    
+    # Minutes methods
+    def create_minutes(self, m: Minutes) -> Minutes:
+        with self._lock:
+            if m.id in self.minutes:
+                raise ValueError(f"Minutes with ID {m.id} already exists")
+            self.minutes[m.id] = m
+            return m
+    
+    def get_minutes(self, minutes_id: str) -> Optional[Minutes]:
+        with self._lock:
+            return self.minutes.get(minutes_id)
+    
+    def update_minutes(self, m: Minutes) -> Minutes:
+        with self._lock:
+            if m.id not in self.minutes:
+                raise ValueError(f"Minutes with ID {m.id} does not exist")
+            self.minutes[m.id] = m
+            return m
+    
+    def get_minutes_by_workshop(self, workshop_id: str) -> List[Minutes]:
+        with self._lock:
+            return [m for m in self.minutes.values() if m.workshop_id == workshop_id]
+    
+    def publish_minutes(self, minutes_id: str) -> Minutes:
+        """Publish minutes - compute hash, set status='published', publishedAt timestamp"""
+        from datetime import datetime, timezone
+        
+        with self._lock:
+            existing_minutes = self.minutes.get(minutes_id)
+            if not existing_minutes:
+                raise ValueError(f"Minutes with ID {minutes_id} not found")
+            
+            if existing_minutes.status != "draft":
+                raise ValueError(f"Can only publish draft minutes. Current status: {existing_minutes.status}")
+            
+            # Create published version with content hash
+            content_hash = existing_minutes.compute_content_hash()
+            published_minutes = Minutes(
+                id=existing_minutes.id,
+                workshop_id=existing_minutes.workshop_id,
+                status="published",
+                sections=existing_minutes.sections,
+                generated_by=existing_minutes.generated_by,
+                published_at=datetime.now(timezone.utc),
+                content_hash=content_hash,
+                parent_id=existing_minutes.parent_id,
+                created_at=existing_minutes.created_at,
+                updated_by=existing_minutes.updated_by
+            )
+            
+            # Store the published minutes
+            self.minutes[minutes_id] = published_minutes
+            return published_minutes
+    
+    def create_new_version(self, parent_id: str, updated_by: str) -> Minutes:
+        """Create new version for editing published minutes"""
+        with self._lock:
+            parent_minutes = self.minutes.get(parent_id)
+            if not parent_minutes:
+                raise ValueError(f"Parent minutes with ID {parent_id} not found")
+            
+            # Create new version as draft with parent reference
+            new_minutes = Minutes(
+                workshop_id=parent_minutes.workshop_id,
+                status="draft",
+                sections=parent_minutes.sections,  # Copy content from parent
+                generated_by="human",  # New version is human-created
+                published_at=None,
+                content_hash=None,  # No hash for drafts
+                parent_id=parent_id,  # Link to parent version
+                updated_by=updated_by
+            )
+            
+            # Store the new version
+            self.minutes[new_minutes.id] = new_minutes
+            return new_minutes

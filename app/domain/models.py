@@ -3,6 +3,8 @@ from typing import List, Optional, Literal, Dict, Any
 from pydantic import BaseModel, Field
 from datetime import datetime, timezone
 import uuid
+import hashlib
+import json
 
 Role = Literal["lead", "member"]
 
@@ -201,3 +203,64 @@ class Workshop(BaseModel):
     created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
     started: bool = False
     started_at: Optional[datetime] = None
+
+class MinutesSection(BaseModel):
+    """Structured minutes section with attendees, decisions, actions, and questions"""
+    attendees: List[str] = Field(default_factory=list)
+    decisions: List[str] = Field(default_factory=list)
+    actions: List[str] = Field(default_factory=list)
+    questions: List[str] = Field(default_factory=list)
+
+class Minutes(BaseModel):
+    """Workshop minutes model"""
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    workshop_id: str
+    status: Literal["draft", "published"] = "draft"
+    sections: MinutesSection = Field(default_factory=MinutesSection)
+    generated_by: Literal["agent", "human"] = "agent"
+    published_at: Optional[datetime] = None
+    content_hash: Optional[str] = None
+    parent_id: Optional[str] = None  # For versioning/revision tracking
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    updated_by: str = ""
+    
+    def compute_content_hash(self) -> str:
+        """
+        Compute SHA-256 hash of normalized content for immutability verification.
+        Includes sections data and workshop_id for uniqueness.
+        """
+        # Create normalized content for hashing
+        normalized_content = {
+            "workshop_id": self.workshop_id,
+            "sections": {
+                "attendees": sorted(self.sections.attendees),  # Sort for consistency
+                "decisions": sorted(self.sections.decisions),
+                "actions": sorted(self.sections.actions),
+                "questions": sorted(self.sections.questions)
+            }
+        }
+        
+        # Convert to JSON with sorted keys for consistent hashing
+        content_json = json.dumps(normalized_content, sort_keys=True, separators=(',', ':'))
+        
+        # Compute SHA-256 hash
+        return hashlib.sha256(content_json.encode('utf-8')).hexdigest()
+    
+    def validate_content_integrity(self) -> bool:
+        """
+        Validate that current content matches the stored content hash.
+        Returns True if valid or no hash is set (draft state).
+        """
+        if not self.content_hash:
+            return True  # No hash means draft state - always valid
+        
+        current_hash = self.compute_content_hash()
+        return current_hash == self.content_hash
+    
+    def is_published(self) -> bool:
+        """Check if minutes are in published state"""
+        return self.status == "published"
+    
+    def can_edit(self) -> bool:
+        """Check if minutes can be edited (only drafts)"""
+        return self.status == "draft"
