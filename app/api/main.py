@@ -213,6 +213,25 @@ async def on_shutdown():
     logger.info("Application shutdown complete")
 
 
+# Feature flags endpoint
+@app.get("/api/features")
+async def get_feature_flags():
+    """Get current S4 feature flag status"""
+    from config import feature_flags
+    
+    return {
+        "s4_enabled": feature_flags.is_s4_enabled(),
+        "features": {
+            "csf": feature_flags.csf_enabled,
+            "workshops": feature_flags.workshops_enabled,
+            "minutes": feature_flags.minutes_enabled,
+            "chat": feature_flags.chat_enabled,
+            "service_bus": feature_flags.service_bus_orchestration_enabled
+        },
+        "enabled_list": feature_flags.get_enabled_features(),
+        "environment": os.getenv("ENVIRONMENT", "development")
+    }
+
 # Performance monitoring endpoint
 @app.get("/api/performance/metrics")
 async def get_performance_metrics(time_window_minutes: int = 60):
@@ -283,9 +302,25 @@ app.include_router(admin_auth_router.router)
 app.include_router(gdpr_router.router)
 app.include_router(admin_settings_router.router)
 app.include_router(evidence_router.router)
-app.include_router(csf_router.router)
-app.include_router(workshops_router.router)
-app.include_router(minutes_router.router)
+
+# S4 Feature routers - conditionally included based on feature flags
+from config import feature_flags
+
+if feature_flags.csf_enabled:
+    app.include_router(csf_router.router)
+    logger.info("CSF Grid feature enabled")
+
+if feature_flags.workshops_enabled:
+    app.include_router(workshops_router.router)
+    logger.info("Workshops & Consent feature enabled")
+
+if feature_flags.minutes_enabled:
+    app.include_router(minutes_router.router)
+    logger.info("Minutes Publishing feature enabled")
+
+# Note: chat_router would be included here if it exists
+# if feature_flags.chat_enabled and chat_router exists:
+#     app.include_router(chat_router.router)
 
 def load_preset(preset_id: str) -> dict:
     # Use new preset service for consistency
