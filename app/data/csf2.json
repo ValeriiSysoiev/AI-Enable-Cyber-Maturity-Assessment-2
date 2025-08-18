@@ -1,0 +1,321 @@
+{
+  "version": "2.0",
+  "metadata": {
+    "title": "NIST Cybersecurity Framework 2.0",
+    "description": "NIST CSF 2.0 taxonomy with Functions, Categories, and Subcategories",
+    "created_at": "2025-08-18"
+  },
+  "functions": [
+    {
+      "id": "GV",
+      "title": "Govern",
+      "description": "Establish and monitor the organization's cybersecurity risk management strategy, expectations, and policy framework.",
+      "categories": [
+        {
+          "id": "GV.OC",
+          "title": "Organizational Context",
+          "description": "The organization's mission, objectives, stakeholders, and activities are understood and used to inform cybersecurity risk management decisions.",
+          "subcategories": [
+            {
+              "id": "GV.OC-01",
+              "title": "Mission and Business Objectives",
+              "description": "The organizational mission and business objectives are defined and communicated."
+            },
+            {
+              "id": "GV.OC-02",
+              "title": "Internal and External Stakeholders",
+              "description": "Internal and external stakeholders are identified and their cybersecurity expectations understood."
+            },
+            {
+              "id": "GV.OC-03",
+              "title": "Legal, Regulatory, and Contractual Requirements",
+              "description": "Legal, regulatory, and contractual requirements regarding cybersecurity are identified and managed."
+            }
+          ]
+        },
+        {
+          "id": "GV.RM",
+          "title": "Risk Management Strategy",
+          "description": "The organization's priorities, constraints, risk tolerances, and assumptions are established and used to support operational risk decisions.",
+          "subcategories": [
+            {
+              "id": "GV.RM-01",
+              "title": "Risk Management Process",
+              "description": "A risk management process is established and managed."
+            },
+            {
+              "id": "GV.RM-02",
+              "title": "Risk Tolerance",
+              "description": "Risk tolerance is identified and clearly expressed."
+            },
+            {
+              "id": "GV.RM-03",
+              "title": "Determination of Risk Tolerance",
+              "description": "The organization's determination of risk tolerance is informed by its role in critical infrastructure and sector-specific risk analysis."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "ID",
+      "title": "Identify",
+      "description": "Develop an organizational understanding to manage cybersecurity risk to systems, people, assets, data, and capabilities.",
+      "categories": [
+        {
+          "id": "ID.AM",
+          "title": "Asset Management",
+          "description": "Assets are identified and managed consistent with their relative importance to organizational objectives and the organization's risk strategy.",
+          "subcategories": [
+            {
+              "id": "ID.AM-01",
+              "title": "Asset Inventory",
+              "description": "Assets are cataloged and managed throughout the asset lifecycle."
+            },
+            {
+              "id": "ID.AM-02",
+              "title": "Asset Classification",
+              "description": "Assets are classified based on business functions and value."
+            },
+            {
+              "id": "ID.AM-03",
+              "title": "Organizational Communication",
+              "description": "Organizational communication and data flows are mapped."
+            },
+            {
+              "id": "ID.AM-04",
+              "title": "External Information Systems",
+              "description": "External information systems are cataloged."
+            }
+          ]
+        },
+        {
+          "id": "ID.RA",
+          "title": "Risk Assessment",
+          "description": "The organization understands the cybersecurity risk to organizational operations, assets, and individuals.",
+          "subcategories": [
+            {
+              "id": "ID.RA-01",
+              "title": "Asset Vulnerabilities",
+              "description": "Asset vulnerabilities are identified and documented."
+            },
+            {
+              "id": "ID.RA-02",
+              "title": "Threat Intelligence",
+              "description": "Threat intelligence is received from information sharing forums and sources."
+            },
+            {
+              "id": "ID.RA-03",
+              "title": "Threat and Vulnerability Information",
+              "description": "Threats, both internal and external, are identified and documented."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "PR",
+      "title": "Protect",
+      "description": "Develop and implement appropriate safeguards to ensure delivery of critical infrastructure services.",
+      "categories": [
+        {
+          "id": "PR.AC",
+          "title": "Identity Management and Access Control",
+          "description": "Access to physical and logical assets and associated facilities is limited to authorized users, processes, and devices.",
+          "subcategories": [
+            {
+              "id": "PR.AC-01",
+              "title": "Identity Management",
+              "description": "Identities and credentials are issued, managed, verified, revoked, and audited for authorized devices, users and processes."
+            },
+            {
+              "id": "PR.AC-02",
+              "title": "Physical Access Control",
+              "description": "Physical access to assets is managed and protected."
+            },
+            {
+              "id": "PR.AC-03",
+              "title": "Remote Access",
+              "description": "Remote access is managed."
+            },
+            {
+              "id": "PR.AC-04",
+              "title": "Access Permissions",
+              "description": "Access permissions and authorizations are managed, incorporating the principles of least privilege and separation of duties."
+            }
+          ]
+        },
+        {
+          "id": "PR.DS",
+          "title": "Data Security",
+          "description": "Information and records are managed consistent with the organization's risk strategy to protect the confidentiality, integrity, and availability of information.",
+          "subcategories": [
+            {
+              "id": "PR.DS-01",
+              "title": "Data-at-rest",
+              "description": "Data-at-rest is protected."
+            },
+            {
+              "id": "PR.DS-02",
+              "title": "Data-in-transit",
+              "description": "Data-in-transit is protected."
+            },
+            {
+              "id": "PR.DS-03",
+              "title": "Assets and Systems Resilience",
+              "description": "Assets are formally managed throughout removal, transfers, and disposition."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "DE",
+      "title": "Detect",
+      "description": "Develop and implement appropriate activities to identify the occurrence of a cybersecurity event.",
+      "categories": [
+        {
+          "id": "DE.AE",
+          "title": "Anomalies and Events",
+          "description": "Anomalous activity is detected and the potential impact of events is understood.",
+          "subcategories": [
+            {
+              "id": "DE.AE-01",
+              "title": "Network Monitoring",
+              "description": "A baseline of network operations and expected data flows is established and managed."
+            },
+            {
+              "id": "DE.AE-02",
+              "title": "Event Analysis",
+              "description": "Detected events are analyzed to understand attack targets and methods."
+            },
+            {
+              "id": "DE.AE-03",
+              "title": "Event Data Aggregation",
+              "description": "Event data are collected and correlated from multiple sources and sensors."
+            }
+          ]
+        },
+        {
+          "id": "DE.CM",
+          "title": "Security Continuous Monitoring",
+          "description": "The information system and assets are monitored to identify cybersecurity events and verify the effectiveness of protective measures.",
+          "subcategories": [
+            {
+              "id": "DE.CM-01",
+              "title": "Network Monitoring",
+              "description": "The network is monitored to detect potential cybersecurity events."
+            },
+            {
+              "id": "DE.CM-02",
+              "title": "Physical Environment Monitoring",
+              "description": "The physical environment is monitored to detect potential cybersecurity events."
+            },
+            {
+              "id": "DE.CM-03",
+              "title": "Personnel Activity Monitoring",
+              "description": "Personnel activity is monitored to detect potential cybersecurity events."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "RS",
+      "title": "Respond",
+      "description": "Develop and implement appropriate activities to take action regarding a detected cybersecurity incident.",
+      "categories": [
+        {
+          "id": "RS.RP",
+          "title": "Response Planning",
+          "description": "Response processes and procedures are executed and maintained to ensure response to detected cybersecurity incidents.",
+          "subcategories": [
+            {
+              "id": "RS.RP-01",
+              "title": "Response Plan",
+              "description": "Response plan is executed during or after an incident."
+            },
+            {
+              "id": "RS.RP-02",
+              "title": "Personnel Response",
+              "description": "Personnel know their roles and order of operations when a response is needed."
+            },
+            {
+              "id": "RS.RP-03",
+              "title": "Information Sharing",
+              "description": "Information is shared consistent with response plans."
+            }
+          ]
+        },
+        {
+          "id": "RS.CO",
+          "title": "Communications",
+          "description": "Response activities are coordinated with internal and external stakeholders.",
+          "subcategories": [
+            {
+              "id": "RS.CO-01",
+              "title": "Personnel Communications",
+              "description": "Personnel know their roles and order of operations when a response is needed."
+            },
+            {
+              "id": "RS.CO-02",
+              "title": "Internal Communications",
+              "description": "Events are reported consistent with established criteria."
+            },
+            {
+              "id": "RS.CO-03",
+              "title": "External Communications",
+              "description": "Information is shared consistent with response plans."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "RC",
+      "title": "Recover",
+      "description": "Develop and implement appropriate activities to maintain plans for resilience and to restore any capabilities or services that were impaired due to a cybersecurity incident.",
+      "categories": [
+        {
+          "id": "RC.RP",
+          "title": "Recovery Planning",
+          "description": "Recovery processes and procedures are executed and maintained to ensure restoration of systems or assets affected by cybersecurity incidents.",
+          "subcategories": [
+            {
+              "id": "RC.RP-01",
+              "title": "Recovery Plan",
+              "description": "Recovery plan is executed during or after a cybersecurity incident."
+            },
+            {
+              "id": "RC.RP-02",
+              "title": "Recovery Plan Testing",
+              "description": "Recovery plans incorporate lessons learned."
+            },
+            {
+              "id": "RC.RP-03",
+              "title": "Recovery Plan Communication",
+              "description": "Recovery planning and processes are communicated to internal and external stakeholders."
+            }
+          ]
+        },
+        {
+          "id": "RC.IM",
+          "title": "Improvements",
+          "description": "Recovery planning and processes are improved by incorporating lessons learned into future activities.",
+          "subcategories": [
+            {
+              "id": "RC.IM-01",
+              "title": "Recovery Lessons Learned",
+              "description": "Recovery plans incorporate lessons learned."
+            },
+            {
+              "id": "RC.IM-02",
+              "title": "Recovery Strategy Updates",
+              "description": "Recovery strategies are updated."
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

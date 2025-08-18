@@ -116,7 +116,6 @@ class EmbeddingDocument(BaseModel):
     model: str = ""
     embedding_created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
 
-
 class ServiceBusMessage(BaseModel):
     """Service Bus message for orchestration queuing"""
     id: str = Field(default_factory=lambda: str(uuid.uuid4()))
@@ -153,3 +152,26 @@ class QueueConfig(BaseModel):
     def __post_init__(self):
         if not self.dead_letter_queue_name and self.enable_dead_letter_queue:
             self.dead_letter_queue_name = f"{self.name}-dlq"
+
+class CSFSubcategory(BaseModel):
+    """CSF 2.0 Subcategory model"""
+    id: str
+    function_id: str
+    category_id: str
+    title: str
+    description: str
+
+class CSFCategory(BaseModel):
+    """CSF 2.0 Category model"""
+    id: str
+    function_id: str
+    title: str
+    description: str
+    subcategories: List[CSFSubcategory] = Field(default_factory=list)
+
+class CSFFunction(BaseModel):
+    """CSF 2.0 Function model"""
+    id: str
+    title: str
+    description: str
+    categories: List[CSFCategory] = Field(default_factory=list)

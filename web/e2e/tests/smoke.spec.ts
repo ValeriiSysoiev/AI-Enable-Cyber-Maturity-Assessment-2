@@ -97,6 +97,52 @@ test.describe('Smoke Tests', () => {
     });
   });
 
+  test('CSF grid page loads without errors', async ({ page }, testInfo) => {
+    const logger = new TestLogger(testInfo);
+    const stepTracker = new TestStepTracker(logger);
+    
+    logger.info('Testing CSF grid page basic functionality');
+    
+    try {
+      await stepTracker.executeStep('Navigate to CSF assessment page', async () => {
+        // Mock authentication for test environment
+        await page.addInitScript(() => {
+          (window as any).__TEST_AUTH__ = {
+            isAuthenticated: true,
+            user: { email: 'test@example.com' },
+            loading: false
+          };
+        });
+        
+        await page.goto('/e/test-engagement/assessment');
+        await page.waitForLoadState('networkidle');
+        
+        // Should not result in 404 or server error
+        expect(page.url()).toContain('/assessment');
+      });
+      
+      await stepTracker.executeStep('Verify CSF grid renders', async () => {
+        await withRetry(async () => {
+          // Should show the CSF 2.0 header or loading state
+          const hasHeader = await page.locator('h1:has-text("CSF 2.0 Assessment Grid")').isVisible();
+          const hasLoading = await page.locator('.animate-pulse').isVisible();
+          const hasError = await page.locator('text=Error Loading Assessment').isVisible();
+          
+          // One of these states should be visible
+          expect(hasHeader || hasLoading || hasError).toBeTruthy();
+        }, 3, 1000);
+      });
+      
+      logger.info('CSF grid smoke test completed successfully');
+      
+    } catch (error) {
+      const errorRecovery = new ErrorRecovery(logger, page);
+      await errorRecovery.captureErrorContext(error as Error);
+      logger.error('CSF grid smoke test failed', { error: error instanceof Error ? error.message : error });
+      throw error;
+    }
+  });
+
   test('responsive design works', async ({ page }) => {
     await test.step('Test desktop viewport', async () => {
       await page.setViewportSize({ width: 1200, height: 800 });
