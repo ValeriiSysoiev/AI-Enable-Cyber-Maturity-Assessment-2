@@ -264,3 +264,24 @@ class Minutes(BaseModel):
     def can_edit(self) -> bool:
         """Check if minutes can be edited (only drafts)"""
         return self.status == "draft"
+
+class ChatMessage(BaseModel):
+    """Chat message for orchestrator shell interface"""
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    engagement_id: str
+    message: str
+    sender: Literal["user", "agent"] = "user"
+    timestamp: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    correlation_id: Optional[str] = None
+
+class RunCard(BaseModel):
+    """Orchestrator command execution record"""
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    engagement_id: str
+    command: str  # Original command text (e.g., "/ingest docs")
+    inputs: Dict[str, Any] = Field(default_factory=dict)  # Parsed command parameters
+    outputs: Optional[Dict[str, Any]] = None  # Command execution results
+    status: Literal["queued", "running", "done", "error"] = "queued"
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    created_by: str  # User email
+    citations: Optional[List[str]] = None  # Document references

@@ -1,8 +1,8 @@
 from __future__ import annotations
 import threading
 import logging
-from typing import Dict, List, Optional
-from .models import Assessment, Question, Response, Finding, Recommendation, RunLog, Engagement, Membership, Document, Workshop, ConsentRecord, Minutes
+from typing import Dict, List, Optional, Tuple
+from .models import Assessment, Question, Response, Finding, Recommendation, RunLog, Engagement, Membership, Document, Workshop, ConsentRecord, Minutes, ChatMessage, RunCard
 
 logger = logging.getLogger(__name__)
 
@@ -46,6 +46,12 @@ class Repository:
     def get_minutes_by_workshop(self, workshop_id: str) -> List[Minutes]: ...
     def publish_minutes(self, minutes_id: str) -> Minutes: ...
     def create_new_version(self, parent_id: str, updated_by: str) -> Minutes: ...
+    
+    # Chat & Orchestrator
+    def create_chat_message(self, msg: ChatMessage) -> ChatMessage: ...
+    def list_chat_messages(self, engagement_id: str, page: int = 1, page_size: int = 50) -> Tuple[List[ChatMessage], int]: ...
+    def create_run_card(self, card: RunCard) -> RunCard: ...
+    def list_run_cards(self, engagement_id: str, status: Optional[str] = None, page: int = 1, page_size: int = 50) -> Tuple[List[RunCard], int]: ...
 
 class InMemoryRepository(Repository):
     def __init__(self):
