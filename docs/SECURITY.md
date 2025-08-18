@@ -314,6 +314,84 @@ test('insufficient permissions shows 403', async ({ page }) => {
 **Vulnerability Disclosure:** Follow responsible disclosure process  
 **Emergency Contact:** Escalate to team leads for critical issues
 
+## Evidence Upload Security
+
+### SAS Token Policy
+
+**Implementation:** Write-only Shared Access Signatures  
+**Location:** `/app/api/routes/sas_upload.py`
+
+**Security Configuration:**
+```python
+# SAS Token Generation
+permissions = BlobSasPermissions(
+    write=True,     # Allow write
+    create=True,    # Allow create
+    add=True,       # Allow append
+    read=False,     # DENY read
+    delete=False,   # DENY delete
+    list=False      # DENY list
+)
+```
+
+**Security Controls:**
+- ✅ **Write-Only Access:** No read, delete, or list permissions
+- ✅ **Short TTL:** 15-minute maximum token lifetime
+- ✅ **Unique Paths:** Engagement-scoped blob paths prevent cross-tenant access
+- ✅ **Audit Logging:** All SAS generation logged with correlation IDs
+
+### File Type Restrictions
+
+**Allowed MIME Types:**
+```python
+ALLOWED_MIME_TYPES = [
+    # Documents
+    'application/pdf',
+    'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+    'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+    'application/vnd.openxmlformats-officedocument.presentationml.presentation',
+    # Images
+    'image/jpeg',
+    'image/png',
+    'image/gif',
+    # Text
+    'text/plain',
+    'text/csv'
+]
+```
+
+**Validation Requirements:**
+- ✅ Client-side MIME type validation before upload
+- ✅ Server-side validation during SAS token request
+- ✅ Azure Storage content-type header enforcement
+- ✅ Rejection of executable and script file types
+
+### Upload Size Limits
+
+**Maximum File Sizes:**
+| File Type | Max Size | Rationale |
+|-----------|----------|-----------|
+| Documents | 50MB | Typical evidence documents |
+| Images | 10MB | Screenshots and diagrams |
+| CSV/Text | 5MB | Configuration and log files |
+
+**Enforcement:**
+- ✅ Client-side validation before upload attempt
+- ✅ API validation during SAS token generation
+- ✅ Azure Storage service-level limits
+- ✅ Monitoring alerts for unusual upload patterns
+
+### Secret Management
+
+**Storage Access Keys:**
+- ❌ **NEVER** commit storage keys to repository
+- ❌ **NEVER** log SAS tokens or connection strings
+- ❌ **NEVER** expose keys in error messages
+- ✅ Use Azure Key Vault for production secrets
+- ✅ Use Managed Identity where possible
+- ✅ Rotate storage keys quarterly
+- ✅ Monitor key usage for anomalies
+
 ## Compliance
 
 **Frameworks Supported:**
@@ -330,4 +408,4 @@ test('insufficient permissions shows 403', async ({ page }) => {
 
 ---
 
-**Note:** This security implementation represents Sprint S1 baseline security. Additional security controls will be implemented in subsequent sprints based on production requirements and compliance needs.
+**Note:** This security implementation represents Sprint S1 baseline security with Phase 3 evidence upload enhancements. Additional security controls will be implemented in subsequent sprints based on production requirements and compliance needs.
