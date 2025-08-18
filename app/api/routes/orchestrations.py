@@ -9,6 +9,7 @@ from ai.orchestrator import Orchestrator
 from ..security import current_context, require_member
 from util.files import extract_text
 from services.rag_service import create_rag_service
+from services.rag_retriever import create_rag_retriever
 from config import config
 
 router = APIRouter(prefix="/orchestrations", tags=["orchestrations"])
@@ -34,6 +35,8 @@ class AnalyzeResponse(BaseModel):
     evidence_used: bool = False
     citations: List[str] = []
     rag_operational: bool = False
+    search_backend: Optional[str] = None
+    evidence_summary: Optional[str] = None
 
 @router.post("/analyze", response_model=AnalyzeResponse)
 async def analyze(
@@ -61,11 +64,14 @@ async def analyze(
     analysis_content = req.content
     evidence_context = ""
     
-    # If evidence is requested and RAG is enabled, search for relevant documents
-    if req.use_evidence and config.is_rag_enabled():
+    # If evidence is requested, use the retriever for enhanced search
+    search_backend_used = None
+    evidence_summary = None
+    
+    if req.use_evidence:
         try:
             logger.info(
-                "Searching for evidence documents",
+                "Searching for evidence documents using retriever",
                 extra={
                     "correlation_id": correlation_id,
                     "assessment_id": req.assessment_id,
@@ -74,17 +80,24 @@ async def analyze(
                 }
             )
             
-            rag_service = create_rag_service(correlation_id)
+            # Use the new retriever for better backend support
+            retriever = create_rag_retriever(correlation_id)
             
-            if rag_service.is_operational():
-                search_results = await rag_service.search(
+            if retriever.is_operational():
+                search_results = await retriever.retrieve(
                     query=req.content,
+                    query_vector=None,  # Let retriever generate if needed
                     engagement_id=ctx["engagement_id"],
-                    top_k=5  # Limit to top 5 most relevant documents
+                    top_k=5,
+                    use_semantic_ranking=True
                 )
                 
                 if search_results:
-                    evidence_context = rag_service.format_search_results_for_context(search_results)
+                    evidence_context = retriever.format_results_for_context(search_results)
+                    search_backend_used = retriever.backend.value
+                    
+                    # Create summary of evidence found
+                    evidence_summary = f"Found {len(search_results)} relevant documents using {search_backend_used} backend"
                     
                     # Combine original content with evidence and citations
                     analysis_content = f"""Original Content:
@@ -96,43 +109,49 @@ Relevant Evidence from Documents:
 Please analyze the original content while considering the relevant evidence provided above. When referencing evidence in your findings, include the citation numbers [1], [2], etc. to indicate which document the evidence comes from."""
                     
                     logger.info(
-                        "Added evidence context to analysis",
+                        "Added evidence context to analysis using retriever",
                         extra={
                             "correlation_id": correlation_id,
                             "assessment_id": req.assessment_id,
                             "evidence_documents": len(search_results),
                             "evidence_length": len(evidence_context),
+                            "search_backend": search_backend_used,
                             "citations": [r.citation for r in search_results]
                         }
                     )
                 else:
                     logger.info(
-                        "No relevant evidence documents found",
+                        "No relevant evidence documents found using retriever",
                         extra={
                             "correlation_id": correlation_id,
                             "assessment_id": req.assessment_id,
-                            "engagement_id": ctx["engagement_id"]
+                            "engagement_id": ctx["engagement_id"],
+                            "search_backend": retriever.backend.value
                         }
                     )
+                    search_backend_used = retriever.backend.value
+                    evidence_summary = f"No relevant documents found using {search_backend_used} backend"
             else:
                 logger.warning(
-                    "RAG service not operational for evidence search",
+                    "RAG retriever not operational for evidence search",
                     extra={
                         "correlation_id": correlation_id,
                         "assessment_id": req.assessment_id,
-                        "rag_mode": rag_service.mode.value if rag_service.mode else "unknown"
+                        "backend": retriever.backend.value
                     }
                 )
+                evidence_summary = f"Retriever not operational (backend: {retriever.backend.value})"
         
         except Exception as e:
             logger.warning(
-                "Failed to retrieve evidence, proceeding without",
+                "Failed to retrieve evidence using retriever, proceeding without",
                 extra={
                     "correlation_id": correlation_id,
                     "assessment_id": req.assessment_id,
                     "error": str(e)
                 }
             )
+            evidence_summary = f"Evidence retrieval failed: {str(e)}"
             # Continue without evidence rather than failing the analysis
     
     elif req.use_evidence and not config.is_rag_enabled():
@@ -158,10 +177,15 @@ Please analyze the original content while considering the relevant evidence prov
         evidence_used = True
         citations = [r.citation for r in search_results]
         rag_operational = True
-    elif req.use_evidence and config.is_rag_enabled():
-        # RAG was requested but may not be operational
-        rag_service = create_rag_service(correlation_id)
-        rag_operational = rag_service.is_operational()
+    elif req.use_evidence:
+        # Check if retriever is operational
+        try:
+            retriever = create_rag_retriever(correlation_id)
+            rag_operational = retriever.is_operational()
+            if not search_backend_used:
+                search_backend_used = retriever.backend.value
+        except:
+            rag_operational = False
     
     repo.add_findings(req.assessment_id, findings)
     repo.add_runlog(log)
@@ -170,7 +194,9 @@ Please analyze the original content while considering the relevant evidence prov
         findings=findings,
         evidence_used=evidence_used,
         citations=citations,
-        rag_operational=rag_operational
+        rag_operational=rag_operational,
+        search_backend=search_backend_used,
+        evidence_summary=evidence_summary
     )
 
 class RecommendRequest(BaseModel):
@@ -181,6 +207,8 @@ class RecommendResponse(BaseModel):
     evidence_used: bool = False
     citations: List[str] = []
     rag_operational: bool = False
+    search_backend: Optional[str] = None
+    evidence_summary: Optional[str] = None
 
 class RAGSearchRequest(BaseModel):
     query: str

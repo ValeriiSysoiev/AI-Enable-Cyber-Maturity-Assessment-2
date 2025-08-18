@@ -29,6 +29,39 @@ def is_admin(user_email: str) -> bool:
     return canonical_email in admins
 
 
+async def is_admin_with_demo_fallback(user_email: str) -> bool:
+    """
+    Check if user is an admin, including demo admin fallback
+    
+    Checks:
+    1. ADMIN_EMAILS environment variable (always)
+    2. Demo admin list (only in AUTH_MODE=demo)
+    """
+    # First check standard admin emails
+    if is_admin(user_email):
+        return True
+    
+    # In demo mode, also check demo admin list
+    auth_mode = os.getenv("AUTH_MODE", "demo").lower()
+    if auth_mode == "demo":
+        try:
+            from domain.admin_repository import create_admin_repository
+            from api.main import app
+            
+            repository = getattr(app.state, 'repo', None)
+            admin_repo = create_admin_repository(
+                data_backend=os.getenv("DATA_BACKEND", "local"),
+                repository=repository
+            )
+            
+            return await admin_repo.is_demo_admin(user_email)
+        except Exception as e:
+            logger.warning(f"Failed to check demo admin status: {e}")
+            return False
+    
+    return False
+
+
 async def current_context(
     request: Request,
     x_user_email: str = Header(..., alias="X-User-Email"),
