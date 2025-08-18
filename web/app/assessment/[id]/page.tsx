@@ -248,7 +248,7 @@ export default function AssessmentPage() {
               <div className="border-t pt-3 space-y-2">
                 <div className="text-sm font-medium">Upload Evidence</div>
                 <EvidenceUploader 
-                  onUploadComplete={(blobUrl) => handleEvidenceUpload(key, blobUrl)}
+                  onUploadComplete={(evidence) => handleEvidenceUpload(key, evidence.blobUrl)}
                 />
                 
                 {/* Display linked evidence */}
