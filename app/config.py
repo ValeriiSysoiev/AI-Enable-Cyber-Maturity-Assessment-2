@@ -325,5 +325,62 @@ class AppConfig(BaseModel):
             return self
 
 
+class FeatureFlags(BaseSettings):
+    """S4 Feature Flags - control feature availability by environment"""
+    
+    # CSF Grid Feature
+    csf_enabled: bool = Field(
+        default_factory=lambda: os.getenv("FEATURE_CSF_ENABLED", "true").lower() == "true"
+    )
+    
+    # Workshops & Consent Feature
+    workshops_enabled: bool = Field(
+        default_factory=lambda: os.getenv("FEATURE_WORKSHOPS_ENABLED", "true").lower() == "true"
+    )
+    
+    # Minutes Publishing Feature
+    minutes_enabled: bool = Field(
+        default_factory=lambda: os.getenv("FEATURE_MINUTES_ENABLED", "true").lower() == "true"
+    )
+    
+    # Chat Shell Commands Feature
+    chat_enabled: bool = Field(
+        default_factory=lambda: os.getenv("FEATURE_CHAT_ENABLED", "true").lower() == "true"
+    )
+    
+    # Service Bus Orchestration (requires Azure Service Bus)
+    service_bus_orchestration_enabled: bool = Field(
+        default_factory=lambda: os.getenv("FEATURE_SERVICE_BUS_ENABLED", "false").lower() == "true"
+    )
+    
+    def is_s4_enabled(self) -> bool:
+        """Check if any S4 feature is enabled"""
+        return any([
+            self.csf_enabled,
+            self.workshops_enabled,
+            self.minutes_enabled,
+            self.chat_enabled,
+            self.service_bus_orchestration_enabled
+        ])
+    
+    def get_enabled_features(self) -> List[str]:
+        """Get list of enabled S4 features"""
+        features = []
+        if self.csf_enabled:
+            features.append("CSF Grid")
+        if self.workshops_enabled:
+            features.append("Workshops & Consent")
+        if self.minutes_enabled:
+            features.append("Minutes Publishing")
+        if self.chat_enabled:
+            features.append("Chat Shell Commands")
+        if self.service_bus_orchestration_enabled:
+            features.append("Service Bus Orchestration")
+        return features
+
+
 # Global configuration instance
 config = AppConfig()
+
+# S4 Feature flags instance
+feature_flags = FeatureFlags()
