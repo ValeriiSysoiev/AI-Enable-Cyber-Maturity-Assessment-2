@@ -42,6 +42,7 @@ export interface SearchResult {
   document_name: string;
   page_number?: number;
   chunk_index: number;
+  url?: string;
 }
 
 export interface EvidenceSearchRequest {

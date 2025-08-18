@@ -14,6 +14,7 @@ class AzureOpenAIConfig(BaseModel):
     api_version: str = Field(default_factory=lambda: os.getenv("AZURE_OPENAI_API_VERSION", "2024-02-01"))
     embedding_deployment: str = Field(default_factory=lambda: os.getenv("AZURE_OPENAI_EMBEDDING_DEPLOYMENT", "text-embedding-3-large"))
     embedding_model: str = Field(default_factory=lambda: os.getenv("AZURE_OPENAI_EMBEDDING_MODEL", "text-embedding-3-large"))
+    embedding_dimensions: int = Field(default_factory=lambda: int(os.getenv("AZURE_OPENAI_EMBEDDING_DIMENSIONS", "3072")))
     max_tokens_per_request: int = Field(default_factory=lambda: int(os.getenv("AZURE_OPENAI_MAX_TOKENS", "8000")))
 
 
@@ -38,6 +39,7 @@ class RAGConfig(BaseModel):
     """RAG service configuration"""
     mode: str = Field(default_factory=lambda: os.getenv("RAG_MODE", "none"))  # azure_openai|none
     enabled: bool = Field(default_factory=lambda: os.getenv("RAG_MODE", "none") == "azure_openai")
+    search_backend: str = Field(default_factory=lambda: os.getenv("RAG_SEARCH_BACKEND", "azure_search"))  # azure_search|cosmos_db
     search_top_k: int = Field(default_factory=lambda: int(os.getenv("RAG_SEARCH_TOP_K", "10")))
     similarity_threshold: float = Field(default_factory=lambda: float(os.getenv("RAG_SIMILARITY_THRESHOLD", "0.7")))
     use_hybrid_search: bool = Field(default_factory=lambda: os.getenv("RAG_USE_HYBRID_SEARCH", "true").lower() == "true")

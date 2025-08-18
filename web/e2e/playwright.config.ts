@@ -179,6 +179,56 @@ export default defineConfig({
       timeout: 300_000, // 5 minutes for load tests
     },
     
+    /* RAG Testing Projects */
+    {
+      name: 'rag-basic',
+      use: { 
+        ...devices['Desktop Chrome'],
+      },
+      testMatch: '**/rag.spec.ts',
+      timeout: 90_000, // Extended timeout for RAG operations
+    },
+    
+    {
+      name: 'rag-advanced',
+      use: { 
+        ...devices['Desktop Chrome'],
+      },
+      testMatch: '**/rag-advanced.spec.ts',
+      timeout: 180_000, // 3 minutes for advanced RAG tests
+      retries: 1, // Allow one retry for advanced tests
+    },
+    
+    {
+      name: 'rag-integration',
+      use: { 
+        ...devices['Desktop Chrome'],
+      },
+      testMatch: '**/rag-integration.spec.ts',
+      timeout: 240_000, // 4 minutes for full integration tests
+      retries: 1,
+    },
+    
+    /* RAG Cross-browser testing */
+    {
+      name: 'rag-firefox',
+      use: { 
+        ...devices['Desktop Firefox'],
+      },
+      testMatch: '**/rag.spec.ts',
+      timeout: 120_000, // Extended for Firefox
+    },
+    
+    /* RAG Mobile testing */
+    {
+      name: 'rag-mobile',
+      use: { 
+        ...devices['Pixel 5'],
+      },
+      testMatch: '**/rag.spec.ts',
+      timeout: 120_000,
+    },
+    
     /* Setup project for enterprise features */
     {
       name: 'setup-enterprise',
