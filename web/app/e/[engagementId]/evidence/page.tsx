@@ -17,10 +17,22 @@ export default function EvidenceManagementPage() {
   const auth = useRequireAuth();
 
   const handleUploadComplete = useCallback((evidence: Evidence) => {
-    // Refresh the table and show the uploaded evidence
+    // Instantly refresh the table and show uploaded evidence
     setRefreshTrigger(prev => prev + 1);
     setSelectedEvidence(evidence);
-    setActiveView('preview');
+    // Keep in table view to show the new row appears instantly
+    setActiveView('table');
+    
+    // Show success notification
+    setTimeout(() => {
+      const notification = document.createElement('div');
+      notification.className = 'fixed top-4 right-4 bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded z-50';
+      notification.innerHTML = `<strong>Success!</strong> ${evidence.filename} uploaded successfully`;
+      document.body.appendChild(notification);
+      setTimeout(() => {
+        notification.remove();
+      }, 5000);
+    }, 100);
   }, []);
 
   const handleEvidenceSelect = useCallback((evidence: Evidence) => {
@@ -118,10 +130,14 @@ export default function EvidenceManagementPage() {
               {/* Recent Uploads Quick View */}
               <div>
                 <h3 className="text-md font-medium mb-4">Recent Uploads</h3>
+                <div className="text-sm text-gray-600 mb-2">
+                  Files appear here instantly after upload
+                </div>
                 <EvidenceTable
                   onEvidenceSelect={handleEvidenceSelect}
                   refreshTrigger={refreshTrigger}
                   className="max-h-96 overflow-y-auto"
+                  showLinkActions={true}
                 />
               </div>
             </div>
@@ -141,6 +157,7 @@ export default function EvidenceManagementPage() {
               <EvidenceTable
                 onEvidenceSelect={handleEvidenceSelect}
                 refreshTrigger={refreshTrigger}
+                showLinkActions={true}
               />
             </div>
           )}
