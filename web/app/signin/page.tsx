@@ -7,19 +7,27 @@ export default function SignIn() {
   const [email, setEmail] = useState("");
   const router = useRouter();
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (email.trim()) {
-      // Check localStorage availability and handle errors
-      if (typeof window !== "undefined" && window.localStorage) {
-        try {
-          localStorage.setItem("email", email.trim());
-        } catch (error) {
-          console.warn("Failed to save email to localStorage:", error);
-          // Continue anyway - the app can still work without persistence
+      try {
+        // Call API route to set authentication cookie
+        const response = await fetch('/api/auth/signin', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ email: email.trim() }),
+        });
+        
+        if (response.ok) {
+          router.push("/engagements");
+        } else {
+          console.error('Failed to sign in');
         }
+      } catch (error) {
+        console.error('Sign in error:', error);
       }
-      router.push("/engagements");
     }
   };
 

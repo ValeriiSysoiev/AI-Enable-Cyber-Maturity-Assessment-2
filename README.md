@@ -186,6 +186,8 @@ npm run dev
 ### Available Pages
 
 - `/` - Dashboard (landing page)
+- `/signin` - Demo authentication page for user login
+- `/engagements` - Protected page showing user's security assessments (requires authentication)
 - `/new` - Create new assessment and load preset
 - `/assessment/draft` - Assessment workspace with pillar navigation and questions
 
@@ -202,6 +204,22 @@ npm run dev
    ```
 
 3. Open http://localhost:3000 in your browser
+
+### Authentication Quickstart (Sprint S1)
+
+The application now includes demo authentication for accessing protected pages:
+
+1. **Access protected page**: Navigate to http://localhost:3000/engagements
+2. **Get redirected**: If not signed in, you'll be redirected to `/signin`
+3. **Sign in**: Enter any email address (e.g., `demo-user@example.com`) and click "Sign in"
+4. **View engagements**: Access the protected engagements page with role-based access control
+
+**Demo Features:**
+- Server-Side Rendering (SSR) guards protect routes
+- Role-based access: Member, LEM, or Admin roles required for `/engagements`
+- Structured logging with correlation IDs for all requests
+- Mock engagement data with status badges and role chips
+- Comprehensive error handling and loading states
 
 ### Phase 2 Features (Implemented)
 
