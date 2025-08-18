@@ -15,7 +15,7 @@ test.describe('Cache Performance', () => {
     try {
       await stepTracker.executeStep('Test API cache miss (first request)', async () => {
         // Clear cache first
-        await page.goto('/api/cache/clear', { method: 'POST' });
+        await page.request.post('/api/cache/clear');
         
         // First request should be a cache miss
         const firstRequestTime = await perfMonitor.measureAction('cache_miss_request', async () => {
@@ -55,7 +55,7 @@ test.describe('Cache Performance', () => {
 
       await stepTracker.executeStep('Test cache invalidation', async () => {
         // Force cache invalidation
-        await page.goto('/api/cache/invalidate/engagements', { method: 'POST' });
+        await page.request.post('/api/cache/invalidate/engagements');
         
         // Next request should be cache miss again
         const invalidatedRequestTime = await perfMonitor.measureAction('cache_invalidated_request', async () => {
@@ -102,13 +102,12 @@ test.describe('Cache Performance', () => {
     try {
       await test.step('Test memory cache performance', async () => {
         // Configure for memory cache
-        await page.goto('/api/cache/config', {
-          method: 'POST',
+        await page.request.post('/api/cache/config', {
           data: { cacheType: 'memory' }
         });
         
         // Clear cache and test performance
-        await page.goto('/api/cache/clear', { method: 'POST' });
+        await page.request.post('/api/cache/clear');
         
         const memoryMissTime = await perfMonitor.measureAction('memory_cache_miss', async () => {
           await page.goto('/api/presets');
@@ -123,13 +122,12 @@ test.describe('Cache Performance', () => {
 
       await test.step('Test Redis cache performance', async () => {
         // Configure for Redis cache
-        await page.goto('/api/cache/config', {
-          method: 'POST',
+        await page.request.post('/api/cache/config', {
           data: { cacheType: 'redis' }
         });
         
         // Clear cache and test performance
-        await page.goto('/api/cache/clear', { method: 'POST' });
+        await page.request.post('/api/cache/clear');
         
         const redisMissTime = await perfMonitor.measureAction('redis_cache_miss', async () => {
           await page.goto('/api/presets');
@@ -419,7 +417,7 @@ test.describe('Frontend Performance', () => {
                   vitals.lcp = entry.startTime;
                 }
                 if (entry.entryType === 'first-input') {
-                  vitals.fid = entry.processingStart - entry.startTime;
+                  vitals.fid = (entry as any).processingStart - entry.startTime;
                 }
                 if (entry.entryType === 'layout-shift') {
                   vitals.cls += (entry as any).value;

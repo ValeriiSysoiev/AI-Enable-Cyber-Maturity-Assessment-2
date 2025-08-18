@@ -7,6 +7,11 @@ declare global {
     mockAADClaims?: any;
     mockAuthMode?: string;
     mockUserContext?: any;
+    authConfig?: any;
+    enterpriseTestData?: any;
+    mockUserRole?: string;
+    mockUserId?: string;
+    mockTenantId?: string;
   }
 }
 

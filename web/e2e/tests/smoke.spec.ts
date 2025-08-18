@@ -66,7 +66,7 @@ test.describe('Smoke Tests', () => {
     const apiBaseURL = process.env.API_BASE_URL;
     
     if (!apiBaseURL) {
-      test.skip('API_BASE_URL not configured');
+      test.skip(true, 'API_BASE_URL not configured');
     }
     
     await test.step('Check API health endpoint', async () => {
