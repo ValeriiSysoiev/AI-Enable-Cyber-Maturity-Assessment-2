@@ -46,6 +46,9 @@ export default function DashboardPage() {
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-semibold">Engagement Dashboard</h1>
         <div className="flex gap-2">
+          <Link className="px-3 py-1 border rounded bg-green-50 text-green-700 hover:bg-green-100" href={`/e/${engagementId}/evidence`}>
+            📎 Evidence
+          </Link>
           <a className="px-3 py-1 border rounded" href={reportMdUrl(engagementId)} target="_blank">Export Markdown</a>
           <Link className="px-3 py-1 border rounded" href={`/e/${engagementId}/demo`}>Open Demo</Link>
           <Link className="px-3 py-1 border rounded" href={`/e/${engagementId}/demo#docs`}>Docs</Link>
