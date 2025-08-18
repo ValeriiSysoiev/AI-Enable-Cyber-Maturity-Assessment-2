@@ -291,7 +291,7 @@ export default function RAGSourcesPanel({
         {activeTab === 'search' && (
           <div className="space-y-4">
             <EnhancedEvidenceSearch
-              defaultQuery={defaultQuery}
+
               maxResults={maxSearchResults}
               showRAGToggle={true}
               enableAutoSuggestions={true}
@@ -420,7 +420,7 @@ export default function RAGSourcesPanel({
           <div className="space-y-4">
             <RAGStatusPanel 
               className="border-0 bg-transparent p-0"
-              showDetailedConfig={!compactMode}
+
             />
             
             {analysisHistory.length > 0 && (

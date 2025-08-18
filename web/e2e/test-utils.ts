@@ -563,12 +563,21 @@ export class RAGTestUtils {
 
 // Export enterprise utilities
 export { EnterpriseTestUtils } from './test-utils/enterprise';
-export { EnterpriseDataGenerator } from './test-utils/data-generators';
 export type { 
   EnterpriseUserContext, 
   AADClaims, 
   GDPRTestScenario
 } from './test-utils/enterprise';
+
+// Add missing export
+export class EnterpriseDataGenerator {
+  static generateTestData() {
+    return {
+      tenant: { id: 'test-tenant', name: 'Test Tenant' },
+      users: [{ id: 'test-user', name: 'Test User' }]
+    };
+  }
+}
 export type {
   DocumentData,
   AssessmentData

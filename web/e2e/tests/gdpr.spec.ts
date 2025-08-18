@@ -82,7 +82,7 @@ test.describe('GDPR Data Export', () => {
         await expect(downloadLink).toBeVisible();
         
         // Test download functionality
-        const downloadPromise = page.waitForDownload();
+        const downloadPromise = page.waitForEvent('download');
         await downloadLink.click();
         const download = await downloadPromise;
         

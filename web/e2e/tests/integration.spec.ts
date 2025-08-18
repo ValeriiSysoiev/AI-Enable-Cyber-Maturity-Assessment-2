@@ -33,7 +33,7 @@ test.describe('API Integration', () => {
 
   test('direct API connectivity', async ({ request }) => {
     if (!apiBaseURL) {
-      test.skip('API_BASE_URL not configured');
+      test.skip(true, 'API_BASE_URL not configured');
     }
 
     await test.step('Test direct API access', async () => {
