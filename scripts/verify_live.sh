@@ -19,16 +19,16 @@ PROJECT_ROOT="$(dirname "$SCRIPT_DIR")"
 # Source safe utilities
 source "$SCRIPT_DIR/lib/safe.sh"
 
-# Configuration from terraform outputs
-RG_NAME="rg-aaa-demo"
-SEARCH_SERVICE_NAME=""
-OPENAI_SERVICE_NAME=""
-KEY_VAULT_NAME=""
-STORAGE_ACCOUNT_NAME=""
-ACA_ENV_NAME=""
-COSMOS_ACCOUNT_NAME=""
-API_BASE_URL=""
-WEB_BASE_URL=""
+# Configuration from environment variables (no defaults for security)
+RG_NAME="${AZURE_RESOURCE_GROUP:-}"
+SEARCH_SERVICE_NAME="${AZURE_SEARCH_SERVICE_NAME:-}"
+OPENAI_SERVICE_NAME="${AZURE_OPENAI_SERVICE_NAME:-}"
+KEY_VAULT_NAME="${AZURE_KEY_VAULT_NAME:-}"
+STORAGE_ACCOUNT_NAME="${AZURE_STORAGE_ACCOUNT_NAME:-}"
+ACA_ENV_NAME="${AZURE_ACA_ENV_NAME:-}"
+COSMOS_ACCOUNT_NAME="${AZURE_COSMOS_ACCOUNT_NAME:-}"
+API_BASE_URL="${API_BASE_URL:-}"
+WEB_BASE_URL="${WEB_BASE_URL:-}"
 
 # Performance thresholds (in seconds)
 API_RESPONSE_THRESHOLD=5
@@ -38,6 +38,28 @@ RAG_RESPONSE_THRESHOLD=10
 # Enterprise gates - critical pass criteria
 ENTERPRISE_GATES_ENABLED=${ENTERPRISE_GATES_ENABLED:-true}
 CRITICAL_PASS_REQUIRED=${CRITICAL_PASS_REQUIRED:-true}
+
+# Validate required environment variables
+validate_environment() {
+    local missing_vars=()
+    
+    if [[ -z "$RG_NAME" ]]; then
+        missing_vars+=("AZURE_RESOURCE_GROUP")
+    fi
+    
+    if [[ ${#missing_vars[@]} -gt 0 ]]; then
+        log_error "Missing required environment variables:"
+        printf '  - %s\n' "${missing_vars[@]}"
+        echo ""
+        echo "Please set the following environment variables:"
+        echo "  export AZURE_RESOURCE_GROUP=<your-resource-group>"
+        echo "  export API_BASE_URL=<your-api-url>  # optional"
+        echo "  export WEB_BASE_URL=<your-web-url>  # optional"
+        echo ""
+        echo "Or run this script in a deployment context where these are set."
+        exit 1
+    fi
+}
 
 # Functions
 log_info() { echo -e "${BLUE}ℹ${NC} $1"; }
@@ -1083,6 +1105,9 @@ verify_s4_extensions() {
 main() {
     echo "=== Live Infrastructure Verification ==="
     echo
+    
+    # Validate environment before proceeding
+    validate_environment
     
     # Infrastructure verification
     verify_az_auth
