@@ -1,0 +1,27 @@
+{
+  "timestamp": "20250815-183055",
+  "api": {
+    "name": "api-aaa-demo",
+    "revision": "api-aaa-demo--0000029",
+    "fqdn": "https://api-aaa-demo.bravewater-3d70a706.canadacentral.azurecontainerapps.io"
+  },
+  "web": {
+    "name": "web-aaa-demo", 
+    "revision": "web-aaa-demo--0000020",
+    "fqdn": "https://web-aaa-demo.bravewater-3d70a706.canadacentral.azurecontainerapps.io"
+  },
+  "mode_flags": {
+    "auth_mode": "demo",
+    "data_backend": "cosmos", 
+    "storage_mode": "blob"
+  },
+  "cosmos_db": {
+    "account": "aaa-demo-cosmos",
+    "database": "ai_maturity",
+    "containers": ["engagements", "memberships", "assessments", "documents", "findings", "recommendations", "runlogs", "answers"]
+  },
+  "blob_storage": {
+    "account": "staaademo6jshgh",
+    "container": "docs"
+  }
+}

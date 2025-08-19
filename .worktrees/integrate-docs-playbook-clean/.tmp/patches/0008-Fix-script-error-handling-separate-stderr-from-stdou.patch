@@ -1,0 +1,338 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Valerii Sysoiev <valsysoiev@gmail.com>
+Date: Wed, 13 Aug 2025 18:05:38 -0600
+Subject: [PATCH 08/90] Fix script error handling: separate stderr from stdout
+ in print_urls.sh and smoke.sh
+
+- Add proper stderr capture using temp files in both scripts
+- Add --only-show-errors flag to az commands
+- Add FQDN validation in print_urls.sh
+- Improve error reporting with separate exit codes and error details
+- Prevent stderr contamination of FQDN values
+
+diff --git a/.github/workflows/deploy.yml b/.github/workflows/deploy.yml
+index 6293b213d3998deafd5d9975d7e41a12dd42bcf4..0d0c6af883ba6b53f82915525d84414622769694 100644
+--- a/.github/workflows/deploy.yml
++++ b/.github/workflows/deploy.yml
+@@ -6,6 +6,15 @@ on:
+   # push:
+   #   branches: [ main ]
+ 
++# Set default permissions to read-only for security
++permissions:
++  contents: read
++
++# Prevent multiple runs for the same ref
++concurrency:
++  group: ${{ github.workflow }}-${{ github.ref }}
++  cancel-in-progress: true
++
+ jobs:
+   build:
+     runs-on: ubuntu-latest
+diff --git a/Makefile b/Makefile
+index a100b51e2f0afbf1c7f81fa868c3518b6fe8a068..d7bd7da8bb21bd2809697cbee50da2cb48baaded 100644
+--- a/Makefile
++++ b/Makefile
+@@ -14,10 +14,10 @@ dev:
+ 	. .venv/bin/activate && honcho start
+ 
+ deploy-admin:
+-	chmod +x scripts/deploy_admin.sh && ./scripts/deploy_admin.sh
++	bash ./scripts/deploy_admin.sh
+ 
+ urls:
+-	scripts/print_urls.sh
++	bash scripts/print_urls.sh
+ 
+ smoke:
+-	scripts/smoke.sh
++	bash scripts/smoke.sh
+diff --git a/README.md b/README.md
+index 6be0192f78fd7d636593bdff7c8d05ee222680d2..adff19edf6d4959d11ef2384b25414abde649f99 100644
+--- a/README.md
++++ b/README.md
+@@ -265,6 +265,15 @@ AZURE_STORAGE_CONTAINER=docs
+ UPLOAD_SAS_TTL_MINUTES=15
+ ```
+ 
++**Security Guidelines for Azure Storage:**
++- **SAS Token Permissions:** Generate write-only SAS tokens with least-privilege permissions. Use only `wca` (write, create, add) for client uploads. Avoid granting list (`l`), read (`r`), or delete (`d`) permissions.
++- **Short TTL:** Use a short time-to-live (TTL) for SAS tokens (10-15 minutes recommended) to minimize exposure window.
++- **Key Rotation:** Implement periodic rotation of storage account keys to enhance security.
++- **Never Log SAS Tokens:** Ensure SAS tokens are never logged in application logs or error messages to prevent unauthorized access.
++- **Configure Storage CORS:** Restrict CORS origins to specific domains (e.g., `http://localhost:3000` for development) and always require HTTPS in production.
++- **Content Validation:** Implement file type and size validation on both client and server sides to prevent malicious uploads.
++- **Size Limits:** Enforce upload size limits to prevent storage abuse and potential denial-of-service attacks.
++
+ If Azure Storage is not configured, the `/uploads/sas` endpoint returns HTTP 501.
+ 
+ ### Running Both Services Together
+diff --git a/app/api/main.py b/app/api/main.py
+index 2c69e5311f199f7eefbd34be7aa68bba2df617a3..2099cfb4d62a64c324fa6b108e31c0feda9ecb07 100644
+--- a/app/api/main.py
++++ b/app/api/main.py
+@@ -4,6 +4,7 @@ from fastapi.middleware.cors import CORSMiddleware
+ from sqlmodel import Session, select
+ from pathlib import Path
+ import json
++import os
+ from typing import List, Dict
+ from .assist import router as assist_router
+ from .storage import router as storage_router
+@@ -19,9 +20,19 @@ def on_startup():
+     create_db_and_tables()
+ 
+ # Configure CORS
++# Load allowed origins from environment variable
++web_urls = os.getenv("WEB_URLS", os.getenv("WEB_URL", ""))
++if web_urls:
++    # Parse comma-separated URLs and strip whitespace
++    allowed_origins = [url.strip() for url in web_urls.split(",") if url.strip()]
++else:
++    # Default to empty list if no URLs configured - CORS will be restrictive
++    allowed_origins = []
++    print("WARNING: No WEB_URL(s) configured. CORS will block all origins.")
++
+ app.add_middleware(
+     CORSMiddleware,
+-    allow_origins=["*"],    # TODO: swap to [WEB_URL] later
++    allow_origins=allowed_origins,
+     allow_credentials=True,
+     allow_methods=["*"],
+     allow_headers=["*"],
+diff --git a/scripts/deploy_admin.sh b/scripts/deploy_admin.sh
+index 7cca882982a13ca80a5b4953f3e8d538de1b6aa1..18003be326dacc1ba37e771d8fe89e8ace3de808 100755
+--- a/scripts/deploy_admin.sh
++++ b/scripts/deploy_admin.sh
+@@ -2,23 +2,56 @@
+ set -euo pipefail
+ 
+ # ---------- Config ----------
+-SUBSCRIPTION="10233675-d493-4a97-9c81-4001e353a7bb"
+-RG="rg-aaa-demo"
+-ACR_NAME="acraaademo9lyu53"
+-ACR_SERVER="${ACR_NAME}.azurecr.io"
+-ACA_ENV_NAME="${ACA_ENV_NAME:-}"     # allow override via env
++# Load from environment variables with defaults where appropriate
++SUBSCRIPTION="${SUBSCRIPTION:-}"
++RG="${RG:-}"
++ACR_NAME="${ACR_NAME:-}"
++STORAGE_ACCOUNT="${STORAGE_ACCOUNT:-}"
++STORAGE_CONTAINER="${STORAGE_CONTAINER:-docs}"
+ APP_API_NAME="${APP_API_NAME:-api-aaa-demo}"
+ APP_WEB_NAME="${APP_WEB_NAME:-web-aaa-demo}"
+-STORAGE_ACCOUNT="${STORAGE_ACCOUNT:-staaademo6jshgh}"
+-STORAGE_CONTAINER="${STORAGE_CONTAINER:-docs}"
++
++# ---------- Validate Required Environment Variables ----------
++REQUIRED_VARS=(
++    "SUBSCRIPTION:Azure subscription ID"
++    "RG:Resource group name"
++    "ACR_NAME:Azure Container Registry name"
++    "STORAGE_ACCOUNT:Storage account name"
++)
++
++MISSING_VARS=()
++for var_spec in "${REQUIRED_VARS[@]}"; do
++    var_name="${var_spec%%:*}"
++    var_desc="${var_spec#*:}"
++    if [[ -z "${!var_name}" ]]; then
++        MISSING_VARS+=("  - $var_name: $var_desc")
++    fi
++done
++
++if [[ ${#MISSING_VARS[@]} -gt 0 ]]; then
++    echo "ERROR: Required environment variables are missing:"
++    printf '%s\n' "${MISSING_VARS[@]}"
++    echo ""
++    echo "Please set these environment variables and try again."
++    exit 1
++fi
++
++# Derive ACR_SERVER from ACR_NAME after validation
++ACR_SERVER="${ACR_NAME}.azurecr.io"
+ 
+ # ---------- Preconditions ----------
+ command -v az >/dev/null || { echo "Azure CLI not found"; exit 1; }
+ command -v docker >/dev/null || { echo "Docker not found"; exit 1; }
+ 
++# Use repo root as build context regardless of where script is called
++REPO_ROOT="$(git rev-parse --show-toplevel 2>/dev/null || pwd)"
++cd "$REPO_ROOT"
++
+ az account set --subscription "$SUBSCRIPTION"
+ az extension add --name containerapp -y >/dev/null 2>&1 || az extension update --name containerapp -y >/dev/null 2>&1
+ 
++# Find ACA environment name in the RG unless provided
++ACA_ENV_NAME="${ACA_ENV_NAME:-}"
+ if [[ -z "${ACA_ENV_NAME}" ]]; then
+   ACA_ENV_NAME="$(az containerapp env list -g "$RG" --query '[0].name' -o tsv 2>/dev/null || true)"
+ fi
+@@ -92,5 +125,29 @@ WEB_URL="https://${WEB_FQDN}"
+ echo "WEB_URL=$WEB_URL"
+ 
+ # ---------- Health ----------
+-echo "API health:"
+-curl -s "$API_URL/health" || true
++echo "Checking API health..."
++MAX_RETRIES=3
++RETRY_DELAY=2
++for i in $(seq 1 $MAX_RETRIES); do
++    echo "  Attempt $i of $MAX_RETRIES: $API_URL/health"
++    
++    # Capture HTTP status code and response
++    HTTP_RESPONSE=$(curl --silent --show-error --max-time 10 --write-out "HTTPSTATUS:%{http_code}" "$API_URL/health" 2>&1) || true
++    HTTP_BODY=$(echo "$HTTP_RESPONSE" | sed -e 's/HTTPSTATUS:.*//g')
++    HTTP_CODE=$(echo "$HTTP_RESPONSE" | tr -d '\n' | sed -e 's/.*HTTPSTATUS://')
++    
++    if [[ "$HTTP_CODE" =~ ^2[0-9][0-9]$ ]]; then
++        echo "  ✓ Health check passed (HTTP $HTTP_CODE): ${HTTP_BODY:0:100}"
++        break
++    else
++        echo "  ✗ Health check failed (HTTP $HTTP_CODE): ${HTTP_BODY:0:100}"
++        if [[ $i -lt $MAX_RETRIES ]]; then
++            echo "  Retrying in $RETRY_DELAY seconds..."
++            sleep $RETRY_DELAY
++        else
++            echo "  ERROR: API health check failed after $MAX_RETRIES attempts"
++            echo "  The API may need more time to start or there may be a deployment issue"
++            # Not exiting with error to allow deployment to continue
++        fi
++    fi
++done
+diff --git a/scripts/print_urls.sh b/scripts/print_urls.sh
+index 2390a16e668799b59e0cdd1a1d47f370f9433ccb..4847f05ebb10ee268525c683225864155b54780d 100755
+--- a/scripts/print_urls.sh
++++ b/scripts/print_urls.sh
+@@ -3,7 +3,56 @@ set -euo pipefail
+ RG="${RG:-rg-aaa-demo}"
+ API="api-aaa-demo"
+ WEB="web-aaa-demo"
+-API_URL="https://$(az containerapp show -g "$RG" -n "$API" --query properties.configuration.ingress.fqdn -o tsv)"
+-WEB_URL="https://$(az containerapp show -g "$RG" -n "$WEB" --query properties.configuration.ingress.fqdn -o tsv)"
++
++# Get API FQDN
++api_err_file=$(mktemp)
++api_fqdn=$(az containerapp show -g "$RG" -n "$API" --query properties.configuration.ingress.fqdn -o tsv --only-show-errors 2>"$api_err_file")
++api_exit_code=$?
++api_err=$(<"$api_err_file")
++rm -f "$api_err_file"
++
++if [[ $api_exit_code -ne 0 ]]; then
++    echo "ERROR: Failed to get API container app details (exit code: $api_exit_code)" >&2
++    if [[ -n "$api_err" ]]; then
++        echo "$api_err" >&2
++    fi
++    exit 1
++fi
++
++if [[ -z "$api_fqdn" || "$api_fqdn" == "null" ]]; then
++    echo "ERROR: API container app '$API' not found or has no ingress configured in resource group '$RG'" >&2
++    exit 1
++fi
++
++# Validate API FQDN looks reasonable
++if [[ "$api_fqdn" =~ [[:space:]] ]] || [[ ! "$api_fqdn" =~ \. ]] || [[ ! "$api_fqdn" =~ ^[A-Za-z0-9.-]+$ ]]; then
++    echo "ERROR: API container app '$API' not found or has no ingress configured in resource group '$RG'" >&2
++    exit 1
++fi
++
++# Get Web FQDN
++web_err_file=$(mktemp)
++web_fqdn=$(az containerapp show -g "$RG" -n "$WEB" --query properties.configuration.ingress.fqdn -o tsv --only-show-errors 2>"$web_err_file")
++web_exit_code=$?
++web_err=$(<"$web_err_file")
++rm -f "$web_err_file"
++
++if [[ $web_exit_code -ne 0 ]]; then
++    echo "ERROR: Failed to get Web container app details (exit code: $web_exit_code)" >&2
++    if [[ -n "$web_err" ]]; then
++        echo "$web_err" >&2
++    fi
++    exit 1
++fi
++
++if [[ -z "$web_fqdn" || "$web_fqdn" == "null" ]]; then
++    echo "ERROR: Web container app '$WEB' not found or has no ingress configured in resource group '$RG'" >&2
++    exit 1
++fi
++
++# Construct URLs from validated FQDNs
++API_URL="https://$api_fqdn"
++WEB_URL="https://$web_fqdn"
++
+ echo "API_URL=$API_URL"
+ echo "WEB_URL=$WEB_URL"
+diff --git a/scripts/smoke.sh b/scripts/smoke.sh
+index a8827bec411e2a727d622ed80487420c3a4f5240..268e1ee79290e69369784b984b9cf7af2fa24939 100755
+--- a/scripts/smoke.sh
++++ b/scripts/smoke.sh
+@@ -2,6 +2,65 @@
+ set -euo pipefail
+ RG="${RG:-rg-aaa-demo}"
+ API="api-aaa-demo"
+-API_URL="https://$(az containerapp show -g "$RG" -n "$API" --query properties.configuration.ingress.fqdn -o tsv)"
++
++# Get API FQDN
++az_err_file=$(mktemp)
++FQDN=$(az containerapp show -g "$RG" -n "$API" --query properties.configuration.ingress.fqdn -o tsv --only-show-errors 2>"$az_err_file")
++az_exit_code=$?
++az_err=$(<"$az_err_file")
++rm -f "$az_err_file"
++
++if [[ $az_exit_code -ne 0 ]]; then
++    echo "ERROR: Failed to get API container app details (exit code: $az_exit_code)" >&2
++    if [[ -n "$az_err" ]]; then
++        echo "$az_err" >&2
++    fi
++    exit 1
++fi
++
++if [[ -z "$FQDN" || "$FQDN" == "null" ]]; then
++    echo "ERROR: API container app '$API' not found or has no ingress configured in resource group '$RG'" >&2
++    exit 1
++fi
++
++# Validate FQDN looks reasonable (contains at least one dot)
++if [[ ! "$FQDN" =~ \. ]]; then
++    echo "ERROR: Invalid FQDN received: '$FQDN'" >&2
++    exit 1
++fi
++
++# Construct URL from validated FQDN
++API_URL="https://$FQDN"
++
+ echo "GET $API_URL/health"
+-curl -s "$API_URL/health" || true
++
++# Make the health check request with explicit error handling
++curl_err_file=$(mktemp)
++HTTP_RESPONSE=$(curl --silent --show-error --max-time 10 --write-out "\nHTTPSTATUS:%{http_code}" "$API_URL/health" 2>"$curl_err_file")
++curl_exit_code=$?
++curl_err=$(<"$curl_err_file")
++rm -f "$curl_err_file"
++
++if [[ $curl_exit_code -ne 0 ]]; then
++    echo "ERROR: curl failed with exit code $curl_exit_code" >&2
++    if [[ -n "$curl_err" ]]; then
++        echo "Error details: $curl_err" >&2
++    fi
++    if [[ -n "$HTTP_RESPONSE" ]]; then
++        echo "Response: $HTTP_RESPONSE" >&2
++    fi
++    exit 1
++fi
++
++# Extract body and status code
++HTTP_BODY=$(echo "$HTTP_RESPONSE" | sed '$d')
++HTTP_CODE=$(echo "$HTTP_RESPONSE" | tail -n1 | sed -e 's/.*HTTPSTATUS://')
++
++# Check for successful response
++if [[ "$HTTP_CODE" =~ ^2[0-9][0-9]$ ]]; then
++    echo "Success (HTTP $HTTP_CODE): $HTTP_BODY"
++else
++    echo "ERROR: Health check failed with HTTP $HTTP_CODE" >&2
++    echo "Response: $HTTP_BODY" >&2
++    exit 1
++fi

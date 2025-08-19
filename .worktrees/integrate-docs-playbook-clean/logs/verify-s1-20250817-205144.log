@@ -1,0 +1,8 @@
+2025-08-17 20:51:44 - [1;33m🚀 Starting Sprint S1 Live Verification[0m
+2025-08-17 20:51:44 - Web Base URL: http://localhost:3000
+2025-08-17 20:51:44 - API Base URL: http://localhost:8000
+2025-08-17 20:51:44 - Correlation ID: 7F8F1DBF-1916-4255-887D-5B04F30F6374
+2025-08-17 20:51:44 - Results will be saved to: logs/verify-s1-results-20250817-205144.json
+2025-08-17 20:51:44 - [1;33m📊 Phase 1: Health & Readiness Endpoints[0m
+2025-08-17 20:51:44 - [0;34m[TEST 1] Web Health Check[0m
+2025-08-17 20:51:44 - [0;31m❌ FAIL: Web Health Check (Status: 000, Expected: 200)[0m

@@ -1,0 +1,281 @@
+rules:
+  - id: fastapi-missing-auth-dependency
+    pattern-either:
+      - pattern: |
+          @app.$METHOD(...)
+          def $FUNC(...):
+              ...
+      - pattern: |
+          @$ROUTER.$METHOD(...)
+          def $FUNC(...):
+              ...
+    pattern-not-inside:
+      - pattern: |
+          @app.$METHOD(..., dependencies=[...])
+          def $FUNC(...):
+              ...
+      - pattern: |
+          @$ROUTER.$METHOD(..., dependencies=[...])
+          def $FUNC(...):
+              ...
+      - pattern: |
+          def $FUNC(..., current_user: ... = Depends(...)):
+              ...
+    paths:
+      include:
+        - "app/api/routes/*.py"
+      exclude:
+        - "app/api/routes/version.py"
+        - "**/test_*.py"
+    message: FastAPI endpoint missing authentication dependency
+    languages: [python]
+    severity: WARNING
+    metadata:
+      category: security
+      subcategory: authentication
+      technology: fastapi
+      references:
+        - https://fastapi.tiangolo.com/tutorial/dependencies/
+      cwe: "CWE-306: Missing Authentication for Critical Function"
+
+  - id: fastapi-sql-injection-risk
+    pattern-either:
+      - pattern: |
+          cursor.execute($QUERY + ...)
+      - pattern: |
+          cursor.execute(f"...")
+      - pattern: |
+          session.execute($QUERY + ...)
+      - pattern: |
+          session.execute(f"...")
+      - pattern: |
+          db.execute($QUERY + ...)
+      - pattern: |
+          db.execute(f"...")
+    message: Potential SQL injection vulnerability - use parameterized queries
+    languages: [python]
+    severity: ERROR
+    metadata:
+      category: security
+      subcategory: injection
+      technology: fastapi
+      cwe: "CWE-89: SQL Injection"
+
+  - id: fastapi-insecure-cors
+    pattern-either:
+      - pattern: |
+          CORSMiddleware(..., allow_origins=["*"], ...)
+      - pattern: |
+          CORSMiddleware(..., allow_origins="*", ...)
+    message: Insecure CORS configuration allows all origins
+    languages: [python]
+    severity: ERROR
+    metadata:
+      category: security
+      subcategory: cors
+      technology: fastapi
+      cwe: "CWE-942: Overly Permissive Cross-domain Whitelist"
+
+  - id: fastapi-missing-input-validation
+    pattern: |
+      def $FUNC(..., $PARAM: str = ...):
+          ...
+    pattern-not-inside:
+      - pattern: |
+          def $FUNC(..., $PARAM: str = Query(...)):
+              ...
+      - pattern: |
+          def $FUNC(..., $PARAM: str = Path(...)):
+              ...
+      - pattern: |
+          def $FUNC(..., $PARAM: str = Body(...)):
+              ...
+    paths:
+      include:
+        - "app/api/routes/*.py"
+    message: FastAPI parameter missing validation constraints
+    languages: [python]
+    severity: INFO
+    metadata:
+      category: security
+      subcategory: validation
+      technology: fastapi
+
+  - id: fastapi-hardcoded-secret
+    pattern-either:
+      - pattern: |
+          SECRET_KEY = "..."
+      - pattern: |
+          secret_key = "..."
+      - pattern: |
+          JWT_SECRET = "..."
+      - pattern: |
+          jwt_secret = "..."
+      - pattern: |
+          API_KEY = "..."
+      - pattern: |
+          api_key = "..."
+    message: Hardcoded secret detected - use environment variables
+    languages: [python]
+    severity: ERROR
+    metadata:
+      category: security
+      subcategory: secrets
+      technology: fastapi
+      cwe: "CWE-798: Use of Hard-coded Credentials"
+
+  - id: fastapi-insecure-session
+    pattern-either:
+      - pattern: |
+          SessionMiddleware(..., secret_key="...", ...)
+      - pattern: |
+          SessionMiddleware(..., secret_key=$KEY, ...) 
+          where:
+            - pattern-inside: |
+                $KEY = "..."
+    message: Session middleware using hardcoded or weak secret
+    languages: [python]
+    severity: ERROR
+    metadata:
+      category: security
+      subcategory: session
+      technology: fastapi
+
+  - id: fastapi-missing-https-only
+    pattern-either:
+      - pattern: |
+          SessionMiddleware(..., https_only=False, ...)
+      - pattern: |
+          $RESPONSE.set_cookie(..., secure=False, ...)
+    message: Session/cookie not configured for HTTPS only
+    languages: [python]
+    severity: WARNING
+    metadata:
+      category: security
+      subcategory: transport
+      technology: fastapi
+
+  - id: fastapi-debug-mode-production
+    pattern-either:
+      - pattern: |
+          FastAPI(debug=True)
+      - pattern: |
+          app.debug = True
+      - pattern: |
+          uvicorn.run(..., debug=True, ...)
+    message: Debug mode enabled - should be disabled in production
+    languages: [python]
+    severity: WARNING
+    metadata:
+      category: security
+      subcategory: configuration
+      technology: fastapi
+
+  - id: fastapi-unvalidated-redirect
+    pattern-either:
+      - pattern: |
+          RedirectResponse($URL)
+      - pattern: |
+          return RedirectResponse($URL)
+    pattern-not-inside:
+      - pattern: |
+          if $URL.startswith("/"):
+              ...
+      - pattern: |
+          if validate_url($URL):
+              ...
+    message: Unvalidated redirect - potential open redirect vulnerability
+    languages: [python]
+    severity: WARNING
+    metadata:
+      category: security
+      subcategory: redirect
+      technology: fastapi
+      cwe: "CWE-601: Open Redirect"
+
+  - id: fastapi-file-upload-no-validation
+    pattern: |
+      def $FUNC(..., file: UploadFile = ...):
+          ...
+    pattern-not-inside:
+      - pattern: |
+          def $FUNC(..., file: UploadFile = ...):
+              ...
+              if file.content_type not in ...:
+                  ...
+      - pattern: |
+          def $FUNC(..., file: UploadFile = ...):
+              ...
+              if file.size > ...:
+                  ...
+    message: File upload endpoint missing content type and size validation
+    languages: [python]
+    severity: WARNING
+    metadata:
+      category: security
+      subcategory: upload
+      technology: fastapi
+
+  - id: fastapi-response-contains-sensitive-data
+    pattern-either:
+      - pattern: |
+          return {..., "password": $PASS, ...}
+      - pattern: |
+          return {..., "secret": $SECRET, ...}
+      - pattern: |
+          return {..., "token": $TOKEN, ...}
+      - pattern: |
+          return {..., "api_key": $KEY, ...}
+    message: Response may contain sensitive data
+    languages: [python]
+    severity: ERROR
+    metadata:
+      category: security
+      subcategory: data-exposure
+      technology: fastapi
+
+  - id: fastapi-missing-rate-limiting
+    pattern: |
+      @app.$METHOD(...)
+      def $FUNC(...):
+          ...
+    pattern-not-inside:
+      - pattern: |
+          @limiter.limit("...")
+          @app.$METHOD(...)
+          def $FUNC(...):
+              ...
+      - pattern: |
+          @app.$METHOD(..., dependencies=[Depends(rate_limit), ...])
+          def $FUNC(...):
+              ...
+    paths:
+      include:
+        - "app/api/routes/*.py"
+    message: API endpoint missing rate limiting protection
+    languages: [python]
+    severity: INFO
+    metadata:
+      category: security
+      subcategory: rate-limiting
+      technology: fastapi
+
+  - id: fastapi-logging-sensitive-data
+    pattern-either:
+      - pattern: |
+          logger.$METHOD(..., password=..., ...)
+      - pattern: |
+          logger.$METHOD(..., secret=..., ...)
+      - pattern: |
+          logger.$METHOD(..., token=..., ...)
+      - pattern: |
+          print(..., password=..., ...)
+      - pattern: |
+          print(..., secret=..., ...)
+    message: Logging statement may expose sensitive data
+    languages: [python]
+    severity: WARNING
+    metadata:
+      category: security
+      subcategory: logging
+      technology: fastapi

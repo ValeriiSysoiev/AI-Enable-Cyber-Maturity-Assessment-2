@@ -1,0 +1,20 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Valerii Sysoiev <valsysoiev@gmail.com>
+Date: Sun, 17 Aug 2025 14:21:43 -0600
+Subject: [PATCH 44/90] Fix TypeScript error - use proper Playwright API for
+ POST requests
+
+
+diff --git a/web/e2e/test-utils/enterprise.ts b/web/e2e/test-utils/enterprise.ts
+index 683fc69d9559e70502fe4cbbcfbd5bdf681210b3..4c9078ca5cfa2cfb3a03ee20db8c16b9ab3a968a 100644
+--- a/web/e2e/test-utils/enterprise.ts
++++ b/web/e2e/test-utils/enterprise.ts
+@@ -228,7 +228,7 @@ export class EnterpriseTestUtils {
+     improvement: number;
+   }> {
+     // Clear cache first
+-    await this.page.goto('/api/cache/clear', { method: 'POST' });
++    await this.page.request.post('/api/cache/clear');
+     
+     // Measure cache miss
+     const missStart = Date.now();

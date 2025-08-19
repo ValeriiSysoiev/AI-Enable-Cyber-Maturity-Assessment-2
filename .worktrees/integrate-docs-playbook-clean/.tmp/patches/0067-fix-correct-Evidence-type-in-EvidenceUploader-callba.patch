@@ -1,0 +1,22 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Valerii Sysoiev <valsysoiev@gmail.com>
+Date: Mon, 18 Aug 2025 13:09:26 -0600
+Subject: [PATCH 67/90] fix: correct Evidence type in EvidenceUploader callback
+
+- EvidenceUploader passes Evidence object, not string
+- Extract blobUrl from evidence object in callback
+- Fixes TypeScript compilation error in staging build
+
+diff --git a/web/app/assessment/[id]/page.tsx b/web/app/assessment/[id]/page.tsx
+index b040a481bfd8af3f0629221b2d467033751522c1..0b69dbca7f5cca6783eb78d5b4d4aed5392b65d9 100644
+--- a/web/app/assessment/[id]/page.tsx
++++ b/web/app/assessment/[id]/page.tsx
+@@ -248,7 +248,7 @@ export default function AssessmentPage() {
+               <div className="border-t pt-3 space-y-2">
+                 <div className="text-sm font-medium">Upload Evidence</div>
+                 <EvidenceUploader 
+-                  onUploadComplete={(blobUrl) => handleEvidenceUpload(key, blobUrl)}
++                  onUploadComplete={(evidence) => handleEvidenceUpload(key, evidence.blobUrl)}
+                 />
+                 
+                 {/* Display linked evidence */}

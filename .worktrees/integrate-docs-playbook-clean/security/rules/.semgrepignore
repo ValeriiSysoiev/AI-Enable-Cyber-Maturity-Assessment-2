@@ -1,0 +1,54 @@
+# Semgrep ignore patterns for security scanning
+
+# Test files
+**/test_*.py
+**/tests/**
+**/*.test.ts
+**/*.test.tsx
+**/*.spec.ts
+**/*.spec.tsx
+**/jest.config.*
+**/pytest.ini
+
+# Node modules and build artifacts
+**/node_modules/**
+**/dist/**
+**/build/**
+**/.next/**
+**/__pycache__/**
+**/*.pyc
+
+# Documentation and configuration
+**/docs/**
+**/README.md
+**/*.md
+**/LICENSE
+**/.gitignore
+**/.env.example
+**/docker-compose*.yml
+
+# Generated files
+**/migrations/**
+**/static/**
+**/public/**
+**/coverage/**
+
+# Third-party libraries
+**/vendor/**
+**/lib/**
+**/packages/**
+
+# Temporary files
+**/tmp/**
+**/temp/**
+**/.tmp/**
+
+# IDE and editor files
+**/.vscode/**
+**/.idea/**
+**/*.swp
+**/*.swo
+
+# Log files
+**/logs/**
+**/*.log
