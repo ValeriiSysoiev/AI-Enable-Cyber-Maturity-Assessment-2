@@ -1,0 +1,23 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Valerii Sysoiev <valsysoiev@gmail.com>
+Date: Sun, 17 Aug 2025 17:17:48 -0600
+Subject: [PATCH 46/90] chore: update .gitignore for Next.js artifacts and
+ deployment logs
+
+
+diff --git a/.gitignore b/.gitignore
+index c2d4ddc09d67a95ea3d280a793abfbb1a2a25ccd..a83735334e63025f76c4063931485aaecf1048ab 100644
+--- a/.gitignore
++++ b/.gitignore
+@@ -16,3 +16,11 @@ README.bak
+ *.tfvars
+ *.tfvars.json
+ web/node_modules/
++
++# Next.js build artifacts
++web/.next/
++web/tsconfig.tsbuildinfo
++
++# Deployment logs
++logs/reports/*.log
++logs/reports/*.md

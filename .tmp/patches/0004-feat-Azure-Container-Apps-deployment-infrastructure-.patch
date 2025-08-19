@@ -1,0 +1,2124 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Valerii Sysoiev <valsysoiev@gmail.com>
+Date: Wed, 13 Aug 2025 17:14:12 -0600
+Subject: [PATCH 04/90] feat: Azure Container Apps deployment infrastructure
+ and application code
+
+- Add Terraform infrastructure for Azure deployment:
+  - Azure Container Registry (ACR) configuration
+  - Container Apps Environment with Log Analytics
+  - User-assigned identities with RBAC roles
+  - Storage account and Key Vault configurations
+  - Resource group and provider setup
+
+- Add FastAPI backend application (app/):
+  - API endpoints for assessment management
+  - Storage integration with Managed Identity support
+  - User-delegation SAS token generation
+  - Preset configurations (Cyber for AI)
+
+- Add Next.js frontend application (web/):
+  - Assessment creation and management UI
+  - Question card components with AI assist
+  - Evidence uploader with Azure Storage integration
+  - Score visualization (radar chart)
+
+- Update .gitignore for Terraform state files and secrets
+
+Note: RBAC role assignments pending manual creation by Owner/UA Admin
+
+diff --git a/.gitignore b/.gitignore
+index 62fa756de64cf0711b103d6e34cd090aa3571dcf..27daa8dcfa7bf123bb978737a44aa30f024f607e 100644
+--- a/.gitignore
++++ b/.gitignore
+@@ -7,3 +7,11 @@ data/projects/*
+ .env
+ 
+ README.bak
++
++# Terraform
++*.tfstate
++*.tfstate.*
++.terraform/
++.terraform.lock.hcl
++*.tfvars
++*.tfvars.json
+diff --git a/app/Dockerfile b/app/Dockerfile
+new file mode 100644
+index 0000000000000000000000000000000000000000..22758607ce5174909e45f3eb327958d0610cc6ce
+--- /dev/null
++++ b/app/Dockerfile
+@@ -0,0 +1,18 @@
++FROM python:3.11-slim AS base
++ENV PYTHONDONTWRITEBYTECODE=1 PYTHONUNBUFFERED=1
++WORKDIR /app
++COPY requirements.txt .
++RUN pip install --no-cache-dir -r requirements.txt
++COPY app app
++ENV PORT=8000
++CMD ["uvicorn","app.api.main:app","--host","0.0.0.0","--port","8000"]
++
++
++
++
++
++
++
++
++
++
+diff --git a/app/STORAGE_CONFIG.md b/app/STORAGE_CONFIG.md
+new file mode 100644
+index 0000000000000000000000000000000000000000..ae28d755a7193f4c54c1969da499d17eeef702d8
+--- /dev/null
++++ b/app/STORAGE_CONFIG.md
+@@ -0,0 +1,50 @@
++# Azure Storage Configuration
++
++To enable evidence uploads, create a `.env` file in the `app/` directory with the following variables:
++
++```env
++# Azure Storage Configuration (optional - for evidence uploads)
++# If not configured, the /uploads/sas endpoint will return 501 Not Implemented
++
++# Storage account name (required if using storage)
++AZURE_STORAGE_ACCOUNT=staaademo6jshgh
++
++# Option 1: Use Managed Identity (recommended for production)
++USE_MANAGED_IDENTITY=true
++
++# Option 2: Use storage account key
++# AZURE_STORAGE_KEY=your-storage-account-key-here
++
++# Option 3: Use connection string (alternative to account key)
++# AZURE_STORAGE_CONNECTION_STRING=DefaultEndpointsProtocol=https;AccountName=...;AccountKey=...;EndpointSuffix=core.windows.net
++
++# Container name for evidence uploads (default: docs)
++AZURE_STORAGE_CONTAINER=docs
++
++# SAS token TTL in minutes (default: 15)
++UPLOAD_SAS_TTL_MINUTES=15
++```
++
++## How it works
++
++1. The `/uploads/sas` endpoint checks for Azure Storage configuration
++2. If not configured, it returns HTTP 501 (Not Implemented)
++3. If configured, it generates a SAS URL with limited permissions and TTL:
++   - With Managed Identity: Uses user delegation key (requires Storage Blob Data Contributor role)
++   - With account key: Uses traditional account key-based SAS
++4. The frontend can then upload directly to Azure Storage using the SAS URL
++
++## Testing
++
++Without configuration:
++```bash
++curl -s -X POST http://127.0.0.1:8000/uploads/sas \
++  -H "Content-Type: application/json" \
++  -d '{"blob_name":"evidence/test.txt","permissions":"cw"}'
++# Returns 501 with "Evidence uploads not configured"
++```
++
++With configuration:
++```bash
++# Returns SAS URL for direct upload to Azure Storage
++```
+diff --git a/app/api/__init__.py b/app/api/__init__.py
+new file mode 100644
+index 0000000000000000000000000000000000000000..e9ccad2ce51eb7a61ed06243a3bc02e19ca6ef43
+--- /dev/null
++++ b/app/api/__init__.py
+@@ -0,0 +1,2 @@
++# app/api/__init__.py
++
+diff --git a/app/api/assist.py b/app/api/assist.py
+new file mode 100644
+index 0000000000000000000000000000000000000000..0bf28b4160a3ff8aa24cca0823d553ab81fa68d9
+--- /dev/null
++++ b/app/api/assist.py
+@@ -0,0 +1,23 @@
++# app/api/assist.py
++from fastapi import APIRouter
++router = APIRouter(prefix="/assist", tags=["assist"])
++
++@router.post("/autofill")
++def autofill(payload: dict):
++  """Stub: returns a canned draft justification."""
++  qtext = payload.get("question_text", "")
++  return {
++    "proposed_level": 3,
++    "justification": f"Based on available evidence and the question '{qtext[:80]}...', a preliminary level 3 is suggested. Provide documented tests, metrics, and approvals to reach level 4.",
++    "citations": []
++  }
++
++
++
++
++
++
++
++
++
++
+diff --git a/app/api/db.py b/app/api/db.py
+new file mode 100644
+index 0000000000000000000000000000000000000000..e7f9e984ecebb9a100bcbbe7b716909e6500e074
+--- /dev/null
++++ b/app/api/db.py
+@@ -0,0 +1,35 @@
++from sqlmodel import create_engine, SQLModel, Session
++from pathlib import Path
++
++# Ensure app directory exists for the database
++db_dir = Path(__file__).parent.parent
++db_dir.mkdir(exist_ok=True)
++
++# SQLite database URL
++DATABASE_URL = f"sqlite:///{db_dir}/app.db"
++
++# Create engine
++engine = create_engine(
++    DATABASE_URL,
++    echo=False,
++    connect_args={"check_same_thread": False}  # Required for SQLite
++)
++
++def create_db_and_tables():
++    """Create database tables"""
++    SQLModel.metadata.create_all(engine)
++
++def get_session():
++    """Dependency to get database session"""
++    with Session(engine) as session:
++        yield session
++
++
++
++
++
++
++
++
++
++
+diff --git a/app/api/main.py b/app/api/main.py
+new file mode 100644
+index 0000000000000000000000000000000000000000..500151d4dcf5ee2fcfafbf3eddb1811d2d4bf40d
+--- /dev/null
++++ b/app/api/main.py
+@@ -0,0 +1,176 @@
++# app/api/main.py
++from fastapi import FastAPI, HTTPException, Depends
++from fastapi.middleware.cors import CORSMiddleware
++from sqlmodel import Session, select
++from pathlib import Path
++import json
++from typing import List, Dict
++from .assist import router as assist_router
++from .storage import router as storage_router
++from .db import create_db_and_tables, get_session
++from .models import Assessment, Answer
++from .schemas import AssessmentCreate, AssessmentResponse, AnswerUpsert, ScoreResponse, PillarScore
++from .scoring import compute_scores
++
++app = FastAPI(title="AI Maturity Tool API", version="0.1.0")
++
++@app.on_event("startup")
++def on_startup():
++    create_db_and_tables()
++
++# Configure CORS
++app.add_middleware(
++    CORSMiddleware,
++    allow_origins=["http://localhost:3000"],
++    allow_credentials=True,
++    allow_methods=["*"],
++    allow_headers=["*"],
++)
++
++app.include_router(assist_router)
++app.include_router(storage_router)
++
++def load_preset(preset_id: str) -> dict:
++    preset_path = Path(__file__).resolve().parents[1] / "config" / "presets" / f"{preset_id}.json"
++    if not preset_path.exists():
++        raise FileNotFoundError(preset_path)
++    return json.loads(preset_path.read_text(encoding="utf-8"))
++
++@app.get("/health")
++def health():
++    return {"status": "ok"}
++
++@app.get("/presets/{preset_id}")
++def get_preset(preset_id: str):
++    try:
++        return load_preset(preset_id)
++    except FileNotFoundError:
++        raise HTTPException(status_code=404, detail="Preset not found")
++
++
++@app.post("/assessments", response_model=AssessmentResponse)
++def create_assessment(assessment: AssessmentCreate, session: Session = Depends(get_session)):
++    """Create a new assessment"""
++    # Verify preset exists
++    try:
++        load_preset(assessment.preset_id)
++    except FileNotFoundError:
++        raise HTTPException(status_code=400, detail="Invalid preset_id")
++    
++    db_assessment = Assessment(**assessment.dict())
++    session.add(db_assessment)
++    session.commit()
++    session.refresh(db_assessment)
++    
++    return AssessmentResponse(
++        id=db_assessment.id,
++        name=db_assessment.name,
++        preset_id=db_assessment.preset_id,
++        created_at=db_assessment.created_at,
++        answers=[]
++    )
++
++
++@app.get("/assessments/{assessment_id}", response_model=AssessmentResponse)
++def get_assessment(assessment_id: str, session: Session = Depends(get_session)):
++    """Get assessment with answers"""
++    assessment = session.get(Assessment, assessment_id)
++    if not assessment:
++        raise HTTPException(status_code=404, detail="Assessment not found")
++    
++    answers = [
++        AnswerUpsert(
++            pillar_id=ans.pillar_id,
++            question_id=ans.question_id,
++            level=ans.level,
++            notes=ans.notes
++        )
++        for ans in assessment.answers
++    ]
++    
++    return AssessmentResponse(
++        id=assessment.id,
++        name=assessment.name,
++        preset_id=assessment.preset_id,
++        created_at=assessment.created_at,
++        answers=answers
++    )
++
++
++@app.post("/assessments/{assessment_id}/answers")
++def upsert_answer(assessment_id: str, answer: AnswerUpsert, session: Session = Depends(get_session)):
++    """Upsert an answer (insert or update by pillar_id and question_id)"""
++    # Verify assessment exists
++    assessment = session.get(Assessment, assessment_id)
++    if not assessment:
++        raise HTTPException(status_code=404, detail="Assessment not found")
++    
++    # Find existing answer
++    statement = select(Answer).where(
++        Answer.assessment_id == assessment_id,
++        Answer.pillar_id == answer.pillar_id,
++        Answer.question_id == answer.question_id
++    )
++    existing = session.exec(statement).first()
++    
++    if existing:
++        # Update existing
++        existing.level = answer.level
++        existing.notes = answer.notes
++    else:
++        # Create new
++        db_answer = Answer(
++            assessment_id=assessment_id,
++            **answer.dict()
++        )
++        session.add(db_answer)
++    
++    session.commit()
++    return {"status": "success"}
++
++
++@app.get("/assessments/{assessment_id}/scores", response_model=ScoreResponse)
++def get_scores(assessment_id: str, session: Session = Depends(get_session)):
++    """Get scores for an assessment"""
++    # Get assessment
++    assessment = session.get(Assessment, assessment_id)
++    if not assessment:
++        raise HTTPException(status_code=404, detail="Assessment not found")
++    
++    # Load preset
++    try:
++        preset = load_preset(assessment.preset_id)
++    except FileNotFoundError:
++        raise HTTPException(status_code=500, detail="Preset not found")
++    
++    # Group answers by pillar
++    answers_by_pillar: Dict[str, List[Answer]] = {}
++    for answer in assessment.answers:
++        if answer.pillar_id not in answers_by_pillar:
++            answers_by_pillar[answer.pillar_id] = []
++        answers_by_pillar[answer.pillar_id].append(answer)
++    
++    # Compute scores
++    pillar_scores_dict, overall_score, gates_applied = compute_scores(answers_by_pillar, preset)
++    
++    # Build response
++    pillar_scores = []
++    for pillar in preset["pillars"]:
++        pillar_id = pillar["id"]
++        total_questions = len(preset["questions"].get(pillar_id, []))
++        questions_answered = len(answers_by_pillar.get(pillar_id, []))
++        
++        pillar_scores.append(PillarScore(
++            pillar_id=pillar_id,
++            score=pillar_scores_dict.get(pillar_id),
++            weight=pillar["weight"],
++            questions_answered=questions_answered,
++            total_questions=total_questions
++        ))
++    
++    return ScoreResponse(
++        assessment_id=assessment_id,
++        pillar_scores=pillar_scores,
++        overall_score=overall_score,
++        gates_applied=gates_applied
++    )
+diff --git a/app/api/models.py b/app/api/models.py
+new file mode 100644
+index 0000000000000000000000000000000000000000..fc867184c813a3e48a4886677c00f669c94f6712
+--- /dev/null
++++ b/app/api/models.py
+@@ -0,0 +1,37 @@
++from sqlmodel import Field, SQLModel, Relationship
++from typing import Optional, List
++from datetime import datetime
++import uuid
++
++class Assessment(SQLModel, table=True):
++    """Assessment database model"""
++    id: str = Field(default_factory=lambda: str(uuid.uuid4()), primary_key=True)
++    name: str
++    preset_id: str
++    created_at: datetime = Field(default_factory=datetime.utcnow)
++    
++    # Relationship
++    answers: List["Answer"] = Relationship(back_populates="assessment")
++
++
++class Answer(SQLModel, table=True):
++    """Answer database model"""
++    id: str = Field(default_factory=lambda: str(uuid.uuid4()), primary_key=True)
++    assessment_id: str = Field(foreign_key="assessment.id")
++    pillar_id: str
++    question_id: str
++    level: int = Field(ge=1, le=5)
++    notes: Optional[str] = None
++    
++    # Relationship
++    assessment: Optional[Assessment] = Relationship(back_populates="answers")
++
++
++
++
++
++
++
++
++
++
+diff --git a/app/api/schemas.py b/app/api/schemas.py
+new file mode 100644
+index 0000000000000000000000000000000000000000..23a86db735042e38a19b68cf0076dd7a93ff15bd
+--- /dev/null
++++ b/app/api/schemas.py
+@@ -0,0 +1,52 @@
++from pydantic import BaseModel, Field
++from typing import Optional, List, Dict
++from datetime import datetime
++
++class AssessmentCreate(BaseModel):
++    """Schema for creating an assessment"""
++    name: str
++    preset_id: str
++
++
++class AnswerUpsert(BaseModel):
++    """Schema for upserting an answer"""
++    pillar_id: str
++    question_id: str
++    level: int = Field(ge=1, le=5)
++    notes: Optional[str] = None
++
++
++class AssessmentResponse(BaseModel):
++    """Schema for assessment response"""
++    id: str
++    name: str
++    preset_id: str
++    created_at: datetime
++    answers: List[AnswerUpsert] = []
++
++
++class PillarScore(BaseModel):
++    """Schema for pillar score"""
++    pillar_id: str
++    score: Optional[float]
++    weight: float
++    questions_answered: int
++    total_questions: int
++
++
++class ScoreResponse(BaseModel):
++    """Schema for scores response"""
++    assessment_id: str
++    pillar_scores: List[PillarScore]
++    overall_score: Optional[float]
++    gates_applied: List[str] = []
++
++
++
++
++
++
++
++
++
++
+diff --git a/app/api/scoring.py b/app/api/scoring.py
+new file mode 100644
+index 0000000000000000000000000000000000000000..b0fc2d20ac30dd8c4f878e65775ff68f7c8577b6
+--- /dev/null
++++ b/app/api/scoring.py
+@@ -0,0 +1,69 @@
++from typing import Dict, List, Optional, Tuple
++from app.api.models import Answer
++
++def compute_scores(answers_by_pillar: Dict[str, List[Answer]], preset: dict) -> Tuple[Dict[str, Optional[float]], Optional[float], List[str]]:
++    """
++    Compute pillar scores and overall score based on answers and preset configuration.
++    
++    Returns:
++        - pillar_scores: Dict mapping pillar_id to score (None if no answers)
++        - overall_score: Weighted average across pillars (None if no scores)
++        - gates_applied: List of gate messages that were applied
++    """
++    pillar_scores = {}
++    gates_applied = []
++    
++    # Calculate per-pillar scores (average of levels)
++    for pillar in preset["pillars"]:
++        pillar_id = pillar["id"]
++        answers = answers_by_pillar.get(pillar_id, [])
++        
++        if answers:
++            total = sum(answer.level for answer in answers)
++            pillar_scores[pillar_id] = total / len(answers)
++        else:
++            pillar_scores[pillar_id] = None
++    
++    # Calculate overall score (weighted average)
++    weighted_sum = 0
++    total_weight = 0
++    
++    for pillar in preset["pillars"]:
++        pillar_id = pillar["id"]
++        weight = pillar["weight"]
++        score = pillar_scores.get(pillar_id)
++        
++        if score is not None:
++            weighted_sum += score * weight
++            total_weight += weight
++    
++    if total_weight > 0:
++        overall_score = weighted_sum / total_weight
++    else:
++        overall_score = None
++    
++    # Apply gates
++    if overall_score is not None and "scoring" in preset and "gates" in preset["scoring"]:
++        for gate in preset["scoring"]["gates"]:
++            gate_pillar = gate["pillar"]
++            min_level = gate["min_level"]
++            reason = gate["reason"]
++            
++            pillar_score = pillar_scores.get(gate_pillar)
++            if pillar_score is not None and pillar_score < min_level:
++                # Cap overall score at 3 if gate condition is met
++                if overall_score > 3:
++                    overall_score = 3.0
++                    gates_applied.append(f"Gate applied: {reason}")
++    
++    return pillar_scores, overall_score, gates_applied
++
++
++
++
++
++
++
++
++
++
+diff --git a/app/api/storage.py b/app/api/storage.py
+new file mode 100644
+index 0000000000000000000000000000000000000000..2ee0943646da061fb9622661a7c67526de1de869
+--- /dev/null
++++ b/app/api/storage.py
+@@ -0,0 +1,126 @@
++import os
++from datetime import datetime, timedelta
++from fastapi import APIRouter, HTTPException
++from pydantic import BaseModel
++from azure.storage.blob import BlobServiceClient, generate_blob_sas, BlobSasPermissions, generate_container_sas, ContainerSasPermissions
++from azure.identity import DefaultAzureCredential
++from dotenv import load_dotenv
++
++# Load environment variables
++load_dotenv()
++
++router = APIRouter(prefix="/uploads", tags=["uploads"])
++
++# Configuration from environment
++USE_MANAGED_IDENTITY = os.getenv("USE_MANAGED_IDENTITY", "false").lower() == "true"
++AZURE_STORAGE_ACCOUNT = os.getenv("AZURE_STORAGE_ACCOUNT")
++AZURE_STORAGE_KEY = os.getenv("AZURE_STORAGE_KEY")
++AZURE_STORAGE_CONNECTION_STRING = os.getenv("AZURE_STORAGE_CONNECTION_STRING")
++AZURE_STORAGE_CONTAINER = os.getenv("AZURE_STORAGE_CONTAINER", "docs")
++UPLOAD_SAS_TTL_MINUTES = int(os.getenv("UPLOAD_SAS_TTL_MINUTES", "15"))
++
++class SasRequest(BaseModel):
++    blob_name: str
++    permissions: str = "cw"  # create, write
++
++@router.post("/sas")
++def generate_sas_token(request: SasRequest):
++    """Generate a SAS token for blob upload. Returns 501 if Azure Storage is not configured."""
++    
++    # Check if storage is configured
++    if not AZURE_STORAGE_ACCOUNT:
++        raise HTTPException(
++            status_code=501, 
++            detail="Evidence uploads not configured. Set AZURE_STORAGE_ACCOUNT"
++        )
++    
++    # Check authentication method
++    if USE_MANAGED_IDENTITY:
++        # Using Managed Identity (no keys needed)
++        pass
++    elif not AZURE_STORAGE_KEY and not AZURE_STORAGE_CONNECTION_STRING:
++        raise HTTPException(
++            status_code=501, 
++            detail="Evidence uploads not configured. Set USE_MANAGED_IDENTITY=true or provide AZURE_STORAGE_KEY/CONNECTION_STRING"
++        )
++    
++    try:
++        # Calculate expiry time
++        expiry_time = datetime.utcnow() + timedelta(minutes=UPLOAD_SAS_TTL_MINUTES)
++        
++        # Parse permissions
++        sas_permissions = BlobSasPermissions()
++        if 'r' in request.permissions:
++            sas_permissions.read = True
++        if 'w' in request.permissions:
++            sas_permissions.write = True
++        if 'c' in request.permissions:
++            sas_permissions.create = True
++        if 'd' in request.permissions:
++            sas_permissions.delete = True
++        
++        if USE_MANAGED_IDENTITY:
++            # Use Managed Identity with user delegation key
++            account_url = f"https://{AZURE_STORAGE_ACCOUNT}.blob.core.windows.net"
++            blob_service_client = BlobServiceClient(
++                account_url=account_url,
++                credential=DefaultAzureCredential()
++            )
++            
++            # Get user delegation key (valid for 1 hour)
++            delegation_key_start = datetime.utcnow()
++            delegation_key_expiry = delegation_key_start + timedelta(hours=1)
++            user_delegation_key = blob_service_client.get_user_delegation_key(
++                key_start_time=delegation_key_start,
++                key_expiry_time=delegation_key_expiry
++            )
++            
++            # Generate user delegation SAS
++            sas_token = generate_blob_sas(
++                account_name=AZURE_STORAGE_ACCOUNT,
++                container_name=AZURE_STORAGE_CONTAINER,
++                blob_name=request.blob_name,
++                user_delegation_key=user_delegation_key,
++                permission=sas_permissions,
++                expiry=expiry_time,
++                start=delegation_key_start,
++                protocol="https"
++            )
++        else:
++            # Use account key (existing logic)
++            if AZURE_STORAGE_KEY:
++                account_key = AZURE_STORAGE_KEY
++            elif AZURE_STORAGE_CONNECTION_STRING:
++                # Extract key from connection string
++                import re
++                match = re.search(r'AccountKey=([^;]+)', AZURE_STORAGE_CONNECTION_STRING)
++                if match:
++                    account_key = match.group(1)
++                else:
++                    raise ValueError("Could not extract AccountKey from connection string")
++            else:
++                raise ValueError("No valid credentials found")
++            
++            # Generate SAS token with account key
++            sas_token = generate_blob_sas(
++                account_name=AZURE_STORAGE_ACCOUNT,
++                container_name=AZURE_STORAGE_CONTAINER,
++                blob_name=request.blob_name,
++                account_key=account_key,
++                permission=sas_permissions,
++                expiry=expiry_time,
++                protocol="https"
++            )
++        
++        # Construct full SAS URL
++        sas_url = f"https://{AZURE_STORAGE_ACCOUNT}.blob.core.windows.net/{AZURE_STORAGE_CONTAINER}/{request.blob_name}?{sas_token}"
++        
++        return {
++            "sasUrl": sas_url,
++            "expiresIn": UPLOAD_SAS_TTL_MINUTES * 60,  # seconds
++            "container": AZURE_STORAGE_CONTAINER,
++            "blobName": request.blob_name
++        }
++        
++    except Exception as e:
++        raise HTTPException(status_code=500, detail=f"Failed to generate SAS token: {str(e)}")
+diff --git a/app/config/presets/cyber-for-ai.json b/app/config/presets/cyber-for-ai.json
+new file mode 100644
+index 0000000000000000000000000000000000000000..7fedf0eeef128f37d25cb4ee7d3f5152bcf8df2a
+--- /dev/null
++++ b/app/config/presets/cyber-for-ai.json
+@@ -0,0 +1,98 @@
++{
++  "schema_version": "0.1.0",
++  "id": "cyber-for-ai",
++  "name": "Cyber for AI (Secure the AI)",
++  "description": "Preset focused on securing models, data, pipelines, prompts and agents. Maps to NIST AI RMF, ISO/IEC 42001, and OWASP LLM Top 10.",
++  "default_target_level": 4,
++  "maturity_levels": {
++    "1": "Ad hoc",
++    "2": "Emerging controls",
++    "3": "Defined & repeatable",
++    "4": "Managed & risk-based",
++    "5": "Optimized & continuous"
++  },
++  "pillars": [
++    { "id": "governance",       "name": "Governance & Responsible AI",        "weight": 0.20, "examples": ["AI policy, intake workflow, risk acceptance, RACI"] },
++    { "id": "model_security",   "name": "Model & Prompt Security",            "weight": 0.20, "examples": ["prompt injection defenses, output filters, key handling"] },
++    { "id": "data_security",    "name": "Data Security & Privacy",            "weight": 0.20, "examples": ["training/inference data protection, DLP, retention"] },
++    { "id": "supply_chain",     "name": "AI Supply Chain & Ops Security",     "weight": 0.15, "examples": ["artifact signing/verification, CI/CD hardening"] },
++    { "id": "evals_monitoring", "name": "Evaluations, Guardrails & Monitoring","weight": 0.15, "examples": ["eval suites, jailbreak testing, drift & safety monitoring"] },
++    { "id": "platform_access",  "name": "Platform & Access Controls",         "weight": 0.10, "examples": ["platform baseline, network controls, IAM/JIT/JEA"] }
++  ],
++  "scoring": {
++    "method": "weighted_average",
++    "gates": [
++      { "pillar": "governance", "min_level": 2, "reason": "Minimum governance required to exceed overall level 3" }
++    ]
++  },
++  "mappings": {
++    "nist_ai_rmf": { "functions": ["Govern", "Map", "Measure", "Manage"] },
++    "iso_42001":   { "clauses":   ["Context", "Leadership", "Planning", "Support", "Operation", "Performance evaluation", "Improvement"] },
++    "nist_csf_2_0":{ "functions": ["Identify", "Protect", "Detect", "Respond", "Recover", "Govern"] },
++    "owasp_llm_top10_2023": [
++      "LLM01: Prompt Injection",
++      "LLM02: Data Leakage",
++      "LLM03: Supply Chain",
++      "LLM04: Model Theft",
++      "LLM05: Insecure Output Handling"
++    ]
++  },
++  "questions": {
++    "governance": [
++      {
++        "id": "gov-01",
++        "text": "Is there an approved AI policy with roles, intake workflow, and risk approvals?",
++        "evidence": ["AI policy doc", "intake process", "approval records"],
++        "level_hints": { "3": "Policy approved; roles & intake defined", "4": "Risk-based approvals with periodic review and metrics" }
++      },
++      {
++        "id": "gov-02",
++        "text": "Are AI risk assessments performed per use case and tracked in a risk register?",
++        "evidence": ["methodology", "risk register entries"],
++        "level_hints": { "3": "Standard method applied", "4": "Thresholds drive controls and go/no-go decisions" }
++      }
++    ],
++    "model_security": [
++      {
++        "id": "mod-01",
++        "text": "Are prompt-injection and data-exfiltration tests executed per release with documented mitigations?",
++        "evidence": ["test plans", "results", "mitigation PRs"],
++        "level_hints": { "3": "Basic tests exist", "4": "Automated gates with thresholds and regression history" }
++      }
++    ],
++    "data_security": [
++      {
++        "id": "data-01",
++        "text": "Is training/inference data classified, access-controlled, and protected by preventive DLP where appropriate?",
++        "evidence": ["data map", "classification standard", "DLP policy/config"],
++        "level_hints": { "3": "Classification defined & applied", "4": "Preventive enforcement + periodic audits" }
++      }
++    ],
++    "supply_chain": [
++      {
++        "id": "sc-01",
++        "text": "Are model artifacts and dependencies signed and verified in CI/CD with provenance records?",
++        "evidence": ["sigstore/cosign logs", "pipeline config"],
++        "level_hints": { "3": "Signing present", "4": "Verification enforced; failure blocks release" }
++      }
++    ],
++    "evals_monitoring": [
++      {
++        "id": "eval-01",
++        "text": "Are evals for safety, security, bias, and drift run and reviewed with alerts on regressions?",
++        "evidence": ["eval reports", "alert config", "review minutes"],
++        "level_hints": { "3": "Periodic manual evals", "4": "Automated eval suite with SLOs & alerting" }
++      }
++    ],
++    "platform_access": [
++      {
++        "id": "plat-01",
++        "text": "Is least-privilege enforced for models, prompts, data, and keys with JIT/JEA and recertification?",
++        "evidence": ["IAM policy", "PIM/JIT config", "access review logs"],
++        "level_hints": { "3": "RBAC defined", "4": "JIT/JEA + periodic recertification + anomaly detection" }
++      }
++    ]
++  },
++  "evidence": { "allowed_types": ["pdf","docx","xlsx","csv","md","png","jpg"], "storage_container": "docs" }
++}
++
+diff --git a/app/requirements.txt b/app/requirements.txt
+new file mode 100644
+index 0000000000000000000000000000000000000000..c86bd61a720c640a49dc14ec19f9ac2c199054a3
+--- /dev/null
++++ b/app/requirements.txt
+@@ -0,0 +1,7 @@
++fastapi>=0.115
++uvicorn[standard]>=0.30
++sqlmodel>=0.0.16
++pydantic>=2.7
++azure-storage-blob>=12.19
++azure-identity>=1.17
++python-dotenv>=1.0
+diff --git a/infra/aca_env.tf b/infra/aca_env.tf
+new file mode 100644
+index 0000000000000000000000000000000000000000..c5c8f879f90ac7e8b1625a3f60a0a048b187949d
+--- /dev/null
++++ b/infra/aca_env.tf
+@@ -0,0 +1,26 @@
++resource "random_string" "log" {
++  length  = 6
++  upper   = false
++  lower   = true
++  numeric = true
++  special = false
++}
++
++resource "azurerm_log_analytics_workspace" "log" {
++  name                = "log-${replace(local.name_prefix,"-","")}-${random_string.log.result}"
++  location            = local.location
++  resource_group_name = azurerm_resource_group.rg.name
++  sku                 = "PerGB2018"
++  retention_in_days   = 30
++  tags                = local.common_tags
++}
++
++resource "azurerm_container_app_environment" "env" {
++  name                       = "aca-${local.name_prefix}"
++  location                   = local.location
++  resource_group_name        = azurerm_resource_group.rg.name
++  log_analytics_workspace_id = azurerm_log_analytics_workspace.log.id
++  tags                       = local.common_tags
++}
++
++output "aca_env_name" { value = azurerm_container_app_environment.env.name }
+diff --git a/infra/acr.tf b/infra/acr.tf
+new file mode 100644
+index 0000000000000000000000000000000000000000..b2838b4cd257f5ba16323d12444bb03a225563a4
+--- /dev/null
++++ b/infra/acr.tf
+@@ -0,0 +1,21 @@
++locals { acr_name_prefix = replace(local.name_prefix, "-", "") }
++
++resource "random_string" "acr" {
++  length = 6
++  upper = false
++  lower = true
++  numeric = true
++  special = false
++}
++
++resource "azurerm_container_registry" "acr" {
++  name                = "acr${local.acr_name_prefix}${random_string.acr.result}"
++  resource_group_name = azurerm_resource_group.rg.name
++  location            = local.location
++  sku                 = "Basic"
++  admin_enabled       = false
++  tags                = local.common_tags
++}
++
++output "acr_name"         { value = azurerm_container_registry.acr.name }
++output "acr_login_server" { value = azurerm_container_registry.acr.login_server }
+diff --git a/infra/identity.tf b/infra/identity.tf
+new file mode 100644
+index 0000000000000000000000000000000000000000..6243066f6ffe8d2821e63bce94c5ac072a0a743d
+--- /dev/null
++++ b/infra/identity.tf
+@@ -0,0 +1,50 @@
++resource "azurerm_user_assigned_identity" "api" {
++  name                = "uai-api-${local.name_prefix}"
++  location            = local.location
++  resource_group_name = azurerm_resource_group.rg.name
++  tags                = local.common_tags
++}
++
++resource "azurerm_user_assigned_identity" "web" {
++  name                = "uai-web-${local.name_prefix}"
++  location            = local.location
++  resource_group_name = azurerm_resource_group.rg.name
++  tags                = local.common_tags
++}
++
++# API identity can pull from ACR
++resource "azurerm_role_assignment" "api_acr_pull" {
++  scope                = azurerm_container_registry.acr.id
++  role_definition_name = "AcrPull"
++  principal_id         = azurerm_user_assigned_identity.api.principal_id
++}
++
++# Web identity can pull from ACR
++resource "azurerm_role_assignment" "web_acr_pull" {
++  scope                = azurerm_container_registry.acr.id
++  role_definition_name = "AcrPull"
++  principal_id         = azurerm_user_assigned_identity.web.principal_id
++}
++
++# API identity can generate user-delegation SAS on Storage (write/create)
++resource "azurerm_role_assignment" "api_storage_blob_contrib" {
++  scope                = azurerm_storage_account.sa.id
++  role_definition_name = "Storage Blob Data Contributor"
++  principal_id         = azurerm_user_assigned_identity.api.principal_id
++}
++
++# API identity can read secrets from Key Vault (future use)
++resource "azurerm_role_assignment" "api_kv_secrets_user" {
++  scope                = azurerm_key_vault.kv.id
++  role_definition_name = "Key Vault Secrets User"
++  principal_id         = azurerm_user_assigned_identity.api.principal_id
++}
++
++output "uai_api_principal_id" { value = azurerm_user_assigned_identity.api.principal_id }
++output "uai_web_principal_id" { value = azurerm_user_assigned_identity.web.principal_id }
++output "uai_api_id" { value = azurerm_user_assigned_identity.api.id }
++output "uai_web_id" { value = azurerm_user_assigned_identity.web.id }
++
++
++
++
+diff --git a/infra/keyvault.tf b/infra/keyvault.tf
+new file mode 100644
+index 0000000000000000000000000000000000000000..aeff308ec5c6cabd6e343619571de7f7a92264e5
+--- /dev/null
++++ b/infra/keyvault.tf
+@@ -0,0 +1,31 @@
++locals { kv_name_prefix = replace(local.name_prefix, "-", "") }
++
++resource "random_string" "kv" {
++  length  = 6
++  upper   = false
++  lower   = true
++  numeric = true
++  special = false
++}
++
++data "azurerm_client_config" "current" {}
++
++resource "azurerm_key_vault" "kv" {
++  name                          = substr("kv${local.kv_name_prefix}${random_string.kv.result}", 0, 24)
++  location                      = local.location
++  resource_group_name           = azurerm_resource_group.rg.name
++  tenant_id                     = data.azurerm_client_config.current.tenant_id
++  sku_name                      = "standard"
++  enable_rbac_authorization     = true
++  soft_delete_retention_days    = 7
++  purge_protection_enabled      = true
++  public_network_access_enabled = true
++  tags                          = local.common_tags
++}
++
++output "key_vault_name" {
++  value = azurerm_key_vault.kv.name
++}
++output "key_vault_uri" {
++  value = azurerm_key_vault.kv.vault_uri
++}
+diff --git a/infra/locals.tf b/infra/locals.tf
+new file mode 100644
+index 0000000000000000000000000000000000000000..df31a30ad2bb0c467286cac3cd8dc99dbc15f0e6
+--- /dev/null
++++ b/infra/locals.tf
+@@ -0,0 +1,14 @@
++locals {
++  # e.g., "aaa-demo"
++  name_prefix = lower("${var.client_code}-${var.env}")
++  location    = var.location
++
++  # Merge defaults with per-deploy values
++  common_tags = merge(
++    var.tags,
++    {
++      Client      = var.client_code
++      Environment = var.env
++    }
++  )
++}
+diff --git a/infra/providers.tf b/infra/providers.tf
+new file mode 100644
+index 0000000000000000000000000000000000000000..35d8853c7fa255f7e2433bd7b2ab2b35176139a0
+--- /dev/null
++++ b/infra/providers.tf
+@@ -0,0 +1,26 @@
++terraform {
++  required_version = "~> 1.9.0"
++
++  required_providers {
++    azurerm = {
++      source  = "hashicorp/azurerm"
++      version = "~> 4.0"
++    }
++    random = {
++      source  = "hashicorp/random"
++      version = "~> 3.6"
++    }
++  }
++
++  backend "local" {
++    path = "terraform.tfstate"
++  }
++}
++
++provider "azurerm" {
++  features {}
++  resource_provider_registrations = "none"
++
++  subscription_id = var.subscription_id
++  tenant_id       = var.tenant_id
++}
+diff --git a/infra/resource_group.tf b/infra/resource_group.tf
+new file mode 100644
+index 0000000000000000000000000000000000000000..281984056c819ca048d43112cca98dab3451c5a0
+--- /dev/null
++++ b/infra/resource_group.tf
+@@ -0,0 +1,9 @@
++resource "azurerm_resource_group" "rg" {
++  name     = "rg-${local.name_prefix}"
++  location = local.location
++  tags     = local.common_tags
++}
++
++output "resource_group_name" {
++  value = azurerm_resource_group.rg.name
++}
+diff --git a/infra/storage.tf b/infra/storage.tf
+new file mode 100644
+index 0000000000000000000000000000000000000000..f643e3ff0a6753b89ebcd759871676e4e87093f0
+--- /dev/null
++++ b/infra/storage.tf
+@@ -0,0 +1,33 @@
++locals { sa_name_prefix = replace(local.name_prefix, "-", "") }
++
++resource "random_string" "sa" {
++  length  = 6
++  upper   = false
++  lower   = true
++  numeric = true
++  special = false
++}
++
++resource "azurerm_storage_account" "sa" {
++  name                            = substr("st${local.sa_name_prefix}${random_string.sa.result}", 0, 24)
++  resource_group_name             = azurerm_resource_group.rg.name
++  location                        = local.location
++  account_tier                    = "Standard"
++  account_replication_type        = "LRS"
++  allow_nested_items_to_be_public = false
++  min_tls_version                 = "TLS1_2"
++  tags                            = local.common_tags
++}
++
++resource "azurerm_storage_container" "docs" {
++  name                  = "docs"
++  storage_account_id    = azurerm_storage_account.sa.id
++  container_access_type = "private"
++}
++
++output "storage_account_name" {
++  value = azurerm_storage_account.sa.name
++}
++output "docs_container_url" {
++  value = "${azurerm_storage_account.sa.primary_blob_endpoint}docs"
++}
+diff --git a/infra/variables.tf b/infra/variables.tf
+new file mode 100644
+index 0000000000000000000000000000000000000000..354bcb87890889731d43890f3ccfaca7d8e9537a
+--- /dev/null
++++ b/infra/variables.tf
+@@ -0,0 +1,37 @@
++variable "subscription_id" {
++  description = "Azure Subscription ID"
++  type        = string
++}
++
++variable "tenant_id" {
++  description = "Azure AD tenant ID"
++  type        = string
++}
++
++variable "location" {
++  description = "Azure region (Canada)"
++  type        = string
++  default     = "canadacentral"
++}
++
++variable "env" {
++  description = "Environment name (e.g., demo, dev, prod)"
++  type        = string
++  default     = "demo"
++}
++
++variable "tags" {
++  description = "Common resource tags"
++  type        = map(string)
++  default = {
++    Project     = "AI-Enable-Cyber-Maturity-Assessment"
++    Environment = "demo"
++    Owner       = "valsysoiev"
++  }
++}
++
++variable "client_code" {
++  description = "Short code for the client (e.g., AAA)"
++  type        = string
++  default     = "AAA"
++}
+diff --git a/web/Dockerfile b/web/Dockerfile
+new file mode 100644
+index 0000000000000000000000000000000000000000..79c16af9aee1841c0f79c83af6dd5be09c57814e
+--- /dev/null
++++ b/web/Dockerfile
+@@ -0,0 +1,29 @@
++FROM node:20-alpine AS deps
++WORKDIR /app
++COPY package*.json ./
++RUN npm ci
++
++FROM node:20-alpine AS build
++WORKDIR /app
++COPY --from=deps /app/node_modules ./node_modules
++COPY . ./
++ARG NEXT_PUBLIC_API_BASE_URL
++ENV NEXT_PUBLIC_API_BASE_URL=$NEXT_PUBLIC_API_BASE_URL
++RUN npm run build
++
++FROM node:20-alpine AS run
++WORKDIR /app
++ENV NODE_ENV=production
++COPY --from=build /app ./
++EXPOSE 3000
++CMD ["npm","start"]
++
++
++
++
++
++
++
++
++
++
+diff --git a/web/ENV_SETUP.md b/web/ENV_SETUP.md
+new file mode 100644
+index 0000000000000000000000000000000000000000..5e33a3c1f7d1af15f30f38dab5ef45f882b9a3c8
+--- /dev/null
++++ b/web/ENV_SETUP.md
+@@ -0,0 +1,19 @@
++# Environment Setup
++
++Create a `.env.local` file in the `web/` directory with the following content:
++
++```env
++NEXT_PUBLIC_API_BASE_URL=http://localhost:8000
++```
++
++This file is ignored by git and should contain your local environment variables.
++
++
++
++
++
++
++
++
++
++
+diff --git a/web/app/assessment/[id]/page.tsx b/web/app/assessment/[id]/page.tsx
+new file mode 100644
+index 0000000000000000000000000000000000000000..b040a481bfd8af3f0629221b2d467033751522c1
+--- /dev/null
++++ b/web/app/assessment/[id]/page.tsx
+@@ -0,0 +1,272 @@
++"use client";
++import { useEffect, useState } from "react";
++import { useParams } from "next/navigation";
++import { fetchPreset } from "@/lib/api";
++import { getAssessment, saveAnswer, getScores, Answer, ScoreData } from "@/lib/assessments";
++import ScoreRadar from "@/components/ScoreRadar";
++import EvidenceUploader from "@/components/EvidenceUploader";
++
++interface QuestionWithAnswer {
++  question: any;
++  answer?: Answer;
++}
++
++export default function AssessmentPage() {
++  const params = useParams();
++  const assessmentId = params.id as string;
++  
++  const [preset, setPreset] = useState<any>(null);
++  const [assessment, setAssessment] = useState<any>(null);
++  const [pillarId, setPillarId] = useState<string | null>(null);
++  const [loading, setLoading] = useState(true);
++  const [error, setError] = useState<string | null>(null);
++  const [saving, setSaving] = useState<string | null>(null);
++  const [savedStates, setSavedStates] = useState<{[key: string]: boolean}>({});
++  const [scoreData, setScoreData] = useState<ScoreData | null>(null);
++  const [loadingScores, setLoadingScores] = useState(false);
++  const [showScores, setShowScores] = useState(false);
++  const [evidenceUrls, setEvidenceUrls] = useState<{[key: string]: string[]}>({});
++
++  useEffect(() => {
++    loadData();
++  }, [assessmentId]);
++
++  async function loadData() {
++    try {
++      // Load assessment
++      const assessmentData = await getAssessment(assessmentId);
++      setAssessment(assessmentData);
++      
++      // Load preset
++      const presetData = await fetchPreset(assessmentData.preset_id);
++      setPreset(presetData);
++      setPillarId(presetData.pillars[0]?.id ?? null);
++    } catch (err) {
++      setError(err instanceof Error ? err.message : "Failed to load data");
++    } finally {
++      setLoading(false);
++    }
++  }
++
++  async function handleSaveAnswer(pillarId: string, questionId: string, level: number, notes?: string) {
++    const key = `${pillarId}-${questionId}`;
++    setSaving(key);
++    setSavedStates({ ...savedStates, [key]: false });
++    
++    try {
++      await saveAnswer(assessmentId, {
++        pillar_id: pillarId,
++        question_id: questionId,
++        level,
++        notes
++      });
++      setSavedStates({ ...savedStates, [key]: true });
++      setTimeout(() => {
++        setSavedStates(prev => ({ ...prev, [key]: false }));
++      }, 2000);
++      // Reload assessment to get updated answers
++      const updatedAssessment = await getAssessment(assessmentId);
++      setAssessment(updatedAssessment);
++    } catch (err) {
++      setError(err instanceof Error ? err.message : "Failed to save answer");
++    } finally {
++      setSaving(null);
++    }
++  }
++
++  async function handleComputeScores() {
++    setLoadingScores(true);
++    try {
++      const scores = await getScores(assessmentId);
++      setScoreData(scores);
++      setShowScores(true);
++    } catch (err) {
++      setError(err instanceof Error ? err.message : "Failed to compute scores");
++    } finally {
++      setLoadingScores(false);
++    }
++  }
++
++  function handleEvidenceUpload(questionKey: string, blobUrl: string) {
++    setEvidenceUrls(prev => ({
++      ...prev,
++      [questionKey]: [...(prev[questionKey] || []), blobUrl]
++    }));
++  }
++
++  if (loading) return <main className="p-8">Loading…</main>;
++  if (error) return <main className="p-8"><div className="p-4 bg-red-50 text-red-700 rounded">Error: {error}</div></main>;
++  if (!preset || !assessment) return <main className="p-8">No data loaded</main>;
++
++  const currentQuestions = pillarId ? preset.questions[pillarId] : [];
++  const answersByKey = assessment.answers.reduce((acc: any, ans: Answer) => {
++    acc[`${ans.pillar_id}-${ans.question_id}`] = ans;
++    return acc;
++  }, {});
++
++  return (
++    <div className="grid grid-cols-12 min-h-screen">
++      <aside className="col-span-3 bg-gray-100 p-4 space-y-2">
++        <h2 className="font-semibold mb-2">Assessment: {assessment.name}</h2>
++        <div className="text-sm text-gray-600 mb-4">ID: {assessmentId.slice(0, 8)}...</div>
++        <h3 className="font-semibold">Pillars</h3>
++        {preset.pillars.map((p: any) => (
++          <button key={p.id} onClick={() => setPillarId(p.id)}
++            className={`block w-full text-left px-3 py-2 rounded ${pillarId===p.id?'bg-white':'hover:bg-white'}`}>
++            {p.name}
++          </button>
++        ))}
++      </aside>
++      <main className="col-span-9 p-6 space-y-4">
++        <div className="flex justify-between items-center">
++          <h1 className="text-xl font-semibold">{preset.name}</h1>
++          <button
++            onClick={handleComputeScores}
++            disabled={loadingScores}
++            className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 disabled:bg-gray-400"
++          >
++            {loadingScores ? "Computing..." : "Compute Scores"}
++          </button>
++        </div>
++        
++        {showScores && scoreData && (
++          <div className="bg-white border rounded p-6 space-y-6">
++            <h2 className="text-lg font-semibold">Assessment Scores</h2>
++            
++            {/* Pillar Scores Table */}
++            <div>
++              <h3 className="font-medium mb-2">Pillar Scores</h3>
++              <table className="w-full text-sm">
++                <thead>
++                  <tr className="border-b">
++                    <th className="text-left py-2">Pillar</th>
++                    <th className="text-center py-2">Score</th>
++                    <th className="text-center py-2">Weight</th>
++                    <th className="text-center py-2">Questions</th>
++                  </tr>
++                </thead>
++                <tbody>
++                  {scoreData.pillar_scores.map((ps) => {
++                    const pillar = preset.pillars.find((p: any) => p.id === ps.pillar_id);
++                    return (
++                      <tr key={ps.pillar_id} className="border-b">
++                        <td className="py-2">{pillar?.name || ps.pillar_id}</td>
++                        <td className="text-center py-2">
++                          {ps.score !== null ? ps.score.toFixed(1) : "N/A"}
++                        </td>
++                        <td className="text-center py-2">{(ps.weight * 100).toFixed(0)}%</td>
++                        <td className="text-center py-2">
++                          {ps.questions_answered} / {ps.total_questions}
++                        </td>
++                      </tr>
++                    );
++                  })}
++                </tbody>
++              </table>
++            </div>
++            
++            {/* Radar Chart */}
++            <div>
++              <h3 className="font-medium mb-2">Radar Visualization</h3>
++              <ScoreRadar 
++                scores={scoreData.pillar_scores.map(ps => {
++                  const pillar = preset.pillars.find((p: any) => p.id === ps.pillar_id);
++                  return {
++                    pillar_id: ps.pillar_id,
++                    pillar_name: pillar?.name || ps.pillar_id,
++                    score: ps.score
++                  };
++                })}
++              />
++            </div>
++            
++            {/* Overall Score */}
++            <div className="bg-gray-50 p-4 rounded">
++              <h3 className="font-medium">Overall Score</h3>
++              <div className="text-2xl font-bold mt-1">
++                {scoreData.overall_score !== null ? scoreData.overall_score.toFixed(2) : "N/A"} / 5.0
++              </div>
++              {scoreData.gates_applied.length > 0 && (
++                <div className="mt-2 text-sm text-orange-600">
++                  {scoreData.gates_applied.map((gate, i) => (
++                    <div key={i}>⚠️ {gate}</div>
++                  ))}
++                </div>
++              )}
++            </div>
++          </div>
++        )}
++        {currentQuestions?.map((q: any) => {
++          const key = `${pillarId}-${q.id}`;
++          const existingAnswer = answersByKey[key];
++          const isSaving = saving === key;
++          const isSaved = savedStates[key];
++          
++          return (
++            <div key={q.id} className="bg-white border rounded p-4 space-y-3">
++              <div className="font-medium">{q.text}</div>
++              {q.level_hints && (
++                <div className="text-sm text-gray-600">
++                  {q.level_hints["3"] && <span>L3: {q.level_hints["3"]}</span>}
++                  {q.level_hints["3"] && q.level_hints["4"] && <span className="mx-2">•</span>}
++                  {q.level_hints["4"] && <span>L4: {q.level_hints["4"]}</span>}
++                </div>
++              )}
++              <div className="text-sm">
++                <span className="font-medium">Evidence:</span> {q.evidence?.join(", ")}
++              </div>
++              <div className="flex items-center gap-4">
++                <div>
++                  <label className="text-sm">Level:</label>
++                  <select 
++                    id={`level-${key}`}
++                    className="ml-2 border rounded px-2 py-1" 
++                    defaultValue={existingAnswer?.level || "3"}
++                    disabled={isSaving}
++                  >
++                    <option value="1">1</option>
++                    <option value="2">2</option>
++                    <option value="3">3</option>
++                    <option value="4">4</option>
++                    <option value="5">5</option>
++                  </select>
++                </div>
++                <button
++                  onClick={() => {
++                    const select = document.getElementById(`level-${key}`) as HTMLSelectElement;
++                    handleSaveAnswer(pillarId!, q.id, parseInt(select.value));
++                  }}
++                  disabled={isSaving}
++                  className="px-3 py-1 text-sm bg-green-600 text-white rounded hover:bg-green-700 disabled:bg-gray-400"
++                >
++                  {isSaving ? "Saving..." : "Save"}
++                </button>
++                {isSaved && <span className="text-sm text-green-600">✓ Saved</span>}
++              </div>
++              
++              {/* Evidence Upload Section */}
++              <div className="border-t pt-3 space-y-2">
++                <div className="text-sm font-medium">Upload Evidence</div>
++                <EvidenceUploader 
++                  onUploadComplete={(blobUrl) => handleEvidenceUpload(key, blobUrl)}
++                />
++                
++                {/* Display linked evidence */}
++                {evidenceUrls[key] && evidenceUrls[key].length > 0 && (
++                  <div className="mt-2 space-y-1">
++                    <div className="text-sm font-medium text-gray-700">Linked Evidence:</div>
++                    {evidenceUrls[key].map((url, idx) => (
++                      <div key={idx} className="text-sm text-blue-600 truncate">
++                        • {url.split('/').pop()}
++                      </div>
++                    ))}
++                  </div>
++                )}
++              </div>
++            </div>
++          );
++        })}
++      </main>
++    </div>
++  );
++}
+diff --git a/web/app/assessment/draft/page.tsx b/web/app/assessment/draft/page.tsx
+new file mode 100644
+index 0000000000000000000000000000000000000000..03acabd33054d205a681f35946fbc715d5633e0b
+--- /dev/null
++++ b/web/app/assessment/draft/page.tsx
+@@ -0,0 +1,51 @@
++"use client";
++import { useEffect, useState } from "react";
++import { fetchPreset } from "@/lib/api";
++import QuestionCard from "@/components/QuestionCard";
++
++export default function DraftAssessment() {
++  const [preset, setPreset] = useState<any>(null);
++  const [pillarId, setPillarId] = useState<string | null>(null);
++  const [loading, setLoading] = useState(true);
++  const [error, setError] = useState<string | null>(null);
++
++  useEffect(() => { 
++    (async () => {
++      try {
++        const p = await fetchPreset("cyber-for-ai");
++        setPreset(p);
++        setPillarId(p.pillars[0]?.id ?? null);
++      } catch (err) {
++        setError(err instanceof Error ? err.message : "Failed to load preset");
++      } finally {
++        setLoading(false);
++      }
++    })(); 
++  }, []);
++
++  if (loading) return <main className="p-8">Loading…</main>;
++  if (error) return <main className="p-8"><div className="p-4 bg-red-50 text-red-700 rounded">Error: {error}</div></main>;
++  if (!preset) return <main className="p-8">No preset loaded</main>;
++
++  const current = pillarId ? preset.questions[pillarId] : [];
++
++  return (
++    <div className="grid grid-cols-12 min-h-screen">
++      <aside className="col-span-3 bg-gray-100 p-4 space-y-2">
++        <h2 className="font-semibold mb-2">Pillars</h2>
++        {preset.pillars.map((p: any) => (
++          <button key={p.id} onClick={() => setPillarId(p.id)}
++            className={`block w-full text-left px-3 py-2 rounded ${pillarId===p.id?'bg-white':'hover:bg-white'}`}>
++            {p.name}
++          </button>
++        ))}
++      </aside>
++      <main className="col-span-9 p-6 space-y-4">
++        <h1 className="text-xl font-semibold">{preset.name}</h1>
++        {current?.map((q: any) => (
++          <QuestionCard key={q.id} question={q} />
++        ))}
++      </main>
++    </div>
++  );
++}
+diff --git a/web/app/globals.css b/web/app/globals.css
+new file mode 100644
+index 0000000000000000000000000000000000000000..a90f0749c75caa03be6aced4c980a79c4dd60138
+--- /dev/null
++++ b/web/app/globals.css
+@@ -0,0 +1,4 @@
++@tailwind base;
++@tailwind components;
++@tailwind utilities;
++
+diff --git a/web/app/layout.tsx b/web/app/layout.tsx
+new file mode 100644
+index 0000000000000000000000000000000000000000..077bedf8a00a1d22cba4bf0526731fe1ab49603b
+--- /dev/null
++++ b/web/app/layout.tsx
+@@ -0,0 +1,16 @@
++import "./globals.css";
++import type { Metadata } from "next";
++import TopNav from "@/components/TopNav";
++
++export const metadata: Metadata = { title: "AI Maturity Tool", description: "Assess and plan AI security maturity" };
++
++export default function RootLayout({ children }: { children: React.ReactNode }) {
++  return (
++    <html lang="en">
++      <body className="min-h-screen bg-gray-50 text-gray-900">
++        <TopNav />
++        {children}
++      </body>
++    </html>
++  );
++}
+diff --git a/web/app/new/page.tsx b/web/app/new/page.tsx
+new file mode 100644
+index 0000000000000000000000000000000000000000..799b95f9d098fbe34573054253cd4e7b620079dc
+--- /dev/null
++++ b/web/app/new/page.tsx
+@@ -0,0 +1,75 @@
++"use client";
++import { useState } from "react";
++import { useRouter } from "next/navigation";
++import { fetchPreset } from "@/lib/api";
++import { createAssessment } from "@/lib/assessments";
++
++export default function NewAssessmentPage() {
++  const router = useRouter();
++  const [loading, setLoading] = useState(false);
++  const [preset, setPreset] = useState<any>(null);
++  const [error, setError] = useState<string | null>(null);
++  const [creating, setCreating] = useState(false);
++  
++  async function load() {
++    setLoading(true);
++    setError(null);
++    try {
++      setPreset(await fetchPreset("cyber-for-ai"));
++    } catch (err) {
++      setError(err instanceof Error ? err.message : "Failed to load preset");
++    } finally {
++      setLoading(false);
++    }
++  }
++
++  async function handleContinue() {
++    setCreating(true);
++    setError(null);
++    try {
++      const assessment = await createAssessment("Demo Assessment", "cyber-for-ai");
++      router.push(`/assessment/${assessment.id}`);
++    } catch (err) {
++      setError(err instanceof Error ? err.message : "Failed to create assessment");
++      setCreating(false);
++    }
++  }
++  return (
++    <main className="p-8 space-y-4">
++      <h1 className="text-2xl font-semibold">New Assessment — Scope</h1>
++      <div className="space-y-2">
++        <label className="block text-sm font-medium">Profile</label>
++        <select className="border rounded px-3 py-2" defaultValue="cyber-for-ai">
++          <option value="cyber-for-ai">Cyber for AI</option>
++        </select>
++      </div>
++      <button onClick={load} className="px-4 py-2 bg-black text-white rounded" disabled={loading}>
++        {loading ? "Loading…" : "Load preset"}
++      </button>
++      {error && (
++        <div className="p-4 bg-red-50 text-red-700 rounded">
++          Error: {error}
++        </div>
++      )}
++      {preset && (
++        <div className="mt-4 border rounded p-4 bg-white">
++          <p className="font-medium">{preset.name}</p>
++          <p className="text-sm text-gray-600">{preset.description}</p>
++          <ul className="mt-2 list-disc list-inside">
++            {preset.pillars.map((p: any) => (
++              <li key={p.id}>{p.name} — weight {(p.weight*100).toFixed(0)}%</li>
++            ))}
++          </ul>
++          <p className="mt-2 text-sm">Default target level: <b>{preset.default_target_level}</b></p>
++          <button 
++            onClick={handleContinue} 
++            disabled={creating}
++            className="inline-block mt-3 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 disabled:bg-gray-400"
++          >
++            {creating ? "Creating..." : "Continue"}
++          </button>
++        </div>
++      )}
++    </main>
++  );
++}
+diff --git a/web/components/EvidenceUploader.tsx b/web/components/EvidenceUploader.tsx
+new file mode 100644
+index 0000000000000000000000000000000000000000..071385f8c0dce9056ff0112cfa18e9291f0c18a4
+--- /dev/null
++++ b/web/components/EvidenceUploader.tsx
+@@ -0,0 +1,120 @@
++"use client";
++import { useState, useRef } from "react";
++
++interface EvidenceUploaderProps {
++  onUploadComplete?: (blobUrl: string) => void;
++}
++
++export default function EvidenceUploader({ onUploadComplete }: EvidenceUploaderProps) {
++  const [uploading, setUploading] = useState(false);
++  const [error, setError] = useState<string | null>(null);
++  const [uploadedUrl, setUploadedUrl] = useState<string | null>(null);
++  const fileInputRef = useRef<HTMLInputElement>(null);
++
++  async function handleUpload(event: React.ChangeEvent<HTMLInputElement>) {
++    const file = event.target.files?.[0];
++    if (!file) return;
++
++    setUploading(true);
++    setError(null);
++    setUploadedUrl(null);
++
++    try {
++      // Generate a unique blob name
++      const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
++      const blobName = `evidence/${timestamp}-${file.name}`;
++
++      // Get SAS URL from backend
++      const sasResponse = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:8000"}/uploads/sas`, {
++        method: "POST",
++        headers: { "Content-Type": "application/json" },
++        body: JSON.stringify({
++          blob_name: blobName,
++          permissions: "cw"
++        })
++      });
++
++      if (sasResponse.status === 501) {
++        setError("Evidence uploads not configured on server");
++        return;
++      }
++
++      if (!sasResponse.ok) {
++        const errorData = await sasResponse.json();
++        throw new Error(errorData.detail || "Failed to get upload URL");
++      }
++
++      const { sasUrl } = await sasResponse.json();
++
++      // Upload file directly to Azure Storage
++      const uploadResponse = await fetch(sasUrl, {
++        method: "PUT",
++        headers: {
++          "x-ms-blob-type": "BlockBlob",
++          "Content-Type": file.type || "application/octet-stream"
++        },
++        body: file
++      });
++
++      if (!uploadResponse.ok) {
++        throw new Error(`Upload failed: ${uploadResponse.statusText}`);
++      }
++
++      // Extract base URL (without SAS token) for display
++      const baseUrl = sasUrl.split('?')[0];
++      setUploadedUrl(baseUrl);
++      
++      // Notify parent component
++      if (onUploadComplete) {
++        onUploadComplete(baseUrl);
++      }
++
++    } catch (err) {
++      setError(err instanceof Error ? err.message : "Upload failed");
++    } finally {
++      setUploading(false);
++      // Reset file input
++      if (fileInputRef.current) {
++        fileInputRef.current.value = "";
++      }
++    }
++  }
++
++  return (
++    <div className="space-y-2">
++      <div className="flex items-center gap-2">
++        <input
++          ref={fileInputRef}
++          type="file"
++          onChange={handleUpload}
++          disabled={uploading}
++          className="text-sm file:mr-2 file:py-1 file:px-3 file:rounded file:border-0 file:text-sm file:font-medium file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 disabled:opacity-50"
++          accept=".pdf,.docx,.xlsx,.csv,.md,.png,.jpg,.txt"
++        />
++        {uploading && <span className="text-sm text-gray-600">Uploading...</span>}
++      </div>
++      
++      {error && (
++        <div className="text-sm text-red-600">
++          Error: {error}
++        </div>
++      )}
++      
++      {uploadedUrl && (
++        <div className="text-sm text-green-600">
++          ✓ Uploaded: {uploadedUrl.split('/').pop()}
++        </div>
++      )}
++    </div>
++  );
++}
++
++
++
++
++
++
++
++
++
++
+diff --git a/web/components/QuestionCard.tsx b/web/components/QuestionCard.tsx
+new file mode 100644
+index 0000000000000000000000000000000000000000..db3d4bd390ec325b36c150297ac25436e578334c
+--- /dev/null
++++ b/web/components/QuestionCard.tsx
+@@ -0,0 +1,85 @@
++"use client";
++import { useState } from "react";
++
++interface QuestionCardProps {
++  question: {
++    id: string;
++    text: string;
++    evidence: string[];
++    level_hints: {
++      [level: string]: string;
++    };
++  };
++}
++
++export default function QuestionCard({ question }: QuestionCardProps) {
++  const [loading, setLoading] = useState(false);
++  const [aiResponse, setAiResponse] = useState<any>(null);
++  const [error, setError] = useState<string | null>(null);
++
++  async function handleAiAssist() {
++    setLoading(true);
++    setError(null);
++    try {
++      const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:8000"}/assist/autofill`, {
++        method: "POST",
++        headers: { "Content-Type": "application/json" },
++        body: JSON.stringify({ question_text: question.text })
++      });
++      if (res.ok) {
++        const data = await res.json();
++        setAiResponse(data);
++      } else {
++        throw new Error("Failed to get AI assistance");
++      }
++    } catch (err) {
++      setError(err instanceof Error ? err.message : "Failed to get AI assistance");
++    } finally {
++      setLoading(false);
++    }
++  }
++
++  return (
++    <div className="bg-white border rounded p-4 space-y-3">
++      <div className="font-medium">{question.text}</div>
++      {question.level_hints && (
++        <div className="text-sm text-gray-600">
++          {question.level_hints["3"] && <span>L3: {question.level_hints["3"]}</span>}
++          {question.level_hints["3"] && question.level_hints["4"] && <span className="mx-2">•</span>}
++          {question.level_hints["4"] && <span>L4: {question.level_hints["4"]}</span>}
++        </div>
++      )}
++      <div className="text-sm">
++        <span className="font-medium">Evidence:</span> {question.evidence?.join(", ")}
++      </div>
++      <div className="flex items-center gap-4">
++        <div>
++          <label className="text-sm">Level:</label>
++          <select className="ml-2 border rounded px-2 py-1" defaultValue="3" disabled>
++            <option>1</option><option>2</option><option>3</option><option>4</option><option>5</option>
++          </select>
++          <span className="ml-2 text-xs text-gray-500">read-only (stub)</span>
++        </div>
++        <button
++          onClick={handleAiAssist}
++          disabled={loading}
++          className="px-3 py-1 text-sm bg-blue-600 text-white rounded hover:bg-blue-700 disabled:bg-gray-400"
++        >
++          {loading ? "Loading..." : "AI Assist → Autofill"}
++        </button>
++      </div>
++      {error && (
++        <div className="mt-3 p-3 bg-red-50 rounded text-sm text-red-700">
++          Error: {error}
++        </div>
++      )}
++      {aiResponse && (
++        <div className="mt-3 p-3 bg-blue-50 rounded text-sm">
++          <div className="font-medium text-blue-900">AI Suggestion:</div>
++          <div className="mt-1 text-blue-800">Proposed Level: {aiResponse.proposed_level}</div>
++          <div className="mt-1 text-blue-700">{aiResponse.justification}</div>
++        </div>
++      )}
++    </div>
++  );
++}
+diff --git a/web/components/ScoreRadar.tsx b/web/components/ScoreRadar.tsx
+new file mode 100644
+index 0000000000000000000000000000000000000000..9e30f6d55f1ab6af8f0e5d4bcc4c57ad98e6df36
+--- /dev/null
++++ b/web/components/ScoreRadar.tsx
+@@ -0,0 +1,58 @@
++"use client";
++import { Radar, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, ResponsiveContainer } from 'recharts';
++
++interface ScoreRadarProps {
++  scores: {
++    pillar_id: string;
++    pillar_name: string;
++    score: number | null;
++  }[];
++}
++
++export default function ScoreRadar({ scores }: ScoreRadarProps) {
++  // Transform data for radar chart
++  const data = scores.map(item => ({
++    pillar: item.pillar_name,
++    score: item.score || 0,
++    fullMark: 5
++  }));
++
++  return (
++    <div className="w-full h-[400px]">
++      <ResponsiveContainer width="100%" height="100%">
++        <RadarChart data={data}>
++          <PolarGrid stroke="#e5e7eb" />
++          <PolarAngleAxis 
++            dataKey="pillar" 
++            tick={{ fontSize: 12 }}
++            className="text-gray-600"
++          />
++          <PolarRadiusAxis 
++            angle={90} 
++            domain={[0, 5]} 
++            tickCount={6}
++            tick={{ fontSize: 10 }}
++          />
++          <Radar 
++            name="Current Score" 
++            dataKey="score" 
++            stroke="#3b82f6" 
++            fill="#3b82f6" 
++            fillOpacity={0.4}
++            strokeWidth={2}
++          />
++        </RadarChart>
++      </ResponsiveContainer>
++    </div>
++  );
++}
++
++
++
++
++
++
++
++
++
++
+diff --git a/web/components/TopNav.tsx b/web/components/TopNav.tsx
+new file mode 100644
+index 0000000000000000000000000000000000000000..e01dee4fa2ca459a2378e9603ec8c0ed58950a62
+--- /dev/null
++++ b/web/components/TopNav.tsx
+@@ -0,0 +1,15 @@
++export default function TopNav() {
++  return (
++    <nav className="bg-white border-b px-8 py-4">
++      <div className="flex items-center justify-between">
++        <div className="flex items-center space-x-8">
++          <h1 className="text-lg font-semibold">AI Maturity Tool</h1>
++          <div className="flex space-x-6">
++            <a href="/" className="text-sm hover:text-blue-600">Dashboard</a>
++            <a href="/new" className="text-sm hover:text-blue-600">New Assessment</a>
++          </div>
++        </div>
++      </div>
++    </nav>
++  );
++}
+diff --git a/web/lib/api.ts b/web/lib/api.ts
+new file mode 100644
+index 0000000000000000000000000000000000000000..c448f8bf4da2f833c3da78cf0019c7e38c2ebae4
+--- /dev/null
++++ b/web/lib/api.ts
+@@ -0,0 +1,14 @@
++const BASE = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:8000";
++
++export async function fetchPreset(id: string) {
++  try {
++    const res = await fetch(`${BASE}/presets/${id}`, { cache: "no-store" });
++    if (!res.ok) {
++      throw new Error(`Preset ${id} not found`);
++    }
++    return res.json();
++  } catch (error) {
++    console.error("Error fetching preset:", error);
++    throw error;
++  }
++}
+diff --git a/web/lib/assessments.ts b/web/lib/assessments.ts
+new file mode 100644
+index 0000000000000000000000000000000000000000..f3afdd292751dc89fec09fa5f5572f593186db1e
+--- /dev/null
++++ b/web/lib/assessments.ts
+@@ -0,0 +1,78 @@
++const BASE = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:8000";
++
++export interface Assessment {
++  id: string;
++  name: string;
++  preset_id: string;
++  created_at: string;
++  answers: Answer[];
++}
++
++export interface Answer {
++  pillar_id: string;
++  question_id: string;
++  level: number;
++  notes?: string;
++}
++
++export interface ScoreData {
++  assessment_id: string;
++  pillar_scores: {
++    pillar_id: string;
++    score: number | null;
++    weight: number;
++    questions_answered: number;
++    total_questions: number;
++  }[];
++  overall_score: number | null;
++  gates_applied: string[];
++}
++
++export async function createAssessment(name: string, presetId: string): Promise<Assessment> {
++  const res = await fetch(`${BASE}/assessments`, {
++    method: "POST",
++    headers: { "Content-Type": "application/json" },
++    body: JSON.stringify({ name, preset_id: presetId })
++  });
++  if (!res.ok) {
++    throw new Error("Failed to create assessment");
++  }
++  return res.json();
++}
++
++export async function saveAnswer(assessmentId: string, payload: Answer): Promise<void> {
++  const res = await fetch(`${BASE}/assessments/${assessmentId}/answers`, {
++    method: "POST",
++    headers: { "Content-Type": "application/json" },
++    body: JSON.stringify(payload)
++  });
++  if (!res.ok) {
++    throw new Error("Failed to save answer");
++  }
++}
++
++export async function getScores(assessmentId: string): Promise<ScoreData> {
++  const res = await fetch(`${BASE}/assessments/${assessmentId}/scores`);
++  if (!res.ok) {
++    throw new Error("Failed to get scores");
++  }
++  return res.json();
++}
++
++export async function getAssessment(assessmentId: string): Promise<Assessment> {
++  const res = await fetch(`${BASE}/assessments/${assessmentId}`);
++  if (!res.ok) {
++    throw new Error("Failed to get assessment");
++  }
++  return res.json();
++}
++
++
++
++
++
++
++
++
++
++
+diff --git a/web/next.config.mjs b/web/next.config.mjs
+new file mode 100644
+index 0000000000000000000000000000000000000000..4d33b1f5c2ad0ea945f0bedcff9a05af1775ec96
+--- /dev/null
++++ b/web/next.config.mjs
+@@ -0,0 +1,4 @@
++/** @type {import('next').NextConfig} */
++const nextConfig = { reactStrictMode: true };
++export default nextConfig;
++
+diff --git a/web/package.json b/web/package.json
+new file mode 100644
+index 0000000000000000000000000000000000000000..7720288708636cd84d3ca8e0bdc7d157eebe9add
+--- /dev/null
++++ b/web/package.json
+@@ -0,0 +1,27 @@
++{
++  "name": "ai-maturity-web",
++  "private": true,
++  "version": "0.1.0",
++  "scripts": {
++    "dev": "next dev",
++    "build": "next build",
++    "start": "next start",
++    "lint": "next lint"
++  },
++  "dependencies": {
++    "next": "14.2.5",
++    "react": "18.3.1",
++    "react-dom": "18.3.1",
++    "recharts": "^2.12.0"
++  },
++  "devDependencies": {
++    "typescript": "^5.4.0",
++    "@types/react": "^18.2.0",
++    "@types/node": "^20.11.0",
++    "tailwindcss": "^3.4.0",
++    "postcss": "^8.4.0",
++    "autoprefixer": "^10.4.0",
++    "eslint": "^8.0.0",
++    "eslint-config-next": "14.2.5"
++  }
++}
+diff --git a/web/postcss.config.js b/web/postcss.config.js
+new file mode 100644
+index 0000000000000000000000000000000000000000..03c6b71b88848c34ccd0c1dfdf2625361cb18740
+--- /dev/null
++++ b/web/postcss.config.js
+@@ -0,0 +1,2 @@
++module.exports = { plugins: { tailwindcss: {}, autoprefixer: {} } };
++
+diff --git a/web/tailwind.config.js b/web/tailwind.config.js
+new file mode 100644
+index 0000000000000000000000000000000000000000..854dbf172f008d32e6d9bc48e7bd9729e44991db
+--- /dev/null
++++ b/web/tailwind.config.js
+@@ -0,0 +1,7 @@
++/** @type {import('tailwindcss').Config} */
++module.exports = {
++  content: ["./app/**/*.{ts,tsx}", "./components/**/*.{ts,tsx}"],
++  theme: { extend: {} },
++  plugins: []
++};
++
+diff --git a/web/tsconfig.json b/web/tsconfig.json
+new file mode 100644
+index 0000000000000000000000000000000000000000..311e2494780f1b876b8668ba7294d6cc99f17cc0
+--- /dev/null
++++ b/web/tsconfig.json
+@@ -0,0 +1,29 @@
++{
++  "compilerOptions": {
++    "target": "ES2017",
++    "lib": ["dom", "dom.iterable", "esnext"],
++    "allowJs": true,
++    "skipLibCheck": true,
++    "strict": true,
++    "forceConsistentCasingInFileNames": true,
++    "noEmit": true,
++    "esModuleInterop": true,
++    "module": "esnext",
++    "moduleResolution": "bundler",
++    "resolveJsonModule": true,
++    "isolatedModules": true,
++    "jsx": "preserve",
++    "incremental": true,
++    "plugins": [
++      {
++        "name": "next"
++      }
++    ],
++    "paths": {
++      "@/*": ["./*"]
++    }
++  },
++  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],
++  "exclude": ["node_modules"]
++}
++

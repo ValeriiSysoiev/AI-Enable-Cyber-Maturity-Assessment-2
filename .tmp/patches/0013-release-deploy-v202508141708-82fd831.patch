@@ -1,0 +1,76 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Valerii Sysoiev <valsysoiev@gmail.com>
+Date: Thu, 14 Aug 2025 17:08:45 -0600
+Subject: [PATCH 13/90] release: deploy v202508141708-82fd831
+
+
+diff --git a/app/api/main.py b/app/api/main.py
+index 9a24eaf378842f69e58db6f768f76cd442c3940c..5d529b823fcffdb070b1372f14f980778be045d6 100644
+--- a/app/api/main.py
++++ b/app/api/main.py
+@@ -20,6 +20,22 @@ from ..ai.orchestrator import Orchestrator
+ 
+ app = FastAPI(title="AI Maturity Tool API", version="0.1.0")
+ 
++# --- CORS configuration (env-driven) ---
++_origins_env = os.getenv("API_ALLOWED_ORIGINS", "")
++_origins = [o.strip() for o in _origins_env.split(",") if o.strip()]
++if not _origins:
++    # Dev-safe fallback; prod will set explicit origin(s) via release script
++    _origins = ["*"]
++
++app.add_middleware(
++    CORSMiddleware,
++    allow_origins=_origins,
++    allow_credentials=True,
++    allow_methods=["*"],
++    allow_headers=["*"],  # allow custom headers like X-User-Email, X-Engagement-ID
++    expose_headers=["Content-Disposition"],
++)
++
+ @app.on_event("startup")
+ def on_startup():
+     create_db_and_tables()
+@@ -40,15 +56,7 @@ def on_startup():
+     except Exception:
+         pass
+ 
+-# Configure CORS
+-allowed_origins = os.getenv("WEB_ORIGIN", "http://localhost:3000").split(",")
+-app.add_middleware(
+-    CORSMiddleware,
+-    allow_origins=allowed_origins,
+-    allow_credentials=True,
+-    allow_methods=["*"],
+-    allow_headers=["*"],
+-)
++
+ 
+ app.include_router(assist_router)
+ app.include_router(storage_router)
+diff --git a/scripts/release.sh b/scripts/release.sh
+index 73f0f83d768f2e1dca6a999695138ac6526c9c05..23c3e0436196722886d5e80fcbfc5f27906b9121 100755
+--- a/scripts/release.sh
++++ b/scripts/release.sh
+@@ -67,11 +67,20 @@ az acr build -r "$ACR_NAME" -t "ai-maturity-api:$TAG" -f app/Dockerfile ./app
+ echo "==> Building WEB image in ACR: $TAG"
+ az acr build -r "$ACR_NAME" -t "ai-maturity-web:$TAG" -f web/Dockerfile ./web
+ 
++# Discover current WEB FQDN before updating API (so its origin is known)
++WEB_FQDN_PRE="$(az containerapp show -g "$RG" -n "$WEB_APP" --query properties.configuration.ingress.fqdn -o tsv 2>/dev/null || true)"
++WEB_ORIGIN=""
++if [ -n "$WEB_FQDN_PRE" ]; then
++  WEB_ORIGIN="https://${WEB_FQDN_PRE}"
++fi
++# Allow override via env if needed; always include local dev origins
++ALLOWED="${API_ALLOWED_ORIGINS_OVERRIDE:-$WEB_ORIGIN,http://localhost:3000,https://localhost:3000}"
++
+ # Update API
+ echo "==> Updating API container app image + env"
+ az containerapp update -g "$RG" -n "$API_APP" \
+   --image "$ACR_SERVER/ai-maturity-api:$TAG" \
+-  --set-env-vars ADMIN_EMAILS="$ADMIN_EMAILS"
++  --set-env-vars ADMIN_EMAILS="$ADMIN_EMAILS" API_ALLOWED_ORIGINS="$ALLOWED"
+ 
+ API_FQDN="$(az containerapp show -g "$RG" -n "$API_APP" --query properties.configuration.ingress.fqdn -o tsv)"
+ API_URL="https://${API_FQDN}"

@@ -1,0 +1,20 @@
+2025-08-18T20:49:48-06:00 [INIT] Agent:ApiOps starting production API deployment
+2025-08-18T20:50:51-06:00 [CHECK] Resource Group: rg-cybermat-prd exists
+2025-08-18T20:50:51-06:00 [CHECK] Cosmos DB: cdb-cybermat-prd exists  
+2025-08-18T20:50:51-06:00 [CHECK] App Service Plan: asp-cybermat-prd exists
+2025-08-18T20:52:37-06:00 [CREATE] App Service: api-cybermat-prd created successfully
+2025-08-18T20:52:37-06:00 [IDENTITY] Managed Identity Principal ID: cd7b8977-58d5-4636-ab45-422dcdc9eb20
+2025-08-18T20:55:28-06:00 [CHECK] Cosmos DB database 'appdb' and all required containers exist:
+2025-08-18T20:55:28-06:00 [CHECK] - engagements (pk: /tenantId)
+2025-08-18T20:55:28-06:00 [CHECK] - memberships (pk: /engagementId) 
+2025-08-18T20:55:28-06:00 [CHECK] - evidence (pk: /engagementId)
+2025-08-18T20:55:28-06:00 [CHECK] - audit (pk: /engagementId)
+2025-08-18T20:56:51-06:00 [RBAC] Granted Cosmos DB Built-in Data Contributor role to API managed identity
+2025-08-18T20:58:15-06:00 [CONFIG] Configured App Settings and startup command for FastAPI
+2025-08-18T21:01:32-06:00 [DEPLOY] ZIP deployment initiated - Oryx build in progress
+2025-08-18T21:12:47-06:00 [COMPLETE] API deployment completed successfully
+2025-08-18T21:12:47-06:00 [SUMMARY] API URL: https://api-cybermat-prd.azurewebsites.net  
+2025-08-18T21:12:47-06:00 [SUMMARY] Health endpoint: /health
+2025-08-18T21:12:47-06:00 [SUMMARY] Engagements endpoint: /engagements
+2025-08-18T21:12:47-06:00 [SUMMARY] Cosmos DB connectivity established via managed identity
+2025-08-18T21:12:47-06:00 [SUMMARY] App Service configured with Python 3.11 + gunicorn + uvicorn

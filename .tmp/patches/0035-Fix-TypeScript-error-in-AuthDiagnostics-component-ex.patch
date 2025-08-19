@@ -1,0 +1,20 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Valerii Sysoiev <valsysoiev@gmail.com>
+Date: Sun, 17 Aug 2025 09:34:02 -0600
+Subject: [PATCH 35/90] Fix TypeScript error in AuthDiagnostics component -
+ explicit type for loadingState
+
+
+diff --git a/web/components/AuthDiagnostics.tsx b/web/components/AuthDiagnostics.tsx
+index 469046b5244ede9b3397a5be64c5edca7da933c3..628f63dacf0d51e86058b1c69feb3da0dc397d29 100644
+--- a/web/components/AuthDiagnostics.tsx
++++ b/web/components/AuthDiagnostics.tsx
+@@ -11,7 +11,7 @@ type LoadingState = "idle" | "loading" | "error" | "success";
+ 
+ export default function AuthDiagnostics({ className = "" }: AuthDiagnosticsProps) {
+   const [diagnostics, setDiagnostics] = useState<AuthDiagnosticsType | null>(null);
+-  const [loadingState, setLoadingState] = useState<LoadingState>("idle");
++  const [loadingState, setLoadingState] = useState<"idle" | "loading" | "error" | "success">("idle");
+   const [error, setError] = useState<string>("");
+   const [lastRefresh, setLastRefresh] = useState<string>("");
+ 

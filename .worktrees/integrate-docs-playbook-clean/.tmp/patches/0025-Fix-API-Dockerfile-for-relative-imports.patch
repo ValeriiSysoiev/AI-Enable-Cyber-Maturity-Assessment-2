@@ -1,0 +1,18 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Valerii Sysoiev <valsysoiev@gmail.com>
+Date: Sat, 16 Aug 2025 17:48:31 -0600
+Subject: [PATCH 25/90] Fix API Dockerfile for relative imports
+
+
+diff --git a/app/Dockerfile b/app/Dockerfile
+index 3691670d8650f6d3ab1195da9d402dddb30f9026..a8b3e14fed341c4f7eae14b69c305f1890ddda0c 100644
+--- a/app/Dockerfile
++++ b/app/Dockerfile
+@@ -23,4 +23,4 @@ COPY ai/ ./ai/
+ COPY __init__.py .
+ 
+ EXPOSE 8000
+-CMD ["python", "-m", "uvicorn", "api.main:app", "--host", "0.0.0.0", "--port", "8000"]
+\ No newline at end of file
++CMD ["python", "-c", "import sys; sys.path.insert(0, '/app'); import uvicorn; uvicorn.run('api.main:app', host='0.0.0.0', port=8000)"]
+\ No newline at end of file
