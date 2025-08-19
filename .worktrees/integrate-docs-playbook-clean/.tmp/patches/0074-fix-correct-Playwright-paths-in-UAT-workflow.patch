@@ -1,0 +1,52 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Valerii Sysoiev <valsysoiev@gmail.com>
+Date: Mon, 18 Aug 2025 14:47:14 -0600
+Subject: [PATCH 74/90] fix: correct Playwright paths in UAT workflow
+
+- Update working directory from ./e2e to ./web (correct project structure)
+- Fix Playwright test execution paths (e2e/tests/smoke.spec.ts)
+- Update artifact collection path for smoke test results
+- Ensure npm ci uses correct package-lock.json location
+
+UAT workflow path correction
+
+diff --git a/.github/workflows/uat_checklist.yml b/.github/workflows/uat_checklist.yml
+index 9a565597d36b563bdbdd66fa33df7d6d8f695bde..00a78ffae5c5118a82d712cd47be25ab357c4f0d 100644
+--- a/.github/workflows/uat_checklist.yml
++++ b/.github/workflows/uat_checklist.yml
+@@ -124,7 +124,7 @@ jobs:
+ 
+     - name: Install Playwright Dependencies
+       timeout-minutes: 8
+-      working-directory: ./e2e
++      working-directory: ./web
+       run: |
+         echo "🎭 Setting up Playwright for E2E tests..."
+         npm ci
+@@ -133,7 +133,7 @@ jobs:
+     - name: E2E Smoke Tests
+       id: e2e_smoke
+       timeout-minutes: 15
+-      working-directory: ./e2e  
++      working-directory: ./web
+       env:
+         API_BASE_URL: ${{ env.API_BASE_URL }}
+         WEB_BASE_URL: ${{ env.WEB_BASE_URL }}
+@@ -142,7 +142,7 @@ jobs:
+         echo "🧪 Running E2E smoke tests..."
+         
+         start_time=$(date +%s)
+-        if timeout 900 npx playwright test smoke.spec.ts --config=playwright.config.ts --reporter=json > smoke-results.json 2>&1; then
++        if timeout 900 npx playwright test e2e/tests/smoke.spec.ts --config=e2e/playwright.config.ts --reporter=json > smoke-results.json 2>&1; then
+           E2E_STATUS="✅ PASSED"
+           E2E_RESULT=0
+         else
+@@ -379,7 +379,7 @@ jobs:
+         path: |
+           UAT-Report.md
+           health-check.log
+-          e2e/smoke-results.json
++          web/smoke-results.json
+         retention-days: 30
+ 
+     - name: Comment UAT Results (if PR context available)

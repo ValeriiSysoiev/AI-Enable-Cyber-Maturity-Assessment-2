@@ -1,0 +1,2876 @@
+{
+  "id": "cscm-v3",
+  "name": "Cyber Security Capability Model v3",
+  "version": "3.0",
+  "generated_at": "2025-08-14T21:20:40Z",
+  "source_file": "Cyber+Security+Capability+Model+v3.xlsx",
+  "columns_mapping": {
+    "pillar": "Function",
+    "capability": "Category",
+    "question": "Control Statement",
+    "weight": "Weight"
+  },
+  "stats": {
+    "pillars": 6,
+    "capabilities": 22,
+    "questions": 448
+  },
+  "pillars": [
+    {
+      "id": "govern",
+      "name": "Govern",
+      "capabilities": [
+        {
+          "id": "organizational-context",
+          "name": "Organizational Context",
+          "questions": [
+            {
+              "id": "q-fe789e974e",
+              "text": "The organization's mission is identified, with a basic understanding of its importance to cybersecurity risk management.",
+              "weight": 0.2,
+              "scale": "0-5"
+            },
+            {
+              "id": "q-593d83c917",
+              "text": "Internal and external stakeholders, including third parties and supply chain partners, are minimally identified, with initial awareness of their needs and expectations regarding cybersecurity risk management.",
+              "weight": 0.2,
+              "scale": "0-5"
+            },
+            {
+              "id": "q-419597bcd5",
+              "text": "Legal, regulatory, and contractual cybersecurity requirements—including those affecting third-party relationships and supply chains—are recognized, with minimal processes to manage them.",
+              "weight": 0.2,
+              "scale": "0-5"
+            },
+            {
+              "id": "q-b3e65b1770",
+              "text": "Critical objectives, capabilities, and services that external stakeholders rely on, including supply chain dependencies, are recognized, with limited communication efforts.",
+              "weight": 0.2,
+              "scale": "0-5"
+            },
+            {
+              "id": "q-e70db09837",
+              "text": "Key outcomes, capabilities, and services that the organization depends on are acknowledged, with minimal documentation or communication.",
+              "weight": 0.2,
+              "scale": "0-5"
+            },
+            {
+              "id": "q-4bbb7bef01",
+              "text": "The organization's mission is identified, and cybersecurity risk management practices are aligned with business objectives in a consistent and repeatable manner.",
+              "weight": 0.2,
+              "scale": "0-5"
+            },
+            {
+              "id": "q-dcfc345db3",
+              "text": "Internal and external stakeholders, including third-party suppliers and partners, are identified, and their needs and expectations regarding cybersecurity are regularly considered through repeatable practices.",
+              "weight": 0.2,
+              "scale": "0-5"
+            },
+            {
+              "id": "q-cd3a4fb563",
+              "text": "Legal, regulatory, and contractual requirements related to cybersecurity—including those concerning third-party and supply chain security—are identified and documented, with consistent management and review processes.",
+              "weight": 0.2,
+              "scale": "0-5"
+            },
+            {
+              "id": "q-b0ed97b91a",
+              "text": "Critical objectives, capabilities, and services that external stakeholders rely on, including supply chain dependencies, are identified and communicated using consistent processes.",
+              "weight": 0.2,
+              "scale": "0-5"
+            },
+            {
+              "id": "q-5cf18e8201",
+              "text": "Key outcomes, capabilities, and services that the organization depends on are documented and periodically reviewed through repeatable practices across the organization.",
+              "weight": 0.2,
+              "scale": "0-5"
+            },
+            {
+              "id": "q-3e3cea9125",
+              "text": "The organizational mission is fully identified, and cybersecurity risk management is consistently aligned with business objectives; all related processes are documented and standardized.",
+              "weight": 0.2,
+              "scale": "0-5"
+            },
+            {
+              "id": "q-11740fa109",
+              "text": "Internal and external stakeholders, including third parties and supply chain partners, are fully identified, and their needs and expectations regarding cybersecurity are formally documented and regularly reviewed.",
+              "weight": 0.2,
+              "scale": "0-5"
+            },
+            {
+              "id": "q-dce4207ea1",
+              "text": "Legal, regulatory, and contractual requirements related to cybersecurity—including third-party and supply chain security requirements—are formally tracked, managed, and regularly reviewed with documented processes in place.",
+              "weight": 0.2,
+              "scale": "0-5"
+            },
+            {
+              "id": "q-7756f950dc",
+              "text": "Critical objectives, capabilities, and services that external stakeholders rely on, including supply chain dependencies, are fully identified, documented, and communicated through formal channels.",
+              "weight": 0.2,
+              "scale": "0-5"
+            },
+            {
+              "id": "q-734d1419b0",
+              "text": "Key outcomes, capabilities, and services that the organization depends on are documented, regularly reviewed, and communicated to relevant stakeholders; all related processes are standardized.",
+              "weight": 0.2,
+              "scale": "0-5"
+            },
+            {
+              "id": "q-fbafbd2b92",
+              "text": "The organizational mission is actively integrated into cybersecurity risk management with regular updates; specific metrics are implemented to ensure continuous alignment with evolving business objectives.",
+              "weight": 0.2,
+              "scale": "0-5"
+            },
+            {
+              "id": "q-229d996a33",
+              "text": "Internal and external stakeholders, including third parties and supply chain partners, are engaged through structured processes; their cybersecurity needs and expectations are continuously reviewed and addressed.",
+              "weight": 0.2,
+              "scale": "0-5"
+            },
+            {
+              "id": "q-bf58af785d",
+              "text": "Legal, regulatory, and contractual requirements related to cybersecurity—including those affecting third-party relationships and supply chain security—are proactively managed with real-time updates and regular compliance reviews using formal processes.",
+              "weight": 0.2,
+              "scale": "0-5"
+            },
+            {
+              "id": "q-662aa4019c",
+              "text": "Critical objectives, capabilities, and services that external stakeholders rely on, including supply chain dependencies, are continuously monitored and formally communicated.",
+              "weight": 0.2,
+              "scale": "0-5"
+            },
+            {
+              "id": "q-52ac93c8cb",
+              "text": "Key outcomes, capabilities, and services that the organization depends on are dynamically monitored, reviewed, and communicated; alignment with strategic goals is ensured through formalized processes and specific metrics.",
+              "weight": 0.2,
+              "scale": "0-5"
+            },
+            {
+              "id": "q-92a209de07",
+              "text": "The organizational mission is continuously integrated into cybersecurity risk management using advanced tools and analytics for real-time insights; predictive technologies are employed with human oversight to assess alignment with business objectives.",
+              "weight": 0.2,
+              "scale": "0-5"
+            },
+            {
+              "id": "q-ae18a71c61",
+              "text": "Internal and external stakeholders, including third parties and supply chain partners, are engaged through processes that leverage advanced tools to monitor evolving needs and expectations; communication efficiency is enhanced while maintaining human interaction for critical concerns.",
+              "weight": 0.2,
+              "scale": "0-5"
+            },
+            {
+              "id": "q-6d30be0fa4",
+              "text": "Legal, regulatory, and contractual requirements related to cybersecurity—including third-party and supply chain security—are dynamically monitored; proactive compliance management is ensured using advanced tools with human oversight to align with business objectives.",
+              "weight": 0.2,
+              "scale": "0-5"
+            },
+            {
+              "id": "q-2d837a5149",
+              "text": "Critical objectives, capabilities, and services that external stakeholders rely on, including supply chain dependencies, are monitored using advanced tools for real-time updates; automation is applied to routine communications while ensuring human-driven accuracy and alignment.",
+              "weight": 0.2,
+              "scale": "0-5"
+            },
+            {
+              "id": "q-f07c694b88",
+              "text": "Key outcomes, capabilities, and services that the organization depends on are continuously optimized through predictive tools and human oversight; alignment with strategic goals is ensured by employing advanced analytics for routine tasks while maintaining human oversight for broader business objectives.",
+              "weight": 0.2,
+              "scale": "0-5"
+            }
+          ]
+        },
+        {
+          "id": "risk-management-strategy",
+          "name": "Risk Management Strategy",
+          "questions": [
+            {
+              "id": "q-19433dffdf",
+              "text": "Risk management objectives are minimally defined, with limited alignment to the organization's overall goals.",
+              "weight": 0.143,
+              "scale": "0-5"
+            },
+            {
+              "id": "q-4d73fe2794",
+              "text": "Risk appetite and tolerance are recognized, with basic awareness among key individuals.",
+              "weight": 0.143,
+              "scale": "0-5"
+            },
+            {
+              "id": "q-9b956a9eb9",
+              "text": "Cybersecurity risk management is conducted separately from enterprise risk management, using ad-hoc practices without structured integration.",
+              "weight": 0.143,
+              "scale": "0-5"
+            },
+            {
+              "id": "q-d900bb7c51",
+              "text": "Risk response options are identified, with minimal communication to stakeholders.",
+              "weight": 0.143,
+              "scale": "0-5"
+            },
+            {
+              "id": "q-a1d0cdb449",
+              "text": "Communication channels for cybersecurity risks are informal and ad-hoc, with limited consideration of supplier and third-party risks.",
+              "weight": 0.143,
+              "scale": "0-5"
+            },
+            {
+              "id": "q-3e377bde3d",
+              "text": "A basic process for identifying and categorizing risks exists.",
+              "weight": 0.143,
+              "scale": "0-5"
+            },
+            {
+              "id": "q-558a729e6e",
+              "text": "Opportunities and positive risks are acknowledged but are not systematically managed or discussed.",
+              "weight": 0.143,
+              "scale": "0-5"
+            },
+            {
+              "id": "q-0cacb663db",
+              "text": "Risk management objectives are understood and regularly considered, showing some alignment with the organization's strategy.",
+              "weight": 0.143,
+              "scale": "0-5"
+            },
+            {
+              "id": "q-ae2073665c",
+              "text": "Risk appetite and tolerance are recognized and periodically reviewed, contributing to decision-making processes.",
+              "weight": 0.143,
+              "scale": "0-5"
+            },
+            {
+              "id": "q-b5314743c6",
+              "text": "Cybersecurity risk management activities are integrated with enterprise risk management on a consistent basis through regular practices.",
+              "weight": 0.143,
+              "scale": "0-5"
+            },
+            {
+              "id": "q-5375dfa8e6",
+              "text": "Risk response options are identified and regularly considered, with consistent communication across the organization.",
+              "weight": 0.143,
+              "scale": "0-5"
+            },
+            {
+              "id": "q-7754331241",
+              "text": "Established communication channels for cybersecurity risks are used regularly, including consideration of supplier and third-party risks.",
+              "weight": 0.143,
+              "scale": "0-5"
+            },
+            {
+              "id": "q-35795b3ada",
+              "text": "A process for identifying, categorizing, and assessing risks exists and is applied consistently.",
+              "weight": 0.143,
+              "scale": "0-5"
+            },
+            {
+              "id": "q-3019c71c0a",
+              "text": "Opportunities and positive risks are recognized and discussed regularly, with practices applied consistently across the organization.",
+              "weight": 0.143,
+              "scale": "0-5"
+            },
+            {
+              "id": "q-9618af4d7c",
+              "text": "Risk management objectives are formally established, documented, and aligned with the organization's strategy, incorporating stakeholder input.",
+              "weight": 0.143,
+              "scale": "0-5"
+            },
+            {
+              "id": "q-a51ee84040",
+              "text": "Risk appetite and tolerance are clearly defined, documented, communicated, and regularly reviewed.",
+              "weight": 0.143,
+              "scale": "0-5"
+            },
+            {
+              "id": "q-01671f7b03",
+              "text": "Cybersecurity risk management is integrated into enterprise risk management with consistent, documented processes.",
+              "weight": 0.143,
+              "scale": "0-5"
+            },
+            {
+              "id": "q-8e379fb725",
+              "text": "Risk response options are formally established, documented, and communicated across the organization.",
+              "weight": 0.143,
+              "scale": "0-5"
+            },
+            {
+              "id": "q-6cbc486553",
+              "text": "Structured communication channels for cybersecurity risks are in place, consistently considering supplier and third-party risks.",
+              "weight": 0.143,
+              "scale": "0-5"
+            },
+            {
+              "id": "q-04555fda39",
+              "text": "A standardized, documented process for calculating, categorizing, and prioritizing risks is consistently applied.",
+              "weight": 0.143,
+              "scale": "0-5"
+            },
+            {
+              "id": "q-29371fbc91",
+              "text": "Opportunities and positive risks are managed through a formal, documented process integrated into risk discussions.",
+              "weight": 0.143,
+              "scale": "0-5"
+            },
+            {
+              "id": "q-19c5172809",
+              "text": "Risk management objectives are actively integrated into strategic planning, with metrics ensuring alignment with business goals.",
+              "weight": 0.143,
+              "scale": "0-5"
+            },
+            {
+              "id": "q-463b245d85",
+              "text": "Risk appetite and tolerance are regularly updated and communicated; metrics assess adherence and stakeholder engagement.",
+              "weight": 0.143,
+              "scale": "0-5"
+            },
+            {
+              "id": "q-e72725f749",
+              "text": "Cybersecurity risk management is seamlessly integrated with enterprise risk management, using continuous monitoring; metrics assess efficiency.",
+              "weight": 0.143,
+              "scale": "0-5"
+            },
+            {
+              "id": "q-6f406e3b3f",
+              "text": "Risk response options are dynamically managed with real-time adjustments; metrics assess effectiveness and alignment.",
+              "weight": 0.143,
+              "scale": "0-5"
+            },
+            {
+              "id": "q-6df3b9d6da",
+              "text": "Comprehensive communication channels for cybersecurity risks are continuously used, including supplier and third-party risks; metrics track effectiveness.",
+              "weight": 0.143,
+              "scale": "0-5"
+            },
+            {
+              "id": "q-4e1b670b10",
+              "text": "A dynamic method for risk management is in place; metrics measure accuracy and timeliness.",
+              "weight": 0.143,
+              "scale": "0-5"
+            },
+            {
+              "id": "q-4a58e92b28",
+              "text": "Opportunities and positive risks are dynamically assessed and managed; metrics evaluate strategic integration.",
+              "weight": 0.143,
+              "scale": "0-5"
+            },
+            {
+              "id": "q-ff3b729233",
+              "text": "Risk management objectives are continuously aligned with business goals using advanced tools; human oversight ensures strategic alignment.",
+              "weight": 0.143,
+              "scale": "0-5"
+            },
+            {
+              "id": "q-a8b3b0b595",
+              "text": "Risk appetite and tolerance are proactively managed with advanced analytics; real-time updates are provided to stakeholders with human oversight.",
+              "weight": 0.143,
+              "scale": "0-5"
+            },
+            {
+              "id": "q-e8a639f78e",
+              "text": "Cybersecurity risk management is fully integrated with enterprise risk management using advanced tools.",
+              "weight": 0.143,
+              "scale": "0-5"
+            },
+            {
+              "id": "q-2148ec82cd",
+              "text": "Risk response options are optimized using analytics and strategic decision-making.",
+              "weight": 0.143,
+              "scale": "0-5"
+            },
+            {
+              "id": "q-732129c6a0",
+              "text": "Communication channels for cybersecurity risks are continuously updated; predictive tools enhance communication with human-managed strategic updates.",
+              "weight": 0.143,
+              "scale": "0-5"
+            },
+            {
+              "id": "q-50056c048d",
+              "text": "A fully optimized risk management method is in place; predictive analytics are used with human expertise focusing on high-risk areas.",
+              "weight": 0.143,
+              "scale": "0-5"
+            },
+            {
+              "id": "q-c677b8c4ce",
+              "text": "Opportunities and positive risks are continuously managed through automation and strategic oversight to ensure alignment with organizational goals.",
+              "weight": 0.143,
+              "scale": "0-5"
+            }
+          ]
+        },
+        {
+          "id": "model-for-roles-responsibilities-and-aut",
+          "name": "Model for Roles, Responsibilities, and Authorities",
+          "questions": [
+            {
+              "id": "q-af0df7e879",
+              "text": "Cybersecurity roles and responsibilities are recognized, with limited and ad-hoc communication across the organization.",
+              "weight": 0.25,
+              "scale": "0-5"
+            },
+            {
+              "id": "q-869ebd717d",
+              "text": "Leadership has a basic understanding of cybersecurity risk, with accountability and responsibility managed at the leadership level.",
+              "weight": 0.25,
+              "scale": "0-5"
+            },
+            {
+              "id": "q-7fa64babdb",
+              "text": "Resource allocation for cybersecurity is reactive and based on immediate needs, with minimal alignment to a broader risk strategy.",
+              "weight": 0.25,
+              "scale": "0-5"
+            },
+            {
+              "id": "q-5aadcb0fc5",
+              "text": "Cybersecurity is included in human resources practices, with training conducted on an ad-hoc or as-needed basis.",
+              "weight": 0.25,
+              "scale": "0-5"
+            },
+            {
+              "id": "q-2dc5141ede",
+              "text": "Cybersecurity roles and responsibilities are understood and performed consistently, showing partial alignment with the organization's cybersecurity strategy.",
+              "weight": 0.25,
+              "scale": "0-5"
+            },
+            {
+              "id": "q-987ebbfae1",
+              "text": "Leadership understands its role in cybersecurity risk, with accountability shared across departments.",
+              "weight": 0.25,
+              "scale": "0-5"
+            },
+            {
+              "id": "q-2b5d102e14",
+              "text": "Resources are allocated for cybersecurity based on periodic reviews, with inconsistent alignment to the organization's risk strategy.",
+              "weight": 0.25,
+              "scale": "0-5"
+            },
+            {
+              "id": "q-4f2651df93",
+              "text": "Cybersecurity is partially included in human resources practices, with onboarding and ongoing training conducted regularly.",
+              "weight": 0.25,
+              "scale": "0-5"
+            },
+            {
+              "id": "q-165d055c75",
+              "text": "Cybersecurity roles, responsibilities, and authorities are formally established, documented, and communicated across the organization, with clear lines of accountability.",
+              "weight": 0.25,
+              "scale": "0-5"
+            },
+            {
+              "id": "q-84c125d263",
+              "text": "Leadership is fully accountable for cybersecurity risks and is actively involved in fostering a risk-aware culture throughout the organization.",
+              "weight": 0.25,
+              "scale": "0-5"
+            },
+            {
+              "id": "q-b4b2cbd39b",
+              "text": "Adequate resources are allocated for cybersecurity, aligned with the organization's risk strategy, and reviewed periodically to ensure they meet the organization's needs.",
+              "weight": 0.25,
+              "scale": "0-5"
+            },
+            {
+              "id": "q-53dcc5a82b",
+              "text": "Cybersecurity is fully integrated into human resources practices, with formalized onboarding, role-based training, and ongoing awareness programs for all relevant personnel.",
+              "weight": 0.25,
+              "scale": "0-5"
+            },
+            {
+              "id": "q-7a2d7eb547",
+              "text": "A centralized system manages cybersecurity roles, responsibilities, and authorities, ensuring regular updates and communication.",
+              "weight": 0.25,
+              "scale": "0-5"
+            },
+            {
+              "id": "q-c5ada05a11",
+              "text": "Leadership actively manages cybersecurity risk accountability, conducting regular reviews aligned with evolving objectives and risks. Metrics evaluate leadership engagement and effectiveness.",
+              "weight": 0.25,
+              "scale": "0-5"
+            },
+            {
+              "id": "q-75029836ef",
+              "text": "Resources for cybersecurity are dynamically managed, with periodic reviews aligning with the risk strategy and strategic goals. Metrics track resource allocation efficiency.",
+              "weight": 0.25,
+              "scale": "0-5"
+            },
+            {
+              "id": "q-18fdabaf3d",
+              "text": "Cybersecurity is fully embedded into human resources practices, with real-time tracking of training and competencies.",
+              "weight": 0.25,
+              "scale": "0-5"
+            },
+            {
+              "id": "q-ead4e9f861",
+              "text": "Cybersecurity roles, responsibilities, and authorities are continuously refined using advanced tools and human oversight, ensuring alignment with business needs and evolving risks.",
+              "weight": 0.25,
+              "scale": "0-5"
+            },
+            {
+              "id": "q-5c30f72842",
+              "text": "Leadership fosters a proactive, risk-aware culture, integrating cybersecurity accountability into strategic decision-making. Advanced tools enhance visibility, with human-driven critical decisions.",
+              "weight": 0.25,
+              "scale": "0-5"
+            },
+            {
+              "id": "q-83227c3f37",
+              "text": "Resources for cybersecurity are continuously optimized, using predictive analysis tools, with human oversight ensuring alignment with long-term objectives.",
+              "weight": 0.25,
+              "scale": "0-5"
+            },
+            {
+              "id": "q-5e1f747014",
+              "text": "Cybersecurity is deeply embedded into all human resources aspects, with advanced tools supporting continuous training and competency optimization. AI is selectively used, with human oversight aligning practices with business priorities.",
+              "weight": 0.25,
+              "scale": "0-5"
+            }
+          ]
+        },
+        {
+          "id": "policy",
+          "name": "Policy",
+          "questions": [
+            {
+              "id": "q-f05f110fdd",
+              "text": "Information security policies are recognized, with limited communication to staff.",
+              "weight": 0.333,
+              "scale": "0-5"
+            },
+            {
+              "id": "q-4db2677c51",
+              "text": "The organization's approach to managing cybersecurity risks is reactive, with policies enforced inconsistently across departments.",
+              "weight": 0.333,
+              "scale": "0-5"
+            },
+            {
+              "id": "q-0b3be5fc60",
+              "text": "Policies are infrequently reviewed or updated, with changes in requirements, threats, or organizational objectives addressed.",
+              "weight": 0.333,
+              "scale": "0-5"
+            },
+            {
+              "id": "q-8858da8d6a",
+              "text": "Information security policies are understood and communicated, showing some alignment with the organization's objectives. Policies are enforced partially and inconsistently documented.",
+              "weight": 0.333,
+              "scale": "0-5"
+            },
+            {
+              "id": "q-3ff125feb9",
+              "text": "Policies are occasionally reviewed, with updates made based on identified changes in requirements or threats.",
+              "weight": 0.333,
+              "scale": "0-5"
+            },
+            {
+              "id": "q-32d2449c7d",
+              "text": "Legal and regulatory requirements are recognized and sometimes incorporated into policy updates.",
+              "weight": 0.333,
+              "scale": "0-5"
+            },
+            {
+              "id": "q-debc17a1b8",
+              "text": "Information security policies are formally established, documented, and aligned with the organization's objectives, strategy, and risk management priorities. These policies are communicated to all relevant personnel.",
+              "weight": 0.333,
+              "scale": "0-5"
+            },
+            {
+              "id": "q-f9794ff69a",
+              "text": "Policies for managing cybersecurity risks are reviewed at planned intervals and updated to reflect changes in legal, regulatory, and business requirements.",
+              "weight": 0.333,
+              "scale": "0-5"
+            },
+            {
+              "id": "q-f84f0540c1",
+              "text": "The organization has a structured process for incorporating legal and regulatory changes into its policies, ensuring ongoing compliance with all relevant requirements.",
+              "weight": 0.333,
+              "scale": "0-5"
+            },
+            {
+              "id": "q-dda6074681",
+              "text": "A centralized system for managing security policies is in place, ensuring policies are consistently updated and enforced across the organization. Metrics measure policy update frequency, enforcement consistency, and alignment with organizational goals.",
+              "weight": 0.333,
+              "scale": "0-5"
+            },
+            {
+              "id": "q-9db79ca76f",
+              "text": "Policies for managing cybersecurity risks are fully integrated into the broader governance framework, with regular reviews ensuring continued alignment with the organization's strategic goals and risk management strategies.",
+              "weight": 0.333,
+              "scale": "0-5"
+            },
+            {
+              "id": "q-2517a380fb",
+              "text": "Legal and regulatory changes are dynamically monitored, and policies are proactively updated to reflect new requirements. Metrics assess compliance adherence and the timeliness of policy adjustments.",
+              "weight": 0.333,
+              "scale": "0-5"
+            },
+            {
+              "id": "q-963fa62267",
+              "text": "Security policies are continuously monitored and updated using advanced tools and human oversight to ensure alignment with the organization's evolving strategy, risk management priorities, and regulatory requirements. AI is used selectively to automate routine updates and flag areas for review, while human oversight ensures policies remain aligned with business goals.",
+              "weight": 0.333,
+              "scale": "0-5"
+            },
+            {
+              "id": "q-2edd7603d6",
+              "text": "Policy management is fully integrated into enterprise governance, with real-time updates driven by advanced analytics to ensure proactive responses to changing threats, requirements, and business goals. Automated tools enhance the efficiency of policy updates, but strategic policy decisions remain under human control to ensure alignment with long-term objectives.",
+              "weight": 0.333,
+              "scale": "0-5"
+            },
+            {
+              "id": "q-6fe5dc83e1",
+              "text": "Legal, regulatory, and contractual requirements are continuously monitored through advanced tools, ensuring the organization's policies are always compliant with current obligations. AI-driven tools streamline compliance checks where applicable, while human oversight ensures that critical updates align with broader business goals and risk management strategies.",
+              "weight": 0.333,
+              "scale": "0-5"
+            }
+          ]
+        },
+        {
+          "id": "oversight",
+          "name": "Oversight",
+          "questions": [
+            {
+              "id": "q-f095632656",
+              "text": "Cybersecurity risk management strategy outcomes are recognized, with reviews conducted on an ad-hoc basis that minimally inform strategic decisions or adjustments.",
+              "weight": 0.333,
+              "scale": "0-5"
+            },
+            {
+              "id": "q-f6eb193150",
+              "text": "The cybersecurity risk management strategy is reviewed with organizational requirements considered.",
+              "weight": 0.333,
+              "scale": "0-5"
+            },
+            {
+              "id": "q-b74f6b7d22",
+              "text": "Performance evaluations of cybersecurity risk management efforts are conducted with adjustments made reactively based on immediate needs.",
+              "weight": 0.333,
+              "scale": "0-5"
+            },
+            {
+              "id": "q-5ccca87200",
+              "text": "Outcomes of the cybersecurity risk management strategy are understood and reviewed periodically, though not through formal processes, to inform adjustments or strategic changes.",
+              "weight": 0.333,
+              "scale": "0-5"
+            },
+            {
+              "id": "q-b595f6cd12",
+              "text": "The cybersecurity risk management strategy is reviewed regularly, with adjustments made and aligned with organizational risks or objectives.",
+              "weight": 0.333,
+              "scale": "0-5"
+            },
+            {
+              "id": "q-e84bac82eb",
+              "text": "Cybersecurity risk management performance is reviewed occasionally, with adjustments made in response to identified issues, though processes remain informal.",
+              "weight": 0.333,
+              "scale": "0-5"
+            },
+            {
+              "id": "q-3cc14557bb",
+              "text": "Cybersecurity risk management strategy outcomes are formally reviewed at planned intervals, with results used to inform adjustments to the strategy and direction.",
+              "weight": 0.333,
+              "scale": "0-5"
+            },
+            {
+              "id": "q-0cbffed560",
+              "text": "The cybersecurity risk management strategy is reviewed and adjusted regularly to ensure alignment with organizational requirements, risks, and objectives.",
+              "weight": 0.333,
+              "scale": "0-5"
+            },
+            {
+              "id": "q-7088aa8511",
+              "text": "Organizational cybersecurity risk management performance is evaluated through formal processes, with documented reviews to inform any necessary adjustments.",
+              "weight": 0.333,
+              "scale": "0-5"
+            },
+            {
+              "id": "q-7a8403ac23",
+              "text": "Cybersecurity risk management strategy outcomes are continuously reviewed and tracked through a centralized system, ensuring real-time updates to inform strategic decisions and adjustments. Metrics measure the alignment of risk management strategy outcomes with strategic decisions.",
+              "weight": 0.333,
+              "scale": "0-5"
+            },
+            {
+              "id": "q-4cbb9ce33f",
+              "text": "The cybersecurity risk management strategy is continuously monitored and updated to reflect changes in organizational risks and business objectives. Metrics measure the performance of risk management strategies and responsiveness to organizational changes.",
+              "weight": 0.333,
+              "scale": "0-5"
+            },
+            {
+              "id": "q-a251f1f22b",
+              "text": "Organizational cybersecurity risk management performance is continuously evaluated through automated systems, ensuring that reviews and adjustments are proactive and aligned with business needs.",
+              "weight": 0.333,
+              "scale": "0-5"
+            },
+            {
+              "id": "q-c74bcaccae",
+              "text": "Cybersecurity risk management strategy outcomes are continuously monitored using advanced tools, providing real-time insights and proactive recommendations for adjustments to align with business goals and evolving risks. Human oversight ensures that strategic adjustments remain aligned with long-term objectives, using advanced tools selectively to enhance efficiency.",
+              "weight": 0.333,
+              "scale": "0-5"
+            },
+            {
+              "id": "q-72ab0ac02d",
+              "text": "The cybersecurity risk management strategy is optimized through a combination of advanced tools and human-driven processes, ensuring real-time alignment with organizational risks, requirements, and objectives. AI supports routine monitoring and insights, while critical strategic decisions are driven by human oversight.",
+              "weight": 0.333,
+              "scale": "0-5"
+            },
+            {
+              "id": "q-db333b3f0a",
+              "text": "Organizational cybersecurity risk management performance is continuously monitored and optimized through advanced tools, with predictive analytics used selectively to drive improvements and strategic adjustments. Human oversight ensures that optimizations align with long-term risk management goals, balancing automation with human-driven processes for high-impact areas.",
+              "weight": 0.333,
+              "scale": "0-5"
+            }
+          ]
+        },
+        {
+          "id": "cybersecurity-supply-chain-risk-manageme",
+          "name": "Cybersecurity Supply Chain Risk Management",
+          "questions": [
+            {
+              "id": "q-9a01311f1c",
+              "text": "The organization understands supply chain risks informally, managing cybersecurity risks in the supply chain on an ad-hoc basis.",
+              "weight": 0.2,
+              "scale": "0-5"
+            },
+            {
+              "id": "q-10c14479e6",
+              "text": "Roles and responsibilities for managing supply chain risks are recognized, with limited communication to suppliers, customers, or partners.",
+              "weight": 0.2,
+              "scale": "0-5"
+            },
+            {
+              "id": "q-2ebb9d2eab",
+              "text": "Supply chain risks are addressed reactively.",
+              "weight": 0.2,
+              "scale": "0-5"
+            },
+            {
+              "id": "q-de1a7baeae",
+              "text": "Suppliers are recognized, but prioritization based on criticality or risk is informal and inconsistent.",
+              "weight": 0.2,
+              "scale": "0-5"
+            },
+            {
+              "id": "q-4cc7809ee8",
+              "text": "Cybersecurity requirements for suppliers are established with minimal integration into contracts or agreements.",
+              "weight": 0.2,
+              "scale": "0-5"
+            },
+            {
+              "id": "q-8cba25071d",
+              "text": "The organization has recognized supply chain risks, with initial efforts to develop a strategy and program for managing cybersecurity risks in the supply chain applied consistently.",
+              "weight": 0.2,
+              "scale": "0-5"
+            },
+            {
+              "id": "q-3de744e939",
+              "text": "Roles and responsibilities for managing supply chain risks are understood and performed regularly.",
+              "weight": 0.2,
+              "scale": "0-5"
+            },
+            {
+              "id": "q-a0fe60ea42",
+              "text": "Supply chain risks are periodically reviewed, with some integration into enterprise risk management and improvement processes, applied consistently.",
+              "weight": 0.2,
+              "scale": "0-5"
+            },
+            {
+              "id": "q-f92c9379cf",
+              "text": "Suppliers are partially prioritized based on criticality, with practices applied consistently.",
+              "weight": 0.2,
+              "scale": "0-5"
+            },
+            {
+              "id": "q-6e3ece21ed",
+              "text": "Cybersecurity requirements for suppliers are recognized and applied regularly.",
+              "weight": 0.2,
+              "scale": "0-5"
+            },
+            {
+              "id": "q-5a9ce83eb6",
+              "text": "A formal cybersecurity supply chain risk management program, strategy, and objectives are established, documented, and communicated across the organization, with stakeholder agreement.",
+              "weight": 0.2,
+              "scale": "0-5"
+            },
+            {
+              "id": "q-6829a6c413",
+              "text": "Roles and responsibilities for managing supply chain risks are formally documented and communicated to suppliers, customers, and partners, with coordinated efforts across the organization.",
+              "weight": 0.2,
+              "scale": "0-5"
+            },
+            {
+              "id": "q-41f68547ff",
+              "text": "Supply chain risk management is fully integrated into enterprise risk management, risk assessment, and improvement processes, with regular reviews and updates.",
+              "weight": 0.2,
+              "scale": "0-5"
+            },
+            {
+              "id": "q-7eb0044147",
+              "text": "Suppliers are formally prioritized based on criticality and documented, with regular updates to ensure alignment with business objectives.",
+              "weight": 0.2,
+              "scale": "0-5"
+            },
+            {
+              "id": "q-5758c4c987",
+              "text": "Cybersecurity requirements for suppliers are formally established, integrated into contracts and agreements, and consistently enforced throughout the relationship.",
+              "weight": 0.2,
+              "scale": "0-5"
+            },
+            {
+              "id": "q-2cf9cca1e6",
+              "text": "A centralized system manages the organization's cybersecurity supply chain risk management program, ensuring real-time updates and consistent application across the supply chain. Metrics assess consistency, performance, and update success.",
+              "weight": 0.2,
+              "scale": "0-5"
+            },
+            {
+              "id": "q-517a19132b",
+              "text": "Roles and responsibilities for managing supply chain risks are actively managed and communicated, with ongoing coordination between the organization, suppliers, and third parties.",
+              "weight": 0.2,
+              "scale": "0-5"
+            },
+            {
+              "id": "q-c625a8ff72",
+              "text": "Supply chain risk management is fully integrated into enterprise governance, with continuous monitoring and updates reflecting changes in risks and objectives.",
+              "weight": 0.2,
+              "scale": "0-5"
+            },
+            {
+              "id": "q-1839131dfc",
+              "text": "Suppliers are dynamically prioritized based on criticality and risk, with real-time updates ensuring alignment with organizational goals. Metrics track prioritization accuracy and risk mitigation effectiveness.",
+              "weight": 0.2,
+              "scale": "0-5"
+            },
+            {
+              "id": "q-d816b050d9",
+              "text": "Cybersecurity requirements for suppliers are actively monitored and enforced throughout the contract lifecycle, with real-time adjustments based on performance and changing risks.",
+              "weight": 0.2,
+              "scale": "0-5"
+            },
+            {
+              "id": "q-10c11c877e",
+              "text": "The organization's cybersecurity supply chain risk management program is fully integrated into enterprise governance, with continuous monitoring and real-time adjustments based on evolving risks and business objectives.",
+              "weight": 0.2,
+              "scale": "0-5"
+            },
+            {
+              "id": "q-d91110773c",
+              "text": "Roles and responsibilities for managing supply chain risks are continuously optimized through regular reviews, ensuring seamless coordination between the organization, suppliers, and third parties. Advanced technologies are leveraged selectively to support decision-making where predictive analytics add value.",
+              "weight": 0.2,
+              "scale": "0-5"
+            },
+            {
+              "id": "q-0b787c4bd3",
+              "text": "Supply chain risk management processes are continuously improved, with proactive responses to emerging risks based on real-time monitoring and human oversight. AI-driven tools enhance visibility into complex supply chain risks.",
+              "weight": 0.2,
+              "scale": "0-5"
+            },
+            {
+              "id": "q-4d9295201f",
+              "text": "Suppliers are prioritized and regularly reassessed based on business objectives, risk profiles, and performance. Advanced analytics assess risk trends and inform decision-making, with human oversight ensuring critical business needs are considered.",
+              "weight": 0.2,
+              "scale": "0-5"
+            },
+            {
+              "id": "q-53b36ae9e2",
+              "text": "Cybersecurity requirements for suppliers are monitored and enforced through automated tools where efficiency is improved, with manual reviews addressing high-risk areas and ensuring compliance with contractual and regulatory obligations.",
+              "weight": 0.2,
+              "scale": "0-5"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "identify",
+      "name": "Identify",
+      "capabilities": [
+        {
+          "id": "asset-management",
+          "name": "Asset Management",
+          "questions": [
+            {
+              "id": "q-433bf06ebe",
+              "text": "An informal list of critical IT assets, including hardware, software, and services, is identified and updated on an ad-hoc basis.",
+              "weight": 0.333,
+              "scale": "0-5"
+            },
+            {
+              "id": "q-1866ed97e2",
+              "text": "At least one individual manages critical assets with roles and responsibilities recognized.",
+              "weight": 0.333,
+              "scale": "0-5"
+            },
+            {
+              "id": "q-7d8a7ccd5d",
+              "text": "Basic procedures for handling asset procurement and disposal exist and are followed inconsistently.",
+              "weight": 0.333,
+              "scale": "0-5"
+            },
+            {
+              "id": "q-98a55b6eee",
+              "text": "Informal lists of hardware, software, and services are maintained and regularly updated for critical assets, covering key components consistently.",
+              "weight": 0.2,
+              "scale": "0-5"
+            },
+            {
+              "id": "q-875ec0726b",
+              "text": "Asset ownership is assigned to specific individuals, with roles and responsibilities understood and partially documented.",
+              "weight": 0.2,
+              "scale": "0-5"
+            },
+            {
+              "id": "q-c84493ba7b",
+              "text": "Asset lifecycle procedures, including procurement, usage, end-of-life, and disposal, are implemented consistently for critical assets.",
+              "weight": 0.2,
+              "scale": "0-5"
+            },
+            {
+              "id": "q-c3e0028ce3",
+              "text": "An initial process for identifying and documenting asset criticality, classification, and impact on mission is established and applied consistently.",
+              "weight": 0.2,
+              "scale": "0-5"
+            },
+            {
+              "id": "q-acc78f2345",
+              "text": "Network communication and data flows are updated regularly, following consistent practices.",
+              "weight": 0.2,
+              "scale": "0-5"
+            },
+            {
+              "id": "q-480eb47d41",
+              "text": "Formal inventories for hardware, software, services, and data are in place, consistently maintained, and regularly updated.",
+              "weight": 0.2,
+              "scale": "0-5"
+            },
+            {
+              "id": "q-6219ba622a",
+              "text": "Asset ownership is clearly defined and documented, with formal roles and responsibilities assigned for the management of all assets.",
+              "weight": 0.2,
+              "scale": "0-5"
+            },
+            {
+              "id": "q-267620aee6",
+              "text": "Formal procedures for managing the full asset lifecycle, including procurement, usage, maintenance, and disposal, are established and consistently followed.",
+              "weight": 0.2,
+              "scale": "0-5"
+            },
+            {
+              "id": "q-ca722a7848",
+              "text": "A formal process for asset classification and prioritization, based on criticality, mission impact, and risk, is implemented and regularly reviewed.",
+              "weight": 0.2,
+              "scale": "0-5"
+            },
+            {
+              "id": "q-849a84d206",
+              "text": "Network communication and data flows are formally documented and regularly reviewed for accuracy and security.",
+              "weight": 0.2,
+              "scale": "0-5"
+            },
+            {
+              "id": "q-9e18b7d77b",
+              "text": "A centralized asset management system is operational, integrating asset data with procurement, risk management, and change management systems. Metrics measure the accuracy of asset tracking, alignment between procurement and asset data, and effectiveness of system integration.",
+              "weight": 0.2,
+              "scale": "0-5"
+            },
+            {
+              "id": "q-1e6967b92c",
+              "text": "Asset lifecycle management processes are governed by formal, measurable procedures, regularly reviewed for efficiency, effectiveness, and compliance with business and regulatory requirements.",
+              "weight": 0.2,
+              "scale": "0-5"
+            },
+            {
+              "id": "q-5e53a511e2",
+              "text": "Asset performance and criticality are assessed periodically, using metrics to optimize lifecycle management and ensure prioritization based on impact and risk.",
+              "weight": 0.2,
+              "scale": "0-5"
+            },
+            {
+              "id": "q-ee60dc4d0d",
+              "text": "Asset-related risks are continuously assessed and managed as part of an integrated risk management system.",
+              "weight": 0.2,
+              "scale": "0-5"
+            },
+            {
+              "id": "q-d86e35b682",
+              "text": "Network communication and data flows associated with assets are continuously monitored, with proactive security adjustments made as necessary.",
+              "weight": 0.2,
+              "scale": "0-5"
+            },
+            {
+              "id": "q-1ae26179a9",
+              "text": "An AI-driven, fully automated asset management system provides real-time visibility, tracking, and reporting of all assets, including hardware, software, services, and data.",
+              "weight": 0.167,
+              "scale": "0-5"
+            },
+            {
+              "id": "q-620c23e527",
+              "text": "Predictive analytics and machine learning optimize asset lifecycle management, enabling automated decisions for procurement, maintenance, and disposal.",
+              "weight": 0.167,
+              "scale": "0-5"
+            },
+            {
+              "id": "q-5d535c6042",
+              "text": "Integration with cybersecurity and threat intelligence systems ensures real-time risk assessments and proactive measures for asset vulnerabilities.",
+              "weight": 0.167,
+              "scale": "0-5"
+            },
+            {
+              "id": "q-cdf82edfb8",
+              "text": "Continuous improvement of asset management processes is driven by AI, data analytics, and lessons learned from security incidents and audits.",
+              "weight": 0.167,
+              "scale": "0-5"
+            },
+            {
+              "id": "q-b4241230b3",
+              "text": "Cutting-edge technologies, such as blockchain for asset tracking and smart contracts for procurement, are integrated to ensure transparency, accountability, and security in asset management.",
+              "weight": 0.167,
+              "scale": "0-5"
+            },
+            {
+              "id": "q-e1f98aa102",
+              "text": "The asset management strategy is fully aligned with organizational goals, leveraging AI-driven insights to maximize asset performance, security, and cost-efficiency.",
+              "weight": 0.167,
+              "scale": "0-5"
+            }
+          ]
+        },
+        {
+          "id": "risk-assessment",
+          "name": "Risk Assessment",
+          "questions": [
+            {
+              "id": "q-f3e97aca3c",
+              "text": "Vulnerabilities in critical assets are identified and recorded with practices applied on an ad-hoc basis.",
+              "weight": 0.167,
+              "scale": "0-5"
+            },
+            {
+              "id": "q-d5d66d7ac2",
+              "text": "Cyber threat intelligence is received and considered on an ad-hoc basis within the organization's risk management activities.",
+              "weight": 0.167,
+              "scale": "0-5"
+            },
+            {
+              "id": "q-6e71b188d0",
+              "text": "Internal and external threats are recognized.",
+              "weight": 0.167,
+              "scale": "0-5"
+            },
+            {
+              "id": "q-1e2c4eba3b",
+              "text": "Assessments of potential impacts and likelihoods of threats exploiting vulnerabilities are infrequently conducted.",
+              "weight": 0.167,
+              "scale": "0-5"
+            },
+            {
+              "id": "q-2ec8fa3845",
+              "text": "Risk ownership is assigned.",
+              "weight": 0.167,
+              "scale": "0-5"
+            },
+            {
+              "id": "q-cd15cd6e4e",
+              "text": "Risk prioritization is conducted based on immediate perceptions.",
+              "weight": 0.167,
+              "scale": "0-5"
+            },
+            {
+              "id": "q-c677217a60",
+              "text": "Vulnerabilities in critical assets are identified, validated, and recorded regularly, with practices applied consistently.",
+              "weight": 0.143,
+              "scale": "0-5"
+            },
+            {
+              "id": "q-0bca0e89a3",
+              "text": "Cyber threat intelligence is received and reviewed regularly, with integration into risk management processes performed consistently.",
+              "weight": 0.143,
+              "scale": "0-5"
+            },
+            {
+              "id": "q-4bd6dbf403",
+              "text": "Internal and external threats are identified and documented regularly, with assessments of potential impacts and likelihoods conducted consistently.",
+              "weight": 0.143,
+              "scale": "0-5"
+            },
+            {
+              "id": "q-c817faea92",
+              "text": "Potential impacts and likelihoods of threats exploiting vulnerabilities are reviewed and recorded consistently.",
+              "weight": 0.143,
+              "scale": "0-5"
+            },
+            {
+              "id": "q-1dcea75427",
+              "text": "Risk ownership is documented with accountability understood and applied consistently across the organization.",
+              "weight": 0.143,
+              "scale": "0-5"
+            },
+            {
+              "id": "q-32a9eac588",
+              "text": "Risk prioritization and responses are managed on a case-by-case basis, with consistent practices.",
+              "weight": 0.143,
+              "scale": "0-5"
+            },
+            {
+              "id": "q-c8cfe2bd86",
+              "text": "Changes and exceptions are managed for risk impact consistently.",
+              "weight": 0.143,
+              "scale": "0-5"
+            },
+            {
+              "id": "q-57e7757a0c",
+              "text": "A formalized process for identifying, validating, and recording vulnerabilities in assets is consistently followed, with regular updates and reviews.",
+              "weight": 0.125,
+              "scale": "0-5"
+            },
+            {
+              "id": "q-58b24b6ae1",
+              "text": "Cyber threat intelligence is systematically gathered and integrated into the organization's risk management process.",
+              "weight": 0.125,
+              "scale": "0-5"
+            },
+            {
+              "id": "q-e11d41941f",
+              "text": "Internal and external threats are formally documented and reviewed, with structured assessments of potential impacts and likelihoods recorded and analyzed.",
+              "weight": 0.125,
+              "scale": "0-5"
+            },
+            {
+              "id": "q-5a4b84c1f3",
+              "text": "A structured process for understanding inherent risks, prioritizing threats and vulnerabilities, and determining appropriate responses is documented and consistently followed.",
+              "weight": 0.125,
+              "scale": "0-5"
+            },
+            {
+              "id": "q-d0c903da8d",
+              "text": "Risk ownership is clearly defined and documented, with accountability assigned for all identified risks.",
+              "weight": 0.125,
+              "scale": "0-5"
+            },
+            {
+              "id": "q-82d8b8b3a2",
+              "text": "Risk responses are chosen, prioritized, planned, tracked, and communicated as part of a structured risk management process.",
+              "weight": 0.125,
+              "scale": "0-5"
+            },
+            {
+              "id": "q-5b4b758ca4",
+              "text": "Changes and exceptions are formally managed for risk impact, recorded, and tracked, with regular reviews.",
+              "weight": 0.125,
+              "scale": "0-5"
+            },
+            {
+              "id": "q-3d5cd80243",
+              "text": "Vulnerability disclosure and response processes are in place, with formal procedures for addressing reported vulnerabilities.",
+              "weight": 0.125,
+              "scale": "0-5"
+            },
+            {
+              "id": "q-b0312a220d",
+              "text": "A centralized system manages the identification, validation, and recording of vulnerabilities, with automated updates and continuous monitoring. Metrics measure effectiveness and efficiency to ensure timely and accurate addressing of vulnerabilities.",
+              "weight": 0.125,
+              "scale": "0-5"
+            },
+            {
+              "id": "q-3bdd78b8a6",
+              "text": "Cyber threat intelligence is continuously gathered, analyzed, and fully integrated into tactical and strategic risk management processes.",
+              "weight": 0.125,
+              "scale": "0-5"
+            },
+            {
+              "id": "q-bb746ebfeb",
+              "text": "Internal and external threats are consistently monitored, with potential impacts and likelihoods assessed using predictive analytics.",
+              "weight": 0.125,
+              "scale": "0-5"
+            },
+            {
+              "id": "q-86c64dcfad",
+              "text": "The risk assessment process is fully integrated into enterprise risk management, ensuring threats, vulnerabilities, and impacts are prioritized based on business objectives.",
+              "weight": 0.125,
+              "scale": "0-5"
+            },
+            {
+              "id": "q-eaf867befa",
+              "text": "Risk ownership is actively enforced, with clear accountability for all risks.",
+              "weight": 0.125,
+              "scale": "0-5"
+            },
+            {
+              "id": "q-afb9c76579",
+              "text": "Risk responses are tracked and monitored through a centralized system, ensuring timely and accurate real-time reporting and communication to stakeholders.",
+              "weight": 0.125,
+              "scale": "0-5"
+            },
+            {
+              "id": "q-991faa188b",
+              "text": "Changes and exceptions are managed through an integrated system, ensuring risk impacts are tracked and reviewed regularly. Metrics measure success of change management processes.",
+              "weight": 0.125,
+              "scale": "0-5"
+            },
+            {
+              "id": "q-6079077143",
+              "text": "Vulnerability disclosure and response processes are fully integrated into workflows, ensuring timely responses and mitigation actions.",
+              "weight": 0.125,
+              "scale": "0-5"
+            },
+            {
+              "id": "q-3300f95f10",
+              "text": "An AI-driven system continuously identifies, validates, and records vulnerabilities, using predictive analytics to proactively address risks.",
+              "weight": 0.143,
+              "scale": "0-5"
+            },
+            {
+              "id": "q-88883cc7b0",
+              "text": "Cyber threat intelligence is dynamically integrated into all risk management processes, enabling real-time risk assessments and proactive responses to emerging threats.",
+              "weight": 0.143,
+              "scale": "0-5"
+            },
+            {
+              "id": "q-a65285c1f6",
+              "text": "Internal and external threats are monitored in real time, with AI-driven analytics continuously assessing impacts, likelihoods, and responses.",
+              "weight": 0.143,
+              "scale": "0-5"
+            },
+            {
+              "id": "q-83c54c5d06",
+              "text": "Risk management processes are continuously optimized, with real-time risk prioritization driving automated decisions on risk responses and resource allocation.",
+              "weight": 0.143,
+              "scale": "0-5"
+            },
+            {
+              "id": "q-d7a21329e3",
+              "text": "Risk responses are fully automated, leveraging AI-driven insights to prioritize, track, and mitigate risks in real time.",
+              "weight": 0.143,
+              "scale": "0-5"
+            },
+            {
+              "id": "q-f6d92a2dea",
+              "text": "Changes and exceptions are managed through AI-based systems, ensuring continuous alignment with risk management objectives.",
+              "weight": 0.143,
+              "scale": "0-5"
+            },
+            {
+              "id": "q-2d3a639d06",
+              "text": "Vulnerability disclosure and response processes are fully automated, ensuring rapid resolution of vulnerabilities through AI-driven insights.",
+              "weight": 0.143,
+              "scale": "0-5"
+            }
+          ]
+        },
+        {
+          "id": "improvement",
+          "name": "Improvement",
+          "questions": [
+            {
+              "id": "q-503430c352",
+              "text": "Initial evaluations of the organization's cybersecurity practices are conducted identifying areas for improvement on an ad-hoc basis.",
+              "weight": 0.25,
+              "scale": "0-5"
+            },
+            {
+              "id": "q-7125113d1d",
+              "text": "Security tests and exercises are conducted in an ad-hoc manner, with improvements recognized and followed up as needed.",
+              "weight": 0.25,
+              "scale": "0-5"
+            },
+            {
+              "id": "q-8cb2b7d338",
+              "text": "Operational processes and procedures are reviewed inconsistently, with potential improvements identified.",
+              "weight": 0.25,
+              "scale": "0-5"
+            },
+            {
+              "id": "q-bd6f4d761c",
+              "text": "Incident response plans and other cybersecurity plans are minimally established, with maintenance and improvements managed on an ad-hoc basis.",
+              "weight": 0.25,
+              "scale": "0-5"
+            },
+            {
+              "id": "q-4241f14a59",
+              "text": "Regular evaluations of the organization's cybersecurity practices are conducted, with identified improvements documented.",
+              "weight": 0.25,
+              "scale": "0-5"
+            },
+            {
+              "id": "q-7c4ce748cf",
+              "text": "Security tests and exercises are regularly performed, with improvements identified and followed up.",
+              "weight": 0.25,
+              "scale": "0-5"
+            },
+            {
+              "id": "q-a806f87c93",
+              "text": "Operational processes, procedures, and activities are reviewed periodically, with improvements captured consistently.",
+              "weight": 0.25,
+              "scale": "0-5"
+            },
+            {
+              "id": "q-2336a07175",
+              "text": "Incident response plans and other cybersecurity plans are established, with improvements tracked regularly through informal processes.",
+              "weight": 0.25,
+              "scale": "0-5"
+            },
+            {
+              "id": "q-a65cda02f0",
+              "text": "A formal process for evaluating the organization's cybersecurity practices is established, with documented identification and tracking of improvements.",
+              "weight": 0.25,
+              "scale": "0-5"
+            },
+            {
+              "id": "q-c299041f76",
+              "text": "Security tests and exercises are formally conducted, with improvements identified, documented, and tracked through structured follow-up processes.",
+              "weight": 0.25,
+              "scale": "0-5"
+            },
+            {
+              "id": "q-119fb73215",
+              "text": "Operational processes, procedures, and activities are regularly reviewed, and identified improvements are formally documented and implemented.",
+              "weight": 0.25,
+              "scale": "0-5"
+            },
+            {
+              "id": "q-154e5894ce",
+              "text": "Incident response plans and other cybersecurity plans are established, maintained, and regularly improved, with a formal review process in place.",
+              "weight": 0.25,
+              "scale": "0-5"
+            },
+            {
+              "id": "q-355f5e991d",
+              "text": "A centralized system manages the evaluation of cybersecurity practices, ensuring real-time updates and tracking of identified improvements.",
+              "weight": 0.25,
+              "scale": "0-5"
+            },
+            {
+              "id": "q-6fd8ff2b57",
+              "text": "Security tests and exercises are systematically conducted, with improvements identified and followed up through a centralized system. Metrics measure the effectiveness of tests, vulnerability identification, and improvement follow-up.",
+              "weight": 0.25,
+              "scale": "0-5"
+            },
+            {
+              "id": "q-dcf89ac0bf",
+              "text": "Operational processes, procedures, and activities are continuously reviewed, with improvements proactively identified and tracked through a formal improvement program.",
+              "weight": 0.25,
+              "scale": "0-5"
+            },
+            {
+              "id": "q-2b04e927fc",
+              "text": "Incident response plans and other cybersecurity plans are dynamically maintained, with regular updates and improvements based on operational and test feedback.",
+              "weight": 0.25,
+              "scale": "0-5"
+            },
+            {
+              "id": "q-48f283750b",
+              "text": "An AI-driven, fully automated system continuously evaluates cybersecurity practices, identifying and tracking improvements in real time.",
+              "weight": 0.25,
+              "scale": "0-5"
+            },
+            {
+              "id": "q-acaa22d2bf",
+              "text": "Security tests and exercises are fully integrated with AI-based analytics, ensuring continuous improvement recommendations and immediate follow-up actions.",
+              "weight": 0.25,
+              "scale": "0-5"
+            },
+            {
+              "id": "q-f8df165f31",
+              "text": "Operational processes, procedures, and activities are continuously monitored through AI-driven systems, with predictive insights driving improvements.",
+              "weight": 0.25,
+              "scale": "0-5"
+            },
+            {
+              "id": "q-3a12351159",
+              "text": "Incident response plans and other cybersecurity plans are continuously optimized, leveraging AI to dynamically update and improve based on real-time feedback and lessons learned.",
+              "weight": 0.25,
+              "scale": "0-5"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "protect",
+      "name": "Protect",
+      "capabilities": [
+        {
+          "id": "identity-management-authentication-and-a",
+          "name": "Identity Management, Authentication, and Access Control",
+          "questions": [
+            {
+              "id": "q-eb427fa1e2",
+              "text": "User identities and access credentials are managed with identity management and authentication handled on an ad-hoc basis.",
+              "weight": 0.25,
+              "scale": "0-5"
+            },
+            {
+              "id": "q-99bf803225",
+              "text": "User authentication for accessing systems and data is conducted reactively, without structured enforcement of secure log-on or external connection procedures.",
+              "weight": 0.25,
+              "scale": "0-5"
+            },
+            {
+              "id": "q-bc2f8f6e51",
+              "text": "Access control policies and permissions are understood, with minimal consideration of least privilege or separation of duties.",
+              "weight": 0.25,
+              "scale": "0-5"
+            },
+            {
+              "id": "q-00e4314e12",
+              "text": "Physical access to systems and assets is managed, with monitoring and enforcement handled on an ad-hoc basis.",
+              "weight": 0.25,
+              "scale": "0-5"
+            },
+            {
+              "id": "q-e74233bdf3",
+              "text": "User identities and credentials are managed on a periodic basis.",
+              "weight": 0.25,
+              "scale": "0-5"
+            },
+            {
+              "id": "q-0d5ca17698",
+              "text": "Authentication procedures are applied consistently but are not systematically enforced across all systems.",
+              "weight": 0.25,
+              "scale": "0-5"
+            },
+            {
+              "id": "q-795a8183e2",
+              "text": "Access control policies are understood and permissions are assigned regularly.",
+              "weight": 0.25,
+              "scale": "0-5"
+            },
+            {
+              "id": "q-36b2af7a54",
+              "text": "Physical access to systems and assets is reviewed periodically, with monitoring conducted consistently.",
+              "weight": 0.25,
+              "scale": "0-5"
+            },
+            {
+              "id": "q-ad7b8b5e56",
+              "text": "A formal identity management system is established, with documented processes for managing user identities, credentials, and access control across all systems and services.",
+              "weight": 0.25,
+              "scale": "0-5"
+            },
+            {
+              "id": "q-104b9d2001",
+              "text": "Authentication procedures for accessing systems and data are formally defined, documented, and consistently enforced, with secure log-on procedures in place.",
+              "weight": 0.25,
+              "scale": "0-5"
+            },
+            {
+              "id": "q-ec5be01548",
+              "text": "Access control policies are established, documented, and enforced, incorporating the principles of least privilege and separation of duties, with regular reviews of permissions and entitlements.",
+              "weight": 0.25,
+              "scale": "0-5"
+            },
+            {
+              "id": "q-2d84205c79",
+              "text": "Physical access to systems and assets is formally managed and monitored, with policies in place to ensure regular reviews and enforcement of access controls.",
+              "weight": 0.25,
+              "scale": "0-5"
+            },
+            {
+              "id": "q-f07dccfff1",
+              "text": "A centralized system manages identities, credentials, and access control, ensuring real-time updates, tracking, and consistent enforcement of access control policies across all systems and services.",
+              "weight": 0.25,
+              "scale": "0-5"
+            },
+            {
+              "id": "q-44a15eef09",
+              "text": "Authentication for users, services, and hardware is dynamically managed, with real-time monitoring of authentication events and proactive security measures for external access.",
+              "weight": 0.25,
+              "scale": "0-5"
+            },
+            {
+              "id": "q-d8b55c3d58",
+              "text": "Access control policies are managed and enforced dynamically, with automated reviews ensuring alignment with the principles of least privilege and separation of duties.",
+              "weight": 0.25,
+              "scale": "0-5"
+            },
+            {
+              "id": "q-b620537d76",
+              "text": "Physical access to systems and assets is continuously monitored and measured, with real-time tracking of access events and proactive enforcement of security controls.",
+              "weight": 0.25,
+              "scale": "0-5"
+            },
+            {
+              "id": "q-0b75dfc623",
+              "text": "The organization's identity management and access control processes are continuously optimized, combining automation and human oversight. Advanced analytics predict and mitigate potential risks related to identity management and authentication.",
+              "weight": 0.25,
+              "scale": "0-5"
+            },
+            {
+              "id": "q-653dfa7938",
+              "text": "Authentication processes for users, services, and hardware are optimized through selective use of cutting-edge technologies such as biometrics or behavioral analytics, where appropriate.",
+              "weight": 0.25,
+              "scale": "0-5"
+            },
+            {
+              "id": "q-3d77f51c64",
+              "text": "Access control policies are fully optimized, with AI-driven tools used selectively to manage entitlements and permissions, ensuring human oversight remains for high-risk areas.",
+              "weight": 0.25,
+              "scale": "0-5"
+            },
+            {
+              "id": "q-9d7cda599c",
+              "text": "Physical access to systems and assets is fully optimized, using advanced technology and regular human reviews to ensure alignment with business needs and security requirements.",
+              "weight": 0.25,
+              "scale": "0-5"
+            }
+          ]
+        },
+        {
+          "id": "awareness-and-training",
+          "name": "Awareness and Training",
+          "questions": [
+            {
+              "id": "q-eedeeb7069",
+              "text": "Cybersecurity awareness and training are conducted, providing basic information on security risks without a structured program or curriculum.",
+              "weight": 0.333,
+              "scale": "0-5"
+            },
+            {
+              "id": "q-0fae202936",
+              "text": "Training for individuals in specialized roles is provided on an as-needed basis.",
+              "weight": 0.333,
+              "scale": "0-5"
+            },
+            {
+              "id": "q-5ed9f87596",
+              "text": "Employee compliance with security policies is reviewed reactively based on immediate issues.",
+              "weight": 0.333,
+              "scale": "0-5"
+            },
+            {
+              "id": "q-fd2f7c4b7b",
+              "text": "Cybersecurity awareness and training are provided periodically, applied consistently across departments.",
+              "weight": 0.333,
+              "scale": "0-5"
+            },
+            {
+              "id": "q-6f91b37cde",
+              "text": "Specialized training is provided for personnel in key roles, with practices applied regularly.",
+              "weight": 0.333,
+              "scale": "0-5"
+            },
+            {
+              "id": "q-2acd19feb0",
+              "text": "Employee compliance with security policies is reviewed irregularly, with disciplinary actions for non-compliance applied consistently.",
+              "weight": 0.333,
+              "scale": "0-5"
+            },
+            {
+              "id": "q-efab3d936f",
+              "text": "A formal cybersecurity awareness and training program is established, with documented training curricula and consistent application across all departments. Personnel receive regular training on general cybersecurity risks and policies.",
+              "weight": 0.333,
+              "scale": "0-5"
+            },
+            {
+              "id": "q-9194870b9f",
+              "text": "Individuals in specialized roles receive formal, role-specific training that is regularly updated to reflect evolving security threats and technologies.",
+              "weight": 0.333,
+              "scale": "0-5"
+            },
+            {
+              "id": "q-afd89ac9fb",
+              "text": "Employee compliance with security policies is formally reviewed, and disciplinary actions for non-compliance are enforced through a structured process.",
+              "weight": 0.333,
+              "scale": "0-5"
+            },
+            {
+              "id": "q-116da22a07",
+              "text": "A centralized system manages cybersecurity awareness and training, ensuring real-time updates, tracking, measurement, and consistent enforcement of the training program across the organization.",
+              "weight": 0.333,
+              "scale": "0-5"
+            },
+            {
+              "id": "q-db3168d7a5",
+              "text": "Specialized training for individuals in key roles is dynamically managed, with real-time updates ensuring that training content is current and aligned with emerging threats and security requirements.",
+              "weight": 0.333,
+              "scale": "0-5"
+            },
+            {
+              "id": "q-6c1bad2709",
+              "text": "Employee compliance with security policies is proactively reviewed and measured through automated systems, ensuring that any non-compliance is addressed in real time, with disciplinary actions enforced as necessary.",
+              "weight": 0.333,
+              "scale": "0-5"
+            },
+            {
+              "id": "q-568dd6d7f6",
+              "text": "Cybersecurity awareness and training are fully optimized, combining advanced tools and human oversight to ensure continuous updates and alignment with emerging threats. AI-driven systems are used selectively to provide real-time training recommendations.",
+              "weight": 0.333,
+              "scale": "0-5"
+            },
+            {
+              "id": "q-0dff5f9a19",
+              "text": "Specialized training for key roles is continuously optimized through predictive analytics and advanced learning technologies, ensuring personnel receive the most relevant training based on evolving risk profiles.",
+              "weight": 0.333,
+              "scale": "0-5"
+            },
+            {
+              "id": "q-2aaa06f049",
+              "text": "Employee compliance with security policies is continuously monitored and enforced, balancing automated systems and human oversight to ensure training effectiveness and proactive addressing of non-compliance.",
+              "weight": 0.333,
+              "scale": "0-5"
+            }
+          ]
+        },
+        {
+          "id": "data-security",
+          "name": "Data Security",
+          "questions": [
+            {
+              "id": "q-e04ff356fb",
+              "text": "Data security controls for protecting data-at-rest, data-in-transit, and data-in-use are applied and managed on an ad-hoc basis.",
+              "weight": 0.333,
+              "scale": "0-5"
+            },
+            {
+              "id": "q-59d49ddfee",
+              "text": "Data backup procedures are conducted sporadically.",
+              "weight": 0.333,
+              "scale": "0-5"
+            },
+            {
+              "id": "q-b99d33fc73",
+              "text": "Legal, regulatory, and contractual data security requirements are recognized with enforcement handled on an ad-hoc basis.",
+              "weight": 0.333,
+              "scale": "0-5"
+            },
+            {
+              "id": "q-c2a31101d0",
+              "text": "Data security controls are applied with some regularity, and there is awareness of the need to protect data-at-rest, data-in-transit, and data-in-use, with practices applied consistently.",
+              "weight": 0.2,
+              "scale": "0-5"
+            },
+            {
+              "id": "q-976cdbe9cd",
+              "text": "Initial DLP measures are in place for monitoring critical data transfers.",
+              "weight": 0.2,
+              "scale": "0-5"
+            },
+            {
+              "id": "q-0fd5d14813",
+              "text": "Data classification processes are recognized and applied regularly.",
+              "weight": 0.2,
+              "scale": "0-5"
+            },
+            {
+              "id": "q-6401ca7aa6",
+              "text": "Data backup procedures are performed regularly, with practices applied consistently.",
+              "weight": 0.2,
+              "scale": "0-5"
+            },
+            {
+              "id": "q-8ccd32713f",
+              "text": "Legal and contractual data security requirements are recognized, with compliance enforced and applied consistently.",
+              "weight": 0.2,
+              "scale": "0-5"
+            },
+            {
+              "id": "q-0ac0a86008",
+              "text": "A formal data security program is established, with documented controls in place to protect the confidentiality, integrity, and availability of data-at-rest, data-in-transit, and data-in-use.",
+              "weight": 0.2,
+              "scale": "0-5"
+            },
+            {
+              "id": "q-b500df4ec2",
+              "text": "DLP systems are fully implemented, with policies and processes documented to prevent unauthorized data exfiltration, ensuring that data transfers align with organizational policies.",
+              "weight": 0.2,
+              "scale": "0-5"
+            },
+            {
+              "id": "q-899257e8ac",
+              "text": "Data classification processes are formally documented and enforced, with data handling and storage procedures consistently applied based on the classification.",
+              "weight": 0.2,
+              "scale": "0-5"
+            },
+            {
+              "id": "q-1b7d869089",
+              "text": "Data backup procedures are formally documented and conducted regularly, with periodic testing and reviews to ensure the effectiveness of backup and recovery processes.",
+              "weight": 0.2,
+              "scale": "0-5"
+            },
+            {
+              "id": "q-3e6b9e4c5e",
+              "text": "Legal, regulatory, and contractual data security requirements are formally documented and enforced, with regular reviews to ensure compliance.",
+              "weight": 0.2,
+              "scale": "0-5"
+            },
+            {
+              "id": "q-6ce144be6a",
+              "text": "Data security is dynamically managed and measured through a centralized system, ensuring real-time updates to controls protecting data-at-rest, data-in-transit, and data-in-use.",
+              "weight": 0.2,
+              "scale": "0-5"
+            },
+            {
+              "id": "q-b22ba7f01f",
+              "text": "DLP systems are dynamically monitored and measured, ensuring that data transfer activities align with organizational policies, with proactive enforcement and real-time alerts for unauthorized activities.",
+              "weight": 0.2,
+              "scale": "0-5"
+            },
+            {
+              "id": "q-3791fb2eb6",
+              "text": "Data classification processes are continuously enforced and measured, with automated tools ensuring data is handled and stored appropriately based on classification.",
+              "weight": 0.2,
+              "scale": "0-5"
+            },
+            {
+              "id": "q-37a5d17e73",
+              "text": "Data backup procedures are dynamically managed and measured, with automated backups and regular testing ensuring that data is recoverable in the event of an incident.",
+              "weight": 0.2,
+              "scale": "0-5"
+            },
+            {
+              "id": "q-a1923d9c2f",
+              "text": "Legal, regulatory, and contractual data security requirements are proactively managed, with real-time monitoring and updates ensuring compliance across all systems.",
+              "weight": 0.2,
+              "scale": "0-5"
+            },
+            {
+              "id": "q-382a195ae4",
+              "text": "Data security processes are continuously optimized through a combination of advanced analytics and human oversight. Predictive analytics are used to identify potential risks to data-at-rest, data-in-transit, and data-in-use, enabling proactive adjustments to security controls.",
+              "weight": 0.2,
+              "scale": "0-5"
+            },
+            {
+              "id": "q-fbdc856e30",
+              "text": "DLP systems are fully optimized, leveraging AI-driven tools where appropriate to predict and prevent unauthorized data transfers. Human oversight remains in place for high-risk data transfer activities to ensure business objectives are met.",
+              "weight": 0.2,
+              "scale": "0-5"
+            },
+            {
+              "id": "q-e7a3e22ee3",
+              "text": "Data classification processes are fully optimized, with AI-driven tools selectively used to classify data based on sensitivity and criticality, while human oversight ensures that sensitive data is handled appropriately.",
+              "weight": 0.2,
+              "scale": "0-5"
+            },
+            {
+              "id": "q-d50c5e3e4b",
+              "text": "Data backup procedures are fully optimized, with a combination of automated tools and human oversight ensuring regular testing, monitoring, and improvements to backup and recovery processes.",
+              "weight": 0.2,
+              "scale": "0-5"
+            },
+            {
+              "id": "q-4850d86b49",
+              "text": "Legal, regulatory, and contractual data security requirements are continuously monitored and optimized, with a balance between automation and human reviews ensuring compliance and proactive risk management.",
+              "weight": 0.2,
+              "scale": "0-5"
+            }
+          ]
+        },
+        {
+          "id": "platform-security",
+          "name": "Platform Security",
+          "questions": [
+            {
+              "id": "q-96459c164e",
+              "text": "Configuration management practices are applied and managed on an ad-hoc basis.",
+              "weight": 0.2,
+              "scale": "0-5"
+            },
+            {
+              "id": "q-fe807da10c",
+              "text": "Platforms are maintained reactively, with software and hardware replaced or removed based on immediate needs.",
+              "weight": 0.2,
+              "scale": "0-5"
+            },
+            {
+              "id": "q-040d845625",
+              "text": "Log records are generated sporadically, with monitoring and analysis conducted inconsistently.",
+              "weight": 0.2,
+              "scale": "0-5"
+            },
+            {
+              "id": "q-6dec864259",
+              "text": "Controls for preventing the installation and execution of unauthorized software are applied with minimal enforcement.",
+              "weight": 0.2,
+              "scale": "0-5"
+            },
+            {
+              "id": "q-aab34a30b9",
+              "text": "Secure software development practices are recognized and applied inconsistently across the organization.",
+              "weight": 0.2,
+              "scale": "0-5"
+            },
+            {
+              "id": "q-65b72fa0d0",
+              "text": "Configuration management practices are applied regularly.",
+              "weight": 0.2,
+              "scale": "0-5"
+            },
+            {
+              "id": "q-0a259bd132",
+              "text": "Platforms are maintained and replaced based on periodic reviews, with a risk-based approach applied inconsistently.",
+              "weight": 0.2,
+              "scale": "0-5"
+            },
+            {
+              "id": "q-1a62bce2ec",
+              "text": "Log records are generated regularly, with monitoring and analysis conducted consistently.",
+              "weight": 0.2,
+              "scale": "0-5"
+            },
+            {
+              "id": "q-271e17fc7f",
+              "text": "Controls for preventing unauthorized software installation are in place and applied regularly.",
+              "weight": 0.2,
+              "scale": "0-5"
+            },
+            {
+              "id": "q-a68db6bf33",
+              "text": "Secure software development practices are partially applied, with some documentation in place, and practices are followed consistently across all projects.",
+              "weight": 0.2,
+              "scale": "0-5"
+            },
+            {
+              "id": "q-e1fe74d3e9",
+              "text": "Formal configuration management practices are established and documented, with controls ensuring that platform configurations are consistently tracked, managed, and updated.",
+              "weight": 0.2,
+              "scale": "0-5"
+            },
+            {
+              "id": "q-3062133c32",
+              "text": "Platforms are maintained, replaced, and removed based on a formal risk assessment process, ensuring hardware and software are managed based on criticality and impact.",
+              "weight": 0.2,
+              "scale": "0-5"
+            },
+            {
+              "id": "q-53d541b5ca",
+              "text": "Log records are consistently generated and monitored, with documented processes for continuous log analysis and review.",
+              "weight": 0.2,
+              "scale": "0-5"
+            },
+            {
+              "id": "q-d38e7c699d",
+              "text": "Controls for preventing the installation and execution of unauthorized software are fully established and enforced, with regular reviews to ensure compliance.",
+              "weight": 0.2,
+              "scale": "0-5"
+            },
+            {
+              "id": "q-982ca6498e",
+              "text": "Secure software development practices are fully integrated into the software development lifecycle, with formalized documentation and monitoring throughout the process.",
+              "weight": 0.2,
+              "scale": "0-5"
+            },
+            {
+              "id": "q-4fa1f10e41",
+              "text": "Configuration management practices are dynamically managed through a centralized system, ensuring real-time updates and continuous tracking of platform configurations. Metrics are in place to measure the effectiveness and accuracy of configuration management.",
+              "weight": 0.2,
+              "scale": "0-5"
+            },
+            {
+              "id": "q-39fb352ae3",
+              "text": "Platforms are maintained, replaced, and removed dynamically, with real-time risk assessments driving decisions on hardware and software management.",
+              "weight": 0.2,
+              "scale": "0-5"
+            },
+            {
+              "id": "q-e5728b1a47",
+              "text": "Log records are continuously generated and monitored, with automated alerts identifying potential security incidents in real time. Metrics measure the coverage of logging, the speed of incident detection and response, and the effectiveness of log analysis processes.",
+              "weight": 0.2,
+              "scale": "0-5"
+            },
+            {
+              "id": "q-4d59713146",
+              "text": "Controls for preventing the installation and execution of unauthorized software are dynamically enforced, with automated systems ensuring compliance and real-time updates. Metrics evaluate the effectiveness of these controls, including the number of unauthorized software installations detected and prevented, compliance rates, and the timeliness of control updates.",
+              "weight": 0.2,
+              "scale": "0-5"
+            },
+            {
+              "id": "q-662f7a7021",
+              "text": "Secure software development practices are dynamically managed, with real-time monitoring ensuring security integration throughout the development lifecycle, from design to deployment. Metrics are used to assess the effectiveness of secure development practices.",
+              "weight": 0.2,
+              "scale": "0-5"
+            },
+            {
+              "id": "q-593bd1a522",
+              "text": "Configuration management practices are continuously optimized through automation, ensuring proactive management of platform configurations. Predictive analytics are used selectively to identify potential risks or configuration drifts.",
+              "weight": 0.2,
+              "scale": "0-5"
+            },
+            {
+              "id": "q-c3cf401012",
+              "text": "Platforms are fully optimized, with hardware and software managed dynamically through advanced analytics and AI-driven processes where appropriate, ensuring continuous alignment of platform security with business objectives.",
+              "weight": 0.2,
+              "scale": "0-5"
+            },
+            {
+              "id": "q-60b35fd30c",
+              "text": "Log records are continuously optimized, with AI-driven tools selectively analyzing logs and predicting potential security incidents. Human oversight ensures critical incidents are handled appropriately.",
+              "weight": 0.2,
+              "scale": "0-5"
+            },
+            {
+              "id": "q-a670ef6a03",
+              "text": "Controls for preventing unauthorized software installations are fully optimized, combining AI-driven tools and human reviews to ensure compliance, especially in high-risk areas.",
+              "weight": 0.2,
+              "scale": "0-5"
+            },
+            {
+              "id": "q-2dac841594",
+              "text": "Secure software development practices are continuously optimized, leveraging AI and automation for code analysis and vulnerability detection, while human oversight ensures security throughout the software development lifecycle.",
+              "weight": 0.2,
+              "scale": "0-5"
+            }
+          ]
+        },
+        {
+          "id": "technology-infrastructure-resilience",
+          "name": "Technology Infrastructure Resilience",
+          "questions": [
+            {
+              "id": "q-23b4415aa1",
+              "text": "Technology infrastructure resilience is recognized and managed on an ad-hoc basis.",
+              "weight": 0.25,
+              "scale": "0-5"
+            },
+            {
+              "id": "q-3646ce94a5",
+              "text": "Critical systems and networks are protected against unauthorized access, with resilience during adverse situations managed reactively.",
+              "weight": 0.25,
+              "scale": "0-5"
+            },
+            {
+              "id": "q-b03524b948",
+              "text": "Technology assets are protected against environmental threats as needed.",
+              "weight": 0.25,
+              "scale": "0-5"
+            },
+            {
+              "id": "q-e53cbe075d",
+              "text": "Resource capacity planning is reactive, with assessments of system availability or continuity requirements conducted.",
+              "weight": 0.25,
+              "scale": "0-5"
+            },
+            {
+              "id": "q-ca6fbe9643",
+              "text": "Initial efforts are in place to protect critical systems and networks from unauthorized access, with mechanisms for resilience during adverse situations applied inconsistently but regularly.",
+              "weight": 0.25,
+              "scale": "0-5"
+            },
+            {
+              "id": "q-2794972285",
+              "text": "Informal processes exist for protecting technology assets against environmental threats, applied consistently.",
+              "weight": 0.25,
+              "scale": "0-5"
+            },
+            {
+              "id": "q-17230efa31",
+              "text": "Resource capacity is assessed periodically, with practices applied consistently to ensure alignment with resilience and availability requirements.",
+              "weight": 0.25,
+              "scale": "0-5"
+            },
+            {
+              "id": "q-25cd4cea56",
+              "text": "Technology infrastructure continuity is managed periodically, with practices applied consistently with some integration into the Business Continuity Planning.",
+              "weight": 0.25,
+              "scale": "0-5"
+            },
+            {
+              "id": "q-adc667c415",
+              "text": "A formal technology infrastructure resilience program is established, with documented processes and mechanisms to protect critical systems and networks from unauthorized access and environmental threats, ensuring resilience during adverse situations.",
+              "weight": 0.25,
+              "scale": "0-5"
+            },
+            {
+              "id": "q-4639e41a6d",
+              "text": "Formal processes are in place to ensure the protection of technology assets against environmental threats, with documented procedures ensuring consistent application.",
+              "weight": 0.25,
+              "scale": "0-5"
+            },
+            {
+              "id": "q-57a1335e4e",
+              "text": "Resource capacity planning is aligned with business continuity and resilience objectives, ensuring adequate resources are available to meet operational demands.",
+              "weight": 0.25,
+              "scale": "0-5"
+            },
+            {
+              "id": "q-88fbaf2c48",
+              "text": "Backup processes are formalized, with regular reviews ensuring alignment with recovery objectives and business continuity plans.",
+              "weight": 0.25,
+              "scale": "0-5"
+            },
+            {
+              "id": "q-e90c008e47",
+              "text": "Technology infrastructure resilience is dynamically managed through a centralized system, ensuring continuous protection of critical systems and networks from unauthorized access and environmental threats. Metrics are in place to measure system availability, response times, and the effectiveness of resilience strategies.",
+              "weight": 0.25,
+              "scale": "0-5"
+            },
+            {
+              "id": "q-93b594bd24",
+              "text": "Environmental threats to technology assets are continuously monitored, with automated systems dynamically updating resilience mechanisms in real time.",
+              "weight": 0.25,
+              "scale": "0-5"
+            },
+            {
+              "id": "q-4478acfddc",
+              "text": "Resource capacity planning is proactively managed, with continuous monitoring and automated adjustments ensuring alignment with resilience objectives and business demands. Metrics measure resource utilization, capacity trends, and forecasting accuracy.",
+              "weight": 0.25,
+              "scale": "0-5"
+            },
+            {
+              "id": "q-a3e2f0215f",
+              "text": "Backup and recovery processes are dynamically managed, ensuring real-time testing and monitoring of RTO and RPO adherence to ensure that the availability and recoverability of critical systems and data meet defined recovery objectives. Metrics evaluate backup success rates, recovery times, adherence to RTO, and data integrity alignment with RPO requirements",
+              "weight": 0.25,
+              "scale": "0-5"
+            },
+            {
+              "id": "q-68bf849850",
+              "text": "Technology infrastructure resilience is fully optimized, leveraging predictive analytics and advanced monitoring tools to identify potential risks and proactively adjust controls. Continuous optimization ensures real-time resilience adjustments to meet evolving business needs and threats.",
+              "weight": 0.25,
+              "scale": "0-5"
+            },
+            {
+              "id": "q-096df29323",
+              "text": "Environmental threats to technology assets are continuously monitored and managed through advanced analytics, enabling predictive identification of potential risks and proactive adjustments to resilience mechanisms.",
+              "weight": 0.25,
+              "scale": "0-5"
+            },
+            {
+              "id": "q-5fbd7f4325",
+              "text": "Resource capacity planning is fully optimized, using AI-driven tools to predict future needs and ensure that resource availability aligns with resilience and continuity objectives, ensuring capacity to meet operational demands under various scenarios.",
+              "weight": 0.25,
+              "scale": "0-5"
+            },
+            {
+              "id": "q-a4033b65d0",
+              "text": "Backup and recovery processes are fully optimized through automation and human oversight, with AI-driven tools used to ensure alignment with RTO and RPO objectives. Continuous proactive testing, monitoring, and adjustments guarantee recoverability of critical data and systems in line with RTO/RPO requirements. Metrics evaluate recovery efficiency, alignment with business continuity objectives, and continuous improvements to backup strategies.",
+              "weight": 0.25,
+              "scale": "0-5"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "detect",
+      "name": "Detect",
+      "capabilities": [
+        {
+          "id": "adverse-event-analysis",
+          "name": "Adverse Event Analysis",
+          "questions": [
+            {
+              "id": "q-7b6990128f",
+              "text": "Adverse event analysis is managed on a case-by-case basis.",
+              "weight": 0.25,
+              "scale": "0-5"
+            },
+            {
+              "id": "q-268d42275e",
+              "text": "Information from adverse events is shared with staff, and correlation from multiple sources is managed.",
+              "weight": 0.25,
+              "scale": "0-5"
+            },
+            {
+              "id": "q-f5cd72b83b",
+              "text": "Estimated impact and scope of adverse events are assessed.",
+              "weight": 0.25,
+              "scale": "0-5"
+            },
+            {
+              "id": "q-f9870c86b1",
+              "text": "Incident declaration processes are managed on an ad-hoc basis.",
+              "weight": 0.25,
+              "scale": "0-5"
+            },
+            {
+              "id": "q-8b9e490db8",
+              "text": "Processes for analyzing adverse events are in place and applied regularly across departments. Incidents are logged periodically, with assessment criteria applied.",
+              "weight": 0.2,
+              "scale": "0-5"
+            },
+            {
+              "id": "q-8025591857",
+              "text": "Information from adverse events is shared and correlated partially, with practices applied consistently.",
+              "weight": 0.2,
+              "scale": "0-5"
+            },
+            {
+              "id": "q-18c6144920",
+              "text": "Impact and scope assessments are performed regularly.",
+              "weight": 0.2,
+              "scale": "0-5"
+            },
+            {
+              "id": "q-0b9eb399e6",
+              "text": "Cyber threat intelligence is partially integrated into the analysis process, applied consistently but not across all events.",
+              "weight": 0.2,
+              "scale": "0-5"
+            },
+            {
+              "id": "q-7009075483",
+              "text": "Incident declaration processes are recognized and applied regularly.",
+              "weight": 0.2,
+              "scale": "0-5"
+            },
+            {
+              "id": "q-ff20e9805a",
+              "text": "A formal adverse event analysis process is established, with documented procedures for logging, assessing, and analyzing incidents. Criteria for declaring incidents are documented and consistently enforced across the organization.",
+              "weight": 0.25,
+              "scale": "0-5"
+            },
+            {
+              "id": "q-314969b0d0",
+              "text": "Information from adverse events is systematically collected, correlated from multiple sources, and shared with relevant staff and tools, ensuring a comprehensive understanding of the events.",
+              "weight": 0.25,
+              "scale": "0-5"
+            },
+            {
+              "id": "q-49cb88fd9b",
+              "text": "Formal processes are in place for assessing the impact and scope of adverse events, with documented procedures for estimating potential impacts and consequences.",
+              "weight": 0.25,
+              "scale": "0-5"
+            },
+            {
+              "id": "q-f32d7fdc3e",
+              "text": "Cyber threat intelligence is fully integrated into the analysis of adverse events, with documented processes for declaring incidents when defined criteria are met.",
+              "weight": 0.25,
+              "scale": "0-5"
+            },
+            {
+              "id": "q-d5e6559478",
+              "text": "Adverse event analysis is dynamically managed through a centralized system, ensuring real-time logging, assessment, and analysis of incidents across all departments. Metrics are used to measure the timeliness of incident detection, accuracy of analysis, and effectiveness of response actions.",
+              "weight": 0.25,
+              "scale": "0-5"
+            },
+            {
+              "id": "q-e9cd51cf2c",
+              "text": "Information from adverse events is dynamically correlated from multiple sources and provided to authorized staff in real time.",
+              "weight": 0.25,
+              "scale": "0-5"
+            },
+            {
+              "id": "q-dd057c4022",
+              "text": "Impact and scope assessments are dynamically managed, with real-time updates ensuring that estimated impacts of adverse events align continuously with organizational risk management processes.",
+              "weight": 0.25,
+              "scale": "0-5"
+            },
+            {
+              "id": "q-f94f21178c",
+              "text": "Cyber threat intelligence is continuously integrated into the analysis process, with dynamic updates ensuring incidents are declared in real time when defined criteria are met. Metrics evaluate the effectiveness of threat intelligence, incident declaration accuracy, and response efficiency.",
+              "weight": 0.25,
+              "scale": "0-5"
+            },
+            {
+              "id": "q-77dcb7a24e",
+              "text": "Adverse event analysis is continuously optimized through the use of advanced analytics and AI-driven tools, enabling predictive analysis and proactive incident response.",
+              "weight": 0.25,
+              "scale": "0-5"
+            },
+            {
+              "id": "q-f1e2094b8a",
+              "text": "Information from adverse events is continuously optimized through AI-driven correlation tools, ensuring real-time analysis from multiple sources.",
+              "weight": 0.25,
+              "scale": "0-5"
+            },
+            {
+              "id": "q-9c90a1ec76",
+              "text": "Impact and scope assessments are optimized through predictive analytics, enabling proactive identification of potential impacts and timely responses to adverse events.",
+              "weight": 0.25,
+              "scale": "0-5"
+            },
+            {
+              "id": "q-6e8d8c96d2",
+              "text": "Cyber threat intelligence is fully optimized and integrated into incident analysis, with AI-driven tools used selectively to predict potential incidents and declare incidents in real time based on dynamic criteria.",
+              "weight": 0.25,
+              "scale": "0-5"
+            }
+          ]
+        },
+        {
+          "id": "continuous-monitoring",
+          "name": "Continuous Monitoring",
+          "questions": [
+            {
+              "id": "q-82ee3a9a9f",
+              "text": "Monitoring of networks, systems, and external service providers is managed on an ad-hoc basis. Logs are generated sporadically and reviewed reactively.",
+              "weight": 0.333,
+              "scale": "0-5"
+            },
+            {
+              "id": "q-28ecde9ab0",
+              "text": "Physical environments, personnel activities, and technology usage are monitored reactively, based on immediate needs.",
+              "weight": 0.333,
+              "scale": "0-5"
+            },
+            {
+              "id": "q-07239d65ab",
+              "text": "Monitoring of critical systems and hardware is conducted with potential issues identified reactivel.",
+              "weight": 0.333,
+              "scale": "0-5"
+            },
+            {
+              "id": "q-ff1a84b81e",
+              "text": "Initial monitoring processes are in place for networks, systems, and external service providers applied regularly.",
+              "weight": 0.25,
+              "scale": "0-5"
+            },
+            {
+              "id": "q-d04d7534af",
+              "text": "Logs are generated periodically, with reviews conducted regularly to identify potential incidents.",
+              "weight": 0.25,
+              "scale": "0-5"
+            },
+            {
+              "id": "q-739e36e30d",
+              "text": "Physical environment monitoring and personnel activity reviews are performed periodically, with incident detection based on consistent reviews.",
+              "weight": 0.25,
+              "scale": "0-5"
+            },
+            {
+              "id": "q-fc31e0a7c9",
+              "text": "Monitoring of critical systems and hardware is recognized and applied regularly.",
+              "weight": 0.25,
+              "scale": "0-5"
+            },
+            {
+              "id": "q-cc7a7afe4a",
+              "text": "A formal continuous monitoring program is established, with documented processes for monitoring networks, systems, personnel activity, and external service providers to identify potential incidents. Logs are regularly generated and reviewed to identify security risks.",
+              "weight": 0.333,
+              "scale": "0-5"
+            },
+            {
+              "id": "q-4828f84435",
+              "text": "Physical environments are monitored through structured processes, with regular reviews of personnel activity and technology usage to identify adverse events.",
+              "weight": 0.333,
+              "scale": "0-5"
+            },
+            {
+              "id": "q-fbb2eef943",
+              "text": "Monitoring of critical systems and hardware is fully integrated into the organization’s security processes, with documented procedures for continuous oversight and incident detection.",
+              "weight": 0.333,
+              "scale": "0-5"
+            },
+            {
+              "id": "q-3c34ca5c67",
+              "text": "Continuous monitoring is dynamically managed through a centralized system, ensuring real-time oversight of networks, systems, personnel activity, and external service providers. Logs are continuously generated and monitored in real time, with automated alerts for potential incidents. Metrics measure the effectiveness of monitoring processes.",
+              "weight": 0.333,
+              "scale": "0-5"
+            },
+            {
+              "id": "q-1ea5f1465e",
+              "text": "Physical environment monitoring is managed in real time, with continuous oversight of personnel activity and technology usage to proactively detect adverse events.",
+              "weight": 0.333,
+              "scale": "0-5"
+            },
+            {
+              "id": "q-aa46b23d78",
+              "text": "Monitoring of critical systems and hardware is continuously managed, with real-time alerts and monitoring ensuring immediate identification of potential risks and issues.",
+              "weight": 0.333,
+              "scale": "0-5"
+            },
+            {
+              "id": "q-71cd1bb067",
+              "text": "Continuous monitoring processes are fully optimized through a combination of advanced analytics and AI-driven tools, enabling predictive monitoring of networks, systems, and external service providers.",
+              "weight": 0.25,
+              "scale": "0-5"
+            },
+            {
+              "id": "q-c785982123",
+              "text": "Logs are fully optimized, with AI-driven tools selectively used to analyze and correlate logs in real time, ensuring proactive identification of potential incidents. Human oversight is applied where necessary to ensure compliance with security policies.",
+              "weight": 0.25,
+              "scale": "0-5"
+            },
+            {
+              "id": "q-3ded3ab84e",
+              "text": "Monitoring of critical systems and hardware is continuously optimized through a combination of predictive analytics and real-time alerts, ensuring that potential risks are identified and mitigated before they impact business operations.",
+              "weight": 0.25,
+              "scale": "0-5"
+            },
+            {
+              "id": "q-0d0776aa18",
+              "text": "Physical environments, personnel activity, and technology usage are continuously optimized through advanced monitoring tools, with proactive alerts for potential risks and human review of critical events.",
+              "weight": 0.25,
+              "scale": "0-5"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "respond",
+      "name": "Respond",
+      "capabilities": [
+        {
+          "id": "incident-management",
+          "name": "Incident Management",
+          "questions": [
+            {
+              "id": "q-c7cef9eef1",
+              "text": "Incident management is managed on an ad-hoc basis. Incidents are handled reactively, with logging, triaging, and escalation conducted informally.",
+              "weight": 0.25,
+              "scale": "0-5"
+            },
+            {
+              "id": "q-c974654f09",
+              "text": "Incident reports are created as needed, with incident categorization and prioritization managed inconsistently.",
+              "weight": 0.25,
+              "scale": "0-5"
+            },
+            {
+              "id": "q-25be1c3214",
+              "text": "Incidents are escalated or elevated on an ad-hoc basis, with criteria for escalation determined on a case-by-case basis.",
+              "weight": 0.25,
+              "scale": "0-5"
+            },
+            {
+              "id": "q-fef26e5984",
+              "text": "Incident recovery processes are conducted, with recovery efforts initiated reactively when incidents occur.",
+              "weight": 0.25,
+              "scale": "0-5"
+            },
+            {
+              "id": "q-cdcd1fd49d",
+              "text": "Processes for managing incidents are in place and applied regularly but inconsistently across the organization. Incident logging and triaging are recognized and conducted regularly.",
+              "weight": 0.25,
+              "scale": "0-5"
+            },
+            {
+              "id": "q-1835d6a76a",
+              "text": "Incident reports are created periodically, with incident categorization and prioritization applied consistently.",
+              "weight": 0.25,
+              "scale": "0-5"
+            },
+            {
+              "id": "q-4471edfb80",
+              "text": "Incident escalation is handled regularly on a case-by-case basis, with criteria applied inconsistently across the organization.",
+              "weight": 0.25,
+              "scale": "0-5"
+            },
+            {
+              "id": "q-f464be3bc5",
+              "text": "Incident recovery processes are recognized and initiated regularly.",
+              "weight": 0.25,
+              "scale": "0-5"
+            },
+            {
+              "id": "q-9e48470d93",
+              "text": "A formal incident management program is established, with documented processes for logging, triaging, categorizing, and prioritizing incidents. Incident reports are consistently created and validated, ensuring incidents are properly categorized and prioritized.",
+              "weight": 0.333,
+              "scale": "0-5"
+            },
+            {
+              "id": "q-b3b0f76070",
+              "text": "Formal criteria for escalating or elevating incidents are established, ensuring that incidents are escalated based on impact and risk.",
+              "weight": 0.333,
+              "scale": "0-5"
+            },
+            {
+              "id": "q-0c1cd4c1f7",
+              "text": "Incident recovery processes are formalized, with documented criteria for initiating recovery efforts, ensuring recovery is timely and aligned with business continuity plans.",
+              "weight": 0.333,
+              "scale": "0-5"
+            },
+            {
+              "id": "q-5fbb6288c1",
+              "text": "Incident management processes are dynamically managed through a centralized system, ensuring real-time logging, triaging, and categorizing of incidents. Incident reports are automatically validated and categorized, with real-time monitoring of incident status.",
+              "weight": 0.25,
+              "scale": "0-5"
+            },
+            {
+              "id": "q-bd6b8da748",
+              "text": "Incident escalation and prioritization processes are managed through measurable metrics. Key metrics such as incident response times, escalation timeframes, and resolution rates are tracked, ensuring incidents are escalated based on risk, business impact, and predefined thresholds.",
+              "weight": 0.25,
+              "scale": "0-5"
+            },
+            {
+              "id": "q-b608d0b313",
+              "text": "Recovery efforts are measured and tracked, with metrics like recovery time objectives (RTO), success rates of recovery processes, and downtime impact used to continuously assess and improve incident recovery processes.",
+              "weight": 0.25,
+              "scale": "0-5"
+            },
+            {
+              "id": "q-a59ec41b29",
+              "text": "Incident management performance is continuously reviewed through dashboards and reports, with metrics used to measure effectiveness and drive improvements.",
+              "weight": 0.25,
+              "scale": "0-5"
+            },
+            {
+              "id": "q-00476aeb42",
+              "text": "Incident management processes are fully optimized through a combination of advanced analytics and AI-driven tools, enabling predictive detection of incidents and real-time triaging and categorizing.",
+              "weight": 0.333,
+              "scale": "0-5"
+            },
+            {
+              "id": "q-f003aaf10a",
+              "text": "Incident escalation processes are fully optimized, leveraging predictive analytics to determine when incidents should be escalated or elevated. Human oversight ensures that escalation decisions are aligned with business impact and risk management strategies.",
+              "weight": 0.333,
+              "scale": "0-5"
+            },
+            {
+              "id": "q-520cf7a6c1",
+              "text": "Incident recovery processes are continuously optimized, with AI-driven tools selectively used to manage and automate recovery efforts.",
+              "weight": 0.333,
+              "scale": "0-5"
+            }
+          ]
+        },
+        {
+          "id": "incident-analysis",
+          "name": "Incident Analysis",
+          "questions": [
+            {
+              "id": "q-f4fd9321b1",
+              "text": "ncident analysis is managed on a case-by-case basis.",
+              "weight": 0.5,
+              "scale": "0-5"
+            },
+            {
+              "id": "q-b3a2697f2a",
+              "text": "Evidence collection and preservation are conducted on an ad-hoc basis.",
+              "weight": 0.5,
+              "scale": "0-5"
+            },
+            {
+              "id": "q-aa50c21b3c",
+              "text": "Processes for analyzing incidents are in place and applied regularly. Incident logging and classification occur periodically, and root cause analysis is performed.",
+              "weight": 0.333,
+              "scale": "0-5"
+            },
+            {
+              "id": "q-1d1edd8dfc",
+              "text": "Evidence collection is recognized and conducted regularly",
+              "weight": 0.333,
+              "scale": "0-5"
+            },
+            {
+              "id": "q-6d0d6c60f3",
+              "text": "The magnitude of incidents is estimated regularly. Forensic investigations are performed if needed.",
+              "weight": 0.333,
+              "scale": "0-5"
+            },
+            {
+              "id": "q-98bafafd02",
+              "text": "A formal incident analysis process is established, with documented procedures for logging, classifying, and analyzing incidents. Root cause analysis is performed systematically, with documented results guiding corrective actions.",
+              "weight": 0.333,
+              "scale": "0-5"
+            },
+            {
+              "id": "q-6187cac66a",
+              "text": "Evidence collection is formalized, with documented processes ensuring the integrity and provenance of records during incident analysis.",
+              "weight": 0.333,
+              "scale": "0-5"
+            },
+            {
+              "id": "q-1f05e36751",
+              "text": "The magnitude of incidents is formally estimated and validated, with forensic investigations conducted for critical incidents. Documentation of findings and corrective actions is enforced across the organization.",
+              "weight": 0.333,
+              "scale": "0-5"
+            },
+            {
+              "id": "q-074dcc0ccf",
+              "text": "Incident analysis is dynamically managed through a centralized system, ensuring real-time logging, classification, and root cause analysis of incidents. Metrics are in place to assess and improve the effectiveness of the incident analysis process.",
+              "weight": 0.333,
+              "scale": "0-5"
+            },
+            {
+              "id": "q-d3161a30a9",
+              "text": "Evidence collection and preservation processes are managed in real time, with automated tools ensuring evidence integrity is maintained throughout the investigation.",
+              "weight": 0.333,
+              "scale": "0-5"
+            },
+            {
+              "id": "q-0115bd078b",
+              "text": "The magnitude and impact of incidents are dynamically assessed, with real-time validation and forensic investigations conducted for critical incidents.",
+              "weight": 0.333,
+              "scale": "0-5"
+            },
+            {
+              "id": "q-1adbc3c839",
+              "text": "Incident analysis leverages advanced analytics and AI-driven tools, enabling predictive identification of root causes and allowing for proactive corrective actions.",
+              "weight": 0.333,
+              "scale": "0-5"
+            },
+            {
+              "id": "q-4fd1343db1",
+              "text": "Evidence collection and preservation are managed using automation and AI-driven tools where applicable, ensuring the integrity and provenance of records. Human oversight is maintained to meet legal and forensic standards.",
+              "weight": 0.333,
+              "scale": "0-5"
+            },
+            {
+              "id": "q-3a7bc37081",
+              "text": "Predictive tools are used to estimate and validate the magnitude of incidents before they escalate, providing early insights into potential impacts. Continuous measurement of predictive accuracy and the success of corrective actions ensures incident management aligns with organizational objectives.",
+              "weight": 0.333,
+              "scale": "0-5"
+            }
+          ]
+        },
+        {
+          "id": "incident-response-reporting-and-communic",
+          "name": "Incident Response Reporting and Communication",
+          "questions": [
+            {
+              "id": "q-aa8e589065",
+              "text": "Incident reporting and communication are managed on an ad-hoc basis. Communication about security weaknesses and incidents is reactive and handled as needs arise.",
+              "weight": 0.5,
+              "scale": "0-5"
+            },
+            {
+              "id": "q-3015af7e8a",
+              "text": "Public communication regarding incidents is conducted sporadically.",
+              "weight": 0.5,
+              "scale": "0-5"
+            },
+            {
+              "id": "q-380f1cf3d7",
+              "text": "Initial processes for incident reporting and communication are in place and applied regularly.",
+              "weight": 0.25,
+              "scale": "0-5"
+            },
+            {
+              "id": "q-7dfc096d5c",
+              "text": "Internal stakeholders are notified of incidents periodically.",
+              "weight": 0.25,
+              "scale": "0-5"
+            },
+            {
+              "id": "q-79e4399aee",
+              "text": "Public communication is recognized and conducted regularly.",
+              "weight": 0.25,
+              "scale": "0-5"
+            },
+            {
+              "id": "q-14ba1f347e",
+              "text": "Data protection and privacy considerations are recognized and applied regularly.",
+              "weight": 0.25,
+              "scale": "0-5"
+            },
+            {
+              "id": "q-412239bd66",
+              "text": "A formal process for incident reporting and communication is established, with documented procedures ensuring that internal and external stakeholders are notified promptly of incidents.",
+              "weight": 0.25,
+              "scale": "0-5"
+            },
+            {
+              "id": "q-16662cbc08",
+              "text": "Reporting and communication processes are aligned with business objectives and regulatory requirements.",
+              "weight": 0.25,
+              "scale": "0-5"
+            },
+            {
+              "id": "q-f2f4be9274",
+              "text": "Public updates on incident recovery are shared using established methods and approved messaging, ensuring consistency across communications.",
+              "weight": 0.25,
+              "scale": "0-5"
+            },
+            {
+              "id": "q-ae98713a1d",
+              "text": "Data protection and privacy considerations are fully integrated into incident communication, ensuring that sensitive information is protected during the reporting process.",
+              "weight": 0.25,
+              "scale": "0-5"
+            },
+            {
+              "id": "q-1d03984211",
+              "text": "Incident reporting and communication are dynamically managed through a centralized system, ensuring real-time notification to internal and external stakeholders.",
+              "weight": 0.333,
+              "scale": "0-5"
+            },
+            {
+              "id": "q-60717f3644",
+              "text": "Public communication regarding incidents is managed in real time, with approved messaging and methods ensuring consistency and transparency. Metrics are tracked to assess communication effectiveness.",
+              "weight": 0.333,
+              "scale": "0-5"
+            },
+            {
+              "id": "q-b428451695",
+              "text": "Data protection and privacy concerns are dynamically managed, with real-time updates ensuring sensitive information is protected during incident reporting.",
+              "weight": 0.333,
+              "scale": "0-5"
+            },
+            {
+              "id": "q-f896302abc",
+              "text": "Incident reporting and communication processes leverage advanced technologies such as AI and predictive analytics to provide proactive communication to internal and external stakeholders before incidents escalate. AI-driven tools anticipate communication needs, ensuring seamless and real-time incident updates across the organization and with external stakeholders.",
+              "weight": 0.333,
+              "scale": "0-5"
+            },
+            {
+              "id": "q-3839639378",
+              "text": "Public communication during incident recovery is continuously enhanced using advanced communication platforms, allowing for real-time, transparent updates aligned with organizational and regulatory requirements. Innovative approaches, such as automated incident recovery updates through approved channels, are implemented.",
+              "weight": 0.333,
+              "scale": "0-5"
+            },
+            {
+              "id": "q-b17e0b3bf8",
+              "text": "Data protection and privacy concerns are continuously improved, using advanced technologies to automatically detect and ensure sensitive information is handled securely throughout the incident reporting process. Privacy and data protection practices are aligned with the latest standards and continuously enhanced using innovative methods.",
+              "weight": 0.333,
+              "scale": "0-5"
+            }
+          ]
+        },
+        {
+          "id": "incident-mitigation",
+          "name": "Incident Mitigation",
+          "questions": [
+            {
+              "id": "q-30efff0932",
+              "text": "Incident mitigation is managed on an ad-hoc basis. Mitigation actions are taken reactively based on immediate needs, with minimal planning and coordination.",
+              "weight": 0.333,
+              "scale": "0-5"
+            },
+            {
+              "id": "q-a6c6e7e8bd",
+              "text": "Incidents are contained with eradication efforts managed reactively.",
+              "weight": 0.333,
+              "scale": "0-5"
+            },
+            {
+              "id": "q-6ff1310272",
+              "text": "Communication during mitigation efforts is conducted sporadically, with coordination between internal and external stakeholders based on immediate needs.",
+              "weight": 0.333,
+              "scale": "0-5"
+            },
+            {
+              "id": "q-6b8bb6b38a",
+              "text": "Processes for incident containment and eradication are in place and applied regularly.",
+              "weight": 0.333,
+              "scale": "0-5"
+            },
+            {
+              "id": "q-5bee97e360",
+              "text": "Incident communication is performed periodically and applied consistently, with updates provided to stakeholders on a regular basis.",
+              "weight": 0.333,
+              "scale": "0-5"
+            },
+            {
+              "id": "q-231dc50de3",
+              "text": "Incident response and mitigation actions are recognized and conducted regularly.",
+              "weight": 0.333,
+              "scale": "0-5"
+            },
+            {
+              "id": "q-7423c412ff",
+              "text": "A formal incident mitigation process is established, with documented procedures for containing and eradicating incidents. Incident response teams are consistently deployed to ensure that incidents are contained promptly and eradicated thoroughly.",
+              "weight": 0.333,
+              "scale": "0-5"
+            },
+            {
+              "id": "q-050885869f",
+              "text": "Incident communication processes are formalized, ensuring that internal and external stakeholders are consistently updated throughout the mitigation process.",
+              "weight": 0.333,
+              "scale": "0-5"
+            },
+            {
+              "id": "q-b151aab20d",
+              "text": "Incident mitigation actions are documented and aligned with recovery processes, ensuring that the organization’s information processing facilities remain available during and after incidents.",
+              "weight": 0.333,
+              "scale": "0-5"
+            },
+            {
+              "id": "q-6cf54d4939",
+              "text": "Incident mitigation is dynamically managed through a centralized system, ensuring real-time containment and eradication of incidents.",
+              "weight": 0.333,
+              "scale": "0-5"
+            },
+            {
+              "id": "q-fee196c1c6",
+              "text": "Communication during mitigation is managed in real time, with automated updates ensuring that internal and external stakeholders are promptly informed.",
+              "weight": 0.333,
+              "scale": "0-5"
+            },
+            {
+              "id": "q-ff1abec7d6",
+              "text": "Incident mitigation efforts are aligned with broader recovery processes, ensuring the availability of information processing facilities. Metrics are in place to evaluate the effectiveness of mitigation actions.",
+              "weight": 0.333,
+              "scale": "0-5"
+            },
+            {
+              "id": "q-90330301f0",
+              "text": "Incident mitigation processes are continuously improved through the use of advanced analytics and AI-driven tools, allowing for proactive containment and eradication of incidents. Predictive tools identify potential incidents before they escalate, enabling proactive mitigation efforts.",
+              "weight": 0.333,
+              "scale": "0-5"
+            },
+            {
+              "id": "q-82d1a94aa8",
+              "text": "Communication during incident mitigation is continuously optimized using AI-driven tools to anticipate communication needs and ensure that stakeholders are informed in real time. Human oversight ensures that communication remains aligned with business objectives and regulatory requirements.",
+              "weight": 0.333,
+              "scale": "0-5"
+            },
+            {
+              "id": "q-020dd89915",
+              "text": "Incident mitigation strategies are continuously refined, leveraging cutting-edge technologies to minimize downtime and ensure the continuous availability of information processing facilities. Advanced recovery tools are integrated into mitigation efforts to ensure seamless transition from mitigation to recovery.",
+              "weight": 0.333,
+              "scale": "0-5"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "recover",
+      "name": "Recover",
+      "capabilities": [
+        {
+          "id": "incident-recovery-plan-execution",
+          "name": "Incident Recovery Plan Execution",
+          "questions": [
+            {
+              "id": "q-2b357267c1",
+              "text": "Incident recovery actions are managed on an ad-hoc basis. Recovery actions are reactive and partially aligned with business continuity or operational needs.",
+              "weight": 0.333,
+              "scale": "0-5"
+            },
+            {
+              "id": "q-58de683435",
+              "text": "Backup integrity and restoration assets are checked sporadically, with no consistent validation process for restored systems.",
+              "weight": 0.333,
+              "scale": "0-5"
+            },
+            {
+              "id": "q-1d96aef357",
+              "text": "Post-incident recovery efforts are determined on an as-needed basis.",
+              "weight": 0.333,
+              "scale": "0-5"
+            },
+            {
+              "id": "q-c21478146f",
+              "text": "Recovery processes are applied regularly across the organization.",
+              "weight": 0.333,
+              "scale": "0-5"
+            },
+            {
+              "id": "q-24822111c2",
+              "text": "Backup integrity is checked periodically.",
+              "weight": 0.333,
+              "scale": "0-5"
+            },
+            {
+              "id": "q-464da2aad4",
+              "text": "Critical mission functions are identified during recovery.",
+              "weight": 0.333,
+              "scale": "0-5"
+            },
+            {
+              "id": "q-ef746f4ca8",
+              "text": "A formal incident recovery plan is established, with documented processes for executing recovery actions aligned with incident response and business continuity plans.",
+              "weight": 0.25,
+              "scale": "0-5"
+            },
+            {
+              "id": "q-92f170b7f4",
+              "text": "Recovery actions are consistently scoped, prioritized, and performed based on the organization's operational needs and risk management processes.",
+              "weight": 0.25,
+              "scale": "0-5"
+            },
+            {
+              "id": "q-7c716124c9",
+              "text": "The integrity of backups and restoration assets is formally verified before they are used for recovery, ensuring that systems and services are restored accurately.",
+              "weight": 0.25,
+              "scale": "0-5"
+            },
+            {
+              "id": "q-bba6c6cd6b",
+              "text": "Critical mission functions are consistently prioritized during recovery, ensuring that post-incident operational norms are re-established in line with business continuity objectives.",
+              "weight": 0.25,
+              "scale": "0-5"
+            },
+            {
+              "id": "q-1a56d2590f",
+              "text": "Recovery processes are dynamically managed through a centralized system, ensuring real-time execution of recovery actions. Metrics are in place to measure and improve the efficiency and effectiveness of recovery efforts.",
+              "weight": 0.333,
+              "scale": "0-5"
+            },
+            {
+              "id": "q-92886da5d5",
+              "text": "Backup integrity and restoration assets are dynamically verified, with automated checks ensuring their accuracy and integrity before systems are restored. Metrics such as backup integrity, restoration success rates, and system reliability are continuously tracked.",
+              "weight": 0.333,
+              "scale": "0-5"
+            },
+            {
+              "id": "q-0ee9d87bfa",
+              "text": "Critical mission functions are dynamically prioritized and restored, with real-time monitoring ensuring alignment between recovery actions, business objectives, and risk management needs. Metrics such as downtime impact, critical system recovery time, and operational continuity are consistently measured.",
+              "weight": 0.333,
+              "scale": "0-5"
+            },
+            {
+              "id": "q-ccf59c3200",
+              "text": "Recovery plan execution is continuously refined using advanced analytics and AI-driven tools, enabling proactive recovery actions before incidents escalate. AI-driven simulations are used to predict potential recovery needs and refine recovery strategies, ensuring faster restoration times and minimal downtime.",
+              "weight": 0.333,
+              "scale": "0-5"
+            },
+            {
+              "id": "q-55f45990b5",
+              "text": "The integrity of backups and restoration assets is continuously monitored using advanced tools to ensure proactive detection of any integrity issues.",
+              "weight": 0.333,
+              "scale": "0-5"
+            },
+            {
+              "id": "q-4b090a4497",
+              "text": "Critical mission functions are continuously monitored, with AI-driven tools used to prioritize recovery actions and optimize the restoration process. Human oversight ensures that recovery efforts align with long-term business objectives and operational needs.",
+              "weight": 0.333,
+              "scale": "0-5"
+            }
+          ]
+        },
+        {
+          "id": "incident-recovery-communication",
+          "name": "Incident Recovery Communication",
+          "questions": [
+            {
+              "id": "q-af372e992e",
+              "text": "Communication during incident recovery is handled on an ad-hoc basis.",
+              "weight": 1.0,
+              "scale": "0-5"
+            },
+            {
+              "id": "q-9942dbdb37",
+              "text": "Processes for communicating during recovery are applied regularly. Updates to internal stakeholders are provided periodically.",
+              "weight": 0.333,
+              "scale": "0-5"
+            },
+            {
+              "id": "q-9f727899da",
+              "text": "Public updates on recovery efforts are provided sporadically, based on immediate needs.",
+              "weight": 0.333,
+              "scale": "0-5"
+            },
+            {
+              "id": "q-afaeda8178",
+              "text": "Some legal and regulatory compliance considerations are incorporated into recovery communication.",
+              "weight": 0.333,
+              "scale": "0-5"
+            },
+            {
+              "id": "q-42cbe8380f",
+              "text": "A formal process for communicating during recovery is established, with documented procedures ensuring that internal and external stakeholders are promptly informed of recovery progress. Recovery communication is aligned with business objectives and regulatory requirements.",
+              "weight": 0.333,
+              "scale": "0-5"
+            },
+            {
+              "id": "q-ae124c63f7",
+              "text": "Public updates on incident recovery are shared using approved methods and messaging, ensuring consistency and transparency. Recovery updates are aligned with organizational communication policies.",
+              "weight": 0.333,
+              "scale": "0-5"
+            },
+            {
+              "id": "q-fa2c7861fc",
+              "text": "Legal, regulatory, and contractual compliance during recovery communication is fully integrated, ensuring that communication meets all required obligations and standards.",
+              "weight": 0.333,
+              "scale": "0-5"
+            },
+            {
+              "id": "q-ba4735e1fa",
+              "text": "Recovery communication is dynamically managed through a centralized system, ensuring real-time updates to internal and external stakeholders. Metrics are in place to measure and improve timely and effective communication.",
+              "weight": 0.333,
+              "scale": "0-5"
+            },
+            {
+              "id": "q-ec7c221dca",
+              "text": "Public communication regarding incident recovery is managed in real-time, with approved messaging and methods ensuring transparency and consistency.",
+              "weight": 0.333,
+              "scale": "0-5"
+            },
+            {
+              "id": "q-0b3302e3eb",
+              "text": "Legal, regulatory, and contractual requirements are dynamically managed during recovery communication, with real-time monitoring ensuring compliance.",
+              "weight": 0.333,
+              "scale": "0-5"
+            },
+            {
+              "id": "q-d185ef3691",
+              "text": "Communication during recovery is continuously improved through the use of advanced technologies such as AI-driven communication tools, which enable proactive updates to internal and external stakeholders. Predictive tools anticipate stakeholder communication needs, ensuring that recovery updates are shared before stakeholders request them.",
+              "weight": 0.333,
+              "scale": "0-5"
+            },
+            {
+              "id": "q-a6ad03da09",
+              "text": "Public communication is continuously optimized through innovative platforms that provide real-time updates on recovery progress. Advanced communication methods, such as automated, targeted messaging and interactive recovery dashboards, ensure transparency and alignment with public and regulatory expectations.",
+              "weight": 0.333,
+              "scale": "0-5"
+            },
+            {
+              "id": "q-da46f91344",
+              "text": "Legal, regulatory, and contractual communication requirements are continuously refined using cutting-edge technologies, ensuring compliance through automation. AI-driven tools are used to detect and ensure adherence to privacy, legal, and contractual obligations, with human oversight ensuring that sensitive information is handled appropriately.",
+              "weight": 0.333,
+              "scale": "0-5"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

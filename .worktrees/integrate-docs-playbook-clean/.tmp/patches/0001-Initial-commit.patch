@@ -1,0 +1,14 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: ValeriiSysoiev <svvtwins.yaryna@gmail.com>
+Date: Fri, 8 Aug 2025 17:10:53 -0600
+Subject: [PATCH 01/90] Initial commit
+
+
+diff --git a/README.md b/README.md
+new file mode 100644
+index 0000000000000000000000000000000000000000..8d47d6bc9a55e15b0230e6a81caae9a51f6624ac
+--- /dev/null
++++ b/README.md
+@@ -0,0 +1 @@
++# AI-Enable-Cyber-Maturity-Assessment-2
+\ No newline at end of file

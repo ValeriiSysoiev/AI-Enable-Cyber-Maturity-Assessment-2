@@ -1,0 +1,87 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Valerii Sysoiev <valsysoiev@gmail.com>
+Date: Sat, 16 Aug 2025 23:57:33 -0600
+Subject: [PATCH 31/90] Fix timeout issues causing exit code 124 in GitHub
+ Actions
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+🔧 E2E Workflow Fixes:
+- Replace problematic 'timeout' command with retry loop logic
+- Add proper error handling for application startup
+- Capture application PID for better debugging
+- Provide detailed logging for troubleshooting
+
+🔧 Nightly E2E Workflow Fixes:
+- Replace timeout command with curl --max-time and retry logic
+- Add 10-attempt retry mechanism with 3-second intervals
+- Improve error messages and debugging output
+
+Resolves exit code 124 errors when applications start successfully but timeout command fails.
+
+diff --git a/.github/workflows/e2e.yml b/.github/workflows/e2e.yml
+index 3ad5a658275a71d16ac47a92a9745c7b9d6ebadf..193a07032060d47c18c995262097ed40d97a79b1 100644
+--- a/.github/workflows/e2e.yml
++++ b/.github/workflows/e2e.yml
+@@ -99,10 +99,25 @@ jobs:
+         if [ "${{ vars.WEB_BASE_URL }}" = "" ]; then
+           echo "Starting local application for testing..."
+           npm start &
+-          sleep 10
++          APP_PID=$!
++          echo "Application started with PID: $APP_PID"
+           
+-          # Wait for application to be ready
+-          timeout 60 bash -c 'while ! curl -f http://localhost:3000 >/dev/null 2>&1; do sleep 2; done'
++          # Wait for application to be ready with better error handling
++          echo "Waiting for application to be ready..."
++          for i in {1..30}; do
++            if curl -f -s http://localhost:3000 >/dev/null 2>&1; then
++              echo "✅ Application is ready after ${i} attempts"
++              break
++            elif [ $i -eq 30 ]; then
++              echo "❌ Application failed to start after 60 seconds"
++              echo "Checking application logs..."
++              ps aux | grep node || true
++              exit 1
++            else
++              echo "Attempt $i/30: Application not ready yet, waiting 2 seconds..."
++              sleep 2
++            fi
++          done
+         else
+           echo "Using remote application: ${{ vars.WEB_BASE_URL }}"
+         fi
+diff --git a/.github/workflows/e2e_nightly.yml b/.github/workflows/e2e_nightly.yml
+index 15baea3aba62b7276b3a968ba8a7afc53a6b25bd..3a5b9cfd6b305c5f357fe294acb84b94854e435c 100644
+--- a/.github/workflows/e2e_nightly.yml
++++ b/.github/workflows/e2e_nightly.yml
+@@ -113,11 +113,22 @@ jobs:
+         if [ -n "$WEB_URL" ]; then
+           echo "Testing connectivity to: $WEB_URL"
+           
+-          # Test with timeout
+-          if timeout 30 curl -f -s "$WEB_URL" > /dev/null; then
+-            echo "✅ Target environment is accessible"
+-          else
+-            echo "❌ Target environment is not accessible"
++          # Test accessibility with retry logic
++          echo "Testing accessibility of $WEB_URL..."
++          success=false
++          for i in {1..10}; do
++            if curl -f -s --max-time 3 "$WEB_URL" > /dev/null 2>&1; then
++              echo "✅ Target environment is accessible (attempt $i)"
++              success=true
++              break
++            else
++              echo "Attempt $i/10: Environment not accessible, retrying in 3 seconds..."
++              sleep 3
++            fi
++          done
++          
++          if [ "$success" = false ]; then
++            echo "❌ Target environment is not accessible after 10 attempts"
+             exit 1
+           fi
+         else

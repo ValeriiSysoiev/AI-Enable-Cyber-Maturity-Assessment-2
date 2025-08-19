@@ -1,0 +1,20 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Valerii Sysoiev <valsysoiev@gmail.com>
+Date: Mon, 18 Aug 2025 13:38:57 -0600
+Subject: [PATCH 68/90] fix(web): use evidence.blob_path from EvidenceUploader
+ callback to store URL
+
+
+diff --git a/web/app/assessment/[id]/page.tsx b/web/app/assessment/[id]/page.tsx
+index 0b69dbca7f5cca6783eb78d5b4d4aed5392b65d9..e48f7fa8bb19df1c72b811d10e3bbe814e400161 100644
+--- a/web/app/assessment/[id]/page.tsx
++++ b/web/app/assessment/[id]/page.tsx
+@@ -248,7 +248,7 @@ export default function AssessmentPage() {
+               <div className="border-t pt-3 space-y-2">
+                 <div className="text-sm font-medium">Upload Evidence</div>
+                 <EvidenceUploader 
+-                  onUploadComplete={(evidence) => handleEvidenceUpload(key, evidence.blobUrl)}
++                  onUploadComplete={(evidence) => handleEvidenceUpload(key, evidence.blob_path)}
+                 />
+                 
+                 {/* Display linked evidence */}

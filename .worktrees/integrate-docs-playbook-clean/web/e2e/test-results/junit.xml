@@ -1,0 +1,80 @@
+<testsuites id="" name="" tests="18" failures="0" skipped="18" errors="0" time="0.08109499999999997">
+<testsuite name="csf-grid.spec.ts" timestamp="2025-08-18T15:10:56.557Z" hostname="chromium" tests="6" failures="0" skipped="6" time="0" errors="0">
+<testcase name="CSF 2.0 Grid Assessment › CSF grid renders correctly with all functions" classname="csf-grid.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="CSF 2.0 Grid Assessment › function expansion and collapse functionality" classname="csf-grid.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="CSF 2.0 Grid Assessment › subcategory selection and details panel" classname="csf-grid.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="CSF 2.0 Grid Assessment › responsive design validation" classname="csf-grid.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="CSF 2.0 Grid Assessment › error handling and loading states" classname="csf-grid.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="CSF 2.0 Grid Assessment › performance and memoization validation" classname="csf-grid.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+</testsuite>
+<testsuite name="csf-grid.spec.ts" timestamp="2025-08-18T15:10:56.557Z" hostname="Mobile Chrome" tests="6" failures="0" skipped="6" time="0" errors="0">
+<testcase name="CSF 2.0 Grid Assessment › CSF grid renders correctly with all functions" classname="csf-grid.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="CSF 2.0 Grid Assessment › function expansion and collapse functionality" classname="csf-grid.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="CSF 2.0 Grid Assessment › subcategory selection and details panel" classname="csf-grid.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="CSF 2.0 Grid Assessment › responsive design validation" classname="csf-grid.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="CSF 2.0 Grid Assessment › error handling and loading states" classname="csf-grid.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="CSF 2.0 Grid Assessment › performance and memoization validation" classname="csf-grid.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+</testsuite>
+<testsuite name="csf-grid.spec.ts" timestamp="2025-08-18T15:10:56.557Z" hostname="firefox" tests="6" failures="0" skipped="6" time="0" errors="0">
+<testcase name="CSF 2.0 Grid Assessment › CSF grid renders correctly with all functions" classname="csf-grid.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="CSF 2.0 Grid Assessment › function expansion and collapse functionality" classname="csf-grid.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="CSF 2.0 Grid Assessment › subcategory selection and details panel" classname="csf-grid.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="CSF 2.0 Grid Assessment › responsive design validation" classname="csf-grid.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="CSF 2.0 Grid Assessment › error handling and loading states" classname="csf-grid.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="CSF 2.0 Grid Assessment › performance and memoization validation" classname="csf-grid.spec.ts" time="0">
+<skipped>
+</skipped>
+</testcase>
+</testsuite>
+</testsuites>

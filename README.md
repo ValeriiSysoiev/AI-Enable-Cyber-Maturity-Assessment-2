@@ -582,6 +582,13 @@ Deploy to a staging environment for testing:
 
 ---
 
+## Playbook & Agent Mode
+
+- Read the playbook: [`docs/PLAYBOOK.md`](docs/PLAYBOOK.md)  
+- Prepend this header to any Claude Code task to enforce agents and RunCards: [`docs/prompts/agent_mode_header.txt`](docs/prompts/agent_mode_header.txt)
+
+---
+
 ## Build & Deploy via ACR Tasks (no Docker Desktop)
 
 This section describes how to build container images using Azure Container Registry (ACR) Tasks, eliminating the need for Docker Desktop.
