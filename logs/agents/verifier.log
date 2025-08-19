@@ -1,0 +1,41 @@
+Agent:Verifier Log - README Update Verification
+============================================
+
+TIMESTAMP: 2025-08-19T14:15:00Z
+TASK: Confirm README update with "Playbook & Agent Mode" section linking to required files
+
+VERIFICATION RESULTS:
+
+1. README UPDATE CHECK:
+   ✅ Added "Playbook & Agent Mode" section to README.md
+   ✅ Section positioned appropriately in document structure (before "Build & Deploy" section)
+   ✅ Proper markdown formatting with header and bullets
+
+2. LINK VERIFICATION:
+   ✅ Link to `docs/PLAYBOOK.md` is correct and matches created file
+   ✅ Link to `docs/prompts/agent_mode_header.txt` is correct and matches created file
+   ✅ Both files exist at specified paths
+
+3. CONTENT VERIFICATION:
+   ✅ Section includes both required elements:
+      - Playbook documentation link
+      - Agent mode header instruction link
+   ✅ Clear instructions for using the agent mode header
+   ✅ Professional and concise presentation
+
+4. MARKDOWN FORMATTING:
+   ✅ Proper section header (##)
+   ✅ Correct bullet point formatting
+   ✅ Links properly formatted with text and URLs
+   ✅ Horizontal rules properly placed
+
+SECTION ADDED:
+```markdown
+## Playbook & Agent Mode
+
+- Read the playbook: [`docs/PLAYBOOK.md`](docs/PLAYBOOK.md)  
+- Prepend this header to any Claude Code task to enforce agents and RunCards: [`docs/prompts/agent_mode_header.txt`](docs/prompts/agent_mode_header.txt)
+```
+
+STATUS: ✅ PASSED - README successfully updated with required section
+NEXT: Hand off to Agent:Security Reviewer for final security check

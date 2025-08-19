@@ -1,0 +1,50 @@
+=== PHASE 3 ACA FALLBACK (Agent:ACAProvisioner + ACABuilder) ===
+Date: Mon 19 Aug 2025 22:45:30 MDT
+
+PREREQUISITES:
+✅ Microsoft.App provider: Registered
+✅ App Service repair cycles: 3/3 exhausted (all failed)
+✅ FastAPI source code: Available in ./app directory
+
+STRATEGY:
+1. Build container image from FastAPI source
+2. Push to GHCR (GitHub Container Registry)
+3. Create Container Apps Environment
+4. Deploy Container App with proper configuration
+5. Verify health endpoint
+
+TARGET CONTAINER: ghcr.io/valeriisysoiev/ai-enable-cyber-maturity-assessment-2:api-prd-e593588d
+
+=== CONTAINER BUILD ATTEMPT ===
+Command: docker build -t ghcr.io/valeriisysoiev/ai-enable-cyber-maturity-assessment-2:api-prd-e593588d ./app
+Result: BLOCKED - Docker Desktop requires organizational sign-in
+
+Error: "Sign in to continue using Docker Desktop. Membership in the [dttldocker] organization is required. Sign in enforced by your administrators (via Config Profile)."
+
+=== GITHUB ACTIONS WORKFLOW APPROACH ===
+Created: .github/workflows/deploy-aca-fallback.yml
+- Builds container image in GitHub Actions (no local Docker required)
+- Pushes to GHCR (GitHub Container Registry)
+- Provisions Container Apps Environment
+- Deploys Container App with proper configuration
+- Tests health endpoint
+
+Push Status: BLOCKED by large files in git repository
+Issue: web/node_modules/@next/swc-darwin-arm64/next-swc.darwin-arm64.node (109.62 MB)
+
+=== ACA FALLBACK STATUS ===
+- Microsoft.App provider: ✅ Registered
+- Container Apps Environment creation: Attempted but unconfirmed
+- Container build: BLOCKED by Docker Desktop policy
+- GitHub Actions deployment: BLOCKED by git large files
+- Workflow file created: ✅ Available for future use
+
+CONCLUSION: ACA fallback path is TECHNICALLY VIABLE but BLOCKED by local environment constraints:
+1. Docker Desktop organizational restrictions
+2. Git LFS requirements for large node_modules files
+
+RECOMMENDED APPROACH:
+1. Clean up node_modules from git history 
+2. Push ACA workflow to GitHub
+3. Trigger workflow via GitHub UI
+4. OR use Azure Container Registry build tasks

@@ -1,0 +1,74 @@
+Web Frontend Repair - Preflight Discovery Report
+===========================================
+Date: 2025-08-19
+Agent: Preflight
+
+AUTHENTICATION STATUS
+=====================
+
+GitHub Authentication:
+- Status: ✓ Logged in
+- Account: ValeriiSysoiev
+- Protocol: HTTPS
+- Scopes: gist, read:org, repo
+
+Azure Authentication:
+- Subscription: Azure subscription 1
+- Tenant: 8354a4cc-cfd8-41e4-9416-ea0304bc62e1
+- User: va.sysoiev@audit3a.com
+
+WEB APP CONFIGURATIONS
+=====================
+
+STAGING ENVIRONMENT (web-cybermat-stg)
+--------------------------------------
+State: Running
+Runtime: NODE|20-lts
+Startup Command: Not configured
+
+App Settings:
+- SCM_DO_BUILD_DURING_DEPLOYMENT: false
+- WEBSITE_NODE_DEFAULT_VERSION: ~20
+- NODE_ENV: production
+- NEXT_TELEMETRY_DISABLED: 1
+- PORT: 8080
+- WEBSITES_PORT: 8080
+- NEXT_PUBLIC_API_BASE_URL: Not configured
+
+Logging: ✓ Enabled (filesystem, Information level)
+
+PRODUCTION ENVIRONMENT (web-cybermat-prd)
+-----------------------------------------
+State: Running
+Runtime: NODE|20-lts
+Startup Command: Not configured
+
+App Settings:
+- PORT: 8080
+- WEBSITES_PORT: 8080
+- NODE_ENV: production
+- WEBSITE_NODE_DEFAULT_VERSION: ~20
+- SCM_DO_BUILD_DURING_DEPLOYMENT: false
+- NEXT_TELEMETRY_DISABLED: 1
+- NEXT_PUBLIC_API_BASE_URL: https://api-cybermat-prd-aca.icystone-69c102b0.westeurope.azurecontainerapps.io
+
+Logging: ✓ Enabled (filesystem, Information level)
+
+FINDINGS SUMMARY
+===============
+
+✓ Authentication: Both GitHub and Azure are properly authenticated
+✓ Web Apps: Both staging and production environments are running
+✓ Runtime: Both using Node.js 20 LTS
+✓ Logging: Successfully enabled for both environments
+
+NOTABLE DIFFERENCES:
+- Production has NEXT_PUBLIC_API_BASE_URL configured, staging does not
+- Both environments use production NODE_ENV setting
+- No custom startup commands configured for either environment
+- SCM build during deployment is disabled on both environments
+
+RECOMMENDATIONS:
+1. Consider configuring NEXT_PUBLIC_API_BASE_URL for staging environment
+2. Review NODE_ENV setting for staging (currently set to production)
+3. Monitor application logs for startup and runtime issues

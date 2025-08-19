@@ -1,0 +1,3 @@
+Docker build: ✓ SUCCESS
+GHCR push failed - using alternative approach
+ACA Container App: ✓ DEPLOYED at https://api-cybermat-prd-aca.icystone-69c102b0.westeurope.azurecontainerapps.io/

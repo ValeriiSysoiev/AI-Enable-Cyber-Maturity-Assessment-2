@@ -1,0 +1,1075 @@
+2025-08-19T03:09:48.073881587Z    _____                               
+2025-08-19T03:09:48.093174822Z   /  _  \ __________ _________   ____  
+2025-08-19T03:09:48.093180486Z  /  /_\  \\___   /  |  \_  __ \_/ __ \ 
+2025-08-19T03:09:48.093183684Z /    |    \/    /|  |  /|  | \/\  ___/ 
+2025-08-19T03:09:48.093186383Z \____|__  /_____ \____/ |__|    \___  >
+2025-08-19T03:09:48.093189330Z         \/      \/                  \/ 
+2025-08-19T03:09:48.093192023Z A P P   S E R V I C E   O N   L I N U X
+2025-08-19T03:09:48.093194636Z 
+2025-08-19T03:09:48.093196992Z Documentation: http://aka.ms/webapp-linux
+2025-08-19T03:09:48.093199488Z Python 3.11.13
+2025-08-19T03:09:48.093201937Z Note: Any data outside '/home' is not persisted
+2025-08-19T03:09:51.514282568Z Starting OpenBSD Secure Shell server: sshd.
+2025-08-19T03:09:51.665537948Z WEBSITES_INCLUDE_CLOUD_CERTS is not set to true.
+2025-08-19T03:09:52.018144357Z Updating certificates in /etc/ssl/certs...
+2025-08-19T03:10:10.896867100Z 4 added, 0 removed; done.
+2025-08-19T03:10:10.898220151Z Running hooks in /etc/ca-certificates/update.d...
+2025-08-19T03:10:10.907969274Z done.
+2025-08-19T03:10:10.937426165Z CA certificates copied and updated successfully.
+2025-08-19T03:10:11.176435549Z Site's appCommandLine: gunicorn -w 2 -k uvicorn.workers.UvicornWorker api.main:app --bind 0.0.0.0:8000
+2025-08-19T03:10:11.189050042Z Launching oryx with: create-script -appPath /home/site/wwwroot -output /opt/startup/startup.sh -virtualEnvName antenv -defaultApp /opt/defaultsite -userStartupCommand 'gunicorn -w 2 -k uvicorn.workers.UvicornWorker api.main:app --bind 0.0.0.0:8000'
+2025-08-19T03:10:11.459874631Z Found build manifest file at '/home/site/wwwroot/oryx-manifest.toml'. Deserializing it...
+2025-08-19T03:10:11.479062105Z Build Operation ID: 72c008f25b023bce
+2025-08-19T03:10:11.487717094Z Oryx Version: 0.2.20250709.3, Commit: 0cfb8cb7d114b65e539d2f9ccf9804e87b9966ba, ReleaseTagName: 20250709.3
+2025-08-19T03:10:11.487839475Z Output is compressed. Extracting it...
+2025-08-19T03:10:11.489001275Z Extracting '/home/site/wwwroot/output.tar.gz' to directory '/tmp/8dddecc8bd5acf7'...
+2025-08-19T03:10:23.784147503Z App path is set to '/tmp/8dddecc8bd5acf7'
+2025-08-19T03:10:23.794040724Z Writing output script to '/opt/startup/startup.sh'
+2025-08-19T03:10:23.904944914Z Using packages from virtual environment antenv located at /tmp/8dddecc8bd5acf7/antenv.
+2025-08-19T03:10:23.904969298Z Updated PYTHONPATH to '/opt/startup/app_logs:/tmp/8dddecc8bd5acf7/antenv/lib/python3.11/site-packages'
+2025-08-19T03:10:25.372139929Z [2025-08-19 03:10:25 +0000] [1019] [INFO] Starting gunicorn 23.0.0
+2025-08-19T03:10:25.391900794Z [2025-08-19 03:10:25 +0000] [1019] [INFO] Listening at: http://0.0.0.0:8000 (1019)
+2025-08-19T03:10:25.392681595Z [2025-08-19 03:10:25 +0000] [1019] [INFO] Using worker: uvicorn.workers.UvicornWorker
+2025-08-19T03:10:25.423076857Z [2025-08-19 03:10:25 +0000] [1020] [INFO] Booting worker with pid: 1020
+2025-08-19T03:10:25.553103579Z [2025-08-19 03:10:25 +0000] [1021] [INFO] Booting worker with pid: 1021
+2025-08-19T03:10:49.271867684Z [2025-08-19 03:10:49 +0000] [1021] [ERROR] Exception in worker process
+2025-08-19T03:10:49.271912002Z Traceback (most recent call last):
+2025-08-19T03:10:49.271916016Z   File "/opt/python/3.11.13/lib/python3.11/site-packages/gunicorn/arbiter.py", line 608, in spawn_worker
+2025-08-19T03:10:49.271919107Z     worker.init_process()
+2025-08-19T03:10:49.271921845Z   File "/tmp/8dddecc8bd5acf7/antenv/lib/python3.11/site-packages/uvicorn/workers.py", line 75, in init_process
+2025-08-19T03:10:49.271924667Z     super().init_process()
+2025-08-19T03:10:49.271927147Z   File "/opt/python/3.11.13/lib/python3.11/site-packages/gunicorn/workers/base.py", line 135, in init_process
+2025-08-19T03:10:49.271930242Z     self.load_wsgi()
+2025-08-19T03:10:49.271932694Z   File "/opt/python/3.11.13/lib/python3.11/site-packages/gunicorn/workers/base.py", line 147, in load_wsgi
+2025-08-19T03:10:49.271935324Z     self.wsgi = self.app.wsgi()
+2025-08-19T03:10:49.271937897Z                 ^^^^^^^^^^^^^^^
+2025-08-19T03:10:49.271940456Z   File "/opt/python/3.11.13/lib/python3.11/site-packages/gunicorn/app/base.py", line 66, in wsgi
+2025-08-19T03:10:49.271943110Z     self.callable = self.load()
+2025-08-19T03:10:49.271945665Z                     ^^^^^^^^^^^
+2025-08-19T03:10:49.271948155Z   File "/opt/python/3.11.13/lib/python3.11/site-packages/gunicorn/app/wsgiapp.py", line 57, in load
+2025-08-19T03:10:49.271950753Z     return self.load_wsgiapp()
+2025-08-19T03:10:49.271953169Z            ^^^^^^^^^^^^^^^^^^^
+2025-08-19T03:10:49.271955580Z   File "/opt/python/3.11.13/lib/python3.11/site-packages/gunicorn/app/wsgiapp.py", line 47, in load_wsgiapp
+2025-08-19T03:10:49.271958372Z     return util.import_app(self.app_uri)
+2025-08-19T03:10:49.271960897Z            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+2025-08-19T03:10:49.271963376Z   File "/opt/python/3.11.13/lib/python3.11/site-packages/gunicorn/util.py", line 370, in import_app
+2025-08-19T03:10:49.271966055Z     mod = importlib.import_module(module)
+2025-08-19T03:10:49.271968509Z           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+2025-08-19T03:10:49.271970937Z   File "/opt/python/3.11.13/lib/python3.11/importlib/__init__.py", line 126, in import_module
+2025-08-19T03:10:49.271973535Z     return _bootstrap._gcd_import(name[level:], package, level)
+2025-08-19T03:10:49.271980488Z            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+2025-08-19T03:10:49.271983352Z   File "<frozen importlib._bootstrap>", line 1204, in _gcd_import
+2025-08-19T03:10:49.271986324Z   File "<frozen importlib._bootstrap>", line 1176, in _find_and_load
+2025-08-19T03:10:49.271988997Z   File "<frozen importlib._bootstrap>", line 1147, in _find_and_load_unlocked
+2025-08-19T03:10:49.271999173Z   File "<frozen importlib._bootstrap>", line 690, in _load_unlocked
+2025-08-19T03:10:49.272001890Z   File "<frozen importlib._bootstrap_external>", line 940, in exec_module
+2025-08-19T03:10:49.272004537Z   File "<frozen importlib._bootstrap>", line 241, in _call_with_frames_removed
+2025-08-19T03:10:49.272007876Z   File "/tmp/8dddecc8bd5acf7/api/main.py", line 17, in <module>
+2025-08-19T03:10:49.272011472Z     from .routes import assessments as assessments_router, orchestrations as orchestrations_router, engagements as engagements_router, documents, summary, presets as presets_router, version as version_router, admin_auth as admin_auth_router, gdpr as gdpr_router, admin_settings as admin_settings_router, evidence as evidence_router, csf as csf_router, workshops as workshops_router, minutes as minutes_router
+2025-08-19T03:10:49.272014911Z   File "/tmp/8dddecc8bd5acf7/api/routes/assessments.py", line 5, in <module>
+2025-08-19T03:10:49.272017686Z     from ..security import current_context, require_member
+2025-08-19T03:10:49.272020266Z   File "/tmp/8dddecc8bd5acf7/api/security.py", line 9, in <module>
+2025-08-19T03:10:49.272022933Z     from config import config
+2025-08-19T03:10:49.272025395Z   File "/tmp/8dddecc8bd5acf7/config.py", line 328, in <module>
+2025-08-19T03:10:49.272027980Z     class FeatureFlags(BaseSettings):
+2025-08-19T03:10:49.272030472Z                        ^^^^^^^^^^^^
+2025-08-19T03:10:49.272033035Z NameError: name 'BaseSettings' is not defined
+2025-08-19T03:10:49.272035601Z [2025-08-19 03:10:49 +0000] [1021] [INFO] Worker exiting (pid: 1021)
+2025-08-19T03:10:49.282980329Z [2025-08-19 03:10:49 +0000] [1020] [ERROR] Exception in worker process
+2025-08-19T03:10:49.282996663Z Traceback (most recent call last):
+2025-08-19T03:10:49.282999744Z   File "/opt/python/3.11.13/lib/python3.11/site-packages/gunicorn/arbiter.py", line 608, in spawn_worker
+2025-08-19T03:10:49.283002644Z     worker.init_process()
+2025-08-19T03:10:49.283005458Z   File "/tmp/8dddecc8bd5acf7/antenv/lib/python3.11/site-packages/uvicorn/workers.py", line 75, in init_process
+2025-08-19T03:10:49.283008104Z     super().init_process()
+2025-08-19T03:10:49.283010537Z   File "/opt/python/3.11.13/lib/python3.11/site-packages/gunicorn/workers/base.py", line 135, in init_process
+2025-08-19T03:10:49.283013332Z     self.load_wsgi()
+2025-08-19T03:10:49.283015837Z   File "/opt/python/3.11.13/lib/python3.11/site-packages/gunicorn/workers/base.py", line 147, in load_wsgi
+2025-08-19T03:10:49.283018507Z     self.wsgi = self.app.wsgi()
+2025-08-19T03:10:49.283021006Z                 ^^^^^^^^^^^^^^^
+2025-08-19T03:10:49.283028566Z   File "/opt/python/3.11.13/lib/python3.11/site-packages/gunicorn/app/base.py", line 66, in wsgi
+2025-08-19T03:10:49.283031612Z     self.callable = self.load()
+2025-08-19T03:10:49.283034088Z                     ^^^^^^^^^^^
+2025-08-19T03:10:49.283044881Z   File "/opt/python/3.11.13/lib/python3.11/site-packages/gunicorn/app/wsgiapp.py", line 57, in load
+2025-08-19T03:10:49.283047607Z     return self.load_wsgiapp()
+2025-08-19T03:10:49.283049993Z            ^^^^^^^^^^^^^^^^^^^
+2025-08-19T03:10:49.283052456Z   File "/opt/python/3.11.13/lib/python3.11/site-packages/gunicorn/app/wsgiapp.py", line 47, in load_wsgiapp
+2025-08-19T03:10:49.283055140Z     return util.import_app(self.app_uri)
+2025-08-19T03:10:49.283057696Z            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+2025-08-19T03:10:49.283060171Z   File "/opt/python/3.11.13/lib/python3.11/site-packages/gunicorn/util.py", line 370, in import_app
+2025-08-19T03:10:49.283062862Z     mod = importlib.import_module(module)
+2025-08-19T03:10:49.283065545Z           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+2025-08-19T03:10:49.283068024Z   File "/opt/python/3.11.13/lib/python3.11/importlib/__init__.py", line 126, in import_module
+2025-08-19T03:10:49.283070653Z     return _bootstrap._gcd_import(name[level:], package, level)
+2025-08-19T03:10:49.283073221Z            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+2025-08-19T03:10:49.283075713Z   File "<frozen importlib._bootstrap>", line 1204, in _gcd_import
+2025-08-19T03:10:49.283078788Z   File "<frozen importlib._bootstrap>", line 1176, in _find_and_load
+2025-08-19T03:10:49.283081384Z   File "<frozen importlib._bootstrap>", line 1147, in _find_and_load_unlocked
+2025-08-19T03:10:49.283083991Z   File "<frozen importlib._bootstrap>", line 690, in _load_unlocked
+2025-08-19T03:10:49.283086627Z   File "<frozen importlib._bootstrap_external>", line 940, in exec_module
+2025-08-19T03:10:49.283089283Z   File "<frozen importlib._bootstrap>", line 241, in _call_with_frames_removed
+2025-08-19T03:10:49.283092781Z   File "/tmp/8dddecc8bd5acf7/api/main.py", line 17, in <module>
+2025-08-19T03:10:49.283095680Z     from .routes import assessments as assessments_router, orchestrations as orchestrations_router, engagements as engagements_router, documents, summary, presets as presets_router, version as version_router, admin_auth as admin_auth_router, gdpr as gdpr_router, admin_settings as admin_settings_router, evidence as evidence_router, csf as csf_router, workshops as workshops_router, minutes as minutes_router
+2025-08-19T03:10:49.283099298Z   File "/tmp/8dddecc8bd5acf7/api/routes/assessments.py", line 5, in <module>
+2025-08-19T03:10:49.283102008Z     from ..security import current_context, require_member
+2025-08-19T03:10:49.283104471Z   File "/tmp/8dddecc8bd5acf7/api/security.py", line 9, in <module>
+2025-08-19T03:10:49.283107084Z     from config import config
+2025-08-19T03:10:49.283109602Z   File "/tmp/8dddecc8bd5acf7/config.py", line 328, in <module>
+2025-08-19T03:10:49.283112233Z     class FeatureFlags(BaseSettings):
+2025-08-19T03:10:49.283114720Z                        ^^^^^^^^^^^^
+2025-08-19T03:10:49.283120150Z NameError: name 'BaseSettings' is not defined
+2025-08-19T03:10:49.321766334Z [2025-08-19 03:10:49 +0000] [1020] [INFO] Worker exiting (pid: 1020)
+2025-08-19T03:10:51.985731483Z [2025-08-19 03:10:51 +0000] [1019] [ERROR] Worker (pid:1021) exited with code 3
+2025-08-19T03:10:52.034940669Z [2025-08-19 03:10:52 +0000] [1019] [ERROR] Worker (pid:1020) was sent SIGTERM!
+2025-08-19T03:10:52.098345541Z [2025-08-19 03:10:52 +0000] [1019] [ERROR] Shutting down: Master
+2025-08-19T03:10:52.098370406Z [2025-08-19 03:10:52 +0000] [1019] [ERROR] Reason: Worker failed to boot.
+
+2025-08-19T03:11:22.611947721Z    _____                               
+2025-08-19T03:11:22.611989805Z   /  _  \ __________ _________   ____  
+2025-08-19T03:11:22.611993946Z  /  /_\  \\___   /  |  \_  __ \_/ __ \ 
+2025-08-19T03:11:22.611996971Z /    |    \/    /|  |  /|  | \/\  ___/ 
+2025-08-19T03:11:22.611999663Z \____|__  /_____ \____/ |__|    \___  >
+2025-08-19T03:11:22.612002971Z         \/      \/                  \/ 
+2025-08-19T03:11:22.612005546Z A P P   S E R V I C E   O N   L I N U X
+2025-08-19T03:11:22.612008105Z 
+2025-08-19T03:11:22.612010425Z Documentation: http://aka.ms/webapp-linux
+2025-08-19T03:11:22.612012883Z Python 3.11.13
+2025-08-19T03:11:22.612015391Z Note: Any data outside '/home' is not persisted
+2025-08-19T03:11:25.129835664Z Starting OpenBSD Secure Shell server: sshd.
+2025-08-19T03:11:25.159893487Z WEBSITES_INCLUDE_CLOUD_CERTS is not set to true.
+2025-08-19T03:11:25.238172339Z Updating certificates in /etc/ssl/certs...
+2025-08-19T03:11:34.176919736Z 4 added, 0 removed; done.
+2025-08-19T03:11:34.176992541Z Running hooks in /etc/ca-certificates/update.d...
+2025-08-19T03:11:34.216089848Z done.
+2025-08-19T03:11:34.216111265Z CA certificates copied and updated successfully.
+2025-08-19T03:11:34.418254784Z Site's appCommandLine: gunicorn -w 2 -k uvicorn.workers.UvicornWorker api.main:app --bind 0.0.0.0:8000
+2025-08-19T03:11:34.418282988Z Launching oryx with: create-script -appPath /home/site/wwwroot -output /opt/startup/startup.sh -virtualEnvName antenv -defaultApp /opt/defaultsite -userStartupCommand 'gunicorn -w 2 -k uvicorn.workers.UvicornWorker api.main:app --bind 0.0.0.0:8000'
+2025-08-19T03:11:34.428398318Z Found build manifest file at '/home/site/wwwroot/oryx-manifest.toml'. Deserializing it...
+2025-08-19T03:11:34.436470850Z Build Operation ID: 72c008f25b023bce
+2025-08-19T03:11:34.437032140Z Oryx Version: 0.2.20250709.3, Commit: 0cfb8cb7d114b65e539d2f9ccf9804e87b9966ba, ReleaseTagName: 20250709.3
+2025-08-19T03:11:34.437109780Z Output is compressed. Extracting it...
+2025-08-19T03:11:34.437930424Z Extracting '/home/site/wwwroot/output.tar.gz' to directory '/tmp/8dddecc8bd5acf7'...
+2025-08-19T03:11:46.912484195Z App path is set to '/tmp/8dddecc8bd5acf7'
+2025-08-19T03:11:46.923488894Z Writing output script to '/opt/startup/startup.sh'
+2025-08-19T03:11:47.022607882Z Using packages from virtual environment antenv located at /tmp/8dddecc8bd5acf7/antenv.
+2025-08-19T03:11:47.022661807Z Updated PYTHONPATH to '/opt/startup/app_logs:/tmp/8dddecc8bd5acf7/antenv/lib/python3.11/site-packages'
+2025-08-19T03:11:49.166495372Z [2025-08-19 03:11:49 +0000] [1020] [INFO] Starting gunicorn 23.0.0
+2025-08-19T03:11:49.166519773Z [2025-08-19 03:11:49 +0000] [1020] [INFO] Listening at: http://0.0.0.0:8000 (1020)
+2025-08-19T03:11:49.166523097Z [2025-08-19 03:11:49 +0000] [1020] [INFO] Using worker: uvicorn.workers.UvicornWorker
+2025-08-19T03:11:49.166536398Z [2025-08-19 03:11:49 +0000] [1021] [INFO] Booting worker with pid: 1021
+2025-08-19T03:11:49.286361123Z [2025-08-19 03:11:49 +0000] [1022] [INFO] Booting worker with pid: 1022
+2025-08-19T03:12:27.339439261Z [2025-08-19 03:12:26 +0000] [1022] [ERROR] Exception in worker process
+2025-08-19T03:12:27.408714122Z Traceback (most recent call last):
+2025-08-19T03:12:27.408731640Z   File "/opt/python/3.11.13/lib/python3.11/site-packages/gunicorn/arbiter.py", line 608, in spawn_worker
+2025-08-19T03:12:27.408735003Z     worker.init_process()
+2025-08-19T03:12:27.408737656Z   File "/tmp/8dddecc8bd5acf7/antenv/lib/python3.11/site-packages/uvicorn/workers.py", line 75, in init_process
+2025-08-19T03:12:27.408740791Z     super().init_process()
+2025-08-19T03:12:27.408743444Z   File "/opt/python/3.11.13/lib/python3.11/site-packages/gunicorn/workers/base.py", line 135, in init_process
+2025-08-19T03:12:27.408746265Z     self.load_wsgi()
+2025-08-19T03:12:27.408748700Z   File "/opt/python/3.11.13/lib/python3.11/site-packages/gunicorn/workers/base.py", line 147, in load_wsgi
+2025-08-19T03:12:27.408751430Z     self.wsgi = self.app.wsgi()
+2025-08-19T03:12:27.408754025Z                 ^^^^^^^^^^^^^^^
+2025-08-19T03:12:27.408756536Z   File "/opt/python/3.11.13/lib/python3.11/site-packages/gunicorn/app/base.py", line 66, in wsgi
+2025-08-19T03:12:27.408759146Z     self.callable = self.load()
+2025-08-19T03:12:27.408761614Z                     ^^^^^^^^^^^
+2025-08-19T03:12:27.408764251Z   File "/opt/python/3.11.13/lib/python3.11/site-packages/gunicorn/app/wsgiapp.py", line 57, in load
+2025-08-19T03:12:27.408767027Z     return self.load_wsgiapp()
+2025-08-19T03:12:27.408769512Z            ^^^^^^^^^^^^^^^^^^^
+2025-08-19T03:12:27.408772158Z   File "/opt/python/3.11.13/lib/python3.11/site-packages/gunicorn/app/wsgiapp.py", line 47, in load_wsgiapp
+2025-08-19T03:12:27.408774873Z     return util.import_app(self.app_uri)
+2025-08-19T03:12:27.408777392Z            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+2025-08-19T03:12:27.408779866Z   File "/opt/python/3.11.13/lib/python3.11/site-packages/gunicorn/util.py", line 370, in import_app
+2025-08-19T03:12:27.408782513Z     mod = importlib.import_module(module)
+2025-08-19T03:12:27.408785049Z           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+2025-08-19T03:12:27.408787663Z   File "/opt/python/3.11.13/lib/python3.11/importlib/__init__.py", line 126, in import_module
+2025-08-19T03:12:27.408790387Z     return _bootstrap._gcd_import(name[level:], package, level)
+2025-08-19T03:12:27.408792970Z            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+2025-08-19T03:12:27.408795547Z   File "<frozen importlib._bootstrap>", line 1204, in _gcd_import
+2025-08-19T03:12:27.408798764Z   File "<frozen importlib._bootstrap>", line 1176, in _find_and_load
+2025-08-19T03:12:27.408801357Z   File "<frozen importlib._bootstrap>", line 1147, in _find_and_load_unlocked
+2025-08-19T03:12:27.408816741Z   File "<frozen importlib._bootstrap>", line 690, in _load_unlocked
+2025-08-19T03:12:27.408819420Z   File "<frozen importlib._bootstrap_external>", line 940, in exec_module
+2025-08-19T03:12:27.408822140Z   File "<frozen importlib._bootstrap>", line 241, in _call_with_frames_removed
+2025-08-19T03:12:27.408831347Z   File "/tmp/8dddecc8bd5acf7/api/main.py", line 17, in <module>
+2025-08-19T03:12:27.408834272Z     from .routes import assessments as assessments_router, orchestrations as orchestrations_router, engagements as engagements_router, documents, summary, presets as presets_router, version as version_router, admin_auth as admin_auth_router, gdpr as gdpr_router, admin_settings as admin_settings_router, evidence as evidence_router, csf as csf_router, workshops as workshops_router, minutes as minutes_router
+2025-08-19T03:12:27.408837590Z   File "/tmp/8dddecc8bd5acf7/api/routes/assessments.py", line 5, in <module>
+2025-08-19T03:12:27.408840251Z     from ..security import current_context, require_member
+2025-08-19T03:12:27.408842676Z   File "/tmp/8dddecc8bd5acf7/api/security.py", line 9, in <module>
+2025-08-19T03:12:27.408845245Z     from config import config
+2025-08-19T03:12:27.408847626Z   File "/tmp/8dddecc8bd5acf7/config.py", line 328, in <module>
+2025-08-19T03:12:27.408850276Z     class FeatureFlags(BaseSettings):
+2025-08-19T03:12:27.408852698Z                        ^^^^^^^^^^^^
+2025-08-19T03:12:27.408855120Z NameError: name 'BaseSettings' is not defined
+2025-08-19T03:12:27.408857595Z [2025-08-19 03:12:26 +0000] [1022] [INFO] Worker exiting (pid: 1022)
+2025-08-19T03:12:27.408860072Z [2025-08-19 03:12:26 +0000] [1021] [ERROR] Exception in worker process
+2025-08-19T03:12:27.408862508Z Traceback (most recent call last):
+2025-08-19T03:12:27.408864964Z   File "/opt/python/3.11.13/lib/python3.11/site-packages/gunicorn/arbiter.py", line 608, in spawn_worker
+2025-08-19T03:12:27.408871777Z     worker.init_process()
+2025-08-19T03:12:27.408874368Z   File "/tmp/8dddecc8bd5acf7/antenv/lib/python3.11/site-packages/uvicorn/workers.py", line 75, in init_process
+2025-08-19T03:12:27.408877097Z     super().init_process()
+2025-08-19T03:12:27.408880198Z   File "/opt/python/3.11.13/lib/python3.11/site-packages/gunicorn/workers/base.py", line 135, in init_process
+2025-08-19T03:12:27.408882859Z     self.load_wsgi()
+2025-08-19T03:12:27.408885167Z   File "/opt/python/3.11.13/lib/python3.11/site-packages/gunicorn/workers/base.py", line 147, in load_wsgi
+2025-08-19T03:12:27.408887759Z     self.wsgi = self.app.wsgi()
+2025-08-19T03:12:27.408890282Z                 ^^^^^^^^^^^^^^^
+2025-08-19T03:12:27.408892704Z   File "/opt/python/3.11.13/lib/python3.11/site-packages/gunicorn/app/base.py", line 66, in wsgi
+2025-08-19T03:12:27.408895415Z     self.callable = self.load()
+2025-08-19T03:12:27.408898427Z                     ^^^^^^^^^^^
+2025-08-19T03:12:27.408904126Z   File "/opt/python/3.11.13/lib/python3.11/site-packages/gunicorn/app/wsgiapp.py", line 57, in load
+2025-08-19T03:12:27.408906758Z     return self.load_wsgiapp()
+2025-08-19T03:12:27.408909125Z            ^^^^^^^^^^^^^^^^^^^
+2025-08-19T03:12:27.408911512Z   File "/opt/python/3.11.13/lib/python3.11/site-packages/gunicorn/app/wsgiapp.py", line 47, in load_wsgiapp
+2025-08-19T03:12:27.408915001Z     return util.import_app(self.app_uri)
+2025-08-19T03:12:27.408917506Z            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+2025-08-19T03:12:27.408919984Z   File "/opt/python/3.11.13/lib/python3.11/site-packages/gunicorn/util.py", line 370, in import_app
+2025-08-19T03:12:27.408922579Z     mod = importlib.import_module(module)
+2025-08-19T03:12:27.408925013Z           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+2025-08-19T03:12:27.408927451Z   File "/opt/python/3.11.13/lib/python3.11/importlib/__init__.py", line 126, in import_module
+2025-08-19T03:12:27.408930003Z     return _bootstrap._gcd_import(name[level:], package, level)
+2025-08-19T03:12:27.408932433Z            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+2025-08-19T03:12:27.408934884Z   File "<frozen importlib._bootstrap>", line 1204, in _gcd_import
+2025-08-19T03:12:27.408937411Z   File "<frozen importlib._bootstrap>", line 1176, in _find_and_load
+2025-08-19T03:12:27.408940033Z   File "<frozen importlib._bootstrap>", line 1147, in _find_and_load_unlocked
+2025-08-19T03:12:27.408942603Z   File "<frozen importlib._bootstrap>", line 690, in _load_unlocked
+2025-08-19T03:12:27.408945145Z   File "<frozen importlib._bootstrap_external>", line 940, in exec_module
+2025-08-19T03:12:27.408947701Z   File "<frozen importlib._bootstrap>", line 241, in _call_with_frames_removed
+2025-08-19T03:12:27.408950295Z   File "/tmp/8dddecc8bd5acf7/api/main.py", line 17, in <module>
+2025-08-19T03:12:27.408952974Z     from .routes import assessments as assessments_router, orchestrations as orchestrations_router, engagements as engagements_router, documents, summary, presets as presets_router, version as version_router, admin_auth as admin_auth_router, gdpr as gdpr_router, admin_settings as admin_settings_router, evidence as evidence_router, csf as csf_router, workshops as workshops_router, minutes as minutes_router
+2025-08-19T03:12:27.408956065Z   File "/tmp/8dddecc8bd5acf7/api/routes/assessments.py", line 5, in <module>
+2025-08-19T03:12:27.408958680Z     from ..security import current_context, require_member
+2025-08-19T03:12:27.408961234Z   File "/tmp/8dddecc8bd5acf7/api/security.py", line 9, in <module>
+2025-08-19T03:12:27.408963813Z     from config import config
+2025-08-19T03:12:27.408966308Z   File "/tmp/8dddecc8bd5acf7/config.py", line 328, in <module>
+2025-08-19T03:12:27.408968888Z     class FeatureFlags(BaseSettings):
+2025-08-19T03:12:27.408971345Z                        ^^^^^^^^^^^^
+2025-08-19T03:12:27.408979795Z NameError: name 'BaseSettings' is not defined
+2025-08-19T03:12:27.408982363Z [2025-08-19 03:12:26 +0000] [1021] [INFO] Worker exiting (pid: 1021)
+2025-08-19T03:12:36.358405582Z [2025-08-19 03:12:36 +0000] [1020] [ERROR] Worker (pid:1022) exited with code 3
+2025-08-19T03:12:36.409623268Z [2025-08-19 03:12:36 +0000] [1020] [ERROR] Worker (pid:1021) exited with code 3
+2025-08-19T03:12:36.411346725Z Traceback (most recent call last):
+2025-08-19T03:12:36.418564976Z   File "/opt/python/3.11.13/lib/python3.11/site-packages/gunicorn/arbiter.py", line 208, in run
+2025-08-19T03:12:36.428162067Z     self.sleep()
+2025-08-19T03:12:36.428176744Z   File "/opt/python/3.11.13/lib/python3.11/site-packages/gunicorn/arbiter.py", line 359, in sleep
+2025-08-19T03:12:36.428180455Z     ready = select.select([self.PIPE[0]], [], [], 1.0)
+2025-08-19T03:12:36.428183087Z             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+2025-08-19T03:12:36.428185801Z   File "/opt/python/3.11.13/lib/python3.11/site-packages/gunicorn/arbiter.py", line 241, in handle_chld
+2025-08-19T03:12:36.438504855Z     self.reap_workers()
+2025-08-19T03:12:36.439504149Z   File "/opt/python/3.11.13/lib/python3.11/site-packages/gunicorn/arbiter.py", line 529, in reap_workers
+2025-08-19T03:12:36.439516053Z     raise HaltServer(reason, self.WORKER_BOOT_ERROR)
+2025-08-19T03:12:36.439519002Z gunicorn.errors.HaltServer: <HaltServer 'Worker failed to boot.' 3>
+2025-08-19T03:12:36.439522615Z 
+2025-08-19T03:12:36.439525132Z During handling of the above exception, another exception occurred:
+2025-08-19T03:12:36.439527777Z 
+2025-08-19T03:12:36.439530130Z Traceback (most recent call last):
+2025-08-19T03:12:36.439533034Z   File "/opt/python/3.11.13/bin/gunicorn", line 8, in <module>
+2025-08-19T03:12:36.439535917Z     sys.exit(run())
+2025-08-19T03:12:36.439538739Z              ^^^^^
+2025-08-19T03:12:36.439541278Z   File "/opt/python/3.11.13/lib/python3.11/site-packages/gunicorn/app/wsgiapp.py", line 66, in run
+2025-08-19T03:12:36.439544028Z     WSGIApplication("%(prog)s [OPTIONS] [APP_MODULE]", prog=prog).run()
+2025-08-19T03:12:36.439546742Z   File "/opt/python/3.11.13/lib/python3.11/site-packages/gunicorn/app/base.py", line 235, in run
+2025-08-19T03:12:36.439549346Z     super().run()
+2025-08-19T03:12:36.439551797Z   File "/opt/python/3.11.13/lib/python3.11/site-packages/gunicorn/app/base.py", line 71, in run
+2025-08-19T03:12:36.439554628Z     Arbiter(self).run()
+2025-08-19T03:12:36.439557194Z   File "/opt/python/3.11.13/lib/python3.11/site-packages/gunicorn/arbiter.py", line 228, in run
+2025-08-19T03:12:36.439559972Z     self.halt(reason=inst.reason, exit_status=inst.exit_status)
+2025-08-19T03:12:36.439562656Z   File "/opt/python/3.11.13/lib/python3.11/site-packages/gunicorn/arbiter.py", line 341, in halt
+2025-08-19T03:12:36.439581105Z     self.stop()
+2025-08-19T03:12:36.439583911Z   File "/opt/python/3.11.13/lib/python3.11/site-packages/gunicorn/arbiter.py", line 384, in stop
+2025-08-19T03:12:36.439828247Z     sock.close_sockets(self.LISTENERS, unlink)
+2025-08-19T03:12:36.439832904Z   File "/opt/python/3.11.13/lib/python3.11/site-packages/gunicorn/sock.py", line 207, in close_sockets
+2025-08-19T03:12:36.467238158Z     def close_sockets(listeners, unlink=True):
+2025-08-19T03:12:36.467254781Z     
+2025-08-19T03:12:36.467257674Z   File "/opt/python/3.11.13/lib/python3.11/site-packages/gunicorn/arbiter.py", line 241, in handle_chld
+2025-08-19T03:12:36.469464177Z     self.reap_workers()
+2025-08-19T03:12:36.475596953Z   File "/opt/python/3.11.13/lib/python3.11/site-packages/gunicorn/arbiter.py", line 529, in reap_workers
+2025-08-19T03:12:36.475911266Z     raise HaltServer(reason, self.WORKER_BOOT_ERROR)
+2025-08-19T03:12:36.476148844Z gunicorn.errors.HaltServer: <HaltServer 'Worker failed to boot.' 3>
+
+2025-08-19T03:30:23.737910493Z    _____                               
+2025-08-19T03:30:23.737958284Z   /  _  \ __________ _________   ____  
+2025-08-19T03:30:23.737962726Z  /  /_\  \\___   /  |  \_  __ \_/ __ \ 
+2025-08-19T03:30:23.737966020Z /    |    \/    /|  |  /|  | \/\  ___/ 
+2025-08-19T03:30:23.737974618Z \____|__  /_____ \____/ |__|    \___  >
+2025-08-19T03:30:23.737977531Z         \/      \/                  \/ 
+2025-08-19T03:30:23.737980256Z A P P   S E R V I C E   O N   L I N U X
+2025-08-19T03:30:23.737982853Z 
+2025-08-19T03:30:23.737985222Z Documentation: http://aka.ms/webapp-linux
+2025-08-19T03:30:23.737987840Z Python 3.11.13
+2025-08-19T03:30:23.737990439Z Note: Any data outside '/home' is not persisted
+2025-08-19T03:30:26.646227081Z Starting OpenBSD Secure Shell server: sshd.
+2025-08-19T03:30:26.808172548Z WEBSITES_INCLUDE_CLOUD_CERTS is not set to true.
+2025-08-19T03:30:26.928822831Z Updating certificates in /etc/ssl/certs...
+2025-08-19T03:30:35.303484243Z 4 added, 0 removed; done.
+2025-08-19T03:30:35.303529085Z Running hooks in /etc/ca-certificates/update.d...
+2025-08-19T03:30:35.330607505Z done.
+2025-08-19T03:30:35.330630459Z CA certificates copied and updated successfully.
+2025-08-19T03:30:35.391785883Z Site's appCommandLine: gunicorn -w 2 -k uvicorn.workers.UvicornWorker api.main:app --bind 0.0.0.0:8000
+2025-08-19T03:30:35.393242699Z Launching oryx with: create-script -appPath /home/site/wwwroot -output /opt/startup/startup.sh -virtualEnvName antenv -defaultApp /opt/defaultsite -userStartupCommand 'gunicorn -w 2 -k uvicorn.workers.UvicornWorker api.main:app --bind 0.0.0.0:8000'
+2025-08-19T03:30:35.682658709Z Found build manifest file at '/home/site/wwwroot/oryx-manifest.toml'. Deserializing it...
+2025-08-19T03:30:35.685428843Z Build Operation ID: 72c008f25b023bce
+2025-08-19T03:30:35.693928859Z Oryx Version: 0.2.20250709.3, Commit: 0cfb8cb7d114b65e539d2f9ccf9804e87b9966ba, ReleaseTagName: 20250709.3
+2025-08-19T03:30:35.732462594Z Output is compressed. Extracting it...
+2025-08-19T03:30:35.732909340Z Extracting '/home/site/wwwroot/output.tar.gz' to directory '/tmp/8dddecc8bd5acf7'...
+2025-08-19T03:30:46.692915228Z App path is set to '/tmp/8dddecc8bd5acf7'
+2025-08-19T03:30:46.696560854Z Writing output script to '/opt/startup/startup.sh'
+2025-08-19T03:30:46.844501765Z Using packages from virtual environment antenv located at /tmp/8dddecc8bd5acf7/antenv.
+2025-08-19T03:30:46.844524678Z Updated PYTHONPATH to '/opt/startup/app_logs:/tmp/8dddecc8bd5acf7/antenv/lib/python3.11/site-packages'
+2025-08-19T03:30:48.141260736Z [2025-08-19 03:30:48 +0000] [1019] [INFO] Starting gunicorn 23.0.0
+2025-08-19T03:30:48.142504348Z [2025-08-19 03:30:48 +0000] [1019] [INFO] Listening at: http://0.0.0.0:8000 (1019)
+2025-08-19T03:30:48.143204869Z [2025-08-19 03:30:48 +0000] [1019] [INFO] Using worker: uvicorn.workers.UvicornWorker
+2025-08-19T03:30:48.163705698Z [2025-08-19 03:30:48 +0000] [1020] [INFO] Booting worker with pid: 1020
+2025-08-19T03:30:48.374105994Z [2025-08-19 03:30:48 +0000] [1021] [INFO] Booting worker with pid: 1021
+2025-08-19T03:31:10.651272768Z [2025-08-19 03:31:10 +0000] [1020] [ERROR] Exception in worker process
+2025-08-19T03:31:10.651305157Z Traceback (most recent call last):
+2025-08-19T03:31:10.651308491Z   File "/opt/python/3.11.13/lib/python3.11/site-packages/gunicorn/arbiter.py", line 608, in spawn_worker
+2025-08-19T03:31:10.651311379Z     worker.init_process()
+2025-08-19T03:31:10.651313948Z   File "/tmp/8dddecc8bd5acf7/antenv/lib/python3.11/site-packages/uvicorn/workers.py", line 75, in init_process
+2025-08-19T03:31:10.651317102Z     super().init_process()
+2025-08-19T03:31:10.651319633Z   File "/opt/python/3.11.13/lib/python3.11/site-packages/gunicorn/workers/base.py", line 135, in init_process
+2025-08-19T03:31:10.651328029Z     self.load_wsgi()
+2025-08-19T03:31:10.651330530Z   File "/opt/python/3.11.13/lib/python3.11/site-packages/gunicorn/workers/base.py", line 147, in load_wsgi
+2025-08-19T03:31:10.651333267Z     self.wsgi = self.app.wsgi()
+2025-08-19T03:31:10.651335793Z                 ^^^^^^^^^^^^^^^
+2025-08-19T03:31:10.651338239Z   File "/opt/python/3.11.13/lib/python3.11/site-packages/gunicorn/app/base.py", line 66, in wsgi
+2025-08-19T03:31:10.651340944Z     self.callable = self.load()
+2025-08-19T03:31:10.651343426Z                     ^^^^^^^^^^^
+2025-08-19T03:31:10.651345991Z   File "/opt/python/3.11.13/lib/python3.11/site-packages/gunicorn/app/wsgiapp.py", line 57, in load
+2025-08-19T03:31:10.651348618Z     return self.load_wsgiapp()
+2025-08-19T03:31:10.651351068Z            ^^^^^^^^^^^^^^^^^^^
+2025-08-19T03:31:10.651353500Z   File "/opt/python/3.11.13/lib/python3.11/site-packages/gunicorn/app/wsgiapp.py", line 47, in load_wsgiapp
+2025-08-19T03:31:10.651356241Z     return util.import_app(self.app_uri)
+2025-08-19T03:31:10.651358770Z            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+2025-08-19T03:31:10.651361363Z   File "/opt/python/3.11.13/lib/python3.11/site-packages/gunicorn/util.py", line 370, in import_app
+2025-08-19T03:31:10.651364051Z     mod = importlib.import_module(module)
+2025-08-19T03:31:10.651366597Z           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+2025-08-19T03:31:10.651369099Z   File "/opt/python/3.11.13/lib/python3.11/importlib/__init__.py", line 126, in import_module
+2025-08-19T03:31:10.651371678Z     return _bootstrap._gcd_import(name[level:], package, level)
+2025-08-19T03:31:10.651374166Z            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+2025-08-19T03:31:10.651376690Z   File "<frozen importlib._bootstrap>", line 1204, in _gcd_import
+2025-08-19T03:31:10.651379947Z   File "<frozen importlib._bootstrap>", line 1176, in _find_and_load
+2025-08-19T03:31:10.651382681Z   File "<frozen importlib._bootstrap>", line 1147, in _find_and_load_unlocked
+2025-08-19T03:31:10.651394215Z   File "<frozen importlib._bootstrap>", line 690, in _load_unlocked
+2025-08-19T03:31:10.651396866Z   File "<frozen importlib._bootstrap_external>", line 940, in exec_module
+2025-08-19T03:31:10.651399550Z   File "<frozen importlib._bootstrap>", line 241, in _call_with_frames_removed
+2025-08-19T03:31:10.651402823Z   File "/tmp/8dddecc8bd5acf7/api/main.py", line 17, in <module>
+2025-08-19T03:31:10.651405686Z     from .routes import assessments as assessments_router, orchestrations as orchestrations_router, engagements as engagements_router, documents, summary, presets as presets_router, version as version_router, admin_auth as admin_auth_router, gdpr as gdpr_router, admin_settings as admin_settings_router, evidence as evidence_router, csf as csf_router, workshops as workshops_router, minutes as minutes_router
+2025-08-19T03:31:10.651408927Z   File "/tmp/8dddecc8bd5acf7/api/routes/assessments.py", line 5, in <module>
+2025-08-19T03:31:10.651411625Z     from ..security import current_context, require_member
+2025-08-19T03:31:10.651414187Z   File "/tmp/8dddecc8bd5acf7/api/security.py", line 9, in <module>
+2025-08-19T03:31:10.651416882Z     from config import config
+2025-08-19T03:31:10.651419320Z   File "/tmp/8dddecc8bd5acf7/config.py", line 328, in <module>
+2025-08-19T03:31:10.651422028Z     class FeatureFlags(BaseSettings):
+2025-08-19T03:31:10.651428549Z                        ^^^^^^^^^^^^
+2025-08-19T03:31:10.651431063Z NameError: name 'BaseSettings' is not defined
+2025-08-19T03:31:10.651433621Z [2025-08-19 03:31:10 +0000] [1020] [INFO] Worker exiting (pid: 1020)
+2025-08-19T03:31:10.651436140Z [2025-08-19 03:31:10 +0000] [1021] [ERROR] Exception in worker process
+2025-08-19T03:31:10.651438747Z Traceback (most recent call last):
+2025-08-19T03:31:10.651441272Z   File "/opt/python/3.11.13/lib/python3.11/site-packages/gunicorn/arbiter.py", line 608, in spawn_worker
+2025-08-19T03:31:10.651444048Z     worker.init_process()
+2025-08-19T03:31:10.651446502Z   File "/tmp/8dddecc8bd5acf7/antenv/lib/python3.11/site-packages/uvicorn/workers.py", line 75, in init_process
+2025-08-19T03:31:10.651449154Z     super().init_process()
+2025-08-19T03:31:10.651451580Z   File "/opt/python/3.11.13/lib/python3.11/site-packages/gunicorn/workers/base.py", line 135, in init_process
+2025-08-19T03:31:10.651454277Z     self.load_wsgi()
+2025-08-19T03:31:10.651456657Z   File "/opt/python/3.11.13/lib/python3.11/site-packages/gunicorn/workers/base.py", line 147, in load_wsgi
+2025-08-19T03:31:10.651459357Z     self.wsgi = self.app.wsgi()
+2025-08-19T03:31:10.651461880Z                 ^^^^^^^^^^^^^^^
+2025-08-19T03:31:10.651464419Z   File "/opt/python/3.11.13/lib/python3.11/site-packages/gunicorn/app/base.py", line 66, in wsgi
+2025-08-19T03:31:10.651467047Z     self.callable = self.load()
+2025-08-19T03:31:10.651469491Z                     ^^^^^^^^^^^
+2025-08-19T03:31:10.651474880Z   File "/opt/python/3.11.13/lib/python3.11/site-packages/gunicorn/app/wsgiapp.py", line 57, in load
+2025-08-19T03:31:10.651477543Z     return self.load_wsgiapp()
+2025-08-19T03:31:10.651479991Z            ^^^^^^^^^^^^^^^^^^^
+2025-08-19T03:31:10.651482547Z   File "/opt/python/3.11.13/lib/python3.11/site-packages/gunicorn/app/wsgiapp.py", line 47, in load_wsgiapp
+2025-08-19T03:31:10.651485536Z     return util.import_app(self.app_uri)
+2025-08-19T03:31:10.651488125Z            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+2025-08-19T03:31:10.651490642Z   File "/opt/python/3.11.13/lib/python3.11/site-packages/gunicorn/util.py", line 370, in import_app
+2025-08-19T03:31:10.651493265Z     mod = importlib.import_module(module)
+2025-08-19T03:31:10.651495733Z           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+2025-08-19T03:31:10.651498194Z   File "/opt/python/3.11.13/lib/python3.11/importlib/__init__.py", line 126, in import_module
+2025-08-19T03:31:10.651500814Z     return _bootstrap._gcd_import(name[level:], package, level)
+2025-08-19T03:31:10.651503435Z            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+2025-08-19T03:31:10.651506017Z   File "<frozen importlib._bootstrap>", line 1204, in _gcd_import
+2025-08-19T03:31:10.651508631Z   File "<frozen importlib._bootstrap>", line 1176, in _find_and_load
+2025-08-19T03:31:10.651511236Z   File "<frozen importlib._bootstrap>", line 1147, in _find_and_load_unlocked
+2025-08-19T03:31:10.651513806Z   File "<frozen importlib._bootstrap>", line 690, in _load_unlocked
+2025-08-19T03:31:10.651516366Z   File "<frozen importlib._bootstrap_external>", line 940, in exec_module
+2025-08-19T03:31:10.651518987Z   File "<frozen importlib._bootstrap>", line 241, in _call_with_frames_removed
+2025-08-19T03:31:10.651521603Z   File "/tmp/8dddecc8bd5acf7/api/main.py", line 17, in <module>
+2025-08-19T03:31:10.651524357Z     from .routes import assessments as assessments_router, orchestrations as orchestrations_router, engagements as engagements_router, documents, summary, presets as presets_router, version as version_router, admin_auth as admin_auth_router, gdpr as gdpr_router, admin_settings as admin_settings_router, evidence as evidence_router, csf as csf_router, workshops as workshops_router, minutes as minutes_router
+2025-08-19T03:31:10.651527570Z   File "/tmp/8dddecc8bd5acf7/api/routes/assessments.py", line 5, in <module>
+2025-08-19T03:31:10.651530242Z     from ..security import current_context, require_member
+2025-08-19T03:31:10.651532769Z   File "/tmp/8dddecc8bd5acf7/api/security.py", line 9, in <module>
+2025-08-19T03:31:10.651535389Z     from config import config
+2025-08-19T03:31:10.651537821Z   File "/tmp/8dddecc8bd5acf7/config.py", line 328, in <module>
+2025-08-19T03:31:10.651540404Z     class FeatureFlags(BaseSettings):
+2025-08-19T03:31:10.651542880Z                        ^^^^^^^^^^^^
+2025-08-19T03:31:10.651548063Z NameError: name 'BaseSettings' is not defined
+2025-08-19T03:31:10.651550669Z [2025-08-19 03:31:10 +0000] [1021] [INFO] Worker exiting (pid: 1021)
+2025-08-19T03:31:13.247520857Z [2025-08-19 03:31:13 +0000] [1019] [ERROR] Worker (pid:1020) exited with code 3
+2025-08-19T03:31:13.247531001Z [2025-08-19 03:31:13 +0000] [1019] [ERROR] Worker (pid:1021) was sent SIGTERM!
+2025-08-19T03:31:13.310074228Z [2025-08-19 03:31:13 +0000] [1019] [ERROR] Shutting down: Master
+2025-08-19T03:31:13.310105201Z [2025-08-19 03:31:13 +0000] [1019] [ERROR] Reason: Worker failed to boot.
+
+2025-08-19T03:33:22.654737227Z    _____                               
+2025-08-19T03:33:22.654786507Z   /  _  \ __________ _________   ____  
+2025-08-19T03:33:22.654790192Z  /  /_\  \\___   /  |  \_  __ \_/ __ \ 
+2025-08-19T03:33:22.654793549Z /    |    \/    /|  |  /|  | \/\  ___/ 
+2025-08-19T03:33:22.654796381Z \____|__  /_____ \____/ |__|    \___  >
+2025-08-19T03:33:22.654800105Z         \/      \/                  \/ 
+2025-08-19T03:33:22.654802710Z A P P   S E R V I C E   O N   L I N U X
+2025-08-19T03:33:22.654805346Z 
+2025-08-19T03:33:22.654807679Z Documentation: http://aka.ms/webapp-linux
+2025-08-19T03:33:22.654810124Z Python 3.11.13
+2025-08-19T03:33:22.654812532Z Note: Any data outside '/home' is not persisted
+2025-08-19T03:33:25.716964732Z Starting OpenBSD Secure Shell server: sshd.
+2025-08-19T03:33:25.743962846Z WEBSITES_INCLUDE_CLOUD_CERTS is not set to true.
+2025-08-19T03:33:25.785703944Z Updating certificates in /etc/ssl/certs...
+2025-08-19T03:33:34.332714668Z 4 added, 0 removed; done.
+2025-08-19T03:33:34.333383451Z Running hooks in /etc/ca-certificates/update.d...
+2025-08-19T03:33:34.380469240Z done.
+2025-08-19T03:33:34.381091578Z CA certificates copied and updated successfully.
+2025-08-19T03:33:34.513789424Z Site's appCommandLine: gunicorn -w 2 -k uvicorn.workers.UvicornWorker api.main:app --bind 0.0.0.0:8000
+2025-08-19T03:33:34.522927058Z Launching oryx with: create-script -appPath /home/site/wwwroot -output /opt/startup/startup.sh -virtualEnvName antenv -defaultApp /opt/defaultsite -userStartupCommand 'gunicorn -w 2 -k uvicorn.workers.UvicornWorker api.main:app --bind 0.0.0.0:8000'
+2025-08-19T03:33:34.683723247Z Found build manifest file at '/home/site/wwwroot/oryx-manifest.toml'. Deserializing it...
+2025-08-19T03:33:34.685329114Z Build Operation ID: 72c008f25b023bce
+2025-08-19T03:33:34.703040901Z Oryx Version: 0.2.20250709.3, Commit: 0cfb8cb7d114b65e539d2f9ccf9804e87b9966ba, ReleaseTagName: 20250709.3
+2025-08-19T03:33:34.703933632Z Output is compressed. Extracting it...
+2025-08-19T03:33:34.703998571Z Extracting '/home/site/wwwroot/output.tar.gz' to directory '/tmp/8dddecc8bd5acf7'...
+2025-08-19T03:33:46.139998270Z App path is set to '/tmp/8dddecc8bd5acf7'
+2025-08-19T03:33:46.158602432Z Writing output script to '/opt/startup/startup.sh'
+2025-08-19T03:33:46.391456346Z Using packages from virtual environment antenv located at /tmp/8dddecc8bd5acf7/antenv.
+2025-08-19T03:33:46.391479285Z Updated PYTHONPATH to '/opt/startup/app_logs:/tmp/8dddecc8bd5acf7/antenv/lib/python3.11/site-packages'
+2025-08-19T03:33:49.860179639Z [2025-08-19 03:33:49 +0000] [1020] [INFO] Starting gunicorn 23.0.0
+2025-08-19T03:33:49.860834803Z [2025-08-19 03:33:49 +0000] [1020] [INFO] Listening at: http://0.0.0.0:8000 (1020)
+2025-08-19T03:33:49.861126045Z [2025-08-19 03:33:49 +0000] [1020] [INFO] Using worker: uvicorn.workers.UvicornWorker
+2025-08-19T03:33:49.959766230Z [2025-08-19 03:33:49 +0000] [1021] [INFO] Booting worker with pid: 1021
+2025-08-19T03:33:50.091412999Z [2025-08-19 03:33:50 +0000] [1022] [INFO] Booting worker with pid: 1022
+2025-08-19T03:34:17.114634882Z [2025-08-19 03:34:17 +0000] [1022] [ERROR] Exception in worker process
+2025-08-19T03:34:17.115204882Z Traceback (most recent call last):
+2025-08-19T03:34:17.115213941Z   File "/opt/python/3.11.13/lib/python3.11/site-packages/gunicorn/arbiter.py", line 608, in spawn_worker
+2025-08-19T03:34:17.115217431Z     worker.init_process()
+2025-08-19T03:34:17.115220269Z   File "/tmp/8dddecc8bd5acf7/antenv/lib/python3.11/site-packages/uvicorn/workers.py", line 75, in init_process
+2025-08-19T03:34:17.115227759Z     super().init_process()
+2025-08-19T03:34:17.115230376Z   File "/opt/python/3.11.13/lib/python3.11/site-packages/gunicorn/workers/base.py", line 135, in init_process
+2025-08-19T03:34:17.115233010Z     self.load_wsgi()
+2025-08-19T03:34:17.115249925Z   File "/opt/python/3.11.13/lib/python3.11/site-packages/gunicorn/workers/base.py", line 147, in load_wsgi
+2025-08-19T03:34:17.115253363Z     self.wsgi = self.app.wsgi()
+2025-08-19T03:34:17.115255839Z                 ^^^^^^^^^^^^^^^
+2025-08-19T03:34:17.115258446Z   File "/opt/python/3.11.13/lib/python3.11/site-packages/gunicorn/app/base.py", line 66, in wsgi
+2025-08-19T03:34:17.115261102Z     self.callable = self.load()
+2025-08-19T03:34:17.115263568Z                     ^^^^^^^^^^^
+2025-08-19T03:34:17.115266054Z   File "/opt/python/3.11.13/lib/python3.11/site-packages/gunicorn/app/wsgiapp.py", line 57, in load
+2025-08-19T03:34:17.115268665Z     return self.load_wsgiapp()
+2025-08-19T03:34:17.115271071Z            ^^^^^^^^^^^^^^^^^^^
+2025-08-19T03:34:17.115273746Z   File "/opt/python/3.11.13/lib/python3.11/site-packages/gunicorn/app/wsgiapp.py", line 47, in load_wsgiapp
+2025-08-19T03:34:17.115276534Z     return util.import_app(self.app_uri)
+2025-08-19T03:34:17.115279196Z            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+2025-08-19T03:34:17.115281683Z   File "/opt/python/3.11.13/lib/python3.11/site-packages/gunicorn/util.py", line 370, in import_app
+2025-08-19T03:34:17.115284323Z     mod = importlib.import_module(module)
+2025-08-19T03:34:17.115286788Z           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+2025-08-19T03:34:17.115289334Z   File "/opt/python/3.11.13/lib/python3.11/importlib/__init__.py", line 126, in import_module
+2025-08-19T03:34:17.115291971Z     return _bootstrap._gcd_import(name[level:], package, level)
+2025-08-19T03:34:17.115294592Z            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+2025-08-19T03:34:17.115297151Z   File "<frozen importlib._bootstrap>", line 1204, in _gcd_import
+2025-08-19T03:34:17.115300854Z   File "<frozen importlib._bootstrap>", line 1176, in _find_and_load
+2025-08-19T03:34:17.115304304Z   File "<frozen importlib._bootstrap>", line 1147, in _find_and_load_unlocked
+2025-08-19T03:34:17.115316891Z   File "<frozen importlib._bootstrap>", line 690, in _load_unlocked
+2025-08-19T03:34:17.115324538Z   File "<frozen importlib._bootstrap_external>", line 940, in exec_module
+2025-08-19T03:34:17.115327183Z   File "<frozen importlib._bootstrap>", line 241, in _call_with_frames_removed
+2025-08-19T03:34:17.115331343Z   File "/tmp/8dddecc8bd5acf7/api/main.py", line 17, in <module>
+2025-08-19T03:34:17.115334157Z     from .routes import assessments as assessments_router, orchestrations as orchestrations_router, engagements as engagements_router, documents, summary, presets as presets_router, version as version_router, admin_auth as admin_auth_router, gdpr as gdpr_router, admin_settings as admin_settings_router, evidence as evidence_router, csf as csf_router, workshops as workshops_router, minutes as minutes_router
+2025-08-19T03:34:17.115337437Z   File "/tmp/8dddecc8bd5acf7/api/routes/assessments.py", line 5, in <module>
+2025-08-19T03:34:17.115340127Z     from ..security import current_context, require_member
+2025-08-19T03:34:17.115342590Z   File "/tmp/8dddecc8bd5acf7/api/security.py", line 9, in <module>
+2025-08-19T03:34:17.115345212Z     from config import config
+2025-08-19T03:34:17.115347622Z   File "/tmp/8dddecc8bd5acf7/config.py", line 328, in <module>
+2025-08-19T03:34:17.115350197Z     class FeatureFlags(BaseSettings):
+2025-08-19T03:34:17.115352759Z                        ^^^^^^^^^^^^
+2025-08-19T03:34:17.115355312Z NameError: name 'BaseSettings' is not defined
+2025-08-19T03:34:17.115357847Z [2025-08-19 03:34:17 +0000] [1022] [INFO] Worker exiting (pid: 1022)
+2025-08-19T03:34:17.144614441Z [2025-08-19 03:34:17 +0000] [1021] [ERROR] Exception in worker process
+2025-08-19T03:34:17.144659203Z Traceback (most recent call last):
+2025-08-19T03:34:17.144663351Z   File "/opt/python/3.11.13/lib/python3.11/site-packages/gunicorn/arbiter.py", line 608, in spawn_worker
+2025-08-19T03:34:17.144666471Z     worker.init_process()
+2025-08-19T03:34:17.144669078Z   File "/tmp/8dddecc8bd5acf7/antenv/lib/python3.11/site-packages/uvicorn/workers.py", line 75, in init_process
+2025-08-19T03:34:17.144671790Z     super().init_process()
+2025-08-19T03:34:17.144674310Z   File "/opt/python/3.11.13/lib/python3.11/site-packages/gunicorn/workers/base.py", line 135, in init_process
+2025-08-19T03:34:17.144677346Z     self.load_wsgi()
+2025-08-19T03:34:17.144679790Z   File "/opt/python/3.11.13/lib/python3.11/site-packages/gunicorn/workers/base.py", line 147, in load_wsgi
+2025-08-19T03:34:17.144682369Z     self.wsgi = self.app.wsgi()
+2025-08-19T03:34:17.144684802Z                 ^^^^^^^^^^^^^^^
+2025-08-19T03:34:17.144687399Z   File "/opt/python/3.11.13/lib/python3.11/site-packages/gunicorn/app/base.py", line 66, in wsgi
+2025-08-19T03:34:17.144689996Z     self.callable = self.load()
+2025-08-19T03:34:17.144692524Z                     ^^^^^^^^^^^
+2025-08-19T03:34:17.144708978Z   File "/opt/python/3.11.13/lib/python3.11/site-packages/gunicorn/app/wsgiapp.py", line 57, in load
+2025-08-19T03:34:17.144711789Z     return self.load_wsgiapp()
+2025-08-19T03:34:17.144714220Z            ^^^^^^^^^^^^^^^^^^^
+2025-08-19T03:34:17.144716660Z   File "/opt/python/3.11.13/lib/python3.11/site-packages/gunicorn/app/wsgiapp.py", line 47, in load_wsgiapp
+2025-08-19T03:34:17.144719318Z     return util.import_app(self.app_uri)
+2025-08-19T03:34:17.144721945Z            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+2025-08-19T03:34:17.144730086Z   File "/opt/python/3.11.13/lib/python3.11/site-packages/gunicorn/util.py", line 370, in import_app
+2025-08-19T03:34:17.144733102Z     mod = importlib.import_module(module)
+2025-08-19T03:34:17.144735631Z           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+2025-08-19T03:34:17.144738093Z   File "/opt/python/3.11.13/lib/python3.11/importlib/__init__.py", line 126, in import_module
+2025-08-19T03:34:17.144740707Z     return _bootstrap._gcd_import(name[level:], package, level)
+2025-08-19T03:34:17.144743248Z            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+2025-08-19T03:34:17.144745823Z   File "<frozen importlib._bootstrap>", line 1204, in _gcd_import
+2025-08-19T03:34:17.144749400Z   File "<frozen importlib._bootstrap>", line 1176, in _find_and_load
+2025-08-19T03:34:17.144752094Z   File "<frozen importlib._bootstrap>", line 1147, in _find_and_load_unlocked
+2025-08-19T03:34:17.144754742Z   File "<frozen importlib._bootstrap>", line 690, in _load_unlocked
+2025-08-19T03:34:17.144757302Z   File "<frozen importlib._bootstrap_external>", line 940, in exec_module
+2025-08-19T03:34:17.144759984Z   File "<frozen importlib._bootstrap>", line 241, in _call_with_frames_removed
+2025-08-19T03:34:17.144763218Z   File "/tmp/8dddecc8bd5acf7/api/main.py", line 17, in <module>
+2025-08-19T03:34:17.144766086Z     from .routes import assessments as assessments_router, orchestrations as orchestrations_router, engagements as engagements_router, documents, summary, presets as presets_router, version as version_router, admin_auth as admin_auth_router, gdpr as gdpr_router, admin_settings as admin_settings_router, evidence as evidence_router, csf as csf_router, workshops as workshops_router, minutes as minutes_router
+2025-08-19T03:34:17.144769405Z   File "/tmp/8dddecc8bd5acf7/api/routes/assessments.py", line 5, in <module>
+2025-08-19T03:34:17.144772126Z     from ..security import current_context, require_member
+2025-08-19T03:34:17.144774623Z   File "/tmp/8dddecc8bd5acf7/api/security.py", line 9, in <module>
+2025-08-19T03:34:17.144777297Z     from config import config
+2025-08-19T03:34:17.144779696Z   File "/tmp/8dddecc8bd5acf7/config.py", line 328, in <module>
+2025-08-19T03:34:17.144782339Z     class FeatureFlags(BaseSettings):
+2025-08-19T03:34:17.144784767Z                        ^^^^^^^^^^^^
+2025-08-19T03:34:17.144790785Z NameError: name 'BaseSettings' is not defined
+2025-08-19T03:34:17.145887043Z [2025-08-19 03:34:17 +0000] [1021] [INFO] Worker exiting (pid: 1021)
+2025-08-19T03:34:19.682905452Z [2025-08-19 03:34:19 +0000] [1020] [ERROR] Worker (pid:1021) exited with code 3
+2025-08-19T03:34:19.730344921Z [2025-08-19 03:34:19 +0000] [1020] [ERROR] Worker (pid:1022) was sent SIGTERM!
+2025-08-19T03:34:19.801023059Z [2025-08-19 03:34:19 +0000] [1020] [ERROR] Shutting down: Master
+2025-08-19T03:34:19.801055708Z [2025-08-19 03:34:19 +0000] [1020] [ERROR] Reason: Worker failed to boot.
+
+2025-08-19T03:39:04.545662535Z    _____                               
+2025-08-19T03:39:04.545720361Z   /  _  \ __________ _________   ____  
+2025-08-19T03:39:04.545723968Z  /  /_\  \\___   /  |  \_  __ \_/ __ \ 
+2025-08-19T03:39:04.545727316Z /    |    \/    /|  |  /|  | \/\  ___/ 
+2025-08-19T03:39:04.545729968Z \____|__  /_____ \____/ |__|    \___  >
+2025-08-19T03:39:04.545732850Z         \/      \/                  \/ 
+2025-08-19T03:39:04.545735462Z A P P   S E R V I C E   O N   L I N U X
+2025-08-19T03:39:04.545738058Z 
+2025-08-19T03:39:04.545740380Z Documentation: http://aka.ms/webapp-linux
+2025-08-19T03:39:04.545742847Z Python 3.11.13
+2025-08-19T03:39:04.545745262Z Note: Any data outside '/home' is not persisted
+2025-08-19T03:39:08.249431228Z Starting OpenBSD Secure Shell server: sshd.
+2025-08-19T03:39:08.267828583Z WEBSITES_INCLUDE_CLOUD_CERTS is not set to true.
+2025-08-19T03:39:08.319734261Z Updating certificates in /etc/ssl/certs...
+2025-08-19T03:39:16.124559791Z 4 added, 0 removed; done.
+2025-08-19T03:39:16.124603770Z Running hooks in /etc/ca-certificates/update.d...
+2025-08-19T03:39:16.152462477Z done.
+2025-08-19T03:39:16.253548438Z CA certificates copied and updated successfully.
+2025-08-19T03:39:16.625016693Z Site's appCommandLine: gunicorn -w 2 -k uvicorn.workers.UvicornWorker api.main:app --bind 0.0.0.0:8000
+2025-08-19T03:39:16.625042187Z Launching oryx with: create-script -appPath /home/site/wwwroot -output /opt/startup/startup.sh -virtualEnvName antenv -defaultApp /opt/defaultsite -userStartupCommand 'gunicorn -w 2 -k uvicorn.workers.UvicornWorker api.main:app --bind 0.0.0.0:8000'
+2025-08-19T03:39:16.805875133Z Found build manifest file at '/home/site/wwwroot/oryx-manifest.toml'. Deserializing it...
+2025-08-19T03:39:16.807927438Z Build Operation ID: 72c008f25b023bce
+2025-08-19T03:39:16.808555077Z Oryx Version: 0.2.20250709.3, Commit: 0cfb8cb7d114b65e539d2f9ccf9804e87b9966ba, ReleaseTagName: 20250709.3
+2025-08-19T03:39:16.808630642Z Output is compressed. Extracting it...
+2025-08-19T03:39:16.815726721Z Extracting '/home/site/wwwroot/output.tar.gz' to directory '/tmp/8dddecc8bd5acf7'...
+2025-08-19T03:39:29.321845165Z App path is set to '/tmp/8dddecc8bd5acf7'
+2025-08-19T03:39:29.326141005Z Writing output script to '/opt/startup/startup.sh'
+2025-08-19T03:39:29.424234365Z Using packages from virtual environment antenv located at /tmp/8dddecc8bd5acf7/antenv.
+2025-08-19T03:39:29.424280679Z Updated PYTHONPATH to '/opt/startup/app_logs:/tmp/8dddecc8bd5acf7/antenv/lib/python3.11/site-packages'
+2025-08-19T03:39:30.762594497Z [2025-08-19 03:39:30 +0000] [1018] [INFO] Starting gunicorn 23.0.0
+2025-08-19T03:39:30.763796196Z [2025-08-19 03:39:30 +0000] [1018] [INFO] Listening at: http://0.0.0.0:8000 (1018)
+2025-08-19T03:39:30.769650055Z [2025-08-19 03:39:30 +0000] [1018] [INFO] Using worker: uvicorn.workers.UvicornWorker
+2025-08-19T03:39:30.781123700Z [2025-08-19 03:39:30 +0000] [1019] [INFO] Booting worker with pid: 1019
+2025-08-19T03:39:30.872517270Z [2025-08-19 03:39:30 +0000] [1020] [INFO] Booting worker with pid: 1020
+2025-08-19T03:39:51.932040915Z [2025-08-19 03:39:51 +0000] [1019] [ERROR] Exception in worker process
+2025-08-19T03:39:51.932074083Z Traceback (most recent call last):
+2025-08-19T03:39:51.932077798Z   File "/opt/python/3.11.13/lib/python3.11/site-packages/gunicorn/arbiter.py", line 608, in spawn_worker
+2025-08-19T03:39:51.932080619Z     worker.init_process()
+2025-08-19T03:39:51.932083175Z   File "/tmp/8dddecc8bd5acf7/antenv/lib/python3.11/site-packages/uvicorn/workers.py", line 75, in init_process
+2025-08-19T03:39:51.932085844Z     super().init_process()
+2025-08-19T03:39:51.932089018Z   File "/opt/python/3.11.13/lib/python3.11/site-packages/gunicorn/workers/base.py", line 135, in init_process
+2025-08-19T03:39:51.932097969Z     self.load_wsgi()
+2025-08-19T03:39:51.932100667Z   File "/opt/python/3.11.13/lib/python3.11/site-packages/gunicorn/workers/base.py", line 147, in load_wsgi
+2025-08-19T03:39:51.932103458Z     self.wsgi = self.app.wsgi()
+2025-08-19T03:39:51.932106063Z                 ^^^^^^^^^^^^^^^
+2025-08-19T03:39:51.932108561Z   File "/opt/python/3.11.13/lib/python3.11/site-packages/gunicorn/app/base.py", line 66, in wsgi
+2025-08-19T03:39:51.932111299Z     self.callable = self.load()
+2025-08-19T03:39:51.932113743Z                     ^^^^^^^^^^^
+2025-08-19T03:39:51.932116231Z   File "/opt/python/3.11.13/lib/python3.11/site-packages/gunicorn/app/wsgiapp.py", line 57, in load
+2025-08-19T03:39:51.932118844Z     return self.load_wsgiapp()
+2025-08-19T03:39:51.932121362Z            ^^^^^^^^^^^^^^^^^^^
+2025-08-19T03:39:51.932123932Z   File "/opt/python/3.11.13/lib/python3.11/site-packages/gunicorn/app/wsgiapp.py", line 47, in load_wsgiapp
+2025-08-19T03:39:51.932126647Z     return util.import_app(self.app_uri)
+2025-08-19T03:39:51.932129212Z            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+2025-08-19T03:39:51.932131769Z   File "/opt/python/3.11.13/lib/python3.11/site-packages/gunicorn/util.py", line 370, in import_app
+2025-08-19T03:39:51.932134431Z     mod = importlib.import_module(module)
+2025-08-19T03:39:51.932136951Z           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+2025-08-19T03:39:51.932139394Z   File "/opt/python/3.11.13/lib/python3.11/importlib/__init__.py", line 126, in import_module
+2025-08-19T03:39:51.932142106Z     return _bootstrap._gcd_import(name[level:], package, level)
+2025-08-19T03:39:51.932144784Z            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+2025-08-19T03:39:51.932147344Z   File "<frozen importlib._bootstrap>", line 1204, in _gcd_import
+2025-08-19T03:39:51.932150931Z   File "<frozen importlib._bootstrap>", line 1176, in _find_and_load
+2025-08-19T03:39:51.932153666Z   File "<frozen importlib._bootstrap>", line 1147, in _find_and_load_unlocked
+2025-08-19T03:39:51.932171379Z   File "<frozen importlib._bootstrap>", line 690, in _load_unlocked
+2025-08-19T03:39:51.932174275Z   File "<frozen importlib._bootstrap_external>", line 940, in exec_module
+2025-08-19T03:39:51.932176916Z   File "<frozen importlib._bootstrap>", line 241, in _call_with_frames_removed
+2025-08-19T03:39:51.932180293Z   File "/tmp/8dddecc8bd5acf7/api/main.py", line 17, in <module>
+2025-08-19T03:39:51.932183230Z     from .routes import assessments as assessments_router, orchestrations as orchestrations_router, engagements as engagements_router, documents, summary, presets as presets_router, version as version_router, admin_auth as admin_auth_router, gdpr as gdpr_router, admin_settings as admin_settings_router, evidence as evidence_router, csf as csf_router, workshops as workshops_router, minutes as minutes_router
+2025-08-19T03:39:51.932186681Z   File "/tmp/8dddecc8bd5acf7/api/routes/assessments.py", line 5, in <module>
+2025-08-19T03:39:51.932189378Z     from ..security import current_context, require_member
+2025-08-19T03:39:51.932191928Z   File "/tmp/8dddecc8bd5acf7/api/security.py", line 9, in <module>
+2025-08-19T03:39:51.932194563Z     from config import config
+2025-08-19T03:39:51.932197003Z   File "/tmp/8dddecc8bd5acf7/config.py", line 328, in <module>
+2025-08-19T03:39:51.932199615Z     class FeatureFlags(BaseSettings):
+2025-08-19T03:39:51.932202111Z                        ^^^^^^^^^^^^
+2025-08-19T03:39:51.932204682Z NameError: name 'BaseSettings' is not defined
+2025-08-19T03:39:51.942819915Z [2025-08-19 03:39:51 +0000] [1019] [INFO] Worker exiting (pid: 1019)
+2025-08-19T03:39:51.962150646Z [2025-08-19 03:39:51 +0000] [1020] [ERROR] Exception in worker process
+2025-08-19T03:39:51.962170658Z Traceback (most recent call last):
+2025-08-19T03:39:51.962174156Z   File "/opt/python/3.11.13/lib/python3.11/site-packages/gunicorn/arbiter.py", line 608, in spawn_worker
+2025-08-19T03:39:51.962203127Z     worker.init_process()
+2025-08-19T03:39:51.962206949Z   File "/tmp/8dddecc8bd5acf7/antenv/lib/python3.11/site-packages/uvicorn/workers.py", line 75, in init_process
+2025-08-19T03:39:51.962209711Z     super().init_process()
+2025-08-19T03:39:51.962212506Z   File "/opt/python/3.11.13/lib/python3.11/site-packages/gunicorn/workers/base.py", line 135, in init_process
+2025-08-19T03:39:51.962215142Z     self.load_wsgi()
+2025-08-19T03:39:51.962217531Z   File "/opt/python/3.11.13/lib/python3.11/site-packages/gunicorn/workers/base.py", line 147, in load_wsgi
+2025-08-19T03:39:51.962220238Z     self.wsgi = self.app.wsgi()
+2025-08-19T03:39:51.962222731Z                 ^^^^^^^^^^^^^^^
+2025-08-19T03:39:51.962225204Z   File "/opt/python/3.11.13/lib/python3.11/site-packages/gunicorn/app/base.py", line 66, in wsgi
+2025-08-19T03:39:51.962227984Z     self.callable = self.load()
+2025-08-19T03:39:51.962230581Z                     ^^^^^^^^^^^
+2025-08-19T03:39:51.962246586Z   File "/opt/python/3.11.13/lib/python3.11/site-packages/gunicorn/app/wsgiapp.py", line 57, in load
+2025-08-19T03:39:51.962249437Z     return self.load_wsgiapp()
+2025-08-19T03:39:51.962251860Z            ^^^^^^^^^^^^^^^^^^^
+2025-08-19T03:39:51.962254453Z   File "/opt/python/3.11.13/lib/python3.11/site-packages/gunicorn/app/wsgiapp.py", line 47, in load_wsgiapp
+2025-08-19T03:39:51.962257099Z     return util.import_app(self.app_uri)
+2025-08-19T03:39:51.962259592Z            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+2025-08-19T03:39:51.962262236Z   File "/opt/python/3.11.13/lib/python3.11/site-packages/gunicorn/util.py", line 370, in import_app
+2025-08-19T03:39:51.962265033Z     mod = importlib.import_module(module)
+2025-08-19T03:39:51.962267584Z           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+2025-08-19T03:39:51.962275641Z   File "/opt/python/3.11.13/lib/python3.11/importlib/__init__.py", line 126, in import_module
+2025-08-19T03:39:51.962278611Z     return _bootstrap._gcd_import(name[level:], package, level)
+2025-08-19T03:39:51.962281243Z            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+2025-08-19T03:39:51.962283739Z   File "<frozen importlib._bootstrap>", line 1204, in _gcd_import
+2025-08-19T03:39:51.962286865Z   File "<frozen importlib._bootstrap>", line 1176, in _find_and_load
+2025-08-19T03:39:51.962289544Z   File "<frozen importlib._bootstrap>", line 1147, in _find_and_load_unlocked
+2025-08-19T03:39:51.962292281Z   File "<frozen importlib._bootstrap>", line 690, in _load_unlocked
+2025-08-19T03:39:51.962294882Z   File "<frozen importlib._bootstrap_external>", line 940, in exec_module
+2025-08-19T03:39:51.962297447Z   File "<frozen importlib._bootstrap>", line 241, in _call_with_frames_removed
+2025-08-19T03:39:51.962300807Z   File "/tmp/8dddecc8bd5acf7/api/main.py", line 17, in <module>
+2025-08-19T03:39:51.962303762Z     from .routes import assessments as assessments_router, orchestrations as orchestrations_router, engagements as engagements_router, documents, summary, presets as presets_router, version as version_router, admin_auth as admin_auth_router, gdpr as gdpr_router, admin_settings as admin_settings_router, evidence as evidence_router, csf as csf_router, workshops as workshops_router, minutes as minutes_router
+2025-08-19T03:39:51.962307040Z   File "/tmp/8dddecc8bd5acf7/api/routes/assessments.py", line 5, in <module>
+2025-08-19T03:39:51.962309888Z     from ..security import current_context, require_member
+2025-08-19T03:39:51.962312426Z   File "/tmp/8dddecc8bd5acf7/api/security.py", line 9, in <module>
+2025-08-19T03:39:51.962315104Z     from config import config
+2025-08-19T03:39:51.962317632Z   File "/tmp/8dddecc8bd5acf7/config.py", line 328, in <module>
+2025-08-19T03:39:51.962320270Z     class FeatureFlags(BaseSettings):
+2025-08-19T03:39:51.962322737Z                        ^^^^^^^^^^^^
+2025-08-19T03:39:51.962328632Z NameError: name 'BaseSettings' is not defined
+2025-08-19T03:39:51.963173977Z [2025-08-19 03:39:51 +0000] [1020] [INFO] Worker exiting (pid: 1020)
+2025-08-19T03:39:54.758921146Z [2025-08-19 03:39:54 +0000] [1018] [ERROR] Worker (pid:1020) exited with code 3
+2025-08-19T03:39:54.818688194Z [2025-08-19 03:39:54 +0000] [1018] [ERROR] Worker (pid:1019) was sent SIGTERM!
+2025-08-19T03:39:54.869121971Z [2025-08-19 03:39:54 +0000] [1018] [ERROR] Shutting down: Master
+2025-08-19T03:39:54.869149263Z [2025-08-19 03:39:54 +0000] [1018] [ERROR] Reason: Worker failed to boot.
+
+2025-08-19T03:43:54.568393371Z    _____                               
+2025-08-19T03:43:54.568439719Z   /  _  \ __________ _________   ____  
+2025-08-19T03:43:54.568443295Z  /  /_\  \\___   /  |  \_  __ \_/ __ \ 
+2025-08-19T03:43:54.568446116Z /    |    \/    /|  |  /|  | \/\  ___/ 
+2025-08-19T03:43:54.568449363Z \____|__  /_____ \____/ |__|    \___  >
+2025-08-19T03:43:54.568452696Z         \/      \/                  \/ 
+2025-08-19T03:43:54.568455287Z A P P   S E R V I C E   O N   L I N U X
+2025-08-19T03:43:54.568457802Z 
+2025-08-19T03:43:54.568460403Z Documentation: http://aka.ms/webapp-linux
+2025-08-19T03:43:54.568462932Z Python 3.11.13
+2025-08-19T03:43:54.568465383Z Note: Any data outside '/home' is not persisted
+2025-08-19T03:43:57.555686909Z Starting OpenBSD Secure Shell server: sshd.
+2025-08-19T03:43:57.585699737Z WEBSITES_INCLUDE_CLOUD_CERTS is not set to true.
+2025-08-19T03:43:57.656730194Z Updating certificates in /etc/ssl/certs...
+2025-08-19T03:44:06.837502057Z 4 added, 0 removed; done.
+2025-08-19T03:44:06.838501876Z Running hooks in /etc/ca-certificates/update.d...
+2025-08-19T03:44:06.878493940Z done.
+2025-08-19T03:44:06.880982054Z CA certificates copied and updated successfully.
+2025-08-19T03:44:07.119214432Z Site's appCommandLine: gunicorn -w 2 -k uvicorn.workers.UvicornWorker api.main:app --bind 0.0.0.0:8000
+2025-08-19T03:44:07.119240737Z Launching oryx with: create-script -appPath /home/site/wwwroot -output /opt/startup/startup.sh -virtualEnvName antenv -defaultApp /opt/defaultsite -userStartupCommand 'gunicorn -w 2 -k uvicorn.workers.UvicornWorker api.main:app --bind 0.0.0.0:8000'
+2025-08-19T03:44:07.281312384Z Found build manifest file at '/home/site/wwwroot/oryx-manifest.toml'. Deserializing it...
+2025-08-19T03:44:07.283138840Z Build Operation ID: 72c008f25b023bce
+2025-08-19T03:44:07.301282043Z Output is compressed. Extracting it...
+2025-08-19T03:44:07.302223339Z Oryx Version: 0.2.20250709.3, Commit: 0cfb8cb7d114b65e539d2f9ccf9804e87b9966ba, ReleaseTagName: 20250709.3
+2025-08-19T03:44:07.302809711Z Extracting '/home/site/wwwroot/output.tar.gz' to directory '/tmp/8dddecc8bd5acf7'...
+2025-08-19T03:44:18.846130401Z App path is set to '/tmp/8dddecc8bd5acf7'
+2025-08-19T03:44:18.863301864Z Writing output script to '/opt/startup/startup.sh'
+2025-08-19T03:44:18.956198385Z Using packages from virtual environment antenv located at /tmp/8dddecc8bd5acf7/antenv.
+2025-08-19T03:44:18.956244552Z Updated PYTHONPATH to '/opt/startup/app_logs:/tmp/8dddecc8bd5acf7/antenv/lib/python3.11/site-packages'
+2025-08-19T03:44:20.372216242Z [2025-08-19 03:44:20 +0000] [1020] [INFO] Starting gunicorn 23.0.0
+2025-08-19T03:44:20.372244938Z [2025-08-19 03:44:20 +0000] [1020] [INFO] Listening at: http://0.0.0.0:8000 (1020)
+2025-08-19T03:44:20.372248820Z [2025-08-19 03:44:20 +0000] [1020] [INFO] Using worker: uvicorn.workers.UvicornWorker
+2025-08-19T03:44:20.390882810Z [2025-08-19 03:44:20 +0000] [1021] [INFO] Booting worker with pid: 1021
+2025-08-19T03:44:20.471402555Z [2025-08-19 03:44:20 +0000] [1022] [INFO] Booting worker with pid: 1022
+2025-08-19T03:44:44.159234987Z [2025-08-19 03:44:44 +0000] [1022] [ERROR] Exception in worker process
+2025-08-19T03:44:44.159273704Z Traceback (most recent call last):
+2025-08-19T03:44:44.159277387Z   File "/opt/python/3.11.13/lib/python3.11/site-packages/gunicorn/arbiter.py", line 608, in spawn_worker
+2025-08-19T03:44:44.159280417Z     worker.init_process()
+2025-08-19T03:44:44.159283517Z   File "/tmp/8dddecc8bd5acf7/antenv/lib/python3.11/site-packages/uvicorn/workers.py", line 75, in init_process
+2025-08-19T03:44:44.159286283Z     super().init_process()
+2025-08-19T03:44:44.159288718Z   File "/opt/python/3.11.13/lib/python3.11/site-packages/gunicorn/workers/base.py", line 135, in init_process
+2025-08-19T03:44:44.159291312Z     self.load_wsgi()
+2025-08-19T03:44:44.159299153Z   File "/opt/python/3.11.13/lib/python3.11/site-packages/gunicorn/workers/base.py", line 147, in load_wsgi
+2025-08-19T03:44:44.159301920Z     self.wsgi = self.app.wsgi()
+2025-08-19T03:44:44.159304570Z                 ^^^^^^^^^^^^^^^
+2025-08-19T03:44:44.159307082Z   File "/opt/python/3.11.13/lib/python3.11/site-packages/gunicorn/app/base.py", line 66, in wsgi
+2025-08-19T03:44:44.159309877Z     self.callable = self.load()
+2025-08-19T03:44:44.159312347Z                     ^^^^^^^^^^^
+2025-08-19T03:44:44.159314769Z   File "/opt/python/3.11.13/lib/python3.11/site-packages/gunicorn/app/wsgiapp.py", line 57, in load
+2025-08-19T03:44:44.159317387Z     return self.load_wsgiapp()
+2025-08-19T03:44:44.159319917Z            ^^^^^^^^^^^^^^^^^^^
+2025-08-19T03:44:44.159322362Z   File "/opt/python/3.11.13/lib/python3.11/site-packages/gunicorn/app/wsgiapp.py", line 47, in load_wsgiapp
+2025-08-19T03:44:44.159325156Z     return util.import_app(self.app_uri)
+2025-08-19T03:44:44.159327681Z            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+2025-08-19T03:44:44.159330200Z   File "/opt/python/3.11.13/lib/python3.11/site-packages/gunicorn/util.py", line 370, in import_app
+2025-08-19T03:44:44.159332858Z     mod = importlib.import_module(module)
+2025-08-19T03:44:44.159335339Z           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+2025-08-19T03:44:44.159337808Z   File "/opt/python/3.11.13/lib/python3.11/importlib/__init__.py", line 126, in import_module
+2025-08-19T03:44:44.159340442Z     return _bootstrap._gcd_import(name[level:], package, level)
+2025-08-19T03:44:44.159342950Z            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+2025-08-19T03:44:44.159345575Z   File "<frozen importlib._bootstrap>", line 1204, in _gcd_import
+2025-08-19T03:44:44.159348797Z   File "<frozen importlib._bootstrap>", line 1176, in _find_and_load
+2025-08-19T03:44:44.159351491Z   File "<frozen importlib._bootstrap>", line 1147, in _find_and_load_unlocked
+2025-08-19T03:44:44.159366883Z   File "<frozen importlib._bootstrap>", line 690, in _load_unlocked
+2025-08-19T03:44:44.159369564Z   File "<frozen importlib._bootstrap_external>", line 940, in exec_module
+2025-08-19T03:44:44.159372192Z   File "<frozen importlib._bootstrap>", line 241, in _call_with_frames_removed
+2025-08-19T03:44:44.159375472Z   File "/tmp/8dddecc8bd5acf7/api/main.py", line 17, in <module>
+2025-08-19T03:44:44.159378261Z     from .routes import assessments as assessments_router, orchestrations as orchestrations_router, engagements as engagements_router, documents, summary, presets as presets_router, version as version_router, admin_auth as admin_auth_router, gdpr as gdpr_router, admin_settings as admin_settings_router, evidence as evidence_router, csf as csf_router, workshops as workshops_router, minutes as minutes_router
+2025-08-19T03:44:44.159382340Z   File "/tmp/8dddecc8bd5acf7/api/routes/assessments.py", line 5, in <module>
+2025-08-19T03:44:44.159385135Z     from ..security import current_context, require_member
+2025-08-19T03:44:44.159391369Z   File "/tmp/8dddecc8bd5acf7/api/security.py", line 9, in <module>
+2025-08-19T03:44:44.159394047Z     from config import config
+2025-08-19T03:44:44.159396563Z   File "/tmp/8dddecc8bd5acf7/config.py", line 328, in <module>
+2025-08-19T03:44:44.159399183Z     class FeatureFlags(BaseSettings):
+2025-08-19T03:44:44.159401648Z                        ^^^^^^^^^^^^
+2025-08-19T03:44:44.159404156Z NameError: name 'BaseSettings' is not defined
+2025-08-19T03:44:44.167857176Z [2025-08-19 03:44:44 +0000] [1022] [INFO] Worker exiting (pid: 1022)
+2025-08-19T03:44:44.197509384Z [2025-08-19 03:44:44 +0000] [1021] [ERROR] Exception in worker process
+2025-08-19T03:44:44.197518031Z Traceback (most recent call last):
+2025-08-19T03:44:44.197520876Z   File "/opt/python/3.11.13/lib/python3.11/site-packages/gunicorn/arbiter.py", line 608, in spawn_worker
+2025-08-19T03:44:44.197523696Z     worker.init_process()
+2025-08-19T03:44:44.197526820Z   File "/tmp/8dddecc8bd5acf7/antenv/lib/python3.11/site-packages/uvicorn/workers.py", line 75, in init_process
+2025-08-19T03:44:44.197529540Z     super().init_process()
+2025-08-19T03:44:44.197532055Z   File "/opt/python/3.11.13/lib/python3.11/site-packages/gunicorn/workers/base.py", line 135, in init_process
+2025-08-19T03:44:44.197534776Z     self.load_wsgi()
+2025-08-19T03:44:44.197537331Z   File "/opt/python/3.11.13/lib/python3.11/site-packages/gunicorn/workers/base.py", line 147, in load_wsgi
+2025-08-19T03:44:44.197540411Z     self.wsgi = self.app.wsgi()
+2025-08-19T03:44:44.197543648Z                 ^^^^^^^^^^^^^^^
+2025-08-19T03:44:44.197546127Z   File "/opt/python/3.11.13/lib/python3.11/site-packages/gunicorn/app/base.py", line 66, in wsgi
+2025-08-19T03:44:44.197548750Z     self.callable = self.load()
+2025-08-19T03:44:44.197551276Z                     ^^^^^^^^^^^
+2025-08-19T03:44:44.197568464Z   File "/opt/python/3.11.13/lib/python3.11/site-packages/gunicorn/app/wsgiapp.py", line 57, in load
+2025-08-19T03:44:44.197571176Z     return self.load_wsgiapp()
+2025-08-19T03:44:44.197573835Z            ^^^^^^^^^^^^^^^^^^^
+2025-08-19T03:44:44.197576335Z   File "/opt/python/3.11.13/lib/python3.11/site-packages/gunicorn/app/wsgiapp.py", line 47, in load_wsgiapp
+2025-08-19T03:44:44.197579043Z     return util.import_app(self.app_uri)
+2025-08-19T03:44:44.197581567Z            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+2025-08-19T03:44:44.197584089Z   File "/opt/python/3.11.13/lib/python3.11/site-packages/gunicorn/util.py", line 370, in import_app
+2025-08-19T03:44:44.197586681Z     mod = importlib.import_module(module)
+2025-08-19T03:44:44.197589154Z           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+2025-08-19T03:44:44.197591692Z   File "/opt/python/3.11.13/lib/python3.11/importlib/__init__.py", line 126, in import_module
+2025-08-19T03:44:44.197594528Z     return _bootstrap._gcd_import(name[level:], package, level)
+2025-08-19T03:44:44.197597061Z            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+2025-08-19T03:44:44.197599673Z   File "<frozen importlib._bootstrap>", line 1204, in _gcd_import
+2025-08-19T03:44:44.197603028Z   File "<frozen importlib._bootstrap>", line 1176, in _find_and_load
+2025-08-19T03:44:44.197605631Z   File "<frozen importlib._bootstrap>", line 1147, in _find_and_load_unlocked
+2025-08-19T03:44:44.197608234Z   File "<frozen importlib._bootstrap>", line 690, in _load_unlocked
+2025-08-19T03:44:44.197610850Z   File "<frozen importlib._bootstrap_external>", line 940, in exec_module
+2025-08-19T03:44:44.197613512Z   File "<frozen importlib._bootstrap>", line 241, in _call_with_frames_removed
+2025-08-19T03:44:44.197616667Z   File "/tmp/8dddecc8bd5acf7/api/main.py", line 17, in <module>
+2025-08-19T03:44:44.197619503Z     from .routes import assessments as assessments_router, orchestrations as orchestrations_router, engagements as engagements_router, documents, summary, presets as presets_router, version as version_router, admin_auth as admin_auth_router, gdpr as gdpr_router, admin_settings as admin_settings_router, evidence as evidence_router, csf as csf_router, workshops as workshops_router, minutes as minutes_router
+2025-08-19T03:44:44.197622864Z   File "/tmp/8dddecc8bd5acf7/api/routes/assessments.py", line 5, in <module>
+2025-08-19T03:44:44.197625584Z     from ..security import current_context, require_member
+2025-08-19T03:44:44.197628071Z   File "/tmp/8dddecc8bd5acf7/api/security.py", line 9, in <module>
+2025-08-19T03:44:44.197630630Z     from config import config
+2025-08-19T03:44:44.197633072Z   File "/tmp/8dddecc8bd5acf7/config.py", line 328, in <module>
+2025-08-19T03:44:44.197635678Z     class FeatureFlags(BaseSettings):
+2025-08-19T03:44:44.197638297Z                        ^^^^^^^^^^^^
+2025-08-19T03:44:44.197643807Z NameError: name 'BaseSettings' is not defined
+2025-08-19T03:44:44.197646411Z [2025-08-19 03:44:44 +0000] [1021] [INFO] Worker exiting (pid: 1021)
+2025-08-19T03:44:46.823390638Z [2025-08-19 03:44:46 +0000] [1020] [ERROR] Worker (pid:1021) exited with code 3
+2025-08-19T03:44:46.915336680Z [2025-08-19 03:44:46 +0000] [1020] [ERROR] Worker (pid:1022) was sent SIGTERM!
+2025-08-19T03:44:46.945134469Z [2025-08-19 03:44:46 +0000] [1020] [ERROR] Shutting down: Master
+2025-08-19T03:44:46.945168225Z [2025-08-19 03:44:46 +0000] [1020] [ERROR] Reason: Worker failed to boot.
+
+2025-08-19T04:27:05.8923568Z    _____                               
+2025-08-19T04:27:05.8925369Z   /  _  \ __________ _________   ____  
+2025-08-19T04:27:05.8925411Z  /  /_\  \\___   /  |  \_  __ \_/ __ \ 
+2025-08-19T04:27:05.8925432Z /    |    \/    /|  |  /|  | \/\  ___/ 
+2025-08-19T04:27:05.8925452Z \____|__  /_____ \____/ |__|    \___  >
+2025-08-19T04:27:05.8925482Z         \/      \/                  \/ 
+2025-08-19T04:27:05.8925522Z A P P   S E R V I C E   O N   L I N U X
+2025-08-19T04:27:05.8925546Z 
+2025-08-19T04:27:05.8925575Z Documentation: http://aka.ms/webapp-linux
+2025-08-19T04:27:05.8925598Z Python 3.11.13
+2025-08-19T04:27:05.8925619Z Note: Any data outside '/home' is not persisted
+2025-08-19T04:27:07.6910961Z Starting OpenBSD Secure Shell server: sshd.
+2025-08-19T04:27:07.7614499Z WEBSITES_INCLUDE_CLOUD_CERTS is not set to true.
+2025-08-19T04:27:07.8520765Z Updating certificates in /etc/ssl/certs...
+2025-08-19T04:27:45.1864200Z 4 added, 0 removed; done.
+2025-08-19T04:27:45.2266196Z Running hooks in /etc/ca-certificates/update.d...
+2025-08-19T04:27:45.2750226Z done.
+2025-08-19T04:27:45.4064198Z CA certificates copied and updated successfully.
+2025-08-19T04:27:45.8589178Z Site's appCommandLine: python -m uvicorn api.main:app --host 0.0.0.0 --port ${PORT:-8000}
+2025-08-19T04:27:48.8768521Z Starting periodic command scheduler: cron.
+2025-08-19T04:27:48.8769058Z Launching oryx with: create-script -appPath /home/site/wwwroot -output /opt/startup/startup.sh -virtualEnvName antenv -defaultApp /opt/defaultsite -userStartupCommand 'python -m uvicorn api.main:app --host 0.0.0.0 --port ${PORT:-8000}'
+2025-08-19T04:27:49.9011009Z Could not find build manifest file at '/home/site/wwwroot/oryx-manifest.toml'
+2025-08-19T04:27:49.9026293Z Could not find operation ID in manifest. Generating an operation id...
+2025-08-19T04:27:49.9199180Z Build Operation ID: 1617842c-1db1-414e-a4cf-a9fa39e786b7
+2025-08-19T04:27:50.8843829Z Oryx Version: 0.2.20250709.3, Commit: 0cfb8cb7d114b65e539d2f9ccf9804e87b9966ba, ReleaseTagName: 20250709.3
+2025-08-19T04:27:50.9076055Z Writing output script to '/opt/startup/startup.sh'
+2025-08-19T04:27:51.1163930Z WARNING: Could not find virtual environment directory /home/site/wwwroot/antenv.
+2025-08-19T04:27:51.1169789Z WARNING: Could not find package directory /home/site/wwwroot/__oryx_packages__.
+2025-08-19T04:27:52.6669133Z /opt/python/3/bin/python: No module named uvicorn
+2025-08-19T04:32:28.8606274Z    _____                               
+2025-08-19T04:32:28.8607809Z   /  _  \ __________ _________   ____  
+2025-08-19T04:32:28.8607851Z  /  /_\  \\___   /  |  \_  __ \_/ __ \ 
+2025-08-19T04:32:28.8607872Z /    |    \/    /|  |  /|  | \/\  ___/ 
+2025-08-19T04:32:28.8607943Z \____|__  /_____ \____/ |__|    \___  >
+2025-08-19T04:32:28.8607971Z         \/      \/                  \/ 
+2025-08-19T04:32:28.8607991Z A P P   S E R V I C E   O N   L I N U X
+2025-08-19T04:32:28.8608019Z 
+2025-08-19T04:32:28.8608049Z Documentation: http://aka.ms/webapp-linux
+2025-08-19T04:32:28.8608072Z Python 3.11.13
+2025-08-19T04:32:28.8608112Z Note: Any data outside '/home' is not persisted
+2025-08-19T04:32:29.7730564Z Starting OpenBSD Secure Shell server: sshd.
+2025-08-19T04:32:29.8218388Z WEBSITES_INCLUDE_CLOUD_CERTS is not set to true.
+2025-08-19T04:32:29.9794226Z Updating certificates in /etc/ssl/certs...
+2025-08-19T04:32:45.8891076Z 4 added, 0 removed; done.
+2025-08-19T04:32:45.8891525Z Running hooks in /etc/ca-certificates/update.d...
+2025-08-19T04:32:45.8891665Z done.
+2025-08-19T04:32:45.8891692Z CA certificates copied and updated successfully.
+2025-08-19T04:32:46.1614886Z Site's appCommandLine: python -m uvicorn api.main:app --host 0.0.0.0 --port ${PORT:-8000}
+2025-08-19T04:32:46.8439812Z Starting periodic command scheduler: cron.
+2025-08-19T04:32:46.8450409Z Launching oryx with: create-script -appPath /home/site/wwwroot -output /opt/startup/startup.sh -virtualEnvName antenv -defaultApp /opt/defaultsite -userStartupCommand 'python -m uvicorn api.main:app --host 0.0.0.0 --port ${PORT:-8000}'
+2025-08-19T04:32:47.1254371Z Could not find build manifest file at '/home/site/wwwroot/oryx-manifest.toml'
+2025-08-19T04:32:47.1260701Z Could not find operation ID in manifest. Generating an operation id...
+2025-08-19T04:32:47.1266344Z Build Operation ID: 3daedf2e-401f-4a2c-a27e-b6100fde5763
+2025-08-19T04:32:47.4762428Z Oryx Version: 0.2.20250709.3, Commit: 0cfb8cb7d114b65e539d2f9ccf9804e87b9966ba, ReleaseTagName: 20250709.3
+2025-08-19T04:32:47.5248964Z Writing output script to '/opt/startup/startup.sh'
+2025-08-19T04:32:47.7843616Z WARNING: Could not find virtual environment directory /home/site/wwwroot/antenv.
+2025-08-19T04:32:47.7856922Z WARNING: Could not find package directory /home/site/wwwroot/__oryx_packages__.
+2025-08-19T04:32:48.9745717Z /opt/python/3/bin/python: No module named uvicorn
+2025-08-19T04:40:54.9909332Z    _____                               
+2025-08-19T04:40:54.9909652Z   /  _  \ __________ _________   ____  
+2025-08-19T04:40:54.9909673Z  /  /_\  \\___   /  |  \_  __ \_/ __ \ 
+2025-08-19T04:40:54.9909692Z /    |    \/    /|  |  /|  | \/\  ___/ 
+2025-08-19T04:40:54.9909709Z \____|__  /_____ \____/ |__|    \___  >
+2025-08-19T04:40:54.9909724Z         \/      \/                  \/ 
+2025-08-19T04:40:54.9909738Z A P P   S E R V I C E   O N   L I N U X
+2025-08-19T04:40:54.9909763Z 
+2025-08-19T04:40:54.9909780Z Documentation: http://aka.ms/webapp-linux
+2025-08-19T04:40:54.9909796Z Python 3.11.13
+2025-08-19T04:40:54.9909883Z Note: Any data outside '/home' is not persisted
+2025-08-19T04:40:57.4317528Z Starting OpenBSD Secure Shell server: sshd.
+2025-08-19T04:40:57.4530820Z WEBSITES_INCLUDE_CLOUD_CERTS is not set to true.
+2025-08-19T04:40:57.5409916Z Updating certificates in /etc/ssl/certs...
+2025-08-19T04:41:06.0645953Z 4 added, 0 removed; done.
+2025-08-19T04:41:06.0646594Z Running hooks in /etc/ca-certificates/update.d...
+2025-08-19T04:41:06.0839479Z done.
+2025-08-19T04:41:06.1144256Z CA certificates copied and updated successfully.
+2025-08-19T04:41:06.4137426Z Site's appCommandLine: python -m uvicorn api.main:app --host 0.0.0.0 --port ${PORT:-8000}
+2025-08-19T04:41:06.8771745Z Starting periodic command scheduler: cron.
+2025-08-19T04:41:06.9024232Z Launching oryx with: create-script -appPath /home/site/wwwroot -output /opt/startup/startup.sh -virtualEnvName antenv -defaultApp /opt/defaultsite -userStartupCommand 'python -m uvicorn api.main:app --host 0.0.0.0 --port ${PORT:-8000}'
+2025-08-19T04:41:07.7991948Z Could not find build manifest file at '/home/site/wwwroot/oryx-manifest.toml'
+2025-08-19T04:41:07.8001090Z Could not find operation ID in manifest. Generating an operation id...
+2025-08-19T04:41:07.8008139Z Build Operation ID: f077da50-dac2-439d-9735-fb7c74e7ee61
+2025-08-19T04:41:08.4192414Z Oryx Version: 0.2.20250709.3, Commit: 0cfb8cb7d114b65e539d2f9ccf9804e87b9966ba, ReleaseTagName: 20250709.3
+2025-08-19T04:41:08.4994975Z Writing output script to '/opt/startup/startup.sh'
+2025-08-19T04:41:08.6885838Z WARNING: Could not find virtual environment directory /home/site/wwwroot/antenv.
+2025-08-19T04:41:08.7079731Z WARNING: Could not find package directory /home/site/wwwroot/__oryx_packages__.
+2025-08-19T04:41:09.6616856Z /opt/python/3/bin/python: No module named uvicorn
+2025-08-19T04:42:41.1452631Z    _____                               
+2025-08-19T04:42:41.1454243Z   /  _  \ __________ _________   ____  
+2025-08-19T04:42:41.1454283Z  /  /_\  \\___   /  |  \_  __ \_/ __ \ 
+2025-08-19T04:42:41.1454304Z /    |    \/    /|  |  /|  | \/\  ___/ 
+2025-08-19T04:42:41.1456515Z \____|__  /_____ \____/ |__|    \___  >
+2025-08-19T04:42:41.1456635Z         \/      \/                  \/ 
+2025-08-19T04:42:41.1456708Z A P P   S E R V I C E   O N   L I N U X
+2025-08-19T04:42:41.1456735Z 
+2025-08-19T04:42:41.1456762Z Documentation: http://aka.ms/webapp-linux
+2025-08-19T04:42:41.1456784Z Python 3.11.13
+2025-08-19T04:42:41.1456806Z Note: Any data outside '/home' is not persisted
+2025-08-19T04:42:43.4811347Z Starting OpenBSD Secure Shell server: sshd.
+2025-08-19T04:42:43.5106685Z WEBSITES_INCLUDE_CLOUD_CERTS is not set to true.
+2025-08-19T04:42:43.5918783Z Updating certificates in /etc/ssl/certs...
+2025-08-19T04:42:51.2896606Z 4 added, 0 removed; done.
+2025-08-19T04:42:51.2899460Z Running hooks in /etc/ca-certificates/update.d...
+2025-08-19T04:42:51.2980326Z done.
+2025-08-19T04:42:51.3482892Z CA certificates copied and updated successfully.
+2025-08-19T04:42:51.5821928Z Site's appCommandLine: python -m uvicorn api.main:app --host 0.0.0.0 --port ${PORT:-8000}
+2025-08-19T04:42:52.0037351Z Starting periodic command scheduler: cron.
+2025-08-19T04:42:52.0127021Z Launching oryx with: create-script -appPath /home/site/wwwroot -output /opt/startup/startup.sh -virtualEnvName antenv -defaultApp /opt/defaultsite -userStartupCommand 'python -m uvicorn api.main:app --host 0.0.0.0 --port ${PORT:-8000}'
+2025-08-19T04:42:52.6456791Z Could not find build manifest file at '/home/site/wwwroot/oryx-manifest.toml'
+2025-08-19T04:42:52.6457396Z Could not find operation ID in manifest. Generating an operation id...
+2025-08-19T04:42:52.6457432Z Build Operation ID: 16ce8694-8932-49f9-af7e-d68de0b4b109
+2025-08-19T04:42:53.2084148Z Oryx Version: 0.2.20250709.3, Commit: 0cfb8cb7d114b65e539d2f9ccf9804e87b9966ba, ReleaseTagName: 20250709.3
+2025-08-19T04:42:53.2576113Z Writing output script to '/opt/startup/startup.sh'
+2025-08-19T04:42:53.3671688Z WARNING: Could not find virtual environment directory /home/site/wwwroot/antenv.
+2025-08-19T04:42:53.3672118Z WARNING: Could not find package directory /home/site/wwwroot/__oryx_packages__.
+2025-08-19T04:42:54.7654906Z /opt/python/3/bin/python: No module named uvicorn
+2025-08-19T04:44:53.5732921Z    _____                               
+2025-08-19T04:44:53.5734597Z   /  _  \ __________ _________   ____  
+2025-08-19T04:44:53.5734640Z  /  /_\  \\___   /  |  \_  __ \_/ __ \ 
+2025-08-19T04:44:53.5734660Z /    |    \/    /|  |  /|  | \/\  ___/ 
+2025-08-19T04:44:53.5734681Z \____|__  /_____ \____/ |__|    \___  >
+2025-08-19T04:44:53.5734711Z         \/      \/                  \/ 
+2025-08-19T04:44:53.5734750Z A P P   S E R V I C E   O N   L I N U X
+2025-08-19T04:44:53.5734775Z 
+2025-08-19T04:44:53.5734807Z Documentation: http://aka.ms/webapp-linux
+2025-08-19T04:44:53.5734829Z Python 3.11.13
+2025-08-19T04:44:53.5734851Z Note: Any data outside '/home' is not persisted
+2025-08-19T04:44:55.1281033Z Starting OpenBSD Secure Shell server: sshd.
+2025-08-19T04:44:55.1484484Z WEBSITES_INCLUDE_CLOUD_CERTS is not set to true.
+2025-08-19T04:44:55.1896291Z Updating certificates in /etc/ssl/certs...
+2025-08-19T04:45:07.5436661Z 4 added, 0 removed; done.
+2025-08-19T04:45:07.5445193Z Running hooks in /etc/ca-certificates/update.d...
+2025-08-19T04:45:07.5955311Z done.
+2025-08-19T04:45:07.6638381Z CA certificates copied and updated successfully.
+2025-08-19T04:45:07.9235229Z Site's appCommandLine: python -m uvicorn app.main:app --host 0.0.0.0 --port ${PORT:-8000}
+2025-08-19T04:45:08.7986844Z Starting periodic command scheduler: cron.
+2025-08-19T04:45:08.8002640Z Launching oryx with: create-script -appPath /home/site/wwwroot -output /opt/startup/startup.sh -virtualEnvName antenv -defaultApp /opt/defaultsite -userStartupCommand 'python -m uvicorn app.main:app --host 0.0.0.0 --port ${PORT:-8000}'
+2025-08-19T04:45:09.1493798Z Could not find build manifest file at '/home/site/wwwroot/oryx-manifest.toml'
+2025-08-19T04:45:09.1494581Z Could not find operation ID in manifest. Generating an operation id...
+2025-08-19T04:45:09.1494621Z Build Operation ID: c5211958-3a7d-4cd4-bdea-e6914ddfea6f
+2025-08-19T04:45:10.2606673Z Oryx Version: 0.2.20250709.3, Commit: 0cfb8cb7d114b65e539d2f9ccf9804e87b9966ba, ReleaseTagName: 20250709.3
+2025-08-19T04:45:10.2700361Z Writing output script to '/opt/startup/startup.sh'
+2025-08-19T04:45:12.1355185Z WARNING: Could not find virtual environment directory /home/site/wwwroot/antenv.
+2025-08-19T04:45:12.1366470Z WARNING: Could not find package directory /home/site/wwwroot/__oryx_packages__.
+2025-08-19T04:45:12.6618212Z /opt/python/3/bin/python: No module named uvicorn
+2025-08-19T04:46:50.0695889Z    _____                               
+2025-08-19T04:46:50.0697492Z   /  _  \ __________ _________   ____  
+2025-08-19T04:46:50.0697533Z  /  /_\  \\___   /  |  \_  __ \_/ __ \ 
+2025-08-19T04:46:50.0697553Z /    |    \/    /|  |  /|  | \/\  ___/ 
+2025-08-19T04:46:50.0697573Z \____|__  /_____ \____/ |__|    \___  >
+2025-08-19T04:46:50.0697599Z         \/      \/                  \/ 
+2025-08-19T04:46:50.0697666Z A P P   S E R V I C E   O N   L I N U X
+2025-08-19T04:46:50.0697688Z 
+2025-08-19T04:46:50.0697714Z Documentation: http://aka.ms/webapp-linux
+2025-08-19T04:46:50.0697736Z Python 3.11.13
+2025-08-19T04:46:50.0697758Z Note: Any data outside '/home' is not persisted
+2025-08-19T04:46:53.3891609Z Starting OpenBSD Secure Shell server: sshd.
+2025-08-19T04:46:53.3892047Z WEBSITES_INCLUDE_CLOUD_CERTS is not set to true.
+2025-08-19T04:46:53.3892072Z Updating certificates in /etc/ssl/certs...
+2025-08-19T04:47:01.8645121Z 4 added, 0 removed; done.
+2025-08-19T04:47:01.9129552Z Running hooks in /etc/ca-certificates/update.d...
+2025-08-19T04:47:01.9129969Z done.
+2025-08-19T04:47:01.9330695Z CA certificates copied and updated successfully.
+2025-08-19T04:47:02.0644499Z Site's appCommandLine: gunicorn -w 2 -k uvicorn.workers.UvicornWorker api.main:app --bind 0.0.0.0:${PORT:-8000}
+2025-08-19T04:47:03.1300674Z Starting periodic command scheduler: cron.
+2025-08-19T04:47:03.1381065Z Launching oryx with: create-script -appPath /home/site/wwwroot -output /opt/startup/startup.sh -virtualEnvName antenv -defaultApp /opt/defaultsite -userStartupCommand 'gunicorn -w 2 -k uvicorn.workers.UvicornWorker api.main:app --bind 0.0.0.0:${PORT:-8000}'
+2025-08-19T04:47:03.6640978Z Could not find build manifest file at '/home/site/wwwroot/oryx-manifest.toml'
+2025-08-19T04:47:03.6641629Z Could not find operation ID in manifest. Generating an operation id...
+2025-08-19T04:47:03.6641661Z Build Operation ID: f61bab7e-b4cd-4e60-af6a-a1b9320f34ad
+2025-08-19T04:47:04.1557743Z Oryx Version: 0.2.20250709.3, Commit: 0cfb8cb7d114b65e539d2f9ccf9804e87b9966ba, ReleaseTagName: 20250709.3
+2025-08-19T04:47:04.2015618Z Writing output script to '/opt/startup/startup.sh'
+2025-08-19T04:47:04.3231608Z WARNING: Could not find virtual environment directory /home/site/wwwroot/antenv.
+2025-08-19T04:47:04.3241542Z WARNING: Could not find package directory /home/site/wwwroot/__oryx_packages__.
+2025-08-19T04:47:07.5804233Z 
+2025-08-19T04:47:07.5804878Z Error: class uri 'uvicorn.workers.UvicornWorker' invalid or not found: 
+2025-08-19T04:47:07.5804915Z 
+2025-08-19T04:47:07.5804938Z [Traceback (most recent call last):
+2025-08-19T04:47:07.5804967Z   File "/opt/python/3.11.13/lib/python3.11/site-packages/gunicorn/util.py", line 110, in load_class
+2025-08-19T04:47:07.5804989Z     mod = importlib.import_module('.'.join(components))
+2025-08-19T04:47:07.5805070Z           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+2025-08-19T04:47:07.6106400Z   File "/opt/python/3.11.13/lib/python3.11/importlib/__init__.py", line 126, in import_module
+2025-08-19T04:47:07.6108697Z     return _bootstrap._gcd_import(name[level:], package, level)
+2025-08-19T04:47:07.6110883Z            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+2025-08-19T04:47:07.6113064Z   File "<frozen importlib._bootstrap>", line 1204, in _gcd_import
+2025-08-19T04:47:07.6115245Z   File "<frozen importlib._bootstrap>", line 1176, in _find_and_load
+2025-08-19T04:47:07.6117425Z   File "<frozen importlib._bootstrap>", line 1126, in _find_and_load_unlocked
+2025-08-19T04:47:07.6119610Z   File "<frozen importlib._bootstrap>", line 241, in _call_with_frames_removed
+2025-08-19T04:47:07.6124236Z   File "<frozen importlib._bootstrap>", line 1204, in _gcd_import
+2025-08-19T04:47:07.6209212Z   File "<frozen importlib._bootstrap>", line 1176, in _find_and_load
+2025-08-19T04:47:07.6218391Z   File "<frozen importlib._bootstrap>", line 1140, in _find_and_load_unlocked
+2025-08-19T04:47:07.6227792Z ModuleNotFoundError: No module named 'uvicorn'
+2025-08-19T04:47:07.6230127Z ]
+2025-08-19T04:47:07.6230430Z 
+2025-08-19T04:51:10.8491566Z    _____                               
+2025-08-19T04:51:10.8493243Z   /  _  \ __________ _________   ____  
+2025-08-19T04:51:10.8493296Z  /  /_\  \\___   /  |  \_  __ \_/ __ \ 
+2025-08-19T04:51:10.8493318Z /    |    \/    /|  |  /|  | \/\  ___/ 
+2025-08-19T04:51:10.8493338Z \____|__  /_____ \____/ |__|    \___  >
+2025-08-19T04:51:10.8493366Z         \/      \/                  \/ 
+2025-08-19T04:51:10.8493406Z A P P   S E R V I C E   O N   L I N U X
+2025-08-19T04:51:10.8493429Z 
+2025-08-19T04:51:10.8493453Z Documentation: http://aka.ms/webapp-linux
+2025-08-19T04:51:10.8493476Z Python 3.11.13
+2025-08-19T04:51:10.8493498Z Note: Any data outside '/home' is not persisted
+2025-08-19T04:51:12.9479189Z Starting OpenBSD Secure Shell server: sshd.
+2025-08-19T04:51:12.9668206Z WEBSITES_INCLUDE_CLOUD_CERTS is not set to true.
+2025-08-19T04:51:13.0186512Z Updating certificates in /etc/ssl/certs...
+2025-08-19T04:51:21.2292465Z 4 added, 0 removed; done.
+2025-08-19T04:51:21.2293096Z Running hooks in /etc/ca-certificates/update.d...
+2025-08-19T04:51:21.2511200Z done.
+2025-08-19T04:51:21.2710430Z CA certificates copied and updated successfully.
+2025-08-19T04:51:21.4619669Z Site's appCommandLine: gunicorn -w 2 -k uvicorn.workers.UvicornWorker api.main:app --bind 0.0.0.0:${PORT:-8000}
+2025-08-19T04:51:21.8917774Z Starting periodic command scheduler: cron.
+2025-08-19T04:51:21.9093597Z Launching oryx with: create-script -appPath /home/site/wwwroot -output /opt/startup/startup.sh -virtualEnvName antenv -defaultApp /opt/defaultsite -userStartupCommand 'gunicorn -w 2 -k uvicorn.workers.UvicornWorker api.main:app --bind 0.0.0.0:${PORT:-8000}'
+2025-08-19T04:51:22.3492198Z Could not find build manifest file at '/home/site/wwwroot/oryx-manifest.toml'
+2025-08-19T04:51:22.3492850Z Could not find operation ID in manifest. Generating an operation id...
+2025-08-19T04:51:22.3492882Z Build Operation ID: e2d36af6-da9e-4b51-a8e0-16c7c97c47ef
+2025-08-19T04:51:23.0040903Z Oryx Version: 0.2.20250709.3, Commit: 0cfb8cb7d114b65e539d2f9ccf9804e87b9966ba, ReleaseTagName: 20250709.3
+2025-08-19T04:51:23.0441813Z Writing output script to '/opt/startup/startup.sh'
+2025-08-19T04:51:23.1429658Z WARNING: Could not find virtual environment directory /home/site/wwwroot/antenv.
+2025-08-19T04:51:23.1437900Z WARNING: Could not find package directory /home/site/wwwroot/__oryx_packages__.
+2025-08-19T04:51:25.6923891Z 
+2025-08-19T04:51:25.6924527Z Error: class uri 'uvicorn.workers.UvicornWorker' invalid or not found: 
+2025-08-19T04:51:25.6924577Z 
+2025-08-19T04:51:25.6924599Z [Traceback (most recent call last):
+2025-08-19T04:51:25.6924624Z   File "/opt/python/3.11.13/lib/python3.11/site-packages/gunicorn/util.py", line 110, in load_class
+2025-08-19T04:51:25.6924647Z     mod = importlib.import_module('.'.join(components))
+2025-08-19T04:51:25.6924668Z           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+2025-08-19T04:51:25.6924712Z   File "/opt/python/3.11.13/lib/python3.11/importlib/__init__.py", line 126, in import_module
+2025-08-19T04:51:25.6924734Z     return _bootstrap._gcd_import(name[level:], package, level)
+2025-08-19T04:51:25.6924755Z            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+2025-08-19T04:51:25.6924776Z   File "<frozen importlib._bootstrap>", line 1204, in _gcd_import
+2025-08-19T04:51:25.6924798Z   File "<frozen importlib._bootstrap>", line 1176, in _find_and_load
+2025-08-19T04:51:25.6924836Z   File "<frozen importlib._bootstrap>", line 1126, in _find_and_load_unlocked
+2025-08-19T04:51:25.6924860Z   File "<frozen importlib._bootstrap>", line 241, in _call_with_frames_removed
+2025-08-19T04:51:25.6924881Z   File "<frozen importlib._bootstrap>", line 1204, in _gcd_import
+2025-08-19T04:51:25.6924902Z   File "<frozen importlib._bootstrap>", line 1176, in _find_and_load
+2025-08-19T04:51:25.6924923Z   File "<frozen importlib._bootstrap>", line 1140, in _find_and_load_unlocked
+2025-08-19T04:51:25.6924980Z ModuleNotFoundError: No module named 'uvicorn'
+2025-08-19T04:51:25.6925001Z ]
+2025-08-19T04:51:25.6932037Z 
+2025-08-19T17:39:45.0088861Z    _____                               
+2025-08-19T17:39:45.0161048Z   /  _  \ __________ _________   ____  
+2025-08-19T17:39:45.0161402Z  /  /_\  \\___   /  |  \_  __ \_/ __ \ 
+2025-08-19T17:39:45.0161425Z /    |    \/    /|  |  /|  | \/\  ___/ 
+2025-08-19T17:39:45.0161442Z \____|__  /_____ \____/ |__|    \___  >
+2025-08-19T17:39:45.0161457Z         \/      \/                  \/ 
+2025-08-19T17:39:45.0161471Z A P P   S E R V I C E   O N   L I N U X
+2025-08-19T17:39:45.0161496Z 
+2025-08-19T17:39:45.0161511Z Documentation: http://aka.ms/webapp-linux
+2025-08-19T17:39:45.0161527Z Python 3.11.13
+2025-08-19T17:39:45.0161545Z Note: Any data outside '/home' is not persisted
+2025-08-19T17:39:47.0961020Z Starting OpenBSD Secure Shell server: sshd.
+2025-08-19T17:39:47.1162899Z WEBSITES_INCLUDE_CLOUD_CERTS is not set to true.
+2025-08-19T17:39:47.1671802Z Updating certificates in /etc/ssl/certs...
+2025-08-19T17:39:55.8024083Z 4 added, 0 removed; done.
+2025-08-19T17:39:55.8024658Z Running hooks in /etc/ca-certificates/update.d...
+2025-08-19T17:39:55.8111726Z done.
+2025-08-19T17:39:55.8416589Z CA certificates copied and updated successfully.
+2025-08-19T17:39:56.0233901Z Site's appCommandLine: gunicorn -w 2 -k uvicorn.workers.UvicornWorker api.main:app --bind 0.0.0.0:${PORT:-8000}
+2025-08-19T17:39:57.2911957Z Starting periodic command scheduler: cron.
+2025-08-19T17:39:57.3083502Z Launching oryx with: create-script -appPath /home/site/wwwroot -output /opt/startup/startup.sh -virtualEnvName antenv -defaultApp /opt/defaultsite -userStartupCommand 'gunicorn -w 2 -k uvicorn.workers.UvicornWorker api.main:app --bind 0.0.0.0:${PORT:-8000}'
+2025-08-19T17:39:57.6796223Z Could not find build manifest file at '/home/site/wwwroot/oryx-manifest.toml'
+2025-08-19T17:39:57.6798376Z Could not find operation ID in manifest. Generating an operation id...
+2025-08-19T17:39:57.6800280Z Build Operation ID: 5017d411-ad1b-42bb-845a-5ab06cfa03fd
+2025-08-19T17:39:58.1519337Z Oryx Version: 0.2.20250709.3, Commit: 0cfb8cb7d114b65e539d2f9ccf9804e87b9966ba, ReleaseTagName: 20250709.3
+2025-08-19T17:39:58.1711986Z Writing output script to '/opt/startup/startup.sh'
+2025-08-19T17:39:58.4422516Z WARNING: Could not find virtual environment directory /home/site/wwwroot/antenv.
+2025-08-19T17:39:58.4423391Z WARNING: Could not find package directory /home/site/wwwroot/__oryx_packages__.
+2025-08-19T17:40:03.0648806Z 
+2025-08-19T17:40:03.0649446Z Error: class uri 'uvicorn.workers.UvicornWorker' invalid or not found: 
+2025-08-19T17:40:03.0649465Z 
+2025-08-19T17:40:03.0649482Z [Traceback (most recent call last):
+2025-08-19T17:40:03.0649500Z   File "/opt/python/3.11.13/lib/python3.11/site-packages/gunicorn/util.py", line 110, in load_class
+2025-08-19T17:40:03.0649518Z     mod = importlib.import_module('.'.join(components))
+2025-08-19T17:40:03.0649534Z           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+2025-08-19T17:40:03.0649552Z   File "/opt/python/3.11.13/lib/python3.11/importlib/__init__.py", line 126, in import_module
+2025-08-19T17:40:03.0649568Z     return _bootstrap._gcd_import(name[level:], package, level)
+2025-08-19T17:40:03.0649584Z            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+2025-08-19T17:40:03.0649623Z   File "<frozen importlib._bootstrap>", line 1204, in _gcd_import
+2025-08-19T17:40:03.0649640Z   File "<frozen importlib._bootstrap>", line 1176, in _find_and_load
+2025-08-19T17:40:03.0649657Z   File "<frozen importlib._bootstrap>", line 1126, in _find_and_load_unlocked
+2025-08-19T17:40:03.0649675Z   File "<frozen importlib._bootstrap>", line 241, in _call_with_frames_removed
+2025-08-19T17:40:03.0649691Z   File "<frozen importlib._bootstrap>", line 1204, in _gcd_import
+2025-08-19T17:40:03.0649707Z   File "<frozen importlib._bootstrap>", line 1176, in _find_and_load
+2025-08-19T17:40:03.0649724Z   File "<frozen importlib._bootstrap>", line 1140, in _find_and_load_unlocked
+2025-08-19T17:40:03.0649740Z ModuleNotFoundError: No module named 'uvicorn'
+2025-08-19T17:40:03.0649754Z ]
+2025-08-19T17:40:03.0921581Z 

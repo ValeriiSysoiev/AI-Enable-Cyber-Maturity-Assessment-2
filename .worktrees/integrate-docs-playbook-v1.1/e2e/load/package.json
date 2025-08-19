@@ -1,0 +1,126 @@
+{
+  "name": "ai-cyber-maturity-load-testing",
+  "version": "1.0.0",
+  "description": "Load testing infrastructure for AI-Enabled Cyber Maturity Assessment platform",
+  "scripts": {
+    "test:smoke": "k6 run scenarios/smoke.js",
+    "test:load": "k6 run scenarios/load.js",
+    "test:stress": "k6 run scenarios/stress.js",
+    "test:spike": "k6 run scenarios/spike.js",
+    "test:soak": "k6 run scenarios/soak.js",
+    "test:breakpoint": "k6 run scenarios/breakpoint.js",
+    "test:all": "npm run test:smoke && npm run test:load && npm run test:stress",
+    "test:quick": "DURATION_OVERRIDE=30s MAX_VUS=5 npm run test:smoke",
+    "test:local": "TARGET_ENV=local npm run test:smoke",
+    "test:dev": "TARGET_ENV=dev npm run test:load",
+    "test:staging": "TARGET_ENV=staging npm run test:load",
+    "test:with-output": "k6 run --out json=reports/load-test-$(date +%Y%m%d-%H%M%S).json scenarios/load.js",
+    "test:debug": "K6_LOG_LEVEL=debug k6 run scenarios/smoke.js",
+    "test:ci": "TARGET_ENV=${TARGET_ENV:-local} k6 run --out json=reports/ci-test-$(date +%Y%m%d-%H%M%S).json scenarios/${SCENARIO:-smoke}.js",
+    "analyze": "node scripts/analyze-results.js reports/",
+    "clean": "rm -rf reports/*.json && mkdir -p reports",
+    "validate": "k6 run --duration 10s --vus 1 scenarios/smoke.js",
+    "setup": "mkdir -p reports data && npm run validate",
+    "help": "echo 'Available scripts:' && npm run | grep '^  test:' && echo '\\nEnvironment variables:' && echo '  TARGET_ENV: local, dev, staging, prod' && echo '  DURATION_OVERRIDE: 30s, 5m, 1h' && echo '  MAX_VUS: 5, 50, 100' && echo '\\nExamples:' && echo '  npm run test:quick' && echo '  TARGET_ENV=dev npm run test:load' && echo '  DURATION_OVERRIDE=2m npm run test:stress'"
+  },
+  "keywords": [
+    "k6",
+    "load-testing",
+    "performance",
+    "testing",
+    "ai",
+    "cyber-security",
+    "assessment"
+  ],
+  "author": "AI Cyber Maturity Assessment Team",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/your-org/AI-Enable-Cyber-Maturity-Assessment-2.git",
+    "directory": "e2e/load"
+  },
+  "engines": {
+    "k6": ">=0.47.0"
+  },
+  "devDependencies": {
+    "k6": "^0.47.0"
+  },
+  "config": {
+    "k6": {
+      "scenarios": {
+        "smoke": {
+          "description": "Basic functionality validation",
+          "duration": "30s",
+          "vus": 1
+        },
+        "load": {
+          "description": "Normal operating load",
+          "duration": "9m",
+          "vus": "0-100"
+        },
+        "stress": {
+          "description": "Peak load testing",
+          "duration": "15m",
+          "vus": "0-500"
+        },
+        "spike": {
+          "description": "Sudden traffic spikes",
+          "duration": "12m",
+          "vus": "100-1000-100"
+        },
+        "soak": {
+          "description": "Extended duration testing",
+          "duration": "30m",
+          "vus": "50"
+        },
+        "breakpoint": {
+          "description": "Find system limits",
+          "duration": "40m",
+          "rps": "100-800+"
+        }
+      },
+      "environments": {
+        "local": {
+          "baseUrl": "http://localhost:8000",
+          "authMode": "demo"
+        },
+        "dev": {
+          "authMode": "demo"
+        },
+        "staging": {
+          "authMode": "aad"
+        },
+        "prod": {
+          "authMode": "aad",
+          "readonly": true
+        }
+      },
+      "thresholds": {
+        "responseTime": {
+          "p95": 2000,
+          "p99": 5000
+        },
+        "errorRate": {
+          "max": 0.05
+        },
+        "throughput": {
+          "min": 10
+        }
+      }
+    }
+  },
+  "directories": {
+    "scenarios": "./scenarios",
+    "utils": "./utils",
+    "data": "./data",
+    "reports": "./reports"
+  },
+  "files": [
+    "scenarios/",
+    "utils/",
+    "data/",
+    "k6.config.js",
+    "README.md",
+    "QUICK_REFERENCE.md"
+  ]
+}

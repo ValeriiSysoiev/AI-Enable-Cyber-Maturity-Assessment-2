@@ -1,0 +1,17 @@
+<step title="Incoming Request" date="2025-08-19T03:00:19.352" instance="7d84ad" url="/api/zipdeploy?isAsync=true" method="POST" type="request" pid="769,1,5" Accept="*/*" Host="api-cybermat-prd.scm.azurewebsites.net" User-Agent="AZURECLI/2.76.0 (HOMEBREW)" Accept-Encoding="gzip, deflate" Authorization="Bea..." Cache-Control="no-cache" Content-Type="application/octet-stream" Content-Length="251670" x-ms-client-request-id="780c5f6e-7ca8-11f0-b99a-5a85575da261" x-ms-artifact-checksum="b041e0e2aec72b127b9579bcc88f5ff1a5b38f9b849d811954bcdd80678ae56b" X-ARR-LOG-ID="780c5f6e-7ca8-11f0-b99a-5a85575da261" CLIENT-IP="104.205.42.51:51128" X-SITE-DEPLOYMENT-ID="api-cybermat-prd" WAS-DEFAULT-HOSTNAME="api-cybermat-prd.scm.azurewebsites.net" X-Forwarded-Proto="https" X-AppService-Proto="https" X-Forwarded-TlsVersion="1.3" X-WAWS-Unencoded-URL="/api/zipdeploy?isAsync=true" X-Client-IP="104.205.42.51" X-Client-Port="51128" >
+  <step title="ZipPushDeploy" date="2025-08-19T03:00:19.957" >
+    <step title="ZipDeploy. Extract zip. Remote build." date="2025-08-19T03:00:19.969" /><!-- duration: 2ms -->
+    <step title="None repository commit" date="2025-08-19T03:00:19.975" >
+      <step title="Commit id: 3a3ff607-47a7-40f6-84d2-2e99451371b1" date="2025-08-19T03:00:19.977" Message="N/A" AuthorName="N/A" AuthorEmail="N/A" /><!-- duration: 1ms -->
+    </step><!-- duration: 5ms -->
+    <step title="Starting PushDeployAsync" date="2025-08-19T03:00:19.981" /><!-- duration: 2ms -->
+    <step title="Writing artifact to /tmp/zipdeploy/1c4e7490-4b0e-4e08-96b9-d1ad13e2eced.zip" date="2025-08-19T03:00:20.000" >
+      <step title="Writing multipart request body to /tmp/zipdeploy/1c4e7490-4b0e-4e08-96b9-d1ad13e2eced.zip" date="2025-08-19T03:00:20.003" /><!-- duration: 2ms -->
+    </step><!-- duration: 58ms -->
+    <step title="Start deployment in the background" date="2025-08-19T03:00:20.087" >
+      <step title="Acquiring Deployment Lock" date="2025-08-19T03:00:20.128" /><!-- duration: 2ms -->
+      <step title="Acquired Deployment Lock" date="2025-08-19T03:00:20.197" /><!-- duration: 12ms -->
+    </step><!-- duration: 272ms -->
+  </step><!-- duration: 406ms -->
+  <step title="Outgoing response" date="2025-08-19T03:00:20.384" type="response" statusCode="202" statusText="Accepted" /><!-- duration: 3ms -->
+</step><!-- duration: 1037ms -->

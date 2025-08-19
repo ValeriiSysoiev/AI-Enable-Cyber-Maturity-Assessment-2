@@ -1,0 +1,8 @@
+<step title="Incoming Request" date="2025-08-18T22:36:38.908" instance="7d84ad" url="/api/deployments/latest?deployer=OneDeploy&amp;time=2025-08-18_22-36-38Z" method="GET" type="request" pid="823,1,57" Host="web-cybermat-prd.scm.azurewebsites.net" User-Agent="GITHUBACTIONS_DeployWebAppToAzure_ce49a0bc5efb052338813c24a831e9383a204a847ca3565e1998bb1d8a8af318" Authorization="Bea..." Content-Type="application/json; charset=utf-8" Cookie="ARRAffinity=7d84ad198c6f807fbfa2076d1e286d2bb239ec2b3ab1f48a5008aac89bd50ca3;Path=/;HttpOnly;Secure;Domain=web-cybermat-prd.scm.azurewebsites.net; ARRAffinitySameSite=7d84ad198c6f807fbfa2076d1e286d2bb239ec2b3ab1f48a5008aac89bd50ca3;Path=/;HttpOnly;SameSite=None;Secure;Domain=web-cybermat-prd.scm.azurewebsites.net" Content-Length="0" X-ARR-LOG-ID="53739695-cf8a-4597-b2c2-763d91a964d8" CLIENT-IP="172.182.226.229:32808" X-SITE-DEPLOYMENT-ID="web-cybermat-prd" WAS-DEFAULT-HOSTNAME="web-cybermat-prd.scm.azurewebsites.net" X-Forwarded-Proto="https" X-AppService-Proto="https" X-Forwarded-TlsVersion="1.3" X-WAWS-Unencoded-URL="/api/deployments/latest?deployer=OneDeploy&amp;time=2025-08-18_22-36-38Z" X-Client-IP="172.182.226.229" X-Client-Port="32808" >
+  <step title="DeploymentService.GetResult" date="2025-08-18T22:36:38.948" >
+    <step title="DeploymentService.GetLatestDeployment" date="2025-08-18T22:36:38.952" >
+      <step title="DeploymentManager.GetResults" date="2025-08-18T22:36:38.955" /><!-- duration: 348ms -->
+    </step><!-- duration: 390ms -->
+  </step><!-- duration: 414ms -->
+  <step title="Outgoing response" date="2025-08-18T22:36:39.733" type="response" statusCode="202" statusText="Accepted" /><!-- duration: 12ms -->
+</step><!-- duration: 855ms -->

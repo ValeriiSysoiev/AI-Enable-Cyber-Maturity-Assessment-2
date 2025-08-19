@@ -1,0 +1,54 @@
+Web Frontend Rebuild Log - $(date)
+========================================
+
+TASK: Rebuild Next.js standalone artifact with correct structure
+
+1. CONFIGURATION VERIFICATION ✓
+   - Verified web/next.config.mjs contains output: 'standalone'
+   - Verified web/package.json has correct build scripts and Node.js engine (>=20.x)
+
+2. CLEAN BUILD PROCESS ✓
+   - Cleaned existing build artifacts: rm -rf .next node_modules
+   - Fresh dependency install: npm ci (423 packages installed)
+   - Production build: npm run build (19 pages generated successfully)
+   - Build includes both static (○) and dynamic (ƒ) routes
+
+3. ARTIFACT VERIFICATION ✓
+   - Confirmed web/.next/standalone/server.js exists (4591 bytes)
+   - Confirmed web/.next/static/ directory exists with chunks, css, and build ID subdirectories
+
+4. DEPLOYMENT ZIP CREATION ✓
+   - Created _deploy_web temporary directory
+   - Copied web/.next/standalone/* to deployment root
+   - Copied web/.next/static to _deploy_web/.next/static/
+   - Copied web/package.json to deployment root
+   - No public directory found (expected for this project)
+   - Generated web-deploy.zip with correct top-level structure
+
+5. ZIP VERIFICATION ✓
+   - Verified ZIP contains server.js at root level
+   - Verified ZIP contains .next/static directory structure
+   - Verified ZIP contains node_modules with Next.js runtime dependencies
+   - Saved complete manifest to logs/agents/web-deploy-manifest.txt
+
+6. CLEANUP ✓
+   - Removed temporary _deploy_web directory
+   - Replaced old web-deploy.zip with new artifact
+
+BUILD STATUS: SUCCESS
+ZIP STRUCTURE: CORRECT (server.js at root, .next/static in proper location)
+DEPLOYMENT READY: YES
+
+Key files in ZIP:
+- server.js (4591 bytes) - Next.js standalone server
+- node_modules/ - Runtime dependencies (Next.js, React, styled-jsx)
+- .next/static/ - Static assets (chunks, CSS, build artifacts)
+
+Archive contains 2,330 files (22.7MB total)
+The new web-deploy.zip is ready for deployment with the correct standalone structure.
+
+VERIFICATION COMPLETED:
+✓ server.js at root level (4591 bytes)
+✓ .next/static directory with CSS and JS chunks
+✓ node_modules with Next.js runtime dependencies
+✓ Complete manifest saved to logs/agents/web-deploy-manifest.txt

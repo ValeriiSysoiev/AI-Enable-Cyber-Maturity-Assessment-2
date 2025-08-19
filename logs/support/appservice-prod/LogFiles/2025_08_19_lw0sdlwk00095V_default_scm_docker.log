@@ -1,0 +1,193 @@
+2025-08-19T04:24:06.7607496Z     __ __          __      __    _ __     
+2025-08-19T04:24:06.7616688Z    / //_/_  _ ____/ /_  __/ /   (_) /____ 
+2025-08-19T04:24:06.7616840Z   / ,< / / / / __  / / / / /   / / __/ _  
+2025-08-19T04:24:06.7616861Z  / /| / /_/ / /_/ / /_/ / /___/ / /_/  __/
+2025-08-19T04:24:06.7616879Z /_/ |_\__,_/\__,_/\__,_/_____/_/\__/\___/ 
+2025-08-19T04:24:06.7616918Z 
+2025-08-19T04:24:06.7616943Z                                           
+2025-08-19T04:24:06.7616961Z DEBUG CONSOLE | AZURE APP SERVICE ON LINUX
+2025-08-19T04:24:06.7617006Z 
+2025-08-19T04:24:06.7617026Z Documentation: http://aka.ms/webapp-linux
+2025-08-19T04:24:06.7617045Z Kudu Version : 20250623.5
+2025-08-19T04:24:06.7617064Z Commit       : 353543ec4c45fcbfd4750522d32c94e23b31927a
+2025-08-19T04:24:06.7617079Z 
+2025-08-19T04:24:07.4790297Z chown: changing ownership of '/temp': Operation not permitted
+2025-08-19T04:24:07.4999139Z chmod: changing permissions of '/temp': Operation not permitted
+2025-08-19T04:24:09.2280386Z Restarting OpenBSD Secure Shell server: sshd.
+2025-08-19T04:24:09.3509766Z node not running, starting node /opt/webssh/index.js
+2025-08-19T04:24:19.1975941Z Tue Aug 19 04:24:19 UTC 2025 running .net core
+2025-08-19T04:24:20.9884153Z Startup : 04.24.20.960468
+2025-08-19T04:24:21.0127232Z Configure Services : 04.24.21.012515
+2025-08-19T04:24:21.4927819Z Configure : 04.24.21.492616
+2025-08-19T04:24:21.8391178Z Setting Up Routes : 04.24.21.838949
+2025-08-19T04:24:22.2701880Z Exiting Configure : 04.24.22.270035
+2025-08-19T04:24:22.5462692Z Hosting environment: Production
+2025-08-19T04:24:22.5471848Z Content root path: /opt/Kudu
+2025-08-19T04:24:22.5480501Z Now listening on: http://0.0.0.0:8181
+2025-08-19T04:24:22.5487866Z Application started. Press Ctrl+C to shut down.
+2025-08-19T04:24:29.9967433Z Deploy Async
+2025-08-19T04:24:34.9051285Z Operation performed by Microsoft Oryx, https://github.com/Microsoft/Oryx
+2025-08-19T04:24:34.9450347Z You can report issues at https://github.com/Microsoft/Oryx/issues
+2025-08-19T04:24:34.9752093Z 
+2025-08-19T04:24:34.9972336Z Oryx Version: 0.2.20250611.1+0649de32f1279969c9023dd41b389cce4bb94493, Commit: 0649de32f1279969c9023dd41b389cce4bb94493, ReleaseTagName: 20250611.1
+2025-08-19T04:24:35.0177957Z 
+2025-08-19T04:24:35.0479713Z Build Operation ID: 562bebb042e172a7
+2025-08-19T04:24:35.0762745Z Repository Commit : b40789c2-dbb0-49e3-b774-d8fb13000798
+2025-08-19T04:24:35.1059069Z OS Type           : bullseye
+2025-08-19T04:24:35.1358216Z Image Type        : githubactions
+2025-08-19T04:24:35.1670587Z 
+2025-08-19T04:24:35.1864085Z Primary SDK Storage URL: https://oryx-cdn.microsoft.io
+2025-08-19T04:24:35.2065230Z Backup SDK Storage URL: https://oryxsdks-cdn.azureedge.net
+2025-08-19T04:24:35.2493473Z Detecting platforms...
+2025-08-19T04:24:35.2860313Z External SDK provider is enabled.
+2025-08-19T04:24:35.4198631Z Requesting metadata for platform python from external SDK provider
+2025-08-19T04:24:37.6672201Z Requesting metadata for platform python from external SDK provider
+2025-08-19T04:24:38.3345955Z Detected following platforms:
+2025-08-19T04:24:38.3631441Z   python: 3.11.13
+2025-08-19T04:24:38.4025342Z Requesting metadata for platform python from external SDK provider
+2025-08-19T04:24:40.1841699Z Version '3.11.13' of platform 'python' is not installed. Generating script to install it...
+2025-08-19T04:24:41.0773996Z 
+2025-08-19T04:24:41.2760712Z Using intermediate directory '/tmp/8ddded84b67fdbe'.
+2025-08-19T04:24:41.3365830Z 
+2025-08-19T04:24:41.3666637Z Copying files to the intermediate directory...
+2025-08-19T04:24:41.9675268Z Done in 0 sec(s).
+2025-08-19T04:24:41.9988653Z 
+2025-08-19T04:24:42.0484862Z Source directory     : /tmp/8ddded84b67fdbe
+2025-08-19T04:24:42.0675437Z Destination directory: /home/site/wwwroot
+2025-08-19T04:24:42.1558906Z 
+2025-08-19T04:24:42.1862530Z 
+2025-08-19T04:24:42.2067631Z Downloading and extracting 'python' version '3.11.13' to '/tmp/oryx/platforms/python/3.11.13'...
+2025-08-19T04:24:42.2456587Z Detected image debian flavor: bullseye.
+2025-08-19T04:24:42.2758463Z Skipping download of python version 3.11.13 as it is available in external sdk provider cache...
+2025-08-19T04:24:42.2958849Z Extracting contents...
+2025-08-19T04:25:02.5875271Z ................
+2025-08-19T04:25:02.5875843Z Successfully extracted python version 3.11.13 from external sdk provider cache...
+2025-08-19T04:25:02.6558636Z Done in 20 sec(s).
+2025-08-19T04:25:02.8151297Z 
+2025-08-19T04:25:02.8372947Z image detector file exists, platform is python..
+2025-08-19T04:25:02.8738226Z OS detector file exists, OS is bullseye..
+2025-08-19T04:25:03.8411371Z Python Version: /tmp/oryx/platforms/python/3.11.13/bin/python3.11
+2025-08-19T04:25:03.8814900Z Creating directory for command manifest file if it does not exist
+2025-08-19T04:25:04.3229674Z Removing existing manifest file
+2025-08-19T04:25:04.5261981Z Python Virtual Environment: antenv
+2025-08-19T04:25:04.5840538Z Creating virtual environment...
+2025-08-19T04:25:29.1875581Z ....................
+2025-08-19T04:25:29.1880825Z Activating virtual environment...
+2025-08-19T04:25:29.2382251Z Running pip install...
+2025-08-19T04:26:15.9459088Z     __ __          __      __    _ __     
+2025-08-19T04:26:15.9561565Z    / //_/_  _ ____/ /_  __/ /   (_) /____ 
+2025-08-19T04:26:15.9561808Z   / ,< / / / / __  / / / / /   / / __/ _  
+2025-08-19T04:26:15.9561828Z  / /| / /_/ / /_/ / /_/ / /___/ / /_/  __/
+2025-08-19T04:26:15.9561845Z /_/ |_\__,_/\__,_/\__,_/_____/_/\__/\___/ 
+2025-08-19T04:26:15.9561877Z 
+2025-08-19T04:26:15.9561926Z                                           
+2025-08-19T04:26:15.9561944Z DEBUG CONSOLE | AZURE APP SERVICE ON LINUX
+2025-08-19T04:26:15.9561991Z 
+2025-08-19T04:26:15.9562009Z Documentation: http://aka.ms/webapp-linux
+2025-08-19T04:26:15.9562029Z Kudu Version : 20250623.5
+2025-08-19T04:26:15.9562049Z Commit       : 353543ec4c45fcbfd4750522d32c94e23b31927a
+2025-08-19T04:26:15.9562065Z 
+2025-08-19T04:26:19.1657829Z chown: changing ownership of '/temp': Operation not permitted
+2025-08-19T04:26:19.1658187Z chmod: changing permissions of '/temp': Operation not permitted
+2025-08-19T04:26:22.2723291Z Restarting OpenBSD Secure Shell server: sshd.
+2025-08-19T04:26:22.4141004Z node not running, starting node /opt/webssh/index.js
+2025-08-19T04:27:02.3624660Z Tue Aug 19 04:27:02 UTC 2025 running .net core
+2025-08-19T04:27:16.9498152Z Startup : 04.27.16.529260
+2025-08-19T04:27:17.6465221Z Configure Services : 04.27.17.646243
+2025-08-19T04:27:25.0426646Z Configure : 04.27.25.042475
+2025-08-19T04:27:30.0895272Z Setting Up Routes : 04.27.30.089335
+2025-08-19T04:27:43.5505418Z Exiting Configure : 04.27.43.550362
+2025-08-19T04:27:50.8669560Z Hosting environment: Production
+2025-08-19T04:27:50.8675385Z Content root path: /opt/Kudu
+2025-08-19T04:27:50.8846985Z Now listening on: http://0.0.0.0:8181
+2025-08-19T04:27:50.8847087Z Application started. Press Ctrl+C to shut down.
+2025-08-19T04:28:16.0365789Z ..............................................................................................................................................................
+2025-08-19T04:30:12.8869796Z     __ __          __      __    _ __     
+2025-08-19T04:30:12.9085843Z    / //_/_  _ ____/ /_  __/ /   (_) /____ 
+2025-08-19T04:30:12.9086033Z   / ,< / / / / __  / / / / /   / / __/ _  
+2025-08-19T04:30:12.9086061Z  / /| / /_/ / /_/ / /_/ / /___/ / /_/  __/
+2025-08-19T04:30:12.9086080Z /_/ |_\__,_/\__,_/\__,_/_____/_/\__/\___/ 
+2025-08-19T04:30:12.9086117Z 
+2025-08-19T04:30:12.9086146Z                                           
+2025-08-19T04:30:12.9086216Z DEBUG CONSOLE | AZURE APP SERVICE ON LINUX
+2025-08-19T04:30:12.9086232Z 
+2025-08-19T04:30:12.9086252Z Documentation: http://aka.ms/webapp-linux
+2025-08-19T04:30:12.9086269Z Kudu Version : 20250623.5
+2025-08-19T04:30:12.9086289Z Commit       : 353543ec4c45fcbfd4750522d32c94e23b31927a
+2025-08-19T04:30:12.9086305Z 
+2025-08-19T04:30:13.6270003Z chown: changing ownership of '/temp': Operation not permitted
+2025-08-19T04:30:13.6377293Z chmod: changing permissions of '/temp': Operation not permitted
+2025-08-19T04:30:16.5381940Z Restarting OpenBSD Secure Shell server: sshd.
+2025-08-19T04:30:16.6384535Z node not running, starting node /opt/webssh/index.js
+2025-08-19T04:30:26.0916882Z Tue Aug 19 04:30:26 UTC 2025 running .net core
+2025-08-19T04:30:28.7368355Z Startup : 04.30.28.705608
+2025-08-19T04:30:28.7675853Z Configure Services : 04.30.28.767389
+2025-08-19T04:30:29.6097129Z Configure : 04.30.29.609534
+2025-08-19T04:30:30.4008200Z Setting Up Routes : 04.30.30.400643
+2025-08-19T04:30:31.6447879Z Exiting Configure : 04.30.31.637561
+2025-08-19T04:30:32.1134168Z Hosting environment: Production
+2025-08-19T04:30:32.1142578Z Content root path: /opt/Kudu
+2025-08-19T04:30:32.1243788Z Now listening on: http://0.0.0.0:8181
+2025-08-19T04:30:32.1312396Z Application started. Press Ctrl+C to shut down.
+2025-08-19T04:30:37.3902915Z Deploy Async
+2025-08-19T04:30:42.7458545Z Operation performed by Microsoft Oryx, https://github.com/Microsoft/Oryx
+2025-08-19T04:30:42.8174717Z You can report issues at https://github.com/Microsoft/Oryx/issues
+2025-08-19T04:30:42.8475957Z 
+2025-08-19T04:30:42.8679448Z Oryx Version: 0.2.20250611.1+0649de32f1279969c9023dd41b389cce4bb94493, Commit: 0649de32f1279969c9023dd41b389cce4bb94493, ReleaseTagName: 20250611.1
+2025-08-19T04:30:42.8980163Z 
+2025-08-19T04:30:42.9173623Z Build Operation ID: 06563a55522f1765
+2025-08-19T04:30:42.9373744Z Repository Commit : a9ac5d93-921b-4ff7-8f42-85ff9980c817
+2025-08-19T04:30:42.9668919Z OS Type           : bullseye
+2025-08-19T04:30:43.0163804Z Image Type        : githubactions
+2025-08-19T04:30:43.1177929Z 
+2025-08-19T04:30:43.1308901Z Primary SDK Storage URL: https://oryx-cdn.microsoft.io
+2025-08-19T04:30:43.1870674Z Backup SDK Storage URL: https://oryxsdks-cdn.azureedge.net
+2025-08-19T04:30:43.2170167Z Detecting platforms...
+2025-08-19T04:30:43.2474255Z External SDK provider is enabled.
+2025-08-19T04:30:43.2900283Z Requesting metadata for platform python from external SDK provider
+2025-08-19T04:30:44.3942768Z Requesting metadata for platform python from external SDK provider
+2025-08-19T04:30:45.7740456Z Detected following platforms:
+2025-08-19T04:30:45.8143824Z   python: 3.11.13
+2025-08-19T04:30:45.8444194Z Requesting metadata for platform python from external SDK provider
+2025-08-19T04:30:47.8363375Z Version '3.11.13' of platform 'python' is not installed. Generating script to install it...
+2025-08-19T04:30:48.7517854Z 
+2025-08-19T04:30:48.9420742Z Using intermediate directory '/tmp/8ddded92676f57f'.
+2025-08-19T04:30:49.0637259Z 
+2025-08-19T04:30:49.1035372Z Copying files to the intermediate directory...
+2025-08-19T04:30:49.2056340Z Done in 1 sec(s).
+2025-08-19T04:30:49.2661135Z 
+2025-08-19T04:30:49.2946321Z Source directory     : /tmp/8ddded92676f57f
+2025-08-19T04:30:49.3343186Z Destination directory: /home/site/wwwroot
+2025-08-19T04:30:49.4151643Z 
+2025-08-19T04:30:49.4362973Z 
+2025-08-19T04:30:49.4668802Z Downloading and extracting 'python' version '3.11.13' to '/tmp/oryx/platforms/python/3.11.13'...
+2025-08-19T04:30:49.5264314Z Detected image debian flavor: bullseye.
+2025-08-19T04:30:49.5678347Z Skipping download of python version 3.11.13 as it is available in external sdk provider cache...
+2025-08-19T04:30:49.6560195Z Extracting contents...
+2025-08-19T17:42:32.0538073Z     __ __          __      __    _ __     
+2025-08-19T17:42:32.0539578Z    / //_/_  _ ____/ /_  __/ /   (_) /____ 
+2025-08-19T17:42:32.0539611Z   / ,< / / / / __  / / / / /   / / __/ _  
+2025-08-19T17:42:32.0539630Z  / /| / /_/ / /_/ / /_/ / /___/ / /_/  __/
+2025-08-19T17:42:32.0539652Z /_/ |_\__,_/\__,_/\__,_/_____/_/\__/\___/ 
+2025-08-19T17:42:32.0539695Z 
+2025-08-19T17:42:32.0539771Z                                           
+2025-08-19T17:42:32.0539792Z DEBUG CONSOLE | AZURE APP SERVICE ON LINUX
+2025-08-19T17:42:32.0539809Z 
+2025-08-19T17:42:32.0539829Z Documentation: http://aka.ms/webapp-linux
+2025-08-19T17:42:32.0539847Z Kudu Version : 20250623.5
+2025-08-19T17:42:32.0539866Z Commit       : 353543ec4c45fcbfd4750522d32c94e23b31927a
+2025-08-19T17:42:32.0539882Z 
+2025-08-19T17:42:32.7879560Z chown: changing ownership of '/temp': Operation not permitted
+2025-08-19T17:42:32.8062638Z chmod: changing permissions of '/temp': Operation not permitted
+2025-08-19T17:42:34.7014907Z Restarting OpenBSD Secure Shell server: sshd.
+2025-08-19T17:42:34.8199378Z node not running, starting node /opt/webssh/index.js
+2025-08-19T17:42:43.6711046Z Tue Aug 19 17:42:43 UTC 2025 running .net core
+2025-08-19T17:42:45.3542535Z Startup : 05.42.45.323321
+2025-08-19T17:42:45.4838407Z Configure Services : 05.42.45.483182
+2025-08-19T17:42:45.9781656Z Configure : 05.42.45.977986
+2025-08-19T17:42:46.3099352Z Setting Up Routes : 05.42.46.309767
+2025-08-19T17:42:47.0500301Z Exiting Configure : 05.42.47.049885
+2025-08-19T17:42:47.7817934Z Hosting environment: Production
+2025-08-19T17:42:47.7818189Z Content root path: /opt/Kudu
+2025-08-19T17:42:47.7818214Z Now listening on: http://0.0.0.0:8181
+2025-08-19T17:42:47.7818237Z Application started. Press Ctrl+C to shut down.

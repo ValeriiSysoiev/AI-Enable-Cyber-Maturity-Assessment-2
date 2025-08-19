@@ -1,0 +1,1239 @@
+2025-08-18T21:52:56.1411931Z Site container: web-cybermat-prd_managedIdentity terminated during site startup.
+2025-08-18T21:52:56.1597461Z ManagedIdentity container failed to startup
+2025-08-18T21:52:56.8342399Z Site: web-cybermat-prd will be blocked for 1 minutes till 08/18/2025 21:53:56
+2025-08-18T21:53:56.8264820Z Site: web-cybermat-prd is unblocked.
+2025-08-19T00:06:08.4906665Z Container start method called.
+2025-08-19T00:06:08.4951218Z Establishing network.
+2025-08-19T00:06:08.4954098Z Pulling image: appsvc/node:20-lts_20250724.2.tuxprod.
+2025-08-19T00:06:14.7024269Z Container is starting.
+2025-08-19T00:06:14.7030621Z Establishing user namespace if not established already.
+2025-08-19T00:06:14.7033325Z Establishing network if not established already.
+2025-08-19T00:06:14.7034773Z Mounting volumes.
+2025-08-19T00:06:14.7124025Z Nested mountpoint 
+2025-08-19T00:06:14.7336722Z Nested mountpoint volatile/logs
+2025-08-19T00:06:14.7711071Z Nested mountpoint 
+2025-08-19T00:06:14.8342341Z Nested mountpoint 
+2025-08-19T00:06:14.8826293Z Nested mountpoint 
+2025-08-19T00:06:15.7380384Z Creating container.
+2025-08-19T00:06:15.7574295Z Creating pipes for streaming container io.
+2025-08-19T00:06:15.7681836Z Creating stdout named pipe at /podr/container/pipe/359d0bd779ee_web-cybermat-prd/stdout_61af2802b5bc418ab45459d533cedb74.
+2025-08-19T00:06:15.7755107Z Successfully created stdout named pipe at: /podr/container/pipe/359d0bd779ee_web-cybermat-prd/stdout_61af2802b5bc418ab45459d533cedb74.
+2025-08-19T00:06:15.7760572Z Opening named pipe /podr/container/pipe/359d0bd779ee_web-cybermat-prd/stdout_61af2802b5bc418ab45459d533cedb74 for reading in non-blocking mode.
+2025-08-19T00:06:15.7765896Z Successfully opened named pipe: /podr/container/pipe/359d0bd779ee_web-cybermat-prd/stdout_61af2802b5bc418ab45459d533cedb74.
+2025-08-19T00:06:15.7767994Z Successfully removed non-blocking flag from /podr/container/pipe/359d0bd779ee_web-cybermat-prd/stdout_61af2802b5bc418ab45459d533cedb74.
+2025-08-19T00:06:15.7769708Z Creating stderr named pipe at /podr/container/pipe/359d0bd779ee_web-cybermat-prd/stderr_903a23b6b8ba49cea601f600f2290398.
+2025-08-19T00:06:15.7771017Z Successfully created stderr named pipe at: /podr/container/pipe/359d0bd779ee_web-cybermat-prd/stderr_903a23b6b8ba49cea601f600f2290398.
+2025-08-19T00:06:15.7773086Z Opening named pipe /podr/container/pipe/359d0bd779ee_web-cybermat-prd/stderr_903a23b6b8ba49cea601f600f2290398 for reading in non-blocking mode.
+2025-08-19T00:06:15.7774250Z Successfully opened named pipe: /podr/container/pipe/359d0bd779ee_web-cybermat-prd/stderr_903a23b6b8ba49cea601f600f2290398.
+2025-08-19T00:06:15.7774991Z Successfully removed non-blocking flag from /podr/container/pipe/359d0bd779ee_web-cybermat-prd/stderr_903a23b6b8ba49cea601f600f2290398.
+2025-08-19T00:06:15.7784368Z Creating container with image: appsvc/node:20-lts_20250724.2.tuxprod from registry: mcr.microsoft.com and fully qualified image name: mcr.microsoft.com/appsvc/node:20-lts_20250724.2.tuxprod
+2025-08-19T00:06:17.2593154Z Starting container: 359d0bd779ee_web-cybermat-prd.
+2025-08-19T00:06:17.3594028Z Starting watchers and probes.
+2025-08-19T00:06:17.3689055Z Starting metrics collection.
+2025-08-19T00:06:17.3691404Z Container is running.
+2025-08-19T00:06:17.6103182Z Container start method finished after 9119 ms.
+2025-08-19T00:06:42.1288512Z Container has finished running with exit code: 127.
+2025-08-19T00:06:42.1355993Z Container is terminating. Grace period: 5 seconds.
+2025-08-19T00:06:42.1389018Z Stop and delete container. Retry count = 0
+2025-08-19T00:06:42.1471519Z Stopping container: 359d0bd779ee_web-cybermat-prd.
+2025-08-19T00:06:42.2162321Z Deleting container: 359d0bd779ee_web-cybermat-prd. Retry count = 0
+2025-08-19T00:06:43.2834951Z Container spec TerminationMessagePolicy  path 
+2025-08-19T00:06:43.2932219Z Container is terminated. Total time elapsed: 1155 ms.
+2025-08-19T00:06:43.2941037Z Site container: web-cybermat-prd terminated during site startup.
+2025-08-19T00:06:43.2959448Z Site startup probe failed after 25.653655 seconds.
+2025-08-19T00:06:43.3955561Z Failed to start site. Revert by stopping site.
+2025-08-19T00:06:43.4148902Z Site: web-cybermat-prd stopped.
+2025-08-19T00:06:44.9964188Z Site container: web-cybermat-prd_managedIdentity terminated during site startup.
+2025-08-19T00:06:45.0170667Z ManagedIdentity container failed to startup
+2025-08-19T00:06:45.3705127Z Site: web-cybermat-prd will be blocked for 1 minutes till 08/19/2025 00:07:45
+2025-08-19T00:06:46.3208718Z Start site prohibitted because the site is being blocked.
+2025-08-19T00:07:45.3695918Z Site: web-cybermat-prd is unblocked.
+2025-08-19T00:10:23.5800869Z Container start method called.
+2025-08-19T00:10:23.5979983Z Establishing network.
+2025-08-19T00:10:23.5983964Z Pulling image: appsvc/node:20-lts_20250724.2.tuxprod.
+2025-08-19T00:10:29.0787262Z Container is starting.
+2025-08-19T00:10:29.0789579Z Establishing user namespace if not established already.
+2025-08-19T00:10:29.0792025Z Establishing network if not established already.
+2025-08-19T00:10:29.0795297Z Mounting volumes.
+2025-08-19T00:10:29.0798435Z Nested mountpoint 
+2025-08-19T00:10:29.1182122Z Nested mountpoint volatile/logs
+2025-08-19T00:10:29.1374505Z Nested mountpoint 
+2025-08-19T00:10:29.1702949Z Nested mountpoint 
+2025-08-19T00:10:29.1895887Z Nested mountpoint 
+2025-08-19T00:10:30.4881856Z Creating container.
+2025-08-19T00:10:30.5279298Z Creating pipes for streaming container io.
+2025-08-19T00:10:30.5365206Z Creating stdout named pipe at /podr/container/pipe/695699a00bf9_web-cybermat-prd/stdout_9ea23e7ff2b7436fada4f4f51bd10d20.
+2025-08-19T00:10:30.5374470Z Successfully created stdout named pipe at: /podr/container/pipe/695699a00bf9_web-cybermat-prd/stdout_9ea23e7ff2b7436fada4f4f51bd10d20.
+2025-08-19T00:10:30.5385190Z Opening named pipe /podr/container/pipe/695699a00bf9_web-cybermat-prd/stdout_9ea23e7ff2b7436fada4f4f51bd10d20 for reading in non-blocking mode.
+2025-08-19T00:10:30.5567127Z Successfully opened named pipe: /podr/container/pipe/695699a00bf9_web-cybermat-prd/stdout_9ea23e7ff2b7436fada4f4f51bd10d20.
+2025-08-19T00:10:30.5571163Z Successfully removed non-blocking flag from /podr/container/pipe/695699a00bf9_web-cybermat-prd/stdout_9ea23e7ff2b7436fada4f4f51bd10d20.
+2025-08-19T00:10:30.5578818Z Creating stderr named pipe at /podr/container/pipe/695699a00bf9_web-cybermat-prd/stderr_c9d8de10d2e74bb2b09d1430747136f9.
+2025-08-19T00:10:30.5585329Z Successfully created stderr named pipe at: /podr/container/pipe/695699a00bf9_web-cybermat-prd/stderr_c9d8de10d2e74bb2b09d1430747136f9.
+2025-08-19T00:10:30.5663811Z Opening named pipe /podr/container/pipe/695699a00bf9_web-cybermat-prd/stderr_c9d8de10d2e74bb2b09d1430747136f9 for reading in non-blocking mode.
+2025-08-19T00:10:30.5666912Z Successfully opened named pipe: /podr/container/pipe/695699a00bf9_web-cybermat-prd/stderr_c9d8de10d2e74bb2b09d1430747136f9.
+2025-08-19T00:10:30.5672511Z Successfully removed non-blocking flag from /podr/container/pipe/695699a00bf9_web-cybermat-prd/stderr_c9d8de10d2e74bb2b09d1430747136f9.
+2025-08-19T00:10:30.5677296Z Creating container with image: appsvc/node:20-lts_20250724.2.tuxprod from registry: mcr.microsoft.com and fully qualified image name: mcr.microsoft.com/appsvc/node:20-lts_20250724.2.tuxprod
+2025-08-19T00:10:31.4530581Z Starting container: 695699a00bf9_web-cybermat-prd.
+2025-08-19T00:10:31.5349231Z Starting watchers and probes.
+2025-08-19T00:10:31.5357226Z Starting metrics collection.
+2025-08-19T00:10:31.5358997Z Container is running.
+2025-08-19T00:10:31.6559250Z Container start method finished after 8075 ms.
+2025-08-19T00:10:54.7421640Z Container has finished running with exit code: 127.
+2025-08-19T00:10:54.7595471Z Container is terminating. Grace period: 5 seconds.
+2025-08-19T00:10:54.7618074Z Stop and delete container. Retry count = 0
+2025-08-19T00:10:54.7619075Z Stopping container: 695699a00bf9_web-cybermat-prd.
+2025-08-19T00:10:54.8696001Z Deleting container: 695699a00bf9_web-cybermat-prd. Retry count = 0
+2025-08-19T00:10:55.7899765Z Container spec TerminationMessagePolicy  path 
+2025-08-19T00:10:55.7930050Z Container is terminated. Total time elapsed: 1032 ms.
+2025-08-19T00:10:55.7935571Z Site container: web-cybermat-prd terminated during site startup.
+2025-08-19T00:10:55.8002306Z Site startup probe failed after 24.1169791 seconds.
+2025-08-19T00:10:55.8236028Z Failed to start site. Revert by stopping site.
+2025-08-19T00:10:55.8366617Z Site: web-cybermat-prd stopped.
+2025-08-19T00:10:57.7239601Z Site container: web-cybermat-prd_managedIdentity terminated during site startup.
+2025-08-19T00:10:57.7249242Z ManagedIdentity container failed to startup
+2025-08-19T00:10:58.2777050Z Site: web-cybermat-prd will be blocked for 2 minutes till 08/19/2025 00:12:58
+2025-08-19T00:10:59.0035350Z Start site prohibitted because the site is being blocked.
+2025-08-19T00:11:00.5604033Z Start site prohibitted because the site is being blocked.
+2025-08-19T00:11:08.6283103Z Start site prohibitted because the site is being blocked.
+2025-08-19T00:11:13.6213749Z Start site prohibitted because the site is being blocked.
+2025-08-19T00:11:26.4770238Z Start site prohibitted because the site is being blocked.
+2025-08-19T00:11:39.4544948Z Start site prohibitted because the site is being blocked.
+2025-08-19T00:11:43.7752563Z Start site prohibitted because the site is being blocked.
+2025-08-19T00:11:47.9922648Z Start site prohibitted because the site is being blocked.
+2025-08-19T00:11:52.1255070Z Start site prohibitted because the site is being blocked.
+2025-08-19T00:11:53.3734490Z Start site prohibitted because the site is being blocked.
+2025-08-19T00:11:54.7731270Z Start site prohibitted because the site is being blocked.
+2025-08-19T00:11:56.2430093Z Start site prohibitted because the site is being blocked.
+2025-08-19T00:11:57.5508295Z Start site prohibitted because the site is being blocked.
+2025-08-19T00:12:02.1213067Z Start site prohibitted because the site is being blocked.
+2025-08-19T00:12:06.5637264Z Start site prohibitted because the site is being blocked.
+2025-08-19T00:12:10.8110302Z Start site prohibitted because the site is being blocked.
+2025-08-19T00:12:23.2182669Z Start site prohibitted because the site is being blocked.
+2025-08-19T00:12:35.6032423Z Start site prohibitted because the site is being blocked.
+2025-08-19T00:12:47.9078094Z Start site prohibitted because the site is being blocked.
+2025-08-19T00:12:48.6296916Z Start site prohibitted because the site is being blocked.
+2025-08-19T00:12:49.8979074Z Start site prohibitted because the site is being blocked.
+2025-08-19T00:12:51.7629705Z Start site prohibitted because the site is being blocked.
+2025-08-19T00:12:53.6511070Z Start site prohibitted because the site is being blocked.
+2025-08-19T00:12:56.6554113Z Start site prohibitted because the site is being blocked.
+2025-08-19T00:12:58.2759609Z Site: web-cybermat-prd is unblocked.
+2025-08-19T00:13:22.9319753Z Container start method called.
+2025-08-19T00:13:22.9494688Z Establishing network.
+2025-08-19T00:13:22.9503026Z Pulling image: appsvc/node:20-lts_20250724.2.tuxprod.
+2025-08-19T00:13:28.9697038Z Container is starting.
+2025-08-19T00:13:28.9773210Z Establishing user namespace if not established already.
+2025-08-19T00:13:28.9781612Z Establishing network if not established already.
+2025-08-19T00:13:28.9789963Z Mounting volumes.
+2025-08-19T00:13:28.9798839Z Nested mountpoint 
+2025-08-19T00:13:29.0180969Z Nested mountpoint volatile/logs
+2025-08-19T00:13:29.0384422Z Nested mountpoint 
+2025-08-19T00:13:29.0476610Z Nested mountpoint 
+2025-08-19T00:13:29.1006933Z Nested mountpoint 
+2025-08-19T00:13:30.2364741Z Creating container.
+2025-08-19T00:13:30.2375842Z Creating pipes for streaming container io.
+2025-08-19T00:13:30.2452621Z Creating stdout named pipe at /podr/container/pipe/e1cb2437d300_web-cybermat-prd/stdout_d2eb9cfa06b24f2188ed4ae92b4bf4ab.
+2025-08-19T00:13:30.2458899Z Successfully created stdout named pipe at: /podr/container/pipe/e1cb2437d300_web-cybermat-prd/stdout_d2eb9cfa06b24f2188ed4ae92b4bf4ab.
+2025-08-19T00:13:30.2463925Z Opening named pipe /podr/container/pipe/e1cb2437d300_web-cybermat-prd/stdout_d2eb9cfa06b24f2188ed4ae92b4bf4ab for reading in non-blocking mode.
+2025-08-19T00:13:30.2470488Z Successfully opened named pipe: /podr/container/pipe/e1cb2437d300_web-cybermat-prd/stdout_d2eb9cfa06b24f2188ed4ae92b4bf4ab.
+2025-08-19T00:13:30.2475483Z Successfully removed non-blocking flag from /podr/container/pipe/e1cb2437d300_web-cybermat-prd/stdout_d2eb9cfa06b24f2188ed4ae92b4bf4ab.
+2025-08-19T00:13:30.2569205Z Creating stderr named pipe at /podr/container/pipe/e1cb2437d300_web-cybermat-prd/stderr_d28d86eb14c24dae992300ab196d8456.
+2025-08-19T00:13:30.2659294Z Successfully created stderr named pipe at: /podr/container/pipe/e1cb2437d300_web-cybermat-prd/stderr_d28d86eb14c24dae992300ab196d8456.
+2025-08-19T00:13:30.2671945Z Opening named pipe /podr/container/pipe/e1cb2437d300_web-cybermat-prd/stderr_d28d86eb14c24dae992300ab196d8456 for reading in non-blocking mode.
+2025-08-19T00:13:30.2754201Z Successfully opened named pipe: /podr/container/pipe/e1cb2437d300_web-cybermat-prd/stderr_d28d86eb14c24dae992300ab196d8456.
+2025-08-19T00:13:30.2766653Z Successfully removed non-blocking flag from /podr/container/pipe/e1cb2437d300_web-cybermat-prd/stderr_d28d86eb14c24dae992300ab196d8456.
+2025-08-19T00:13:30.2774477Z Creating container with image: appsvc/node:20-lts_20250724.2.tuxprod from registry: mcr.microsoft.com and fully qualified image name: mcr.microsoft.com/appsvc/node:20-lts_20250724.2.tuxprod
+2025-08-19T00:13:30.9233063Z Starting container: e1cb2437d300_web-cybermat-prd.
+2025-08-19T00:13:30.9854505Z Starting watchers and probes.
+2025-08-19T00:13:30.9865092Z Starting metrics collection.
+2025-08-19T00:13:31.0235392Z Container is running.
+2025-08-19T00:13:31.3074724Z Container start method finished after 8345 ms.
+2025-08-19T00:13:51.2682908Z Container has finished running with exit code: 127.
+2025-08-19T00:13:51.2684067Z Container is terminating. Grace period: 5 seconds.
+2025-08-19T00:13:51.2696971Z Stop and delete container. Retry count = 0
+2025-08-19T00:13:51.2783508Z Stopping container: e1cb2437d300_web-cybermat-prd.
+2025-08-19T00:13:51.4283073Z Deleting container: e1cb2437d300_web-cybermat-prd. Retry count = 0
+2025-08-19T00:13:52.3922670Z Container spec TerminationMessagePolicy  path 
+2025-08-19T00:13:52.3935549Z Container is terminated. Total time elapsed: 1124 ms.
+2025-08-19T00:13:52.3946579Z Site container: web-cybermat-prd terminated during site startup.
+2025-08-19T00:13:52.4042464Z Site startup probe failed after 21.0150219 seconds.
+2025-08-19T00:13:52.4445975Z Failed to start site. Revert by stopping site.
+2025-08-19T00:13:52.4529801Z Site: web-cybermat-prd stopped.
+2025-08-19T00:13:54.2854217Z Site container: web-cybermat-prd_managedIdentity terminated during site startup.
+2025-08-19T00:13:54.2944404Z ManagedIdentity container failed to startup
+2025-08-19T00:13:54.8555717Z Site: web-cybermat-prd will be blocked for 2 minutes till 08/19/2025 00:15:54
+2025-08-19T00:14:08.1178409Z Start site prohibitted because the site is being blocked.
+2025-08-19T00:14:21.1251603Z Start site prohibitted because the site is being blocked.
+2025-08-19T00:14:25.4328161Z Start site prohibitted because the site is being blocked.
+2025-08-19T00:14:29.7600296Z Start site prohibitted because the site is being blocked.
+2025-08-19T00:14:33.8355344Z Start site prohibitted because the site is being blocked.
+2025-08-19T00:14:34.9925448Z Start site prohibitted because the site is being blocked.
+2025-08-19T00:14:36.2893003Z Start site prohibitted because the site is being blocked.
+2025-08-19T00:14:37.5797401Z Start site prohibitted because the site is being blocked.
+2025-08-19T00:14:38.8066476Z Start site prohibitted because the site is being blocked.
+2025-08-19T00:14:43.4493868Z Start site prohibitted because the site is being blocked.
+2025-08-19T00:14:48.1498330Z Start site prohibitted because the site is being blocked.
+2025-08-19T00:14:52.8249654Z Start site prohibitted because the site is being blocked.
+2025-08-19T00:15:05.0971058Z Start site prohibitted because the site is being blocked.
+2025-08-19T00:15:17.3075077Z Start site prohibitted because the site is being blocked.
+2025-08-19T00:15:29.5319844Z Start site prohibitted because the site is being blocked.
+2025-08-19T00:15:30.3124802Z Start site prohibitted because the site is being blocked.
+2025-08-19T00:15:31.5271815Z Start site prohibitted because the site is being blocked.
+2025-08-19T00:15:33.2292624Z Start site prohibitted because the site is being blocked.
+2025-08-19T00:15:34.9740985Z Start site prohibitted because the site is being blocked.
+2025-08-19T00:15:39.4663860Z Start site prohibitted because the site is being blocked.
+2025-08-19T00:15:39.9349434Z Start site prohibitted because the site is being blocked.
+2025-08-19T00:15:53.5492327Z Start site prohibitted because the site is being blocked.
+2025-08-19T00:15:53.8816610Z Start site prohibitted because the site is being blocked.
+2025-08-19T00:15:54.8603710Z Site: web-cybermat-prd is unblocked.
+2025-08-19T00:16:21.4847115Z Container start method called.
+2025-08-19T00:16:21.5031744Z Establishing network.
+2025-08-19T00:16:21.5033613Z Pulling image: appsvc/node:20-lts_20250724.2.tuxprod.
+2025-08-19T00:16:28.9889232Z Container is starting.
+2025-08-19T00:16:28.9974898Z Establishing user namespace if not established already.
+2025-08-19T00:16:28.9976645Z Establishing network if not established already.
+2025-08-19T00:16:28.9982657Z Mounting volumes.
+2025-08-19T00:16:28.9986887Z Nested mountpoint 
+2025-08-19T00:16:29.0583197Z Nested mountpoint volatile/logs
+2025-08-19T00:16:29.0784547Z Nested mountpoint 
+2025-08-19T00:16:29.1001401Z Nested mountpoint 
+2025-08-19T00:16:29.1299921Z Nested mountpoint 
+2025-08-19T00:16:30.4356557Z Creating container.
+2025-08-19T00:16:30.4365922Z Creating pipes for streaming container io.
+2025-08-19T00:16:30.4373386Z Creating stdout named pipe at /podr/container/pipe/a9b082ac4ba9_web-cybermat-prd/stdout_c388446660c64e1b9037ae9201c8e405.
+2025-08-19T00:16:30.4563004Z Successfully created stdout named pipe at: /podr/container/pipe/a9b082ac4ba9_web-cybermat-prd/stdout_c388446660c64e1b9037ae9201c8e405.
+2025-08-19T00:16:30.4569494Z Opening named pipe /podr/container/pipe/a9b082ac4ba9_web-cybermat-prd/stdout_c388446660c64e1b9037ae9201c8e405 for reading in non-blocking mode.
+2025-08-19T00:16:30.4575066Z Successfully opened named pipe: /podr/container/pipe/a9b082ac4ba9_web-cybermat-prd/stdout_c388446660c64e1b9037ae9201c8e405.
+2025-08-19T00:16:30.4646977Z Successfully removed non-blocking flag from /podr/container/pipe/a9b082ac4ba9_web-cybermat-prd/stdout_c388446660c64e1b9037ae9201c8e405.
+2025-08-19T00:16:30.4648646Z Creating stderr named pipe at /podr/container/pipe/a9b082ac4ba9_web-cybermat-prd/stderr_b06edc62ab1f44ed9c42e86a4f4e0806.
+2025-08-19T00:16:30.4650343Z Successfully created stderr named pipe at: /podr/container/pipe/a9b082ac4ba9_web-cybermat-prd/stderr_b06edc62ab1f44ed9c42e86a4f4e0806.
+2025-08-19T00:16:30.4651416Z Opening named pipe /podr/container/pipe/a9b082ac4ba9_web-cybermat-prd/stderr_b06edc62ab1f44ed9c42e86a4f4e0806 for reading in non-blocking mode.
+2025-08-19T00:16:30.4654368Z Successfully opened named pipe: /podr/container/pipe/a9b082ac4ba9_web-cybermat-prd/stderr_b06edc62ab1f44ed9c42e86a4f4e0806.
+2025-08-19T00:16:30.4656701Z Successfully removed non-blocking flag from /podr/container/pipe/a9b082ac4ba9_web-cybermat-prd/stderr_b06edc62ab1f44ed9c42e86a4f4e0806.
+2025-08-19T00:16:30.4658035Z Creating container with image: appsvc/node:20-lts_20250724.2.tuxprod from registry: mcr.microsoft.com and fully qualified image name: mcr.microsoft.com/appsvc/node:20-lts_20250724.2.tuxprod
+2025-08-19T00:16:31.2316770Z Starting container: a9b082ac4ba9_web-cybermat-prd.
+2025-08-19T00:16:31.2948110Z Starting watchers and probes.
+2025-08-19T00:16:31.3032604Z Starting metrics collection.
+2025-08-19T00:16:31.3039601Z Container is running.
+2025-08-19T00:16:31.5430197Z Container start method finished after 10050 ms.
+2025-08-19T00:16:52.4811220Z Container has finished running with exit code: 127.
+2025-08-19T00:16:52.4818867Z Container is terminating. Grace period: 5 seconds.
+2025-08-19T00:16:52.4842148Z Stop and delete container. Retry count = 0
+2025-08-19T00:16:52.4919916Z Stopping container: a9b082ac4ba9_web-cybermat-prd.
+2025-08-19T00:16:52.5534947Z Deleting container: a9b082ac4ba9_web-cybermat-prd. Retry count = 0
+2025-08-19T00:16:53.8573540Z Container spec TerminationMessagePolicy  path 
+2025-08-19T00:16:53.8579430Z Container is terminated. Total time elapsed: 1375 ms.
+2025-08-19T00:16:53.8584401Z Site container: web-cybermat-prd terminated during site startup.
+2025-08-19T00:16:53.8591641Z Site startup probe failed after 22.2522623 seconds.
+2025-08-19T00:16:53.8883841Z Failed to start site. Revert by stopping site.
+2025-08-19T00:16:53.9073673Z Site: web-cybermat-prd stopped.
+2025-08-19T00:16:55.8056186Z Site container: web-cybermat-prd_managedIdentity terminated during site startup.
+2025-08-19T00:16:55.8144444Z ManagedIdentity container failed to startup
+2025-08-19T00:16:56.3581858Z Site: web-cybermat-prd will be blocked for 2 minutes till 08/19/2025 00:18:56
+2025-08-19T00:16:56.8117346Z Start site prohibitted because the site is being blocked.
+2025-08-19T00:17:09.2933963Z Start site prohibitted because the site is being blocked.
+2025-08-19T00:17:09.5864036Z Start site prohibitted because the site is being blocked.
+2025-08-19T00:17:15.5885588Z Start site prohibitted because the site is being blocked.
+2025-08-19T00:17:15.8906171Z Start site prohibitted because the site is being blocked.
+2025-08-19T00:17:21.4345322Z Start site prohibitted because the site is being blocked.
+2025-08-19T00:17:21.7001952Z Start site prohibitted because the site is being blocked.
+2025-08-19T00:17:25.8319655Z Start site prohibitted because the site is being blocked.
+2025-08-19T00:17:29.6597701Z Start site prohibitted because the site is being blocked.
+2025-08-19T00:17:30.8286518Z Start site prohibitted because the site is being blocked.
+2025-08-19T00:17:33.1688105Z Start site prohibitted because the site is being blocked.
+2025-08-19T00:17:33.4519771Z Start site prohibitted because the site is being blocked.
+2025-08-19T00:17:34.4883830Z Start site prohibitted because the site is being blocked.
+2025-08-19T00:17:34.7113092Z Start site prohibitted because the site is being blocked.
+2025-08-19T00:17:40.3754999Z Start site prohibitted because the site is being blocked.
+2025-08-19T00:17:40.6784572Z Start site prohibitted because the site is being blocked.
+2025-08-19T00:17:46.4919715Z Start site prohibitted because the site is being blocked.
+2025-08-19T00:17:46.7850782Z Start site prohibitted because the site is being blocked.
+2025-08-19T00:17:52.3233177Z Start site prohibitted because the site is being blocked.
+2025-08-19T00:17:52.6186264Z Start site prohibitted because the site is being blocked.
+2025-08-19T00:18:06.7075752Z Start site prohibitted because the site is being blocked.
+2025-08-19T00:18:06.9493482Z Start site prohibitted because the site is being blocked.
+2025-08-19T00:18:20.3034961Z Start site prohibitted because the site is being blocked.
+2025-08-19T00:18:20.6151416Z Start site prohibitted because the site is being blocked.
+2025-08-19T00:18:33.6432966Z Start site prohibitted because the site is being blocked.
+2025-08-19T00:18:33.9673014Z Start site prohibitted because the site is being blocked.
+2025-08-19T00:18:34.6521838Z Start site prohibitted because the site is being blocked.
+2025-08-19T00:18:34.9256430Z Start site prohibitted because the site is being blocked.
+2025-08-19T00:18:36.0182399Z Start site prohibitted because the site is being blocked.
+2025-08-19T00:18:36.3624245Z Start site prohibitted because the site is being blocked.
+2025-08-19T00:18:37.8500339Z Start site prohibitted because the site is being blocked.
+2025-08-19T00:18:39.6453774Z Start site prohibitted because the site is being blocked.
+2025-08-19T00:18:42.6654885Z Start site prohibitted because the site is being blocked.
+2025-08-19T00:18:43.2605694Z Start site prohibitted because the site is being blocked.
+2025-08-19T00:18:43.8031681Z Start site prohibitted because the site is being blocked.
+2025-08-19T00:18:44.5396647Z Start site prohibitted because the site is being blocked.
+2025-08-19T00:18:45.2108609Z Start site prohibitted because the site is being blocked.
+2025-08-19T00:18:45.8246595Z Start site prohibitted because the site is being blocked.
+2025-08-19T00:18:46.3365925Z Start site prohibitted because the site is being blocked.
+2025-08-19T00:18:56.3500517Z Site: web-cybermat-prd is unblocked.
+2025-08-19T00:20:44.8599873Z Container start method called.
+2025-08-19T00:20:44.8612301Z Establishing network.
+2025-08-19T00:20:44.8625266Z Pulling image: appsvc/node:20-lts_20250724.2.tuxprod.
+2025-08-19T00:20:49.6356882Z Container is starting.
+2025-08-19T00:20:49.6364063Z Establishing user namespace if not established already.
+2025-08-19T00:20:49.6369409Z Establishing network if not established already.
+2025-08-19T00:20:49.6373348Z Mounting volumes.
+2025-08-19T00:20:49.6451024Z Nested mountpoint 
+2025-08-19T00:20:49.6664837Z Nested mountpoint volatile/logs
+2025-08-19T00:20:49.6973666Z Nested mountpoint 
+2025-08-19T00:20:49.7066111Z Nested mountpoint 
+2025-08-19T00:20:49.7574684Z Nested mountpoint 
+2025-08-19T00:20:50.5097511Z Creating container.
+2025-08-19T00:20:50.5101495Z Creating pipes for streaming container io.
+2025-08-19T00:20:50.5106816Z Creating stdout named pipe at /podr/container/pipe/96c19e21cd6e_web-cybermat-prd/stdout_93da0e3f68ba435abfa1e9967edb100a.
+2025-08-19T00:20:50.5113064Z Successfully created stdout named pipe at: /podr/container/pipe/96c19e21cd6e_web-cybermat-prd/stdout_93da0e3f68ba435abfa1e9967edb100a.
+2025-08-19T00:20:50.5119229Z Opening named pipe /podr/container/pipe/96c19e21cd6e_web-cybermat-prd/stdout_93da0e3f68ba435abfa1e9967edb100a for reading in non-blocking mode.
+2025-08-19T00:20:50.5191397Z Successfully opened named pipe: /podr/container/pipe/96c19e21cd6e_web-cybermat-prd/stdout_93da0e3f68ba435abfa1e9967edb100a.
+2025-08-19T00:20:50.5196997Z Successfully removed non-blocking flag from /podr/container/pipe/96c19e21cd6e_web-cybermat-prd/stdout_93da0e3f68ba435abfa1e9967edb100a.
+2025-08-19T00:20:50.5200473Z Creating stderr named pipe at /podr/container/pipe/96c19e21cd6e_web-cybermat-prd/stderr_09f79c9f63b347e68a39c89b0dd8bcbe.
+2025-08-19T00:20:50.5205273Z Successfully created stderr named pipe at: /podr/container/pipe/96c19e21cd6e_web-cybermat-prd/stderr_09f79c9f63b347e68a39c89b0dd8bcbe.
+2025-08-19T00:20:50.5209748Z Opening named pipe /podr/container/pipe/96c19e21cd6e_web-cybermat-prd/stderr_09f79c9f63b347e68a39c89b0dd8bcbe for reading in non-blocking mode.
+2025-08-19T00:20:50.5214297Z Successfully opened named pipe: /podr/container/pipe/96c19e21cd6e_web-cybermat-prd/stderr_09f79c9f63b347e68a39c89b0dd8bcbe.
+2025-08-19T00:20:50.5218460Z Successfully removed non-blocking flag from /podr/container/pipe/96c19e21cd6e_web-cybermat-prd/stderr_09f79c9f63b347e68a39c89b0dd8bcbe.
+2025-08-19T00:20:50.5291811Z Creating container with image: appsvc/node:20-lts_20250724.2.tuxprod from registry: mcr.microsoft.com and fully qualified image name: mcr.microsoft.com/appsvc/node:20-lts_20250724.2.tuxprod
+2025-08-19T00:20:51.2810787Z Starting container: 96c19e21cd6e_web-cybermat-prd.
+2025-08-19T00:20:51.3521682Z Starting watchers and probes.
+2025-08-19T00:20:51.3606923Z Starting metrics collection.
+2025-08-19T00:20:51.3618266Z Container is running.
+2025-08-19T00:20:51.5036676Z Container start method finished after 6642 ms.
+2025-08-19T00:21:14.9809151Z Container has finished running with exit code: 127.
+2025-08-19T00:21:14.9810296Z Container is terminating. Grace period: 5 seconds.
+2025-08-19T00:21:15.0016238Z Stop and delete container. Retry count = 0
+2025-08-19T00:21:15.0091735Z Stopping container: 96c19e21cd6e_web-cybermat-prd.
+2025-08-19T00:21:15.0714088Z Deleting container: 96c19e21cd6e_web-cybermat-prd. Retry count = 0
+2025-08-19T00:21:15.7891972Z Container spec TerminationMessagePolicy  path 
+2025-08-19T00:21:15.7961427Z Container is terminated. Total time elapsed: 795 ms.
+2025-08-19T00:21:15.7984245Z Site container: web-cybermat-prd terminated during site startup.
+2025-08-19T00:21:15.8003009Z Site startup probe failed after 24.2675329 seconds.
+2025-08-19T00:21:15.8688377Z Failed to start site. Revert by stopping site.
+2025-08-19T00:21:15.8715715Z Site: web-cybermat-prd stopped.
+2025-08-19T00:21:17.5303997Z Site container: web-cybermat-prd_managedIdentity terminated during site startup.
+2025-08-19T00:21:17.5395510Z ManagedIdentity container failed to startup
+2025-08-19T00:21:18.1104839Z Site: web-cybermat-prd will be blocked for 2 minutes till 08/19/2025 00:23:18
+2025-08-19T00:23:18.1046916Z Site: web-cybermat-prd is unblocked.
+2025-08-19T00:30:55.9760169Z Container start method called.
+2025-08-19T00:30:55.9767859Z Establishing network.
+2025-08-19T00:30:55.9773465Z Pulling image: appsvc/node:20-lts_20250724.2.tuxprod.
+2025-08-19T00:31:02.2562529Z Container is starting.
+2025-08-19T00:31:02.2570619Z Establishing user namespace if not established already.
+2025-08-19T00:31:02.2576669Z Establishing network if not established already.
+2025-08-19T00:31:02.2581873Z Mounting volumes.
+2025-08-19T00:31:02.2661978Z Nested mountpoint 
+2025-08-19T00:31:02.3066707Z Nested mountpoint volatile/logs
+2025-08-19T00:31:02.3182666Z Nested mountpoint 
+2025-08-19T00:31:02.3662625Z Nested mountpoint 
+2025-08-19T00:31:02.3686155Z Nested mountpoint 
+2025-08-19T00:31:04.0948184Z Creating container.
+2025-08-19T00:31:04.1037747Z Creating pipes for streaming container io.
+2025-08-19T00:31:04.1044585Z Creating stdout named pipe at /podr/container/pipe/fc03d1edc900_web-cybermat-prd/stdout_46a208df5a844698a07fd0f594e0114f.
+2025-08-19T00:31:04.1051242Z Successfully created stdout named pipe at: /podr/container/pipe/fc03d1edc900_web-cybermat-prd/stdout_46a208df5a844698a07fd0f594e0114f.
+2025-08-19T00:31:04.1137665Z Opening named pipe /podr/container/pipe/fc03d1edc900_web-cybermat-prd/stdout_46a208df5a844698a07fd0f594e0114f for reading in non-blocking mode.
+2025-08-19T00:31:04.1142132Z Successfully opened named pipe: /podr/container/pipe/fc03d1edc900_web-cybermat-prd/stdout_46a208df5a844698a07fd0f594e0114f.
+2025-08-19T00:31:04.1149321Z Successfully removed non-blocking flag from /podr/container/pipe/fc03d1edc900_web-cybermat-prd/stdout_46a208df5a844698a07fd0f594e0114f.
+2025-08-19T00:31:04.1153378Z Creating stderr named pipe at /podr/container/pipe/fc03d1edc900_web-cybermat-prd/stderr_520906a2cea243679da59ac7374821fb.
+2025-08-19T00:31:04.1160062Z Successfully created stderr named pipe at: /podr/container/pipe/fc03d1edc900_web-cybermat-prd/stderr_520906a2cea243679da59ac7374821fb.
+2025-08-19T00:31:04.1232306Z Opening named pipe /podr/container/pipe/fc03d1edc900_web-cybermat-prd/stderr_520906a2cea243679da59ac7374821fb for reading in non-blocking mode.
+2025-08-19T00:31:04.1240350Z Successfully opened named pipe: /podr/container/pipe/fc03d1edc900_web-cybermat-prd/stderr_520906a2cea243679da59ac7374821fb.
+2025-08-19T00:31:04.1244217Z Successfully removed non-blocking flag from /podr/container/pipe/fc03d1edc900_web-cybermat-prd/stderr_520906a2cea243679da59ac7374821fb.
+2025-08-19T00:31:04.1248300Z Creating container with image: appsvc/node:20-lts_20250724.2.tuxprod from registry: mcr.microsoft.com and fully qualified image name: mcr.microsoft.com/appsvc/node:20-lts_20250724.2.tuxprod
+2025-08-19T00:31:04.8062053Z Starting container: fc03d1edc900_web-cybermat-prd.
+2025-08-19T00:31:04.8995554Z Starting watchers and probes.
+2025-08-19T00:31:04.9025638Z Starting metrics collection.
+2025-08-19T00:31:04.9206730Z Container is running.
+2025-08-19T00:31:05.0323499Z Container start method finished after 9055 ms.
+2025-08-19T00:31:26.7284876Z Container has finished running with exit code: 127.
+2025-08-19T00:31:26.7286731Z Container is terminating. Grace period: 5 seconds.
+2025-08-19T00:31:26.7489105Z Stop and delete container. Retry count = 0
+2025-08-19T00:31:26.7490406Z Stopping container: fc03d1edc900_web-cybermat-prd.
+2025-08-19T00:31:26.8113040Z Container get mounts received unexpected exception.
+2025-08-19T00:31:26.8312137Z Container get mounts received unexpected exception.
+2025-08-19T00:31:27.0010845Z Deleting container: fc03d1edc900_web-cybermat-prd. Retry count = 0
+2025-08-19T00:31:28.0940693Z Container spec TerminationMessagePolicy  path 
+2025-08-19T00:31:28.0947158Z Container is terminated. Total time elapsed: 1345 ms.
+2025-08-19T00:31:28.0953659Z Site container: web-cybermat-prd terminated during site startup.
+2025-08-19T00:31:28.0963385Z Site startup probe failed after 22.993689 seconds.
+2025-08-19T00:31:28.7117763Z Failed to start site. Revert by stopping site.
+2025-08-19T00:31:28.7156205Z Site: web-cybermat-prd stopped.
+2025-08-19T00:46:40.7506342Z Container start method called.
+2025-08-19T00:46:40.7507765Z Establishing network.
+2025-08-19T00:46:40.7509200Z Pulling image: appsvc/node:20-lts_20250724.2.tuxprod.
+2025-08-19T00:46:45.8292973Z Container is starting.
+2025-08-19T00:46:45.8296001Z Establishing user namespace if not established already.
+2025-08-19T00:46:45.8303358Z Establishing network if not established already.
+2025-08-19T00:46:45.8307558Z Mounting volumes.
+2025-08-19T00:46:45.8312972Z Nested mountpoint 
+2025-08-19T00:46:45.8604112Z Nested mountpoint volatile/logs
+2025-08-19T00:46:45.9094149Z Nested mountpoint 
+2025-08-19T00:46:45.9493139Z Nested mountpoint 
+2025-08-19T00:46:45.9712136Z Nested mountpoint 
+2025-08-19T00:46:47.3286466Z Creating container.
+2025-08-19T00:46:47.3289188Z Creating pipes for streaming container io.
+2025-08-19T00:46:47.3290426Z Creating stdout named pipe at /podr/container/pipe/31f894bd0b29_web-cybermat-prd/stdout_d3268cd55f6e4b8b93ac1e9d26de7225.
+2025-08-19T00:46:47.3475326Z Successfully created stdout named pipe at: /podr/container/pipe/31f894bd0b29_web-cybermat-prd/stdout_d3268cd55f6e4b8b93ac1e9d26de7225.
+2025-08-19T00:46:47.3484240Z Opening named pipe /podr/container/pipe/31f894bd0b29_web-cybermat-prd/stdout_d3268cd55f6e4b8b93ac1e9d26de7225 for reading in non-blocking mode.
+2025-08-19T00:46:47.3499108Z Successfully opened named pipe: /podr/container/pipe/31f894bd0b29_web-cybermat-prd/stdout_d3268cd55f6e4b8b93ac1e9d26de7225.
+2025-08-19T00:46:47.3673325Z Successfully removed non-blocking flag from /podr/container/pipe/31f894bd0b29_web-cybermat-prd/stdout_d3268cd55f6e4b8b93ac1e9d26de7225.
+2025-08-19T00:46:47.3680058Z Creating stderr named pipe at /podr/container/pipe/31f894bd0b29_web-cybermat-prd/stderr_57d7a74d1da746c794d46fec15cf4bac.
+2025-08-19T00:46:47.3686154Z Successfully created stderr named pipe at: /podr/container/pipe/31f894bd0b29_web-cybermat-prd/stderr_57d7a74d1da746c794d46fec15cf4bac.
+2025-08-19T00:46:47.3691392Z Opening named pipe /podr/container/pipe/31f894bd0b29_web-cybermat-prd/stderr_57d7a74d1da746c794d46fec15cf4bac for reading in non-blocking mode.
+2025-08-19T00:46:47.3696815Z Successfully opened named pipe: /podr/container/pipe/31f894bd0b29_web-cybermat-prd/stderr_57d7a74d1da746c794d46fec15cf4bac.
+2025-08-19T00:46:47.3702202Z Successfully removed non-blocking flag from /podr/container/pipe/31f894bd0b29_web-cybermat-prd/stderr_57d7a74d1da746c794d46fec15cf4bac.
+2025-08-19T00:46:47.3897827Z Creating container with image: appsvc/node:20-lts_20250724.2.tuxprod from registry: mcr.microsoft.com and fully qualified image name: mcr.microsoft.com/appsvc/node:20-lts_20250724.2.tuxprod
+2025-08-19T00:46:48.6154295Z Starting container: 31f894bd0b29_web-cybermat-prd.
+2025-08-19T00:46:48.6982521Z Starting watchers and probes.
+2025-08-19T00:46:48.7087718Z Starting metrics collection.
+2025-08-19T00:46:48.7177092Z Container is running.
+2025-08-19T00:46:48.7782892Z Container start method finished after 8027 ms.
+2025-08-19T00:47:31.2605392Z Container has finished running with exit code: 127.
+2025-08-19T00:47:31.2608425Z Container is terminating. Grace period: 5 seconds.
+2025-08-19T00:47:31.4207228Z Stop and delete container. Retry count = 0
+2025-08-19T00:47:31.4213191Z Stopping container: 31f894bd0b29_web-cybermat-prd.
+2025-08-19T00:47:31.7834946Z Deleting container: 31f894bd0b29_web-cybermat-prd. Retry count = 0
+2025-08-19T00:47:33.1914058Z Container spec TerminationMessagePolicy  path 
+2025-08-19T00:47:33.1926894Z Container is terminated. Total time elapsed: 1909 ms.
+2025-08-19T00:47:33.1927790Z Site container: web-cybermat-prd terminated during site startup.
+2025-08-19T00:47:33.2221111Z Site startup probe failed after 44.3822405 seconds.
+2025-08-19T00:47:33.7143805Z Failed to start site. Revert by stopping site.
+2025-08-19T00:47:33.7651348Z Site: web-cybermat-prd stopped.
+2025-08-19T00:47:36.6081690Z Site container: web-cybermat-prd_managedIdentity terminated during site startup.
+2025-08-19T00:47:36.6563752Z ManagedIdentity container failed to startup
+2025-08-19T00:47:52.7369049Z Container start method called.
+2025-08-19T00:47:52.7382772Z Establishing network.
+2025-08-19T00:47:52.7563421Z Pulling image: appsvc/node:20-lts_20250724.2.tuxprod.
+2025-08-19T00:47:59.7006376Z Container is starting.
+2025-08-19T00:47:59.7079180Z Establishing user namespace if not established already.
+2025-08-19T00:47:59.7082394Z Establishing network if not established already.
+2025-08-19T00:47:59.7087945Z Mounting volumes.
+2025-08-19T00:47:59.7092253Z Nested mountpoint 
+2025-08-19T00:47:59.7285641Z Nested mountpoint volatile/logs
+2025-08-19T00:47:59.7501750Z Nested mountpoint 
+2025-08-19T00:47:59.7809641Z Nested mountpoint 
+2025-08-19T00:47:59.8206388Z Nested mountpoint 
+2025-08-19T00:48:02.5577059Z Creating container.
+2025-08-19T00:48:02.6165779Z Creating pipes for streaming container io.
+2025-08-19T00:48:02.6272976Z Creating stdout named pipe at /podr/container/pipe/364e4ea63053_web-cybermat-prd/stdout_005e5a430134404a941e2e3f412ef16d.
+2025-08-19T00:48:02.6279167Z Successfully created stdout named pipe at: /podr/container/pipe/364e4ea63053_web-cybermat-prd/stdout_005e5a430134404a941e2e3f412ef16d.
+2025-08-19T00:48:02.6967917Z Opening named pipe /podr/container/pipe/364e4ea63053_web-cybermat-prd/stdout_005e5a430134404a941e2e3f412ef16d for reading in non-blocking mode.
+2025-08-19T00:48:02.6981702Z Successfully opened named pipe: /podr/container/pipe/364e4ea63053_web-cybermat-prd/stdout_005e5a430134404a941e2e3f412ef16d.
+2025-08-19T00:48:02.7359257Z Successfully removed non-blocking flag from /podr/container/pipe/364e4ea63053_web-cybermat-prd/stdout_005e5a430134404a941e2e3f412ef16d.
+2025-08-19T00:48:02.7370881Z Creating stderr named pipe at /podr/container/pipe/364e4ea63053_web-cybermat-prd/stderr_2b272814566940a2a0401e88f27f074c.
+2025-08-19T00:48:02.7379856Z Successfully created stderr named pipe at: /podr/container/pipe/364e4ea63053_web-cybermat-prd/stderr_2b272814566940a2a0401e88f27f074c.
+2025-08-19T00:48:02.7454346Z Opening named pipe /podr/container/pipe/364e4ea63053_web-cybermat-prd/stderr_2b272814566940a2a0401e88f27f074c for reading in non-blocking mode.
+2025-08-19T00:48:02.7463383Z Successfully opened named pipe: /podr/container/pipe/364e4ea63053_web-cybermat-prd/stderr_2b272814566940a2a0401e88f27f074c.
+2025-08-19T00:48:02.7470396Z Successfully removed non-blocking flag from /podr/container/pipe/364e4ea63053_web-cybermat-prd/stderr_2b272814566940a2a0401e88f27f074c.
+2025-08-19T00:48:02.7476665Z Creating container with image: appsvc/node:20-lts_20250724.2.tuxprod from registry: mcr.microsoft.com and fully qualified image name: mcr.microsoft.com/appsvc/node:20-lts_20250724.2.tuxprod
+2025-08-19T00:48:04.2146863Z Starting container: 364e4ea63053_web-cybermat-prd.
+2025-08-19T00:48:04.3657067Z Starting watchers and probes.
+2025-08-19T00:48:04.3667765Z Starting metrics collection.
+2025-08-19T00:48:04.3956288Z Container is running.
+2025-08-19T00:48:06.3568006Z Container start method finished after 13588 ms.
+2025-08-19T00:48:26.1454068Z Container has finished running with exit code: 127.
+2025-08-19T00:48:26.1466495Z Container is terminating. Grace period: 5 seconds.
+2025-08-19T00:48:26.1547023Z Stop and delete container. Retry count = 0
+2025-08-19T00:48:26.1557244Z Stopping container: 364e4ea63053_web-cybermat-prd.
+2025-08-19T00:48:26.2068727Z Deleting container: 364e4ea63053_web-cybermat-prd. Retry count = 0
+2025-08-19T00:48:26.7859488Z Container get mounts received unexpected exception.
+2025-08-19T00:48:26.8354867Z Container get mounts received unexpected exception.
+2025-08-19T00:48:26.8456210Z Container get processes received unexpected exception.
+2025-08-19T00:48:26.8568816Z Container get processes received unexpected exception.
+2025-08-19T00:48:26.9874020Z Container spec TerminationMessagePolicy  path 
+2025-08-19T00:48:26.9880981Z Container is terminated. Total time elapsed: 840 ms.
+2025-08-19T00:48:26.9887056Z Site container: web-cybermat-prd terminated during site startup.
+2025-08-19T00:48:26.9894524Z Site startup probe failed after 20.6123233 seconds.
+2025-08-19T00:48:27.9528855Z Failed to start site. Revert by stopping site.
+2025-08-19T00:48:27.9623910Z Site: web-cybermat-prd stopped.
+2025-08-19T01:08:08.9129338Z Container start method called.
+2025-08-19T01:08:08.9218579Z Establishing network.
+2025-08-19T01:08:08.9221062Z Pulling image: appsvc/node:20-lts_20250724.2.tuxprod.
+2025-08-19T01:08:15.0152980Z Container is starting.
+2025-08-19T01:08:15.0158340Z Establishing user namespace if not established already.
+2025-08-19T01:08:15.0162770Z Establishing network if not established already.
+2025-08-19T01:08:15.0167379Z Mounting volumes.
+2025-08-19T01:08:15.0173603Z Nested mountpoint 
+2025-08-19T01:08:15.0552026Z Nested mountpoint volatile/logs
+2025-08-19T01:08:15.0759081Z Nested mountpoint 
+2025-08-19T01:08:15.1259412Z Nested mountpoint 
+2025-08-19T01:08:15.1466595Z Nested mountpoint 
+2025-08-19T01:08:16.1733328Z Creating container.
+2025-08-19T01:08:16.1815309Z Creating pipes for streaming container io.
+2025-08-19T01:08:16.1829192Z Creating stdout named pipe at /podr/container/pipe/f02ffaf4fc1d_web-cybermat-prd/stdout_41698dcab16a4ee391ba582e659a812c.
+2025-08-19T01:08:16.1837399Z Successfully created stdout named pipe at: /podr/container/pipe/f02ffaf4fc1d_web-cybermat-prd/stdout_41698dcab16a4ee391ba582e659a812c.
+2025-08-19T01:08:16.1909994Z Opening named pipe /podr/container/pipe/f02ffaf4fc1d_web-cybermat-prd/stdout_41698dcab16a4ee391ba582e659a812c for reading in non-blocking mode.
+2025-08-19T01:08:16.1915789Z Successfully opened named pipe: /podr/container/pipe/f02ffaf4fc1d_web-cybermat-prd/stdout_41698dcab16a4ee391ba582e659a812c.
+2025-08-19T01:08:16.1920139Z Successfully removed non-blocking flag from /podr/container/pipe/f02ffaf4fc1d_web-cybermat-prd/stdout_41698dcab16a4ee391ba582e659a812c.
+2025-08-19T01:08:16.1924615Z Creating stderr named pipe at /podr/container/pipe/f02ffaf4fc1d_web-cybermat-prd/stderr_145f4bf48d9c4533942482322c5235cb.
+2025-08-19T01:08:16.1929610Z Successfully created stderr named pipe at: /podr/container/pipe/f02ffaf4fc1d_web-cybermat-prd/stderr_145f4bf48d9c4533942482322c5235cb.
+2025-08-19T01:08:16.1933695Z Opening named pipe /podr/container/pipe/f02ffaf4fc1d_web-cybermat-prd/stderr_145f4bf48d9c4533942482322c5235cb for reading in non-blocking mode.
+2025-08-19T01:08:16.1938134Z Successfully opened named pipe: /podr/container/pipe/f02ffaf4fc1d_web-cybermat-prd/stderr_145f4bf48d9c4533942482322c5235cb.
+2025-08-19T01:08:16.2018020Z Successfully removed non-blocking flag from /podr/container/pipe/f02ffaf4fc1d_web-cybermat-prd/stderr_145f4bf48d9c4533942482322c5235cb.
+2025-08-19T01:08:16.2028273Z Creating container with image: appsvc/node:20-lts_20250724.2.tuxprod from registry: mcr.microsoft.com and fully qualified image name: mcr.microsoft.com/appsvc/node:20-lts_20250724.2.tuxprod
+2025-08-19T01:08:17.7115823Z Starting container: f02ffaf4fc1d_web-cybermat-prd.
+2025-08-19T01:08:17.8224810Z Starting watchers and probes.
+2025-08-19T01:08:17.8352211Z Starting metrics collection.
+2025-08-19T01:08:17.8634965Z Container is running.
+2025-08-19T01:08:18.1265268Z Container start method finished after 9212 ms.
+2025-08-19T01:08:41.6348246Z Container has finished running with exit code: 1.
+2025-08-19T01:08:41.6361660Z Container is terminating. Grace period: 5 seconds.
+2025-08-19T01:08:41.6475173Z Stop and delete container. Retry count = 0
+2025-08-19T01:08:41.6481688Z Stopping container: f02ffaf4fc1d_web-cybermat-prd.
+2025-08-19T01:08:41.7672721Z Deleting container: f02ffaf4fc1d_web-cybermat-prd. Retry count = 0
+2025-08-19T01:08:42.9691732Z Container spec TerminationMessagePolicy  path 
+2025-08-19T01:08:42.9888820Z Container is terminated. Total time elapsed: 1341 ms.
+2025-08-19T01:08:42.9910178Z Site container: web-cybermat-prd terminated during site startup.
+2025-08-19T01:08:43.0000358Z Site startup probe failed after 24.7841898 seconds.
+2025-08-19T01:08:43.1414681Z Failed to start site. Revert by stopping site.
+2025-08-19T01:08:43.1903426Z Site: web-cybermat-prd stopped.
+2025-08-19T01:08:45.3025590Z Site container: web-cybermat-prd_managedIdentity terminated during site startup.
+2025-08-19T01:08:45.3720487Z ManagedIdentity container failed to startup
+2025-08-19T01:09:26.3214261Z Container start method called.
+2025-08-19T01:09:26.3402496Z Establishing network.
+2025-08-19T01:09:26.3416886Z Pulling image: appsvc/node:20-lts_20250724.2.tuxprod.
+2025-08-19T01:09:31.7885777Z Container is starting.
+2025-08-19T01:09:31.7967879Z Establishing user namespace if not established already.
+2025-08-19T01:09:31.7973939Z Establishing network if not established already.
+2025-08-19T01:09:31.7978888Z Mounting volumes.
+2025-08-19T01:09:31.7984198Z Nested mountpoint 
+2025-08-19T01:09:31.8384408Z Nested mountpoint volatile/logs
+2025-08-19T01:09:31.8670146Z Nested mountpoint 
+2025-08-19T01:09:31.8778134Z Nested mountpoint 
+2025-08-19T01:09:31.9502614Z Nested mountpoint 
+2025-08-19T01:09:32.8940491Z Creating container.
+2025-08-19T01:09:32.8942997Z Creating pipes for streaming container io.
+2025-08-19T01:09:32.8945299Z Creating stdout named pipe at /podr/container/pipe/87994240fbc9_web-cybermat-prd/stdout_7b06689544994f23aca0399834de0ffe.
+2025-08-19T01:09:32.8951077Z Successfully created stdout named pipe at: /podr/container/pipe/87994240fbc9_web-cybermat-prd/stdout_7b06689544994f23aca0399834de0ffe.
+2025-08-19T01:09:32.8953621Z Opening named pipe /podr/container/pipe/87994240fbc9_web-cybermat-prd/stdout_7b06689544994f23aca0399834de0ffe for reading in non-blocking mode.
+2025-08-19T01:09:32.8955144Z Successfully opened named pipe: /podr/container/pipe/87994240fbc9_web-cybermat-prd/stdout_7b06689544994f23aca0399834de0ffe.
+2025-08-19T01:09:32.8958361Z Successfully removed non-blocking flag from /podr/container/pipe/87994240fbc9_web-cybermat-prd/stdout_7b06689544994f23aca0399834de0ffe.
+2025-08-19T01:09:32.8960700Z Creating stderr named pipe at /podr/container/pipe/87994240fbc9_web-cybermat-prd/stderr_09e1b7a8e7184fa2a0f5f57e09113200.
+2025-08-19T01:09:32.8962476Z Successfully created stderr named pipe at: /podr/container/pipe/87994240fbc9_web-cybermat-prd/stderr_09e1b7a8e7184fa2a0f5f57e09113200.
+2025-08-19T01:09:32.9456381Z Opening named pipe /podr/container/pipe/87994240fbc9_web-cybermat-prd/stderr_09e1b7a8e7184fa2a0f5f57e09113200 for reading in non-blocking mode.
+2025-08-19T01:09:32.9464005Z Successfully opened named pipe: /podr/container/pipe/87994240fbc9_web-cybermat-prd/stderr_09e1b7a8e7184fa2a0f5f57e09113200.
+2025-08-19T01:09:32.9548958Z Successfully removed non-blocking flag from /podr/container/pipe/87994240fbc9_web-cybermat-prd/stderr_09e1b7a8e7184fa2a0f5f57e09113200.
+2025-08-19T01:09:32.9551347Z Creating container with image: appsvc/node:20-lts_20250724.2.tuxprod from registry: mcr.microsoft.com and fully qualified image name: mcr.microsoft.com/appsvc/node:20-lts_20250724.2.tuxprod
+2025-08-19T01:09:33.5496066Z Starting container: 87994240fbc9_web-cybermat-prd.
+2025-08-19T01:09:33.6199606Z Starting watchers and probes.
+2025-08-19T01:09:33.6411131Z Starting metrics collection.
+2025-08-19T01:09:33.6430712Z Container is running.
+2025-08-19T01:09:34.8178407Z Container start method finished after 8495 ms.
+2025-08-19T01:09:55.6007701Z Container has finished running with exit code: 1.
+2025-08-19T01:09:55.6008720Z Container is terminating. Grace period: 5 seconds.
+2025-08-19T01:09:55.6011124Z Stop and delete container. Retry count = 0
+2025-08-19T01:09:55.6011945Z Stopping container: 87994240fbc9_web-cybermat-prd.
+2025-08-19T01:09:55.6819001Z Deleting container: 87994240fbc9_web-cybermat-prd. Retry count = 0
+2025-08-19T01:09:56.5607622Z Container spec TerminationMessagePolicy  path 
+2025-08-19T01:09:56.5608986Z Container is terminated. Total time elapsed: 959 ms.
+2025-08-19T01:09:56.5609835Z Site container: web-cybermat-prd terminated during site startup.
+2025-08-19T01:09:56.5611450Z Site startup probe failed after 21.653881 seconds.
+2025-08-19T01:09:56.5784705Z Failed to start site. Revert by stopping site.
+2025-08-19T01:09:56.5979045Z Site: web-cybermat-prd stopped.
+2025-08-19T01:10:42.4771006Z Container start method called.
+2025-08-19T01:10:42.4773922Z Establishing network.
+2025-08-19T01:10:42.4775394Z Pulling image: appsvc/node:20-lts_20250724.2.tuxprod.
+2025-08-19T01:10:49.3820620Z Container is starting.
+2025-08-19T01:10:49.3824678Z Establishing user namespace if not established already.
+2025-08-19T01:10:49.3914396Z Establishing network if not established already.
+2025-08-19T01:10:49.3920641Z Mounting volumes.
+2025-08-19T01:10:49.3926899Z Nested mountpoint 
+2025-08-19T01:10:49.4127420Z Nested mountpoint volatile/logs
+2025-08-19T01:10:49.4244112Z Nested mountpoint 
+2025-08-19T01:10:49.4547120Z Nested mountpoint 
+2025-08-19T01:10:49.5227861Z Nested mountpoint 
+2025-08-19T01:10:50.7495009Z Creating container.
+2025-08-19T01:10:50.7505012Z Creating pipes for streaming container io.
+2025-08-19T01:10:50.7513293Z Creating stdout named pipe at /podr/container/pipe/1a4a8128324f_web-cybermat-prd/stdout_3df37127452c4117af4c5a7b4f694dac.
+2025-08-19T01:10:50.7588053Z Successfully created stdout named pipe at: /podr/container/pipe/1a4a8128324f_web-cybermat-prd/stdout_3df37127452c4117af4c5a7b4f694dac.
+2025-08-19T01:10:50.7600864Z Opening named pipe /podr/container/pipe/1a4a8128324f_web-cybermat-prd/stdout_3df37127452c4117af4c5a7b4f694dac for reading in non-blocking mode.
+2025-08-19T01:10:50.7612887Z Successfully opened named pipe: /podr/container/pipe/1a4a8128324f_web-cybermat-prd/stdout_3df37127452c4117af4c5a7b4f694dac.
+2025-08-19T01:10:50.7688081Z Successfully removed non-blocking flag from /podr/container/pipe/1a4a8128324f_web-cybermat-prd/stdout_3df37127452c4117af4c5a7b4f694dac.
+2025-08-19T01:10:50.7695131Z Creating stderr named pipe at /podr/container/pipe/1a4a8128324f_web-cybermat-prd/stderr_dbfd1eb1b348409299df32e8399ce5a6.
+2025-08-19T01:10:50.7702540Z Successfully created stderr named pipe at: /podr/container/pipe/1a4a8128324f_web-cybermat-prd/stderr_dbfd1eb1b348409299df32e8399ce5a6.
+2025-08-19T01:10:50.7709868Z Opening named pipe /podr/container/pipe/1a4a8128324f_web-cybermat-prd/stderr_dbfd1eb1b348409299df32e8399ce5a6 for reading in non-blocking mode.
+2025-08-19T01:10:50.7716128Z Successfully opened named pipe: /podr/container/pipe/1a4a8128324f_web-cybermat-prd/stderr_dbfd1eb1b348409299df32e8399ce5a6.
+2025-08-19T01:10:50.7791574Z Successfully removed non-blocking flag from /podr/container/pipe/1a4a8128324f_web-cybermat-prd/stderr_dbfd1eb1b348409299df32e8399ce5a6.
+2025-08-19T01:10:50.7799174Z Creating container with image: appsvc/node:20-lts_20250724.2.tuxprod from registry: mcr.microsoft.com and fully qualified image name: mcr.microsoft.com/appsvc/node:20-lts_20250724.2.tuxprod
+2025-08-19T01:10:52.0691194Z Starting container: 1a4a8128324f_web-cybermat-prd.
+2025-08-19T01:10:52.1398479Z Starting watchers and probes.
+2025-08-19T01:10:52.1410472Z Starting metrics collection.
+2025-08-19T01:10:52.1418311Z Container is running.
+2025-08-19T01:10:52.2921077Z Container start method finished after 9814 ms.
+2025-08-19T01:11:20.7742909Z Container has finished running with exit code: 1.
+2025-08-19T01:11:20.7929984Z Container is terminating. Grace period: 5 seconds.
+2025-08-19T01:11:20.8021113Z Stop and delete container. Retry count = 0
+2025-08-19T01:11:20.8032003Z Stopping container: 1a4a8128324f_web-cybermat-prd.
+2025-08-19T01:11:20.8531937Z Deleting container: 1a4a8128324f_web-cybermat-prd. Retry count = 0
+2025-08-19T01:11:21.2777770Z Container spec TerminationMessagePolicy  path 
+2025-08-19T01:11:21.2779205Z Container is terminated. Total time elapsed: 483 ms.
+2025-08-19T01:11:21.2780026Z Site container: web-cybermat-prd terminated during site startup.
+2025-08-19T01:11:21.2781702Z Site startup probe failed after 28.9363451 seconds.
+2025-08-19T01:11:21.3076731Z Failed to start site. Revert by stopping site.
+2025-08-19T01:11:21.3273968Z Site: web-cybermat-prd stopped.
+2025-08-19T01:11:22.9651630Z Site container: web-cybermat-prd_managedIdentity terminated during site startup.
+2025-08-19T01:11:22.9659989Z ManagedIdentity container failed to startup
+2025-08-19T01:11:37.3733276Z Container start method called.
+2025-08-19T01:11:37.3736026Z Establishing network.
+2025-08-19T01:11:37.3737368Z Pulling image: appsvc/node:20-lts_20250724.2.tuxprod.
+2025-08-19T01:11:43.9684373Z Container is starting.
+2025-08-19T01:11:43.9689421Z Establishing user namespace if not established already.
+2025-08-19T01:11:43.9693086Z Establishing network if not established already.
+2025-08-19T01:11:43.9767352Z Mounting volumes.
+2025-08-19T01:11:43.9770638Z Nested mountpoint 
+2025-08-19T01:11:43.9980577Z Nested mountpoint volatile/logs
+2025-08-19T01:11:44.0474576Z Nested mountpoint 
+2025-08-19T01:11:44.0998659Z Nested mountpoint 
+2025-08-19T01:11:44.1297827Z Nested mountpoint 
+2025-08-19T01:11:44.9230814Z Creating container.
+2025-08-19T01:11:44.9231851Z Creating pipes for streaming container io.
+2025-08-19T01:11:44.9232677Z Creating stdout named pipe at /podr/container/pipe/8797b93bd7c9_web-cybermat-prd/stdout_f6676580ec224f6982f351a5f6308468.
+2025-08-19T01:11:44.9234253Z Successfully created stdout named pipe at: /podr/container/pipe/8797b93bd7c9_web-cybermat-prd/stdout_f6676580ec224f6982f351a5f6308468.
+2025-08-19T01:11:44.9234984Z Opening named pipe /podr/container/pipe/8797b93bd7c9_web-cybermat-prd/stdout_f6676580ec224f6982f351a5f6308468 for reading in non-blocking mode.
+2025-08-19T01:11:44.9235831Z Successfully opened named pipe: /podr/container/pipe/8797b93bd7c9_web-cybermat-prd/stdout_f6676580ec224f6982f351a5f6308468.
+2025-08-19T01:11:44.9236756Z Successfully removed non-blocking flag from /podr/container/pipe/8797b93bd7c9_web-cybermat-prd/stdout_f6676580ec224f6982f351a5f6308468.
+2025-08-19T01:11:44.9237528Z Creating stderr named pipe at /podr/container/pipe/8797b93bd7c9_web-cybermat-prd/stderr_c715f198cd9243c386e634cb7fbb67a7.
+2025-08-19T01:11:44.9238563Z Successfully created stderr named pipe at: /podr/container/pipe/8797b93bd7c9_web-cybermat-prd/stderr_c715f198cd9243c386e634cb7fbb67a7.
+2025-08-19T01:11:44.9239309Z Opening named pipe /podr/container/pipe/8797b93bd7c9_web-cybermat-prd/stderr_c715f198cd9243c386e634cb7fbb67a7 for reading in non-blocking mode.
+2025-08-19T01:11:44.9240143Z Successfully opened named pipe: /podr/container/pipe/8797b93bd7c9_web-cybermat-prd/stderr_c715f198cd9243c386e634cb7fbb67a7.
+2025-08-19T01:11:44.9240838Z Successfully removed non-blocking flag from /podr/container/pipe/8797b93bd7c9_web-cybermat-prd/stderr_c715f198cd9243c386e634cb7fbb67a7.
+2025-08-19T01:11:44.9322271Z Creating container with image: appsvc/node:20-lts_20250724.2.tuxprod from registry: mcr.microsoft.com and fully qualified image name: mcr.microsoft.com/appsvc/node:20-lts_20250724.2.tuxprod
+2025-08-19T01:11:45.7018182Z Starting container: 8797b93bd7c9_web-cybermat-prd.
+2025-08-19T01:11:45.9226669Z Starting watchers and probes.
+2025-08-19T01:11:45.9354818Z Starting metrics collection.
+2025-08-19T01:11:45.9841786Z Container is running.
+2025-08-19T01:11:46.1058173Z Container start method finished after 8732 ms.
+2025-08-19T01:12:10.5603069Z Container has finished running with exit code: 1.
+2025-08-19T01:12:10.5609187Z Container is terminating. Grace period: 5 seconds.
+2025-08-19T01:12:10.5791840Z Stop and delete container. Retry count = 0
+2025-08-19T01:12:10.5809556Z Stopping container: 8797b93bd7c9_web-cybermat-prd.
+2025-08-19T01:12:10.6888841Z Deleting container: 8797b93bd7c9_web-cybermat-prd. Retry count = 0
+2025-08-19T01:12:12.7628553Z Container spec TerminationMessagePolicy  path 
+2025-08-19T01:12:12.7679696Z Container is terminated. Total time elapsed: 2201 ms.
+2025-08-19T01:12:12.7682756Z Site container: web-cybermat-prd terminated during site startup.
+2025-08-19T01:12:12.7686391Z Site startup probe failed after 26.602853 seconds.
+2025-08-19T01:12:12.8003992Z Failed to start site. Revert by stopping site.
+2025-08-19T01:12:12.8104288Z Site: web-cybermat-prd stopped.
+2025-08-19T01:38:25.8600841Z Container start method called.
+2025-08-19T01:38:25.8606335Z Establishing network.
+2025-08-19T01:38:25.8611316Z Pulling image: appsvc/node:20-lts_20250724.2.tuxprod.
+2025-08-19T01:38:31.7585298Z Container is starting.
+2025-08-19T01:38:31.7590928Z Establishing user namespace if not established already.
+2025-08-19T01:38:31.7592444Z Establishing network if not established already.
+2025-08-19T01:38:31.7593304Z Mounting volumes.
+2025-08-19T01:38:31.7594599Z Nested mountpoint 
+2025-08-19T01:38:31.7998058Z Nested mountpoint volatile/logs
+2025-08-19T01:38:31.8111291Z Nested mountpoint 
+2025-08-19T01:38:31.9112526Z Nested mountpoint 
+2025-08-19T01:38:31.9616883Z Nested mountpoint 
+2025-08-19T01:38:33.0254800Z Creating container.
+2025-08-19T01:38:33.0261338Z Creating pipes for streaming container io.
+2025-08-19T01:38:33.0268826Z Creating stdout named pipe at /podr/container/pipe/184dafac5f30_web-cybermat-prd/stdout_3d3c583032274dae9eefaf7647ff971c.
+2025-08-19T01:38:33.0276739Z Successfully created stdout named pipe at: /podr/container/pipe/184dafac5f30_web-cybermat-prd/stdout_3d3c583032274dae9eefaf7647ff971c.
+2025-08-19T01:38:33.0359762Z Opening named pipe /podr/container/pipe/184dafac5f30_web-cybermat-prd/stdout_3d3c583032274dae9eefaf7647ff971c for reading in non-blocking mode.
+2025-08-19T01:38:33.0369796Z Successfully opened named pipe: /podr/container/pipe/184dafac5f30_web-cybermat-prd/stdout_3d3c583032274dae9eefaf7647ff971c.
+2025-08-19T01:38:33.0377909Z Successfully removed non-blocking flag from /podr/container/pipe/184dafac5f30_web-cybermat-prd/stdout_3d3c583032274dae9eefaf7647ff971c.
+2025-08-19T01:38:33.0555007Z Creating stderr named pipe at /podr/container/pipe/184dafac5f30_web-cybermat-prd/stderr_3eec2ce5da88442aa07d1359ecd6ce2c.
+2025-08-19T01:38:33.0566459Z Successfully created stderr named pipe at: /podr/container/pipe/184dafac5f30_web-cybermat-prd/stderr_3eec2ce5da88442aa07d1359ecd6ce2c.
+2025-08-19T01:38:33.0576680Z Opening named pipe /podr/container/pipe/184dafac5f30_web-cybermat-prd/stderr_3eec2ce5da88442aa07d1359ecd6ce2c for reading in non-blocking mode.
+2025-08-19T01:38:33.0653165Z Successfully opened named pipe: /podr/container/pipe/184dafac5f30_web-cybermat-prd/stderr_3eec2ce5da88442aa07d1359ecd6ce2c.
+2025-08-19T01:38:33.0661344Z Successfully removed non-blocking flag from /podr/container/pipe/184dafac5f30_web-cybermat-prd/stderr_3eec2ce5da88442aa07d1359ecd6ce2c.
+2025-08-19T01:38:33.0675220Z Creating container with image: appsvc/node:20-lts_20250724.2.tuxprod from registry: mcr.microsoft.com and fully qualified image name: mcr.microsoft.com/appsvc/node:20-lts_20250724.2.tuxprod
+2025-08-19T01:38:33.8471201Z Starting container: 184dafac5f30_web-cybermat-prd.
+2025-08-19T01:38:33.9148774Z Starting watchers and probes.
+2025-08-19T01:38:33.9253402Z Starting metrics collection.
+2025-08-19T01:38:33.9340226Z Container is running.
+2025-08-19T01:38:34.0857289Z Container start method finished after 8225 ms.
+2025-08-19T01:38:53.7469395Z Container has finished running with exit code: 1.
+2025-08-19T01:38:53.7474755Z Container is terminating. Grace period: 5 seconds.
+2025-08-19T01:38:53.7554397Z Stop and delete container. Retry count = 0
+2025-08-19T01:38:53.7563321Z Stopping container: 184dafac5f30_web-cybermat-prd.
+2025-08-19T01:38:53.8272597Z Deleting container: 184dafac5f30_web-cybermat-prd. Retry count = 0
+2025-08-19T01:38:54.9642581Z Container spec TerminationMessagePolicy  path 
+2025-08-19T01:38:54.9650320Z Container is terminated. Total time elapsed: 1216 ms.
+2025-08-19T01:38:54.9714861Z Site container: web-cybermat-prd terminated during site startup.
+2025-08-19T01:38:54.9721942Z Site startup probe failed after 20.8243845 seconds.
+2025-08-19T01:38:55.0047443Z Failed to start site. Revert by stopping site.
+2025-08-19T01:38:55.0323269Z Site: web-cybermat-prd stopped.
+2025-08-19T01:38:56.3723423Z Site container: web-cybermat-prd_managedIdentity terminated during site startup.
+2025-08-19T01:38:56.4019694Z ManagedIdentity container failed to startup
+2025-08-19T01:39:11.8900278Z Container start method called.
+2025-08-19T01:39:11.8905852Z Establishing network.
+2025-08-19T01:39:11.8911991Z Pulling image: appsvc/node:20-lts_20250724.2.tuxprod.
+2025-08-19T01:39:16.5475206Z Container is starting.
+2025-08-19T01:39:16.5489941Z Establishing user namespace if not established already.
+2025-08-19T01:39:16.5492942Z Establishing network if not established already.
+2025-08-19T01:39:16.5568372Z Mounting volumes.
+2025-08-19T01:39:16.5575164Z Nested mountpoint 
+2025-08-19T01:39:16.5782826Z Nested mountpoint volatile/logs
+2025-08-19T01:39:16.5970138Z Nested mountpoint 
+2025-08-19T01:39:16.6084128Z Nested mountpoint 
+2025-08-19T01:39:16.6463063Z Nested mountpoint 
+2025-08-19T01:39:17.4434309Z Creating container.
+2025-08-19T01:39:17.4617004Z Creating pipes for streaming container io.
+2025-08-19T01:39:17.4624037Z Creating stdout named pipe at /podr/container/pipe/0499873a2156_web-cybermat-prd/stdout_7a80301e886f495f9085fa0cd2ce0f4a.
+2025-08-19T01:39:17.4630490Z Successfully created stdout named pipe at: /podr/container/pipe/0499873a2156_web-cybermat-prd/stdout_7a80301e886f495f9085fa0cd2ce0f4a.
+2025-08-19T01:39:17.4634578Z Opening named pipe /podr/container/pipe/0499873a2156_web-cybermat-prd/stdout_7a80301e886f495f9085fa0cd2ce0f4a for reading in non-blocking mode.
+2025-08-19T01:39:17.4724919Z Successfully opened named pipe: /podr/container/pipe/0499873a2156_web-cybermat-prd/stdout_7a80301e886f495f9085fa0cd2ce0f4a.
+2025-08-19T01:39:17.4729546Z Successfully removed non-blocking flag from /podr/container/pipe/0499873a2156_web-cybermat-prd/stdout_7a80301e886f495f9085fa0cd2ce0f4a.
+2025-08-19T01:39:17.4734517Z Creating stderr named pipe at /podr/container/pipe/0499873a2156_web-cybermat-prd/stderr_b8e2586cc34141ebb2bee858ac0e052b.
+2025-08-19T01:39:17.4809084Z Successfully created stderr named pipe at: /podr/container/pipe/0499873a2156_web-cybermat-prd/stderr_b8e2586cc34141ebb2bee858ac0e052b.
+2025-08-19T01:39:17.4810640Z Opening named pipe /podr/container/pipe/0499873a2156_web-cybermat-prd/stderr_b8e2586cc34141ebb2bee858ac0e052b for reading in non-blocking mode.
+2025-08-19T01:39:17.4814207Z Successfully opened named pipe: /podr/container/pipe/0499873a2156_web-cybermat-prd/stderr_b8e2586cc34141ebb2bee858ac0e052b.
+2025-08-19T01:39:17.4815713Z Successfully removed non-blocking flag from /podr/container/pipe/0499873a2156_web-cybermat-prd/stderr_b8e2586cc34141ebb2bee858ac0e052b.
+2025-08-19T01:39:17.4816909Z Creating container with image: appsvc/node:20-lts_20250724.2.tuxprod from registry: mcr.microsoft.com and fully qualified image name: mcr.microsoft.com/appsvc/node:20-lts_20250724.2.tuxprod
+2025-08-19T01:39:18.1783682Z Starting container: 0499873a2156_web-cybermat-prd.
+2025-08-19T01:39:18.2989193Z Starting watchers and probes.
+2025-08-19T01:39:18.2996081Z Starting metrics collection.
+2025-08-19T01:39:18.3001321Z Container is running.
+2025-08-19T01:39:18.6526215Z Container start method finished after 6732 ms.
+2025-08-19T01:39:37.9647208Z Container has finished running with exit code: 1.
+2025-08-19T01:39:37.9648398Z Container is terminating. Grace period: 5 seconds.
+2025-08-19T01:39:37.9650669Z Stop and delete container. Retry count = 0
+2025-08-19T01:39:37.9651403Z Stopping container: 0499873a2156_web-cybermat-prd.
+2025-08-19T01:39:38.0452800Z Deleting container: 0499873a2156_web-cybermat-prd. Retry count = 0
+2025-08-19T01:39:38.6815461Z Container spec TerminationMessagePolicy  path 
+2025-08-19T01:39:38.6869076Z Container is terminated. Total time elapsed: 721 ms.
+2025-08-19T01:39:38.6953867Z Site container: web-cybermat-prd terminated during site startup.
+2025-08-19T01:39:38.7040710Z Site startup probe failed after 20.0223522 seconds.
+2025-08-19T01:39:38.7259951Z Failed to start site. Revert by stopping site.
+2025-08-19T01:39:38.7274946Z Site: web-cybermat-prd stopped.
+2025-08-19T01:39:40.0669768Z Site container: web-cybermat-prd_managedIdentity terminated during site startup.
+2025-08-19T01:39:40.0867888Z ManagedIdentity container failed to startup
+2025-08-19T01:39:40.6507830Z Site: web-cybermat-prd will be blocked for 1 minutes till 08/19/2025 01:40:40
+2025-08-19T01:40:41.1356631Z Site: web-cybermat-prd is unblocked.
+2025-08-19T01:45:49.4994429Z Container start method called.
+2025-08-19T01:45:49.4995932Z Establishing network.
+2025-08-19T01:45:49.4996747Z Pulling image: appsvc/node:20-lts_20250724.2.tuxprod.
+2025-08-19T01:45:57.1802261Z Container is starting.
+2025-08-19T01:45:57.1803495Z Establishing user namespace if not established already.
+2025-08-19T01:45:57.1807704Z Establishing network if not established already.
+2025-08-19T01:45:57.1809419Z Mounting volumes.
+2025-08-19T01:45:57.1812296Z Nested mountpoint 
+2025-08-19T01:45:57.2225524Z Nested mountpoint volatile/logs
+2025-08-19T01:45:57.2322710Z Nested mountpoint 
+2025-08-19T01:45:57.2713414Z Nested mountpoint 
+2025-08-19T01:45:57.2815422Z Nested mountpoint 
+2025-08-19T01:45:58.1569306Z Creating container.
+2025-08-19T01:45:58.1641337Z Creating pipes for streaming container io.
+2025-08-19T01:45:58.1648573Z Creating stdout named pipe at /podr/container/pipe/5a7b18c06e93_web-cybermat-prd/stdout_c5999434bc664811b96152aab26cb10b.
+2025-08-19T01:45:58.1655072Z Successfully created stdout named pipe at: /podr/container/pipe/5a7b18c06e93_web-cybermat-prd/stdout_c5999434bc664811b96152aab26cb10b.
+2025-08-19T01:45:58.1660525Z Opening named pipe /podr/container/pipe/5a7b18c06e93_web-cybermat-prd/stdout_c5999434bc664811b96152aab26cb10b for reading in non-blocking mode.
+2025-08-19T01:45:58.1665711Z Successfully opened named pipe: /podr/container/pipe/5a7b18c06e93_web-cybermat-prd/stdout_c5999434bc664811b96152aab26cb10b.
+2025-08-19T01:45:58.1671648Z Successfully removed non-blocking flag from /podr/container/pipe/5a7b18c06e93_web-cybermat-prd/stdout_c5999434bc664811b96152aab26cb10b.
+2025-08-19T01:45:58.1743372Z Creating stderr named pipe at /podr/container/pipe/5a7b18c06e93_web-cybermat-prd/stderr_ae640414ba18425199d90faffc68d067.
+2025-08-19T01:45:58.1749712Z Successfully created stderr named pipe at: /podr/container/pipe/5a7b18c06e93_web-cybermat-prd/stderr_ae640414ba18425199d90faffc68d067.
+2025-08-19T01:45:58.1754426Z Opening named pipe /podr/container/pipe/5a7b18c06e93_web-cybermat-prd/stderr_ae640414ba18425199d90faffc68d067 for reading in non-blocking mode.
+2025-08-19T01:45:58.1759324Z Successfully opened named pipe: /podr/container/pipe/5a7b18c06e93_web-cybermat-prd/stderr_ae640414ba18425199d90faffc68d067.
+2025-08-19T01:45:58.1763722Z Successfully removed non-blocking flag from /podr/container/pipe/5a7b18c06e93_web-cybermat-prd/stderr_ae640414ba18425199d90faffc68d067.
+2025-08-19T01:45:58.1767140Z Creating container with image: appsvc/node:20-lts_20250724.2.tuxprod from registry: mcr.microsoft.com and fully qualified image name: mcr.microsoft.com/appsvc/node:20-lts_20250724.2.tuxprod
+2025-08-19T01:45:58.9012909Z Starting container: 5a7b18c06e93_web-cybermat-prd.
+2025-08-19T01:45:58.9549996Z Starting watchers and probes.
+2025-08-19T01:45:58.9560832Z Starting metrics collection.
+2025-08-19T01:45:58.9568260Z Container is running.
+2025-08-19T01:45:59.6681818Z Container start method finished after 10110 ms.
+2025-08-19T01:46:17.9401804Z Container has finished running with exit code: 1.
+2025-08-19T01:46:17.9487211Z Container is terminating. Grace period: 5 seconds.
+2025-08-19T01:46:17.9495782Z Stop and delete container. Retry count = 0
+2025-08-19T01:46:17.9501115Z Stopping container: 5a7b18c06e93_web-cybermat-prd.
+2025-08-19T01:46:18.0487697Z Deleting container: 5a7b18c06e93_web-cybermat-prd. Retry count = 0
+2025-08-19T01:46:18.8069957Z Container spec TerminationMessagePolicy  path 
+2025-08-19T01:46:18.8101027Z Container is terminated. Total time elapsed: 860 ms.
+2025-08-19T01:46:18.8111228Z Site container: web-cybermat-prd terminated during site startup.
+2025-08-19T01:46:18.8120939Z Site startup probe failed after 19.1318104 seconds.
+2025-08-19T01:46:18.9133285Z Failed to start site. Revert by stopping site.
+2025-08-19T01:46:18.9220904Z Site: web-cybermat-prd stopped.
+2025-08-19T01:46:22.3616285Z Site container: web-cybermat-prd_managedIdentity terminated during site startup.
+2025-08-19T01:46:22.3688874Z ManagedIdentity container failed to startup
+2025-08-19T01:46:22.8226079Z Site: web-cybermat-prd will be blocked for 1 minutes till 08/19/2025 01:47:22
+2025-08-19T01:46:23.5289307Z Start site prohibitted because the site is being blocked.
+2025-08-19T01:47:22.8227983Z Site: web-cybermat-prd is unblocked.
+2025-08-19T01:48:40.4495004Z Container start method called.
+2025-08-19T01:48:40.4680989Z Establishing network.
+2025-08-19T01:48:40.4693357Z Pulling image: appsvc/node:20-lts_20250724.2.tuxprod.
+2025-08-19T01:48:46.2088875Z Container is starting.
+2025-08-19T01:48:46.2093689Z Establishing user namespace if not established already.
+2025-08-19T01:48:46.2098185Z Establishing network if not established already.
+2025-08-19T01:48:46.2102872Z Mounting volumes.
+2025-08-19T01:48:46.2173949Z Nested mountpoint 
+2025-08-19T01:48:46.2304904Z Nested mountpoint volatile/logs
+2025-08-19T01:48:46.2581737Z Nested mountpoint 
+2025-08-19T01:48:46.2606828Z Nested mountpoint 
+2025-08-19T01:48:46.3101445Z Nested mountpoint 
+2025-08-19T01:48:47.1050168Z Creating container.
+2025-08-19T01:48:47.1127756Z Creating pipes for streaming container io.
+2025-08-19T01:48:47.1137915Z Creating stdout named pipe at /podr/container/pipe/195ed7786db4_web-cybermat-prd/stdout_b35c6d89d1e644b78794e14e3ce54582.
+2025-08-19T01:48:47.1145754Z Successfully created stdout named pipe at: /podr/container/pipe/195ed7786db4_web-cybermat-prd/stdout_b35c6d89d1e644b78794e14e3ce54582.
+2025-08-19T01:48:47.1152050Z Opening named pipe /podr/container/pipe/195ed7786db4_web-cybermat-prd/stdout_b35c6d89d1e644b78794e14e3ce54582 for reading in non-blocking mode.
+2025-08-19T01:48:47.1224432Z Successfully opened named pipe: /podr/container/pipe/195ed7786db4_web-cybermat-prd/stdout_b35c6d89d1e644b78794e14e3ce54582.
+2025-08-19T01:48:47.1231660Z Successfully removed non-blocking flag from /podr/container/pipe/195ed7786db4_web-cybermat-prd/stdout_b35c6d89d1e644b78794e14e3ce54582.
+2025-08-19T01:48:47.1236615Z Creating stderr named pipe at /podr/container/pipe/195ed7786db4_web-cybermat-prd/stderr_bdd34e457797402f8fec64cedc0de65d.
+2025-08-19T01:48:47.1241998Z Successfully created stderr named pipe at: /podr/container/pipe/195ed7786db4_web-cybermat-prd/stderr_bdd34e457797402f8fec64cedc0de65d.
+2025-08-19T01:48:47.1246579Z Opening named pipe /podr/container/pipe/195ed7786db4_web-cybermat-prd/stderr_bdd34e457797402f8fec64cedc0de65d for reading in non-blocking mode.
+2025-08-19T01:48:47.1251301Z Successfully opened named pipe: /podr/container/pipe/195ed7786db4_web-cybermat-prd/stderr_bdd34e457797402f8fec64cedc0de65d.
+2025-08-19T01:48:47.1322477Z Successfully removed non-blocking flag from /podr/container/pipe/195ed7786db4_web-cybermat-prd/stderr_bdd34e457797402f8fec64cedc0de65d.
+2025-08-19T01:48:47.1327442Z Creating container with image: appsvc/node:20-lts_20250724.2.tuxprod from registry: mcr.microsoft.com and fully qualified image name: mcr.microsoft.com/appsvc/node:20-lts_20250724.2.tuxprod
+2025-08-19T01:48:47.9623858Z Starting container: 195ed7786db4_web-cybermat-prd.
+2025-08-19T01:48:48.1108204Z Starting watchers and probes.
+2025-08-19T01:48:48.1123811Z Starting metrics collection.
+2025-08-19T01:48:48.1195846Z Container is running.
+2025-08-19T01:48:48.4227892Z Container start method finished after 7945 ms.
+2025-08-19T01:49:05.8852328Z Container has finished running with exit code: 1.
+2025-08-19T01:49:05.8853466Z Container is terminating. Grace period: 5 seconds.
+2025-08-19T01:49:05.8855806Z Stop and delete container. Retry count = 0
+2025-08-19T01:49:05.8856602Z Stopping container: 195ed7786db4_web-cybermat-prd.
+2025-08-19T01:49:05.9678485Z Deleting container: 195ed7786db4_web-cybermat-prd. Retry count = 0
+2025-08-19T01:49:06.6527993Z Container spec TerminationMessagePolicy  path 
+2025-08-19T01:49:06.6535944Z Container is terminated. Total time elapsed: 767 ms.
+2025-08-19T01:49:06.6538165Z Site container: web-cybermat-prd terminated during site startup.
+2025-08-19T01:49:06.6543477Z Site startup probe failed after 18.1912882 seconds.
+2025-08-19T01:49:06.6935932Z Failed to start site. Revert by stopping site.
+2025-08-19T01:49:06.6952132Z Site: web-cybermat-prd stopped.
+2025-08-19T01:49:08.3195038Z Site container: web-cybermat-prd_managedIdentity terminated during site startup.
+2025-08-19T01:49:08.3202637Z ManagedIdentity container failed to startup
+2025-08-19T01:49:08.7730103Z Site: web-cybermat-prd will be blocked for 2 minutes till 08/19/2025 01:51:08
+2025-08-19T01:49:09.2968180Z Start site prohibitted because the site is being blocked.
+2025-08-19T01:51:08.7753414Z Site: web-cybermat-prd is unblocked.
+2025-08-19T01:55:27.6824779Z Container start method called.
+2025-08-19T01:55:27.6830525Z Establishing network.
+2025-08-19T01:55:27.6902735Z Pulling image: appsvc/node:20-lts_20250724.2.tuxprod.
+2025-08-19T01:55:33.6580271Z Container is starting.
+2025-08-19T01:55:33.6581543Z Establishing user namespace if not established already.
+2025-08-19T01:55:33.6586364Z Establishing network if not established already.
+2025-08-19T01:55:33.6587857Z Mounting volumes.
+2025-08-19T01:55:33.6591008Z Nested mountpoint 
+2025-08-19T01:55:33.6783455Z Nested mountpoint volatile/logs
+2025-08-19T01:55:33.7906165Z Nested mountpoint 
+2025-08-19T01:55:33.8199228Z Nested mountpoint 
+2025-08-19T01:55:33.8799557Z Nested mountpoint 
+2025-08-19T01:55:34.9455098Z Creating container.
+2025-08-19T01:55:34.9471832Z Creating pipes for streaming container io.
+2025-08-19T01:55:34.9569125Z Creating stdout named pipe at /podr/container/pipe/8b849dbeaee6_web-cybermat-prd/stdout_b73486441b7c4a55955936e9243b5a8c.
+2025-08-19T01:55:34.9652135Z Successfully created stdout named pipe at: /podr/container/pipe/8b849dbeaee6_web-cybermat-prd/stdout_b73486441b7c4a55955936e9243b5a8c.
+2025-08-19T01:55:34.9663773Z Opening named pipe /podr/container/pipe/8b849dbeaee6_web-cybermat-prd/stdout_b73486441b7c4a55955936e9243b5a8c for reading in non-blocking mode.
+2025-08-19T01:55:34.9744667Z Successfully opened named pipe: /podr/container/pipe/8b849dbeaee6_web-cybermat-prd/stdout_b73486441b7c4a55955936e9243b5a8c.
+2025-08-19T01:55:34.9758572Z Successfully removed non-blocking flag from /podr/container/pipe/8b849dbeaee6_web-cybermat-prd/stdout_b73486441b7c4a55955936e9243b5a8c.
+2025-08-19T01:55:34.9770325Z Creating stderr named pipe at /podr/container/pipe/8b849dbeaee6_web-cybermat-prd/stderr_2d3cd5cd32634509ad75103b52d8142c.
+2025-08-19T01:55:34.9846536Z Successfully created stderr named pipe at: /podr/container/pipe/8b849dbeaee6_web-cybermat-prd/stderr_2d3cd5cd32634509ad75103b52d8142c.
+2025-08-19T01:55:34.9851907Z Opening named pipe /podr/container/pipe/8b849dbeaee6_web-cybermat-prd/stderr_2d3cd5cd32634509ad75103b52d8142c for reading in non-blocking mode.
+2025-08-19T01:55:34.9857669Z Successfully opened named pipe: /podr/container/pipe/8b849dbeaee6_web-cybermat-prd/stderr_2d3cd5cd32634509ad75103b52d8142c.
+2025-08-19T01:55:34.9862879Z Successfully removed non-blocking flag from /podr/container/pipe/8b849dbeaee6_web-cybermat-prd/stderr_2d3cd5cd32634509ad75103b52d8142c.
+2025-08-19T01:55:34.9868731Z Creating container with image: appsvc/node:20-lts_20250724.2.tuxprod from registry: mcr.microsoft.com and fully qualified image name: mcr.microsoft.com/appsvc/node:20-lts_20250724.2.tuxprod
+2025-08-19T01:55:35.6141374Z Starting container: 8b849dbeaee6_web-cybermat-prd.
+2025-08-19T01:55:35.7220459Z Starting watchers and probes.
+2025-08-19T01:55:35.7335980Z Starting metrics collection.
+2025-08-19T01:55:35.7344232Z Container is running.
+2025-08-19T01:55:35.9533785Z Container start method finished after 8270 ms.
+2025-08-19T01:55:53.7925945Z Container has finished running with exit code: 1.
+2025-08-19T01:55:53.7927323Z Container is terminating. Grace period: 5 seconds.
+2025-08-19T01:55:53.7929797Z Stop and delete container. Retry count = 0
+2025-08-19T01:55:53.7930647Z Stopping container: 8b849dbeaee6_web-cybermat-prd.
+2025-08-19T01:55:53.8731424Z Deleting container: 8b849dbeaee6_web-cybermat-prd. Retry count = 0
+2025-08-19T01:55:54.4808032Z Container spec TerminationMessagePolicy  path 
+2025-08-19T01:55:54.4830474Z Container is terminated. Total time elapsed: 689 ms.
+2025-08-19T01:55:54.4905642Z Site container: web-cybermat-prd terminated during site startup.
+2025-08-19T01:55:54.4922686Z Site startup probe failed after 18.5363698 seconds.
+2025-08-19T01:55:54.5322501Z Failed to start site. Revert by stopping site.
+2025-08-19T01:55:54.5625557Z Site: web-cybermat-prd stopped.
+2025-08-19T01:55:56.0863407Z Site container: web-cybermat-prd_managedIdentity terminated during site startup.
+2025-08-19T01:55:56.1270367Z ManagedIdentity container failed to startup
+2025-08-19T01:55:56.7009939Z Site: web-cybermat-prd will be blocked for 2 minutes till 08/19/2025 01:57:56
+2025-08-19T01:55:57.2153237Z Start site prohibitted because the site is being blocked.
+2025-08-19T01:57:56.7012782Z Site: web-cybermat-prd is unblocked.
+2025-08-19T01:58:17.1755180Z Container start method called.
+2025-08-19T01:58:17.1762400Z Establishing network.
+2025-08-19T01:58:17.1767904Z Pulling image: appsvc/node:20-lts_20250724.2.tuxprod.
+2025-08-19T01:58:21.6281766Z Container is starting.
+2025-08-19T01:58:21.6283008Z Establishing user namespace if not established already.
+2025-08-19T01:58:21.6284051Z Establishing network if not established already.
+2025-08-19T01:58:21.6289246Z Mounting volumes.
+2025-08-19T01:58:21.6292198Z Nested mountpoint 
+2025-08-19T01:58:21.6411002Z Nested mountpoint volatile/logs
+2025-08-19T01:58:21.6683350Z Nested mountpoint 
+2025-08-19T01:58:21.6790871Z Nested mountpoint 
+2025-08-19T01:58:21.7097622Z Nested mountpoint 
+2025-08-19T01:58:22.6160482Z Creating container.
+2025-08-19T01:58:22.6241843Z Creating pipes for streaming container io.
+2025-08-19T01:58:22.6253468Z Creating stdout named pipe at /podr/container/pipe/b121fdbd6827_web-cybermat-prd/stdout_4b0f41d6e3664fca857ce929457a2778.
+2025-08-19T01:58:22.6333538Z Successfully created stdout named pipe at: /podr/container/pipe/b121fdbd6827_web-cybermat-prd/stdout_4b0f41d6e3664fca857ce929457a2778.
+2025-08-19T01:58:22.6343070Z Opening named pipe /podr/container/pipe/b121fdbd6827_web-cybermat-prd/stdout_4b0f41d6e3664fca857ce929457a2778 for reading in non-blocking mode.
+2025-08-19T01:58:22.6354306Z Successfully opened named pipe: /podr/container/pipe/b121fdbd6827_web-cybermat-prd/stdout_4b0f41d6e3664fca857ce929457a2778.
+2025-08-19T01:58:22.6432613Z Successfully removed non-blocking flag from /podr/container/pipe/b121fdbd6827_web-cybermat-prd/stdout_4b0f41d6e3664fca857ce929457a2778.
+2025-08-19T01:58:22.6444060Z Creating stderr named pipe at /podr/container/pipe/b121fdbd6827_web-cybermat-prd/stderr_c3719186d0994208939dcd2eb8eada1a.
+2025-08-19T01:58:22.6454264Z Successfully created stderr named pipe at: /podr/container/pipe/b121fdbd6827_web-cybermat-prd/stderr_c3719186d0994208939dcd2eb8eada1a.
+2025-08-19T01:58:22.6643689Z Opening named pipe /podr/container/pipe/b121fdbd6827_web-cybermat-prd/stderr_c3719186d0994208939dcd2eb8eada1a for reading in non-blocking mode.
+2025-08-19T01:58:22.6658958Z Successfully opened named pipe: /podr/container/pipe/b121fdbd6827_web-cybermat-prd/stderr_c3719186d0994208939dcd2eb8eada1a.
+2025-08-19T01:58:22.6842511Z Successfully removed non-blocking flag from /podr/container/pipe/b121fdbd6827_web-cybermat-prd/stderr_c3719186d0994208939dcd2eb8eada1a.
+2025-08-19T01:58:22.6856391Z Creating container with image: appsvc/node:20-lts_20250724.2.tuxprod from registry: mcr.microsoft.com and fully qualified image name: mcr.microsoft.com/appsvc/node:20-lts_20250724.2.tuxprod
+2025-08-19T01:58:23.3343537Z Starting container: b121fdbd6827_web-cybermat-prd.
+2025-08-19T01:58:23.4648566Z Starting watchers and probes.
+2025-08-19T01:58:23.4754649Z Starting metrics collection.
+2025-08-19T01:58:23.4944724Z Container is running.
+2025-08-19T01:58:23.7466647Z Container start method finished after 6570 ms.
+2025-08-19T01:58:44.2218932Z Container has finished running with exit code: 1.
+2025-08-19T01:58:44.2301311Z Container is terminating. Grace period: 5 seconds.
+2025-08-19T01:58:44.2320398Z Stop and delete container. Retry count = 0
+2025-08-19T01:58:44.2321894Z Stopping container: b121fdbd6827_web-cybermat-prd.
+2025-08-19T01:58:44.3010679Z Deleting container: b121fdbd6827_web-cybermat-prd. Retry count = 0
+2025-08-19T01:58:45.0347241Z Container spec TerminationMessagePolicy  path 
+2025-08-19T01:58:45.0411723Z Container is terminated. Total time elapsed: 810 ms.
+2025-08-19T01:58:45.0421112Z Site container: web-cybermat-prd terminated during site startup.
+2025-08-19T01:58:45.0487276Z Site startup probe failed after 21.2624328 seconds.
+2025-08-19T01:58:45.0871580Z Failed to start site. Revert by stopping site.
+2025-08-19T01:58:45.0902166Z Site: web-cybermat-prd stopped.
+2025-08-19T02:00:34.4491991Z Container start method called.
+2025-08-19T02:00:34.4499722Z Establishing network.
+2025-08-19T02:00:34.4675274Z Pulling image: appsvc/node:20-lts_20250724.2.tuxprod.
+2025-08-19T02:00:40.8039476Z Container is starting.
+2025-08-19T02:00:40.8043390Z Establishing user namespace if not established already.
+2025-08-19T02:00:40.8047410Z Establishing network if not established already.
+2025-08-19T02:00:40.8052043Z Mounting volumes.
+2025-08-19T02:00:40.8056371Z Nested mountpoint 
+2025-08-19T02:00:40.8359781Z Nested mountpoint volatile/logs
+2025-08-19T02:00:40.9847689Z Nested mountpoint 
+2025-08-19T02:00:40.9957656Z Nested mountpoint 
+2025-08-19T02:00:41.0867093Z Nested mountpoint 
+2025-08-19T02:00:42.5618898Z Creating container.
+2025-08-19T02:00:42.5737334Z Creating pipes for streaming container io.
+2025-08-19T02:00:42.5816141Z Creating stdout named pipe at /podr/container/pipe/d87b158769a5_web-cybermat-prd/stdout_39bfd643d0fd4e10a9affb37e67627fb.
+2025-08-19T02:00:42.5835072Z Successfully created stdout named pipe at: /podr/container/pipe/d87b158769a5_web-cybermat-prd/stdout_39bfd643d0fd4e10a9affb37e67627fb.
+2025-08-19T02:00:42.6030956Z Opening named pipe /podr/container/pipe/d87b158769a5_web-cybermat-prd/stdout_39bfd643d0fd4e10a9affb37e67627fb for reading in non-blocking mode.
+2025-08-19T02:00:42.6214019Z Successfully opened named pipe: /podr/container/pipe/d87b158769a5_web-cybermat-prd/stdout_39bfd643d0fd4e10a9affb37e67627fb.
+2025-08-19T02:00:42.6225751Z Successfully removed non-blocking flag from /podr/container/pipe/d87b158769a5_web-cybermat-prd/stdout_39bfd643d0fd4e10a9affb37e67627fb.
+2025-08-19T02:00:42.6235915Z Creating stderr named pipe at /podr/container/pipe/d87b158769a5_web-cybermat-prd/stderr_d048e515dbe44a3b9456731a2a10ac07.
+2025-08-19T02:00:42.6419845Z Successfully created stderr named pipe at: /podr/container/pipe/d87b158769a5_web-cybermat-prd/stderr_d048e515dbe44a3b9456731a2a10ac07.
+2025-08-19T02:00:42.6430971Z Opening named pipe /podr/container/pipe/d87b158769a5_web-cybermat-prd/stderr_d048e515dbe44a3b9456731a2a10ac07 for reading in non-blocking mode.
+2025-08-19T02:00:42.6439240Z Successfully opened named pipe: /podr/container/pipe/d87b158769a5_web-cybermat-prd/stderr_d048e515dbe44a3b9456731a2a10ac07.
+2025-08-19T02:00:42.6536499Z Successfully removed non-blocking flag from /podr/container/pipe/d87b158769a5_web-cybermat-prd/stderr_d048e515dbe44a3b9456731a2a10ac07.
+2025-08-19T02:00:42.6609562Z Creating container with image: appsvc/node:20-lts_20250724.2.tuxprod from registry: mcr.microsoft.com and fully qualified image name: mcr.microsoft.com/appsvc/node:20-lts_20250724.2.tuxprod
+2025-08-19T02:00:43.2855106Z Starting container: d87b158769a5_web-cybermat-prd.
+2025-08-19T02:00:43.3603913Z Starting watchers and probes.
+2025-08-19T02:00:43.3696427Z Starting metrics collection.
+2025-08-19T02:00:43.3804674Z Container is running.
+2025-08-19T02:00:43.5956265Z Container start method finished after 9146 ms.
+2025-08-19T02:01:00.6457386Z Container has finished running with exit code: 1.
+2025-08-19T02:01:00.6532170Z Container is terminating. Grace period: 5 seconds.
+2025-08-19T02:01:00.6537782Z Stop and delete container. Retry count = 0
+2025-08-19T02:01:00.6545196Z Stopping container: d87b158769a5_web-cybermat-prd.
+2025-08-19T02:01:00.7232118Z Deleting container: d87b158769a5_web-cybermat-prd. Retry count = 0
+2025-08-19T02:01:02.3938414Z Container spec TerminationMessagePolicy  path 
+2025-08-19T02:01:02.3945358Z Container is terminated. Total time elapsed: 1740 ms.
+2025-08-19T02:01:02.3951848Z Site container: web-cybermat-prd terminated during site startup.
+2025-08-19T02:01:02.4532400Z Site startup probe failed after 18.8095787 seconds.
+2025-08-19T02:01:02.5731603Z Failed to start site. Revert by stopping site.
+2025-08-19T02:01:02.5835233Z Site: web-cybermat-prd stopped.
+2025-08-19T02:08:42.0322124Z Container start method called.
+2025-08-19T02:08:42.0323440Z Establishing network.
+2025-08-19T02:08:42.0325568Z Pulling image: appsvc/node:20-lts_20250724.2.tuxprod.
+2025-08-19T02:08:47.8217121Z Container is starting.
+2025-08-19T02:08:47.8220570Z Establishing user namespace if not established already.
+2025-08-19T02:08:47.8225120Z Establishing network if not established already.
+2025-08-19T02:08:47.8227933Z Mounting volumes.
+2025-08-19T02:08:47.8326791Z Nested mountpoint 
+2025-08-19T02:08:47.8725735Z Nested mountpoint volatile/logs
+2025-08-19T02:08:47.8914113Z Nested mountpoint 
+2025-08-19T02:08:47.9118474Z Nested mountpoint 
+2025-08-19T02:08:48.0109539Z Nested mountpoint 
+2025-08-19T02:08:49.6106636Z Creating container.
+2025-08-19T02:08:49.6117420Z Creating pipes for streaming container io.
+2025-08-19T02:08:49.6124958Z Creating stdout named pipe at /podr/container/pipe/751726a5203e_web-cybermat-prd/stdout_b53565a9bbad40e99e6d9bac97e675eb.
+2025-08-19T02:08:49.6132821Z Successfully created stdout named pipe at: /podr/container/pipe/751726a5203e_web-cybermat-prd/stdout_b53565a9bbad40e99e6d9bac97e675eb.
+2025-08-19T02:08:49.6206208Z Opening named pipe /podr/container/pipe/751726a5203e_web-cybermat-prd/stdout_b53565a9bbad40e99e6d9bac97e675eb for reading in non-blocking mode.
+2025-08-19T02:08:49.6223368Z Successfully opened named pipe: /podr/container/pipe/751726a5203e_web-cybermat-prd/stdout_b53565a9bbad40e99e6d9bac97e675eb.
+2025-08-19T02:08:49.6233868Z Successfully removed non-blocking flag from /podr/container/pipe/751726a5203e_web-cybermat-prd/stdout_b53565a9bbad40e99e6d9bac97e675eb.
+2025-08-19T02:08:49.6322370Z Creating stderr named pipe at /podr/container/pipe/751726a5203e_web-cybermat-prd/stderr_2288b8b79f3a42ca9611e7fa9b08e157.
+2025-08-19T02:08:49.6330464Z Successfully created stderr named pipe at: /podr/container/pipe/751726a5203e_web-cybermat-prd/stderr_2288b8b79f3a42ca9611e7fa9b08e157.
+2025-08-19T02:08:49.6405420Z Opening named pipe /podr/container/pipe/751726a5203e_web-cybermat-prd/stderr_2288b8b79f3a42ca9611e7fa9b08e157 for reading in non-blocking mode.
+2025-08-19T02:08:49.6411852Z Successfully opened named pipe: /podr/container/pipe/751726a5203e_web-cybermat-prd/stderr_2288b8b79f3a42ca9611e7fa9b08e157.
+2025-08-19T02:08:49.6416588Z Successfully removed non-blocking flag from /podr/container/pipe/751726a5203e_web-cybermat-prd/stderr_2288b8b79f3a42ca9611e7fa9b08e157.
+2025-08-19T02:08:49.6420887Z Creating container with image: appsvc/node:20-lts_20250724.2.tuxprod from registry: mcr.microsoft.com and fully qualified image name: mcr.microsoft.com/appsvc/node:20-lts_20250724.2.tuxprod
+2025-08-19T02:08:50.5272286Z Starting container: 751726a5203e_web-cybermat-prd.
+2025-08-19T02:08:50.6679566Z Starting watchers and probes.
+2025-08-19T02:08:50.6690938Z Starting metrics collection.
+2025-08-19T02:08:50.7084532Z Container is running.
+2025-08-19T02:08:50.8770623Z Container start method finished after 8837 ms.
+2025-08-19T02:09:21.8618683Z Site startup probe succeeded after 30.9622632 seconds.
+2025-08-19T02:09:22.0033679Z Site is running with deployment version: 84607237-e1b2-45b5-bfd9-67094e044364
+2025-08-19T02:09:22.0125878Z Site started.
+2025-08-19T03:21:05.1206637Z Container start method called.
+2025-08-19T03:21:05.1219148Z Establishing network.
+2025-08-19T03:21:05.1222524Z Pulling image: appsvc/node:20-lts_20250724.2.tuxprod.
+2025-08-19T03:21:16.8528806Z Container is starting.
+2025-08-19T03:21:16.8533055Z Establishing user namespace if not established already.
+2025-08-19T03:21:16.8535642Z Establishing network if not established already.
+2025-08-19T03:21:16.8538044Z Mounting volumes.
+2025-08-19T03:21:16.8542087Z Nested mountpoint 
+2025-08-19T03:21:16.8942722Z Nested mountpoint volatile/logs
+2025-08-19T03:21:16.9850161Z Nested mountpoint 
+2025-08-19T03:21:17.1557344Z Nested mountpoint 
+2025-08-19T03:21:17.1640667Z Nested mountpoint 
+2025-08-19T03:21:20.0012711Z Creating container.
+2025-08-19T03:21:20.0016734Z Creating pipes for streaming container io.
+2025-08-19T03:21:20.0020611Z Creating stdout named pipe at /podr/container/pipe/ef50a0fbe11a_web-cybermat-prd/stdout_85886637514e489ba2e6f3131419432e.
+2025-08-19T03:21:20.0025544Z Successfully created stdout named pipe at: /podr/container/pipe/ef50a0fbe11a_web-cybermat-prd/stdout_85886637514e489ba2e6f3131419432e.
+2025-08-19T03:21:20.0029580Z Opening named pipe /podr/container/pipe/ef50a0fbe11a_web-cybermat-prd/stdout_85886637514e489ba2e6f3131419432e for reading in non-blocking mode.
+2025-08-19T03:21:20.0032352Z Successfully opened named pipe: /podr/container/pipe/ef50a0fbe11a_web-cybermat-prd/stdout_85886637514e489ba2e6f3131419432e.
+2025-08-19T03:21:20.0101883Z Successfully removed non-blocking flag from /podr/container/pipe/ef50a0fbe11a_web-cybermat-prd/stdout_85886637514e489ba2e6f3131419432e.
+2025-08-19T03:21:20.0104337Z Creating stderr named pipe at /podr/container/pipe/ef50a0fbe11a_web-cybermat-prd/stderr_7197efec1d35426a9fb48c75af0a2898.
+2025-08-19T03:21:20.0107241Z Successfully created stderr named pipe at: /podr/container/pipe/ef50a0fbe11a_web-cybermat-prd/stderr_7197efec1d35426a9fb48c75af0a2898.
+2025-08-19T03:21:20.0110095Z Opening named pipe /podr/container/pipe/ef50a0fbe11a_web-cybermat-prd/stderr_7197efec1d35426a9fb48c75af0a2898 for reading in non-blocking mode.
+2025-08-19T03:21:20.0111543Z Successfully opened named pipe: /podr/container/pipe/ef50a0fbe11a_web-cybermat-prd/stderr_7197efec1d35426a9fb48c75af0a2898.
+2025-08-19T03:21:20.0112571Z Successfully removed non-blocking flag from /podr/container/pipe/ef50a0fbe11a_web-cybermat-prd/stderr_7197efec1d35426a9fb48c75af0a2898.
+2025-08-19T03:21:20.0114368Z Creating container with image: appsvc/node:20-lts_20250724.2.tuxprod from registry: mcr.microsoft.com and fully qualified image name: mcr.microsoft.com/appsvc/node:20-lts_20250724.2.tuxprod
+2025-08-19T03:21:24.1586447Z Container start up interrupted. Revert by terminate.
+2025-08-19T03:21:24.1606434Z Container is terminating. Grace period: 5 seconds.
+2025-08-19T03:21:24.1705733Z Stop and delete container. Retry count = 0
+2025-08-19T03:21:24.1777939Z Stopping container: ef50a0fbe11a_web-cybermat-prd.
+2025-08-19T03:21:24.3808075Z Deleting container: ef50a0fbe11a_web-cybermat-prd. Retry count = 0
+2025-08-19T03:21:25.5698006Z Container spec TerminationMessagePolicy  path 
+2025-08-19T03:21:25.5786644Z Container is terminated. Total time elapsed: 1409 ms.
+2025-08-19T03:21:25.5811369Z Site container: web-cybermat-prd terminated during site startup.
+2025-08-19T03:21:26.2430330Z Site container: web-cybermat-prd terminated. Stopping the entire site.
+2025-08-19T03:21:26.2545209Z Site: web-cybermat-prd stopped.
+2025-08-19T03:21:46.6939377Z Container is terminating. Grace period: 5 seconds.
+2025-08-19T03:21:46.7149429Z Stop and delete container. Retry count = 0
+2025-08-19T03:21:46.7228680Z Stopping container: 751726a5203e_web-cybermat-prd.
+2025-08-19T03:21:46.9545410Z Deleting container: 751726a5203e_web-cybermat-prd. Retry count = 0
+2025-08-19T03:21:47.9196809Z Container spec TerminationMessagePolicy  path 
+2025-08-19T03:21:47.9208564Z Container is terminated. Total time elapsed: 1225 ms.
+2025-08-19T03:21:47.9213084Z Site: web-cybermat-prd stopped.
+2025-08-19T03:22:33.2291013Z Container start method called.
+2025-08-19T03:22:33.2386308Z Establishing network.
+2025-08-19T03:22:33.2390654Z Pulling image: appsvc/node:20-lts_20250724.2.tuxprod.
+2025-08-19T03:22:39.6132784Z Container is starting.
+2025-08-19T03:22:39.6134007Z Establishing user namespace if not established already.
+2025-08-19T03:22:39.6135267Z Establishing network if not established already.
+2025-08-19T03:22:39.6136463Z Mounting volumes.
+2025-08-19T03:22:39.6138124Z Nested mountpoint 
+2025-08-19T03:22:39.6336155Z Nested mountpoint volatile/logs
+2025-08-19T03:22:39.6640033Z Nested mountpoint 
+2025-08-19T03:22:39.7439247Z Nested mountpoint 
+2025-08-19T03:22:39.7666839Z Nested mountpoint 
+2025-08-19T03:22:40.8927632Z Creating container.
+2025-08-19T03:22:40.9004292Z Creating pipes for streaming container io.
+2025-08-19T03:22:40.9008592Z Creating stdout named pipe at /podr/container/pipe/80cce0f84828_web-cybermat-prd/stdout_9601513275014b369fb68ae57e0cab63.
+2025-08-19T03:22:40.9014006Z Successfully created stdout named pipe at: /podr/container/pipe/80cce0f84828_web-cybermat-prd/stdout_9601513275014b369fb68ae57e0cab63.
+2025-08-19T03:22:40.9017709Z Opening named pipe /podr/container/pipe/80cce0f84828_web-cybermat-prd/stdout_9601513275014b369fb68ae57e0cab63 for reading in non-blocking mode.
+2025-08-19T03:22:40.9022743Z Successfully opened named pipe: /podr/container/pipe/80cce0f84828_web-cybermat-prd/stdout_9601513275014b369fb68ae57e0cab63.
+2025-08-19T03:22:40.9026526Z Successfully removed non-blocking flag from /podr/container/pipe/80cce0f84828_web-cybermat-prd/stdout_9601513275014b369fb68ae57e0cab63.
+2025-08-19T03:22:40.9221787Z Creating stderr named pipe at /podr/container/pipe/80cce0f84828_web-cybermat-prd/stderr_957c82b8ea5b42b4b75554090bc6fe19.
+2025-08-19T03:22:40.9300197Z Successfully created stderr named pipe at: /podr/container/pipe/80cce0f84828_web-cybermat-prd/stderr_957c82b8ea5b42b4b75554090bc6fe19.
+2025-08-19T03:22:40.9309390Z Opening named pipe /podr/container/pipe/80cce0f84828_web-cybermat-prd/stderr_957c82b8ea5b42b4b75554090bc6fe19 for reading in non-blocking mode.
+2025-08-19T03:22:40.9317778Z Successfully opened named pipe: /podr/container/pipe/80cce0f84828_web-cybermat-prd/stderr_957c82b8ea5b42b4b75554090bc6fe19.
+2025-08-19T03:22:40.9326664Z Successfully removed non-blocking flag from /podr/container/pipe/80cce0f84828_web-cybermat-prd/stderr_957c82b8ea5b42b4b75554090bc6fe19.
+2025-08-19T03:22:40.9407149Z Creating container with image: appsvc/node:20-lts_20250724.2.tuxprod from registry: mcr.microsoft.com and fully qualified image name: mcr.microsoft.com/appsvc/node:20-lts_20250724.2.tuxprod
+2025-08-19T03:22:41.6182576Z Starting container: 80cce0f84828_web-cybermat-prd.
+2025-08-19T03:22:41.6978083Z Starting watchers and probes.
+2025-08-19T03:22:41.7058631Z Starting metrics collection.
+2025-08-19T03:22:41.7064619Z Container is running.
+2025-08-19T03:22:41.9889580Z Container start method finished after 8749 ms.
+2025-08-19T03:23:11.5563748Z Site startup probe succeeded after 29.5343756 seconds.
+2025-08-19T03:23:11.6816558Z Site is running with deployment version: 84607237-e1b2-45b5-bfd9-67094e044364
+2025-08-19T03:23:11.6870186Z Site started.
+2025-08-19T19:29:44.3576987Z Container start method called.
+2025-08-19T19:29:44.3597364Z Establishing network.
+2025-08-19T19:29:44.3602004Z Pulling image: appsvc/node:20-lts_20250724.2.tuxprod.
+2025-08-19T19:29:49.5597595Z Container is starting.
+2025-08-19T19:29:49.5601923Z Establishing user namespace if not established already.
+2025-08-19T19:29:49.5605736Z Establishing network if not established already.
+2025-08-19T19:29:49.5609619Z Mounting volumes.
+2025-08-19T19:29:49.5613739Z Nested mountpoint 
+2025-08-19T19:29:49.5811274Z Nested mountpoint volatile/logs
+2025-08-19T19:29:49.6219681Z Nested mountpoint 
+2025-08-19T19:29:49.7132050Z Nested mountpoint 
+2025-08-19T19:29:49.7507639Z Nested mountpoint 
+2025-08-19T19:29:50.7558901Z Creating container.
+2025-08-19T19:29:50.7562472Z Creating pipes for streaming container io.
+2025-08-19T19:29:50.7564811Z Creating stdout named pipe at /podr/container/pipe/3aa3fd12786c_web-cybermat-prd/stdout_6ba895ad43b24ef2ab61cdf57e18386f.
+2025-08-19T19:29:50.7660314Z Successfully created stdout named pipe at: /podr/container/pipe/3aa3fd12786c_web-cybermat-prd/stdout_6ba895ad43b24ef2ab61cdf57e18386f.
+2025-08-19T19:29:50.7661551Z Opening named pipe /podr/container/pipe/3aa3fd12786c_web-cybermat-prd/stdout_6ba895ad43b24ef2ab61cdf57e18386f for reading in non-blocking mode.
+2025-08-19T19:29:50.7662875Z Successfully opened named pipe: /podr/container/pipe/3aa3fd12786c_web-cybermat-prd/stdout_6ba895ad43b24ef2ab61cdf57e18386f.
+2025-08-19T19:29:50.7663884Z Successfully removed non-blocking flag from /podr/container/pipe/3aa3fd12786c_web-cybermat-prd/stdout_6ba895ad43b24ef2ab61cdf57e18386f.
+2025-08-19T19:29:50.7664969Z Creating stderr named pipe at /podr/container/pipe/3aa3fd12786c_web-cybermat-prd/stderr_2f26219a5e0743a6b1139442a1b90cdb.
+2025-08-19T19:29:50.7670000Z Successfully created stderr named pipe at: /podr/container/pipe/3aa3fd12786c_web-cybermat-prd/stderr_2f26219a5e0743a6b1139442a1b90cdb.
+2025-08-19T19:29:50.7679403Z Opening named pipe /podr/container/pipe/3aa3fd12786c_web-cybermat-prd/stderr_2f26219a5e0743a6b1139442a1b90cdb for reading in non-blocking mode.
+2025-08-19T19:29:50.7681149Z Successfully opened named pipe: /podr/container/pipe/3aa3fd12786c_web-cybermat-prd/stderr_2f26219a5e0743a6b1139442a1b90cdb.
+2025-08-19T19:29:50.7864346Z Successfully removed non-blocking flag from /podr/container/pipe/3aa3fd12786c_web-cybermat-prd/stderr_2f26219a5e0743a6b1139442a1b90cdb.
+2025-08-19T19:29:50.7870898Z Creating container with image: appsvc/node:20-lts_20250724.2.tuxprod from registry: mcr.microsoft.com and fully qualified image name: mcr.microsoft.com/appsvc/node:20-lts_20250724.2.tuxprod
+2025-08-19T19:29:51.9393692Z Container start up interrupted. Revert by terminate.
+2025-08-19T19:29:51.9470492Z Container is terminating. Grace period: 5 seconds.
+2025-08-19T19:29:51.9497068Z Stop and delete container. Retry count = 0
+2025-08-19T19:29:51.9506190Z Stopping container: 3aa3fd12786c_web-cybermat-prd.
+2025-08-19T19:29:51.9808580Z Get exit code failed with unexpected exception. Proceed regardless.
+2025-08-19T19:29:51.9813166Z Deleting container: 3aa3fd12786c_web-cybermat-prd. Retry count = 0
+2025-08-19T19:29:51.9928558Z Container spec TerminationMessagePolicy  path 
+2025-08-19T19:29:51.9972099Z Container is terminated. Total time elapsed: 47 ms.
+2025-08-19T19:29:51.9978005Z Site container: web-cybermat-prd terminated during site startup.
+2025-08-19T19:29:52.2485019Z Site container: web-cybermat-prd terminated. Stopping the entire site.
+2025-08-19T19:29:52.2544334Z Site: web-cybermat-prd stopped.
+2025-08-19T19:30:12.2185855Z Container is terminating. Grace period: 5 seconds.
+2025-08-19T19:30:12.2579088Z Stop and delete container. Retry count = 0
+2025-08-19T19:30:12.2585548Z Stopping container: 80cce0f84828_web-cybermat-prd.
+2025-08-19T19:30:12.5661165Z Deleting container: 80cce0f84828_web-cybermat-prd. Retry count = 0
+2025-08-19T19:30:13.2731792Z Container spec TerminationMessagePolicy  path 
+2025-08-19T19:30:13.2733339Z Container is terminated. Total time elapsed: 1054 ms.
+2025-08-19T19:30:13.2733661Z Site: web-cybermat-prd stopped.
+2025-08-19T19:32:33.6965588Z Container start method called.
+2025-08-19T19:32:33.6970056Z Establishing network.
+2025-08-19T19:32:33.6973537Z Pulling image: appsvc/node:20-lts_20250724.2.tuxprod.
+2025-08-19T19:32:38.8015287Z Container is starting.
+2025-08-19T19:32:38.8020199Z Establishing user namespace if not established already.
+2025-08-19T19:32:38.8025157Z Establishing network if not established already.
+2025-08-19T19:32:38.8030261Z Mounting volumes.
+2025-08-19T19:32:38.8034634Z Nested mountpoint 
+2025-08-19T19:32:38.8350064Z Nested mountpoint volatile/logs
+2025-08-19T19:32:38.8637298Z Nested mountpoint 
+2025-08-19T19:32:38.8642896Z Nested mountpoint 
+2025-08-19T19:32:38.9037256Z Nested mountpoint 
+2025-08-19T19:32:40.1490607Z Creating container.
+2025-08-19T19:32:40.1496927Z Creating pipes for streaming container io.
+2025-08-19T19:32:40.1503024Z Creating stdout named pipe at /podr/container/pipe/a1ccc9559f0e_web-cybermat-prd/stdout_441000848ca14e1a9112f3ef89c08c40.
+2025-08-19T19:32:40.1786494Z Successfully created stdout named pipe at: /podr/container/pipe/a1ccc9559f0e_web-cybermat-prd/stdout_441000848ca14e1a9112f3ef89c08c40.
+2025-08-19T19:32:40.1794925Z Opening named pipe /podr/container/pipe/a1ccc9559f0e_web-cybermat-prd/stdout_441000848ca14e1a9112f3ef89c08c40 for reading in non-blocking mode.
+2025-08-19T19:32:40.1800188Z Successfully opened named pipe: /podr/container/pipe/a1ccc9559f0e_web-cybermat-prd/stdout_441000848ca14e1a9112f3ef89c08c40.
+2025-08-19T19:32:40.1806603Z Successfully removed non-blocking flag from /podr/container/pipe/a1ccc9559f0e_web-cybermat-prd/stdout_441000848ca14e1a9112f3ef89c08c40.
+2025-08-19T19:32:40.2089781Z Creating stderr named pipe at /podr/container/pipe/a1ccc9559f0e_web-cybermat-prd/stderr_6209248a2cd94d45ae181f6ab86b057e.
+2025-08-19T19:32:40.2097709Z Successfully created stderr named pipe at: /podr/container/pipe/a1ccc9559f0e_web-cybermat-prd/stderr_6209248a2cd94d45ae181f6ab86b057e.
+2025-08-19T19:32:40.2102654Z Opening named pipe /podr/container/pipe/a1ccc9559f0e_web-cybermat-prd/stderr_6209248a2cd94d45ae181f6ab86b057e for reading in non-blocking mode.
+2025-08-19T19:32:40.2305958Z Successfully opened named pipe: /podr/container/pipe/a1ccc9559f0e_web-cybermat-prd/stderr_6209248a2cd94d45ae181f6ab86b057e.
+2025-08-19T19:32:40.2400372Z Successfully removed non-blocking flag from /podr/container/pipe/a1ccc9559f0e_web-cybermat-prd/stderr_6209248a2cd94d45ae181f6ab86b057e.
+2025-08-19T19:32:40.2404360Z Creating container with image: appsvc/node:20-lts_20250724.2.tuxprod from registry: mcr.microsoft.com and fully qualified image name: mcr.microsoft.com/appsvc/node:20-lts_20250724.2.tuxprod
+2025-08-19T19:32:40.9313528Z Starting container: a1ccc9559f0e_web-cybermat-prd.
+2025-08-19T19:32:40.9873135Z Starting watchers and probes.
+2025-08-19T19:32:41.0050260Z Starting metrics collection.
+2025-08-19T19:32:41.0153625Z Container is running.
+2025-08-19T19:32:41.8746844Z Container start method finished after 8177 ms.
+2025-08-19T19:33:16.0852973Z Site startup probe succeeded after 34.1500866 seconds.
+2025-08-19T19:33:17.0850419Z Site is running with deployment version: 84607237-e1b2-45b5-bfd9-67094e044364
+2025-08-19T19:33:17.1202370Z Site started.
+2025-08-19T19:37:04.6135590Z Container start method called.
+2025-08-19T19:37:04.6136617Z Establishing network.
+2025-08-19T19:37:04.6137527Z Pulling image: appsvc/node:20-lts_20250724.2.tuxprod.
+2025-08-19T19:37:22.3289911Z Container is starting.
+2025-08-19T19:37:22.3290948Z Establishing user namespace if not established already.
+2025-08-19T19:37:22.3291768Z Establishing network if not established already.
+2025-08-19T19:37:22.3292532Z Mounting volumes.
+2025-08-19T19:37:22.3293794Z Nested mountpoint 
+2025-08-19T19:37:22.3608512Z Nested mountpoint volatile/logs
+2025-08-19T19:37:22.4113008Z Nested mountpoint 
+2025-08-19T19:37:22.5200975Z Nested mountpoint 
+2025-08-19T19:37:22.5997490Z Nested mountpoint 
+2025-08-19T19:37:34.3516723Z Creating container.
+2025-08-19T19:37:34.3693285Z Creating pipes for streaming container io.
+2025-08-19T19:37:34.3705757Z Creating stdout named pipe at /podr/container/pipe/6fda78233620_web-cybermat-prd/stdout_7cf7098d5a7c4e758125dea61bfb514a.
+2025-08-19T19:37:34.3717556Z Successfully created stdout named pipe at: /podr/container/pipe/6fda78233620_web-cybermat-prd/stdout_7cf7098d5a7c4e758125dea61bfb514a.
+2025-08-19T19:37:34.3798203Z Opening named pipe /podr/container/pipe/6fda78233620_web-cybermat-prd/stdout_7cf7098d5a7c4e758125dea61bfb514a for reading in non-blocking mode.
+2025-08-19T19:37:34.3801602Z Successfully opened named pipe: /podr/container/pipe/6fda78233620_web-cybermat-prd/stdout_7cf7098d5a7c4e758125dea61bfb514a.
+2025-08-19T19:37:34.3803802Z Successfully removed non-blocking flag from /podr/container/pipe/6fda78233620_web-cybermat-prd/stdout_7cf7098d5a7c4e758125dea61bfb514a.
+2025-08-19T19:37:34.3806083Z Creating stderr named pipe at /podr/container/pipe/6fda78233620_web-cybermat-prd/stderr_68ef09e629264fc4806ff26ff46513e5.
+2025-08-19T19:37:34.3808767Z Successfully created stderr named pipe at: /podr/container/pipe/6fda78233620_web-cybermat-prd/stderr_68ef09e629264fc4806ff26ff46513e5.
+2025-08-19T19:37:34.3810711Z Opening named pipe /podr/container/pipe/6fda78233620_web-cybermat-prd/stderr_68ef09e629264fc4806ff26ff46513e5 for reading in non-blocking mode.
+2025-08-19T19:37:34.3812755Z Successfully opened named pipe: /podr/container/pipe/6fda78233620_web-cybermat-prd/stderr_68ef09e629264fc4806ff26ff46513e5.
+2025-08-19T19:37:34.3814791Z Successfully removed non-blocking flag from /podr/container/pipe/6fda78233620_web-cybermat-prd/stderr_68ef09e629264fc4806ff26ff46513e5.
+2025-08-19T19:37:34.3816892Z Creating container with image: appsvc/node:20-lts_20250724.2.tuxprod from registry: mcr.microsoft.com and fully qualified image name: mcr.microsoft.com/appsvc/node:20-lts_20250724.2.tuxprod
+2025-08-19T19:37:35.5969607Z Starting container: 6fda78233620_web-cybermat-prd.
+2025-08-19T19:37:35.6803227Z Starting watchers and probes.
+2025-08-19T19:37:35.7296608Z Starting metrics collection.
+2025-08-19T19:37:35.7310329Z Container is running.
+2025-08-19T19:37:35.9030222Z Container start method finished after 31289 ms.
+2025-08-19T19:38:02.0591077Z Container has finished running with exit code: 1.
+2025-08-19T19:38:02.3026889Z Container is terminating. Grace period: 5 seconds.
+2025-08-19T19:38:02.3322511Z Stop and delete container. Retry count = 0
+2025-08-19T19:38:02.3324422Z Stopping container: 6fda78233620_web-cybermat-prd.
+2025-08-19T19:38:02.7440690Z Deleting container: 6fda78233620_web-cybermat-prd. Retry count = 0
+2025-08-19T19:38:05.4252990Z Container spec TerminationMessagePolicy  path 
+2025-08-19T19:38:05.4458580Z Container is terminated. Total time elapsed: 3115 ms.
+2025-08-19T19:38:05.4460859Z Site container: web-cybermat-prd terminated during site startup.
+2025-08-19T19:38:05.4768442Z Site startup probe failed after 29.4715812 seconds.
+2025-08-19T19:38:05.9088609Z Failed to start site. Revert by stopping site.
+2025-08-19T19:38:05.9455859Z Site: web-cybermat-prd stopped.
+2025-08-19T19:38:33.0006720Z Container is terminating. Grace period: 5 seconds.
+2025-08-19T19:38:33.1437960Z Stop and delete container. Retry count = 0
+2025-08-19T19:38:33.1440584Z Stopping container: a1ccc9559f0e_web-cybermat-prd.
+2025-08-19T19:38:33.5607868Z Deleting container: a1ccc9559f0e_web-cybermat-prd. Retry count = 0
+2025-08-19T19:38:34.2258402Z Container spec TerminationMessagePolicy  path 
+2025-08-19T19:38:34.2260387Z Container is terminated. Total time elapsed: 1224 ms.
+2025-08-19T19:38:34.2260696Z Site: web-cybermat-prd stopped.
+2025-08-19T19:38:11.0948241Z Site container: web-cybermat-prd_managedIdentity terminated during site startup.
+2025-08-19T19:38:11.1059644Z ManagedIdentity container failed to startup
+2025-08-19T19:39:46.3287597Z Container start method called.
+2025-08-19T19:39:46.3288685Z Establishing network.
+2025-08-19T19:39:46.3289485Z Pulling image: appsvc/node:20-lts_20250724.2.tuxprod.
+2025-08-19T19:39:51.9405563Z Container is starting.
+2025-08-19T19:39:51.9406454Z Establishing user namespace if not established already.
+2025-08-19T19:39:51.9407360Z Establishing network if not established already.
+2025-08-19T19:39:51.9408173Z Mounting volumes.
+2025-08-19T19:39:51.9409359Z Nested mountpoint 
+2025-08-19T19:39:52.0021673Z Nested mountpoint volatile/logs
+2025-08-19T19:39:52.0199590Z Nested mountpoint 
+2025-08-19T19:39:52.0299321Z Nested mountpoint 
+2025-08-19T19:39:52.1398869Z Nested mountpoint 
+2025-08-19T19:39:53.6945935Z Creating container.
+2025-08-19T19:39:53.7026833Z Creating pipes for streaming container io.
+2025-08-19T19:39:53.7036789Z Creating stdout named pipe at /podr/container/pipe/286da821ce79_web-cybermat-prd/stdout_cadf13a661444fc7ad7b758ad16d0849.
+2025-08-19T19:39:53.7045263Z Successfully created stdout named pipe at: /podr/container/pipe/286da821ce79_web-cybermat-prd/stdout_cadf13a661444fc7ad7b758ad16d0849.
+2025-08-19T19:39:53.7120907Z Opening named pipe /podr/container/pipe/286da821ce79_web-cybermat-prd/stdout_cadf13a661444fc7ad7b758ad16d0849 for reading in non-blocking mode.
+2025-08-19T19:39:53.7126917Z Successfully opened named pipe: /podr/container/pipe/286da821ce79_web-cybermat-prd/stdout_cadf13a661444fc7ad7b758ad16d0849.
+2025-08-19T19:39:53.7131777Z Successfully removed non-blocking flag from /podr/container/pipe/286da821ce79_web-cybermat-prd/stdout_cadf13a661444fc7ad7b758ad16d0849.
+2025-08-19T19:39:53.7136606Z Creating stderr named pipe at /podr/container/pipe/286da821ce79_web-cybermat-prd/stderr_67e575a4090e469abbbdbf565ddca46a.
+2025-08-19T19:39:53.7142876Z Successfully created stderr named pipe at: /podr/container/pipe/286da821ce79_web-cybermat-prd/stderr_67e575a4090e469abbbdbf565ddca46a.
+2025-08-19T19:39:53.7147734Z Opening named pipe /podr/container/pipe/286da821ce79_web-cybermat-prd/stderr_67e575a4090e469abbbdbf565ddca46a for reading in non-blocking mode.
+2025-08-19T19:39:53.7221569Z Successfully opened named pipe: /podr/container/pipe/286da821ce79_web-cybermat-prd/stderr_67e575a4090e469abbbdbf565ddca46a.
+2025-08-19T19:39:53.7231511Z Successfully removed non-blocking flag from /podr/container/pipe/286da821ce79_web-cybermat-prd/stderr_67e575a4090e469abbbdbf565ddca46a.
+2025-08-19T19:39:53.7243903Z Creating container with image: appsvc/node:20-lts_20250724.2.tuxprod from registry: mcr.microsoft.com and fully qualified image name: mcr.microsoft.com/appsvc/node:20-lts_20250724.2.tuxprod
+2025-08-19T19:39:54.5886034Z Starting container: 286da821ce79_web-cybermat-prd.
+2025-08-19T19:39:54.6891804Z Starting watchers and probes.
+2025-08-19T19:39:54.6903836Z Starting metrics collection.
+2025-08-19T19:39:54.6978025Z Container is running.
+2025-08-19T19:39:56.3004844Z Container start method finished after 9971 ms.
+2025-08-19T19:40:23.6014235Z Container has finished running with exit code: 1.
+2025-08-19T19:40:23.6015269Z Container is terminating. Grace period: 5 seconds.
+2025-08-19T19:40:23.6184738Z Stop and delete container. Retry count = 0
+2025-08-19T19:40:23.6195794Z Stopping container: 286da821ce79_web-cybermat-prd.
+2025-08-19T19:40:23.7410641Z Deleting container: 286da821ce79_web-cybermat-prd. Retry count = 0
+2025-08-19T19:40:24.6901846Z Container spec TerminationMessagePolicy  path 
+2025-08-19T19:40:24.6914196Z Container is terminated. Total time elapsed: 1089 ms.
+2025-08-19T19:40:24.6997584Z Site container: web-cybermat-prd terminated during site startup.
+2025-08-19T19:40:24.7012137Z Site startup probe failed after 28.3985479 seconds.
+2025-08-19T19:40:24.7302747Z Failed to start site. Revert by stopping site.
+2025-08-19T19:40:24.7307647Z Site: web-cybermat-prd stopped.
+2025-08-19T19:41:05.2080973Z Container start method called.
+2025-08-19T19:41:05.2293754Z Establishing network.
+2025-08-19T19:41:05.2367921Z Pulling image: appsvc/node:20-lts_20250724.2.tuxprod.
+2025-08-19T19:41:13.9877206Z Container is starting.
+2025-08-19T19:41:13.9881121Z Establishing user namespace if not established already.
+2025-08-19T19:41:13.9885012Z Establishing network if not established already.
+2025-08-19T19:41:13.9888657Z Mounting volumes.
+2025-08-19T19:41:13.9892880Z Nested mountpoint 
+2025-08-19T19:41:14.0590208Z Nested mountpoint volatile/logs
+2025-08-19T19:41:14.0695610Z Nested mountpoint 
+2025-08-19T19:41:14.1608581Z Nested mountpoint 
+2025-08-19T19:41:14.2010951Z Nested mountpoint 
+2025-08-19T19:41:15.8981648Z Creating container.
+2025-08-19T19:41:15.9309885Z Creating pipes for streaming container io.
+2025-08-19T19:41:15.9494748Z Creating stdout named pipe at /podr/container/pipe/9764a95ccaff_web-cybermat-prd/stdout_2f6697bc59454b3b9070badb959ea963.
+2025-08-19T19:41:15.9505024Z Successfully created stdout named pipe at: /podr/container/pipe/9764a95ccaff_web-cybermat-prd/stdout_2f6697bc59454b3b9070badb959ea963.
+2025-08-19T19:41:15.9512127Z Opening named pipe /podr/container/pipe/9764a95ccaff_web-cybermat-prd/stdout_2f6697bc59454b3b9070badb959ea963 for reading in non-blocking mode.
+2025-08-19T19:41:15.9518802Z Successfully opened named pipe: /podr/container/pipe/9764a95ccaff_web-cybermat-prd/stdout_2f6697bc59454b3b9070badb959ea963.
+2025-08-19T19:41:15.9591353Z Successfully removed non-blocking flag from /podr/container/pipe/9764a95ccaff_web-cybermat-prd/stdout_2f6697bc59454b3b9070badb959ea963.
+2025-08-19T19:41:15.9594541Z Creating stderr named pipe at /podr/container/pipe/9764a95ccaff_web-cybermat-prd/stderr_0eb145b4cb4340c5a8fd54bc97430a70.
+2025-08-19T19:41:15.9597872Z Successfully created stderr named pipe at: /podr/container/pipe/9764a95ccaff_web-cybermat-prd/stderr_0eb145b4cb4340c5a8fd54bc97430a70.
+2025-08-19T19:41:15.9600994Z Opening named pipe /podr/container/pipe/9764a95ccaff_web-cybermat-prd/stderr_0eb145b4cb4340c5a8fd54bc97430a70 for reading in non-blocking mode.
+2025-08-19T19:41:15.9619025Z Successfully opened named pipe: /podr/container/pipe/9764a95ccaff_web-cybermat-prd/stderr_0eb145b4cb4340c5a8fd54bc97430a70.
+2025-08-19T19:41:15.9708605Z Successfully removed non-blocking flag from /podr/container/pipe/9764a95ccaff_web-cybermat-prd/stderr_0eb145b4cb4340c5a8fd54bc97430a70.
+2025-08-19T19:41:15.9718046Z Creating container with image: appsvc/node:20-lts_20250724.2.tuxprod from registry: mcr.microsoft.com and fully qualified image name: mcr.microsoft.com/appsvc/node:20-lts_20250724.2.tuxprod
+2025-08-19T19:41:16.6846307Z Starting container: 9764a95ccaff_web-cybermat-prd.
+2025-08-19T19:41:16.8049048Z Starting watchers and probes.
+2025-08-19T19:41:16.8118041Z Starting metrics collection.
+2025-08-19T19:41:16.8400962Z Container is running.
+2025-08-19T19:41:17.2327545Z Container start method finished after 11975 ms.
+2025-08-19T19:41:37.7419403Z Container has finished running with exit code: 1.
+2025-08-19T19:41:37.7494222Z Container is terminating. Grace period: 5 seconds.
+2025-08-19T19:41:37.7498025Z Stop and delete container. Retry count = 0
+2025-08-19T19:41:37.7503410Z Stopping container: 9764a95ccaff_web-cybermat-prd.
+2025-08-19T19:41:37.8326512Z Deleting container: 9764a95ccaff_web-cybermat-prd. Retry count = 0
+2025-08-19T19:41:38.5621733Z Container spec TerminationMessagePolicy  path 
+2025-08-19T19:41:38.5627024Z Container is terminated. Total time elapsed: 812 ms.
+2025-08-19T19:41:38.5694729Z Site container: web-cybermat-prd terminated during site startup.
+2025-08-19T19:41:38.5699700Z Site startup probe failed after 21.3252102 seconds.
+2025-08-19T19:41:38.5822726Z Failed to start site. Revert by stopping site.
+2025-08-19T19:41:38.6092695Z Site: web-cybermat-prd stopped.

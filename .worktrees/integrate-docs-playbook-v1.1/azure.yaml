@@ -1,0 +1,56 @@
+# Azure Developer CLI skeleton (adjust names before running `azd up`)
+name: cyber-ai-maturity-tool
+metadata:
+  template: custom/cyber-ai-maturity
+services:
+  api:
+    project: ./services/api
+    language: py
+    docker:
+      path: ./services/api/Dockerfile
+      context: ./services/api
+  orchestrator:
+    project: ./services/orchestrator
+    language: py
+    docker:
+      path: ./services/orchestrator/Dockerfile
+      context: ./services/orchestrator
+  doc-analyzer:
+    project: ./services/agents/documentation_analyzer
+    language: py
+    docker:
+      path: ./services/agents/documentation_analyzer/Dockerfile
+      context: ./services/agents/documentation_analyzer
+  gap-analysis:
+    project: ./services/agents/gap_analysis
+    language: py
+    docker:
+      path: ./services/agents/gap_analysis/Dockerfile
+      context: ./services/agents/gap_analysis
+  initiative-gen:
+    project: ./services/agents/initiative_generation
+    language: py
+    docker:
+      path: ./services/agents/initiative_generation/Dockerfile
+      context: ./services/agents/initiative_generation
+  prioritization:
+    project: ./services/agents/prioritization
+    language: py
+    docker:
+      path: ./services/agents/prioritization/Dockerfile
+      context: ./services/agents/prioritization
+  roadmap-planner:
+    project: ./services/agents/roadmap_planner
+    language: py
+    docker:
+      path: ./services/agents/roadmap_planner/Dockerfile
+      context: ./services/agents/roadmap_planner
+  report-generator:
+    project: ./services/agents/report_generator
+    language: py
+    docker:
+      path: ./services/agents/report_generator/Dockerfile
+      context: ./services/agents/report_generator
+infra:
+  provider: bicep
+  path: infra

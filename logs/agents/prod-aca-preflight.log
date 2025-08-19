@@ -1,0 +1,36 @@
+=== PHASE 0 PREFLIGHT ===
+Tue 19 Aug 2025 12:22:47 MDT
+github.com
+  ✓ Logged in to github.com account ValeriiSysoiev (keyring)
+  - Active account: true
+  - Git operations protocol: https
+  - Token: gho_************************************
+{
+  "subscription": "10233675-d493-4a97-9c81-4001e353a7bb",
+  "tenant": "8354a4cc-cfd8-41e4-9416-ea0304bc62e1",
+  "user": "va.sysoiev@audit3a.com"
+}
+ValeriiSysoiev/AI-Enable-Cyber-Maturity-Assessment-2
+{
+  "fqdn": "api-cybermat-prd-aca.icystone-69c102b0.westeurope.azurecontainerapps.io",
+  "name": "api-cybermat-prd-aca",
+  "state": "Succeeded"
+}
+Registered
+-rw-r--r--@ 1 svvval  staff  788 Aug 18 22:05 app/Dockerfile
+-rw-r--r--@ 1 svvval  staff  595 Aug 18 21:56 app/requirements.txt
+uvicorn[standard]>=0.30
+pydantic-settings>=2.0.0
+[
+  {
+    "location": "West Europe",
+    "name": "cdb-cybermat-prd"
+  }
+]
+[
+  {
+    "location": "westeurope",
+    "name": "kv-cybermat-prd"
+  }
+]
+PREFLIGHT COMPLETE: Repo=ValeriiSysoiev/AI-Enable-Cyber-Maturity-Assessment-2, ACA FQDN=api-cybermat-prd-aca.icystone-69c102b0.westeurope.azurecontainerapps.io

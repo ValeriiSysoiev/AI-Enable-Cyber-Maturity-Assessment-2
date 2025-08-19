@@ -1,0 +1,102 @@
+Configurator Agent - Web Frontend Repair Configuration Log
+==========================================================
+Started: 2025-08-19
+Task: Configure Azure App Service settings for staging and production
+
+STAGING ENVIRONMENT CONFIGURATION
+=================================
+Resource Group: rg-cybermat-stg
+Web App Name: web-cybermat-stg
+
+PRODUCTION ENVIRONMENT CONFIGURATION
+====================================
+Resource Group: rg-cybermat-prd
+Web App Name: web-cybermat-prd
+
+Configuration Steps:
+1. Set Node.js runtime version to 20-lts
+2. Configure app settings including PORT, NODE_ENV, etc.
+3. Set API URL endpoints
+4. Configure startup file
+5. Verify final configuration
+
+=== STAGING ENVIRONMENT CONFIGURATION ===
+Resource Group: rg-cybermat-stg
+Web App Name: web-cybermat-stg
+
+COMMANDS TO EXECUTE:
+
+1. Set Node.js Runtime:
+az webapp config set -g rg-cybermat-stg -n web-cybermat-stg --linux-fx-version "NODE|20-lts"
+
+2. Configure App Settings:
+az webapp config appsettings set -g rg-cybermat-stg -n web-cybermat-stg --settings \
+  "PORT=8080" \
+  "WEBSITES_PORT=8080" \
+  "NODE_ENV=production" \
+  "NEXT_TELEMETRY_DISABLED=1" \
+  "WEBSITE_NODE_DEFAULT_VERSION=~20" \
+  "SCM_DO_BUILD_DURING_DEPLOYMENT=false" \
+  "NEXT_PUBLIC_API_BASE_URL=https://api-cybermat-prd-aca.icystone-69c102b0.westeurope.azurecontainerapps.io"
+
+3. Set Startup File:
+az webapp config set -g rg-cybermat-stg -n web-cybermat-stg --startup-file "node server.js"
+
+=== PRODUCTION ENVIRONMENT CONFIGURATION ===
+Resource Group: rg-cybermat-prd
+Web App Name: web-cybermat-prd
+
+COMMANDS TO EXECUTE:
+
+1. Set Node.js Runtime:
+az webapp config set -g rg-cybermat-prd -n web-cybermat-prd --linux-fx-version "NODE|20-lts"
+
+2. Configure App Settings:
+az webapp config appsettings set -g rg-cybermat-prd -n web-cybermat-prd --settings \
+  "PORT=8080" \
+  "WEBSITES_PORT=8080" \
+  "NODE_ENV=production" \
+  "NEXT_TELEMETRY_DISABLED=1" \
+  "WEBSITE_NODE_DEFAULT_VERSION=~20" \
+  "SCM_DO_BUILD_DURING_DEPLOYMENT=false" \
+  "NEXT_PUBLIC_API_BASE_URL=https://api-cybermat-prd-aca.icystone-69c102b0.westeurope.azurecontainerapps.io"
+
+3. Set Startup File:
+az webapp config set -g rg-cybermat-prd -n web-cybermat-prd --startup-file "node server.js"
+
+=== VERIFICATION COMMANDS ===
+
+For Staging:
+az webapp config show -g rg-cybermat-stg -n web-cybermat-stg --query "{linuxFxVersion:linuxFxVersion,nodeVersion:nodeVersion}"
+az webapp config appsettings list -g rg-cybermat-stg -n web-cybermat-stg --query "[?name=='PORT' || name=='WEBSITES_PORT' || name=='NODE_ENV' || name=='NEXT_PUBLIC_API_BASE_URL']"
+az webapp config show -g rg-cybermat-stg -n web-cybermat-stg --query "appCommandLine"
+
+For Production:
+az webapp config show -g rg-cybermat-prd -n web-cybermat-prd --query "{linuxFxVersion:linuxFxVersion,nodeVersion:nodeVersion}"
+az webapp config appsettings list -g rg-cybermat-prd -n web-cybermat-prd --query "[?name=='PORT' || name=='WEBSITES_PORT' || name=='NODE_ENV' || name=='NEXT_PUBLIC_API_BASE_URL']"
+az webapp config show -g rg-cybermat-prd -n web-cybermat-prd --query "appCommandLine"
+
+=== CONFIGURATION STATUS ===
+Date: 2025-08-19
+Agent: Configurator
+
+STATUS: PREPARED
+- Configuration commands documented above
+- Automation script created: /scripts/configure_web_apps.sh
+- Manual execution required due to Azure CLI environment limitations
+
+EXECUTION INSTRUCTIONS:
+1. Ensure Azure CLI is installed and authenticated (az login)
+2. Execute the automation script: ./scripts/configure_web_apps.sh
+   OR
+3. Run the individual commands listed above manually
+
+EXPECTED OUTCOMES:
+- Staging (web-cybermat-stg): Node.js 20-lts runtime, proper app settings, startup file configured
+- Production (web-cybermat-prd): Node.js 20-lts runtime, proper app settings, startup file configured
+- Both environments will have PORT=8080, NODE_ENV=production, and correct API URLs
+
+VERIFICATION:
+After execution, verify configurations using the verification commands listed above.
+
+The configuration is ready for deployment.

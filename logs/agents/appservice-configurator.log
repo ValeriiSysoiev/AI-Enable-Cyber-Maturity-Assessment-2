@@ -1,0 +1,162 @@
+=== APP SERVICE CONFIGURATOR AGENT EXECUTION LOG ===
+Timestamp: 2025-08-19 19:42:15
+Agent: AppServiceConfigurator
+Target: web-cybermat-prd (Production App Service)
+Status: PREPARED
+
+=== CONFIGURATION SCRIPTS CREATED ===
+
+1. Production Configuration Script
+   Location: /Users/svvval/Documents/AI-Enable-Cyber-Maturity-Assessment-2/scripts/appservice-prd-config.sh
+   Purpose: Complete Azure CLI commands for web-cybermat-prd configuration
+   Features:
+   - Node.js 20 LTS runtime setup
+   - Required environment variables configuration
+   - Startup command configuration (node .next/standalone/server.js)
+   - Security settings (TLS 1.2, FTPS only, HTTP/2)
+   - Performance optimizations (Always On, memory settings)
+   - Health check verification
+   
+2. Configuration Backup Script
+   Location: /Users/svvval/Documents/AI-Enable-Cyber-Maturity-Assessment-2/scripts/capture-current-config.sh
+   Purpose: Document and preserve current App Service configuration
+   Features:
+   - Complete configuration backup to JSON
+   - Critical settings documentation
+   - Environment variables preservation
+   - Timestamped backup files
+   
+3. Emergency Rollback Script
+   Location: /Users/svvval/Documents/AI-Enable-Cyber-Maturity-Assessment-2/scripts/appservice-rollback.sh
+   Purpose: Emergency rollback to last known working state
+   Features:
+   - Interactive rollback menu
+   - Multiple rollback strategies
+   - Configuration backup restoration
+   - Health verification after rollback
+   - Current state documentation
+   
+4. Self-Healing Logic Script
+   Location: /Users/svvval/Documents/AI-Enable-Cyber-Maturity-Assessment-2/scripts/appservice-self-heal.sh
+   Purpose: Automated recovery for common failure scenarios
+   Features:
+   - Health monitoring and auto-healing
+   - Multiple healing scenarios
+   - ZIP deployment recovery
+   - Runtime configuration fixes
+   - Performance optimization healing
+   - Comprehensive healing sequence
+
+=== CURRENT PRODUCTION CONFIGURATION (PRESERVED) ===
+
+Runtime Settings:
+- Linux FX Version: NODE|20-lts
+- App Command Line: node .next/standalone/server.js
+- State: Running
+- Always On: true
+- HTTP/2 Enabled: true
+- Min TLS Version: 1.2
+- FTPS State: FtpsOnly
+
+Critical Environment Variables:
+- PORT=8080
+- WEBSITES_PORT=8080
+- NODE_ENV=production
+- WEBSITE_NODE_DEFAULT_VERSION=20-lts
+- NEXT_TELEMETRY_DISABLED=1
+- SCM_DO_BUILD_DURING_DEPLOYMENT=false
+- WEBSITE_HTTPLOGGING_RETENTION_DAYS=3
+
+API Integration:
+- NEXT_PUBLIC_API_BASE_URL=https://api-cybermat-prd-aca.icystone-69c102b0.westeurope.azurecontainerapps.io
+
+=== ROLLBACK SCENARIOS DOCUMENTED ===
+
+Primary Rollback Configuration:
+- Runtime: NODE|20-lts
+- Startup Command: node .next/standalone/server.js
+- Fallback Startup: node server.js
+- Essential App Settings: Documented and preserved
+
+Emergency Procedures:
+1. Immediate rollback: ./appservice-rollback.sh --emergency
+2. Backup restoration: ./appservice-rollback.sh --backup
+3. Fallback startup: ./appservice-rollback.sh --fallback
+
+=== SELF-HEALING SCENARIOS ===
+
+1. App Not Responding
+   - Check app service status
+   - Restart or start app service
+   - 60-second recovery verification
+
+2. ZIP Deployment Recovery
+   - Check deployment status
+   - Redeploy from local ZIP package
+   - 120-second deployment verification
+
+3. Startup Command Issues
+   - Try primary startup: node .next/standalone/server.js
+   - Fallback to: node server.js
+   - Last resort: npm start
+
+4. Runtime Configuration Issues
+   - Reset to Node.js 20 LTS
+   - Restore critical environment variables
+   - Restart with corrected runtime
+
+5. Performance Issues
+   - Adjust Node.js memory settings
+   - Enable Always On and HTTP/2
+   - Apply performance optimizations
+
+6. Monitoring Mode
+   - Continuous health monitoring (5-minute intervals)
+   - Auto-healing after 3 consecutive failures
+   - Comprehensive healing sequence
+
+=== EXECUTION COMMANDS ===
+
+Production Configuration:
+./scripts/appservice-prd-config.sh
+
+Configuration Backup:
+./scripts/capture-current-config.sh
+
+Emergency Rollback:
+./scripts/appservice-rollback.sh [--emergency|--backup|--fallback]
+
+Self-Healing:
+./scripts/appservice-self-heal.sh [--check|--comprehensive|--monitor]
+
+=== CRITICAL NOTES ===
+
+1. All scripts require Azure CLI authentication (az login)
+2. Scripts target Resource Group: rg-cybermat-prd
+3. Scripts target App Service: web-cybermat-prd
+4. Configuration backups are timestamped and preserved
+5. Health checks use HTTPS endpoint verification
+6. All operations are logged to this file
+
+=== SCRIPT PERMISSIONS ===
+
+All scripts should be made executable with:
+chmod +x scripts/*.sh
+
+=== VERIFICATION CHECKLIST ===
+
+[ ] Azure CLI authenticated
+[ ] Resource group access confirmed
+[ ] App Service exists and accessible
+[ ] Backup configuration captured
+[ ] Rollback procedures tested
+[ ] Self-healing scenarios validated
+
+=== AGENT STATUS: PREPARED ===
+
+All App Service configuration commands have been prepared and documented.
+Scripts are ready for production deployment and emergency scenarios.
+Configuration status: PREPARED
+
+End of AppServiceConfigurator Agent Log
+=== LOG COMPLETE ===

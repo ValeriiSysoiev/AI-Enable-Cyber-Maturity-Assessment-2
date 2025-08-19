@@ -1,0 +1,260 @@
+2025-08-18T21:33:58.244022872Z    _____                               
+2025-08-18T21:33:58.244054723Z   /  _  \ __________ _________   ____  
+2025-08-18T21:33:58.244058231Z  /  /_\  \\___   /  |  \_  __ \_/ __ \ 
+2025-08-18T21:33:58.244061362Z /    |    \/    /|  |  /|  | \/\  ___/ 
+2025-08-18T21:33:58.244064148Z \____|__  /_____ \____/ |__|    \___  >
+2025-08-18T21:33:58.244072933Z         \/      \/                  \/ 
+2025-08-18T21:33:58.244075589Z A P P   S E R V I C E   O N   L I N U X
+2025-08-18T21:33:58.244078108Z 
+2025-08-18T21:33:58.244080427Z Documentation: http://aka.ms/webapp-linux
+2025-08-18T21:33:58.244082863Z NodeJS quickstart: https://aka.ms/node-qs
+2025-08-18T21:33:58.244085800Z NodeJS Version : v20.19.3
+2025-08-18T21:33:58.244088319Z Note: Any data outside '/home' is not persisted
+2025-08-18T21:33:58.244090957Z 
+2025-08-18T21:34:06.494586939Z Starting OpenBSD Secure Shell server: sshd.
+2025-08-18T21:34:06.516694000Z WEBSITES_INCLUDE_CLOUD_CERTS is not set to true.
+2025-08-18T21:34:06.544501319Z Updating certificates in /etc/ssl/certs...
+2025-08-18T21:34:15.938016625Z rehash: warning: skipping ca-certificates.crt,it does not contain exactly one certificate or CRL
+2025-08-18T21:34:16.086586646Z 4 added, 0 removed; done.
+2025-08-18T21:34:16.116866570Z Running hooks in /etc/ca-certificates/update.d...
+2025-08-18T21:34:16.127150804Z done.
+2025-08-18T21:34:16.148873210Z CA certificates copied and updated successfully.
+2025-08-18T21:34:16.607860087Z Starting periodic command scheduler: cron.
+2025-08-18T21:34:17.051322183Z Could not find build manifest file at '/home/site/wwwroot/oryx-manifest.toml'
+2025-08-18T21:34:17.051360470Z Could not find operation ID in manifest. Generating an operation id...
+2025-08-18T21:34:17.051364407Z Build Operation ID: 8eb8c48a-332b-40b1-bc6f-80cf8a57f8f2
+2025-08-18T21:34:17.503772136Z Environment Variables for Application Insight's IPA Codeless Configuration exists..
+2025-08-18T21:34:17.512679620Z Writing output script to '/opt/startup/startup.sh'
+2025-08-18T21:34:17.543493861Z Running #!/bin/sh
+2025-08-18T21:34:17.543532197Z 
+2025-08-18T21:34:17.543536067Z # Enter the source directory to make sure the script runs where the user expects
+2025-08-18T21:34:17.543538998Z cd "/home/site/wwwroot"
+2025-08-18T21:34:17.543541566Z 
+2025-08-18T21:34:17.543544499Z export NODE_PATH=/usr/local/lib/node_modules:$NODE_PATH
+2025-08-18T21:34:17.543547078Z if [ -z "$PORT" ]; then
+2025-08-18T21:34:17.543549712Z 		export PORT=8080
+2025-08-18T21:34:17.543552878Z fi
+2025-08-18T21:34:17.543555249Z 
+2025-08-18T21:34:17.543557637Z npm start
+2025-08-18T21:34:21.030123247Z npm info using npm@10.9.2
+2025-08-18T21:34:21.031022054Z npm info using node@v20.19.3
+2025-08-18T21:34:25.950557410Z 
+2025-08-18T21:34:25.950616207Z > ai-maturity-web@0.1.0 start
+2025-08-18T21:34:25.950620979Z > next start
+2025-08-18T21:34:25.950623816Z 
+2025-08-18T21:34:26.011309168Z sh: 1: next: not found
+2025-08-18T21:34:26.253097470Z npm http fetch GET 200 https://registry.npmjs.org/npm 473ms
+2025-08-18T21:34:26.253649977Z npm notice
+2025-08-18T21:34:26.253663193Z npm notice New major version of npm available! 10.9.2 -> 11.5.2
+2025-08-18T21:34:26.253666893Z npm notice Changelog: https://github.com/npm/cli/releases/tag/v11.5.2
+2025-08-18T21:34:26.253669631Z npm notice To update run: npm install -g npm@11.5.2
+2025-08-18T21:34:26.253672230Z npm notice
+
+2025-08-18T21:34:55.459967005Z    _____                               
+2025-08-18T21:34:55.459987110Z   /  _  \ __________ _________   ____  
+2025-08-18T21:34:55.459990431Z  /  /_\  \\___   /  |  \_  __ \_/ __ \ 
+2025-08-18T21:34:55.459993299Z /    |    \/    /|  |  /|  | \/\  ___/ 
+2025-08-18T21:34:55.459996079Z \____|__  /_____ \____/ |__|    \___  >
+2025-08-18T21:34:55.459998963Z         \/      \/                  \/ 
+2025-08-18T21:34:55.460001597Z A P P   S E R V I C E   O N   L I N U X
+2025-08-18T21:34:55.460004215Z 
+2025-08-18T21:34:55.460012796Z Documentation: http://aka.ms/webapp-linux
+2025-08-18T21:34:55.460015600Z NodeJS quickstart: https://aka.ms/node-qs
+2025-08-18T21:34:55.460018190Z NodeJS Version : v20.19.3
+2025-08-18T21:34:55.460020887Z Note: Any data outside '/home' is not persisted
+2025-08-18T21:34:55.460023743Z 
+2025-08-18T21:35:05.761478840Z Starting OpenBSD Secure Shell server: sshd.
+2025-08-18T21:35:05.772095605Z WEBSITES_INCLUDE_CLOUD_CERTS is not set to true.
+2025-08-18T21:35:05.793956616Z Updating certificates in /etc/ssl/certs...
+2025-08-18T21:35:17.172177138Z rehash: warning: skipping ca-certificates.crt,it does not contain exactly one certificate or CRL
+2025-08-18T21:35:17.292483119Z 4 added, 0 removed; done.
+2025-08-18T21:35:17.292506259Z Running hooks in /etc/ca-certificates/update.d...
+2025-08-18T21:35:17.292509626Z done.
+2025-08-18T21:35:17.313413125Z CA certificates copied and updated successfully.
+2025-08-18T21:35:17.574934011Z Starting periodic command scheduler: cron.
+2025-08-18T21:35:17.654048722Z Could not find build manifest file at '/home/site/wwwroot/oryx-manifest.toml'
+2025-08-18T21:35:17.654074446Z Could not find operation ID in manifest. Generating an operation id...
+2025-08-18T21:35:17.655463169Z Build Operation ID: 48bd7df4-e4fd-40d5-80b1-235118deb9a8
+2025-08-18T21:35:18.299177207Z Environment Variables for Application Insight's IPA Codeless Configuration exists..
+2025-08-18T21:35:18.299201259Z Writing output script to '/opt/startup/startup.sh'
+2025-08-18T21:35:18.299204511Z Running #!/bin/sh
+2025-08-18T21:35:18.299207119Z 
+2025-08-18T21:35:18.299209694Z # Enter the source directory to make sure the script runs where the user expects
+2025-08-18T21:35:18.299212353Z cd "/home/site/wwwroot"
+2025-08-18T21:35:18.299214959Z 
+2025-08-18T21:35:18.299217379Z export NODE_PATH=/usr/local/lib/node_modules:$NODE_PATH
+2025-08-18T21:35:18.299219902Z if [ -z "$PORT" ]; then
+2025-08-18T21:35:18.299222459Z 		export PORT=8080
+2025-08-18T21:35:18.299225241Z fi
+2025-08-18T21:35:18.299227686Z 
+2025-08-18T21:35:18.299230141Z npm start
+2025-08-18T21:35:20.771308448Z npm info using npm@10.9.2
+2025-08-18T21:35:20.842002575Z npm info using node@v20.19.3
+2025-08-18T21:35:25.145469981Z 
+2025-08-18T21:35:25.145531792Z > ai-maturity-web@0.1.0 start
+2025-08-18T21:35:25.145536615Z > next start
+2025-08-18T21:35:25.145539579Z 
+2025-08-18T21:35:25.266057893Z sh: 1: next: not found
+2025-08-18T21:35:25.598677304Z npm http fetch GET 200 https://registry.npmjs.org/npm 1075ms
+2025-08-18T21:35:25.658029895Z npm notice
+2025-08-18T21:35:25.658051919Z npm notice New major version of npm available! 10.9.2 -> 11.5.2
+2025-08-18T21:35:25.658056038Z npm notice Changelog: https://github.com/npm/cli/releases/tag/v11.5.2
+2025-08-18T21:35:25.658058769Z npm notice To update run: npm install -g npm@11.5.2
+2025-08-18T21:35:25.658061474Z npm notice
+
+2025-08-18T21:35:53.880601341Z    _____                               
+2025-08-18T21:35:53.880643561Z   /  _  \ __________ _________   ____  
+2025-08-18T21:35:53.880647143Z  /  /_\  \\___   /  |  \_  __ \_/ __ \ 
+2025-08-18T21:35:53.880650060Z /    |    \/    /|  |  /|  | \/\  ___/ 
+2025-08-18T21:35:53.880652870Z \____|__  /_____ \____/ |__|    \___  >
+2025-08-18T21:35:53.880656191Z         \/      \/                  \/ 
+2025-08-18T21:35:53.880658859Z A P P   S E R V I C E   O N   L I N U X
+2025-08-18T21:35:53.880661488Z 
+2025-08-18T21:35:53.880663852Z Documentation: http://aka.ms/webapp-linux
+2025-08-18T21:35:53.880666301Z NodeJS quickstart: https://aka.ms/node-qs
+2025-08-18T21:35:53.880669006Z NodeJS Version : v20.19.3
+2025-08-18T21:35:53.880671537Z Note: Any data outside '/home' is not persisted
+2025-08-18T21:35:53.880674227Z 
+2025-08-18T21:35:57.425776106Z Starting OpenBSD Secure Shell server: sshd.
+2025-08-18T21:35:57.428281837Z WEBSITES_INCLUDE_CLOUD_CERTS is not set to true.
+2025-08-18T21:35:57.467557521Z Updating certificates in /etc/ssl/certs...
+2025-08-18T21:36:08.906242020Z rehash: warning: skipping ca-certificates.crt,it does not contain exactly one certificate or CRL
+2025-08-18T21:36:09.055837797Z 4 added, 0 removed; done.
+2025-08-18T21:36:09.056653572Z Running hooks in /etc/ca-certificates/update.d...
+2025-08-18T21:36:09.085520137Z done.
+2025-08-18T21:36:09.116582944Z CA certificates copied and updated successfully.
+2025-08-18T21:36:09.547876931Z Starting periodic command scheduler: cron.
+2025-08-18T21:36:09.647837304Z Could not find build manifest file at '/home/site/wwwroot/oryx-manifest.toml'
+2025-08-18T21:36:09.647863174Z Could not find operation ID in manifest. Generating an operation id...
+2025-08-18T21:36:09.647866510Z Build Operation ID: c751a5b9-25ab-4e68-9dc0-c243b4626243
+2025-08-18T21:36:09.898731030Z Environment Variables for Application Insight's IPA Codeless Configuration exists..
+2025-08-18T21:36:09.900054025Z Writing output script to '/opt/startup/startup.sh'
+2025-08-18T21:36:09.940416117Z Running #!/bin/sh
+2025-08-18T21:36:09.940451276Z 
+2025-08-18T21:36:09.940455109Z # Enter the source directory to make sure the script runs where the user expects
+2025-08-18T21:36:09.940458195Z cd "/home/site/wwwroot"
+2025-08-18T21:36:09.940460760Z 
+2025-08-18T21:36:09.940463421Z export NODE_PATH=/usr/local/lib/node_modules:$NODE_PATH
+2025-08-18T21:36:09.940465949Z if [ -z "$PORT" ]; then
+2025-08-18T21:36:09.940468821Z 		export PORT=8080
+2025-08-18T21:36:09.940472229Z fi
+2025-08-18T21:36:09.940474562Z 
+2025-08-18T21:36:09.940476965Z npm start
+2025-08-18T21:36:10.893567942Z npm info using npm@10.9.2
+2025-08-18T21:36:10.893600278Z npm info using node@v20.19.3
+2025-08-18T21:36:13.972131213Z 
+2025-08-18T21:36:13.972216774Z > ai-maturity-web@0.1.0 start
+2025-08-18T21:36:13.972221948Z > next start
+2025-08-18T21:36:13.972224978Z 
+2025-08-18T21:36:14.042074270Z sh: 1: next: not found
+2025-08-18T21:36:14.403460581Z npm http fetch GET 200 https://registry.npmjs.org/npm 1006ms
+2025-08-18T21:36:14.464874495Z npm notice
+2025-08-18T21:36:14.464917646Z npm notice New major version of npm available! 10.9.2 -> 11.5.2
+2025-08-18T21:36:14.464922070Z npm notice Changelog: https://github.com/npm/cli/releases/tag/v11.5.2
+2025-08-18T21:36:14.464924953Z npm notice To update run: npm install -g npm@11.5.2
+2025-08-18T21:36:14.464927669Z npm notice
+
+2025-08-18T21:38:06.994364141Z    _____                               
+2025-08-18T21:38:06.994402166Z   /  _  \ __________ _________   ____  
+2025-08-18T21:38:06.994405638Z  /  /_\  \\___   /  |  \_  __ \_/ __ \ 
+2025-08-18T21:38:06.994408489Z /    |    \/    /|  |  /|  | \/\  ___/ 
+2025-08-18T21:38:06.994411208Z \____|__  /_____ \____/ |__|    \___  >
+2025-08-18T21:38:06.994413997Z         \/      \/                  \/ 
+2025-08-18T21:38:06.994416717Z A P P   S E R V I C E   O N   L I N U X
+2025-08-18T21:38:06.994419352Z 
+2025-08-18T21:38:06.994421725Z Documentation: http://aka.ms/webapp-linux
+2025-08-18T21:38:06.994424151Z NodeJS quickstart: https://aka.ms/node-qs
+2025-08-18T21:38:06.994426601Z NodeJS Version : v20.19.3
+2025-08-18T21:38:06.994429138Z Note: Any data outside '/home' is not persisted
+2025-08-18T21:38:06.994431844Z 
+2025-08-18T21:38:10.644999927Z Starting OpenBSD Secure Shell server: sshd.
+2025-08-18T21:38:10.694310332Z WEBSITES_INCLUDE_CLOUD_CERTS is not set to true.
+2025-08-18T21:38:10.785024372Z Updating certificates in /etc/ssl/certs...
+2025-08-18T21:38:20.412520541Z rehash: warning: skipping ca-certificates.crt,it does not contain exactly one certificate or CRL
+2025-08-18T21:38:20.515602039Z 4 added, 0 removed; done.
+2025-08-18T21:38:20.515640917Z Running hooks in /etc/ca-certificates/update.d...
+2025-08-18T21:38:20.525426259Z done.
+2025-08-18T21:38:20.574402506Z CA certificates copied and updated successfully.
+2025-08-18T21:38:20.737298787Z Starting periodic command scheduler: cron.
+2025-08-18T21:38:20.936880489Z Could not find build manifest file at '/home/site/wwwroot/oryx-manifest.toml'
+2025-08-18T21:38:20.938274186Z Could not find operation ID in manifest. Generating an operation id...
+2025-08-18T21:38:20.938289547Z Build Operation ID: fd4d69e8-c4d5-45bc-9fed-ce3ee2479dd6
+2025-08-18T21:38:21.370912896Z Environment Variables for Application Insight's IPA Codeless Configuration exists..
+2025-08-18T21:38:21.370937560Z Writing output script to '/opt/startup/startup.sh'
+2025-08-18T21:38:21.410371077Z Running #!/bin/sh
+2025-08-18T21:38:21.410410275Z 
+2025-08-18T21:38:21.410414124Z # Enter the source directory to make sure the script runs where the user expects
+2025-08-18T21:38:21.410416891Z cd "/home/site/wwwroot"
+2025-08-18T21:38:21.410419593Z 
+2025-08-18T21:38:21.410422121Z export NODE_PATH=/usr/local/lib/node_modules:$NODE_PATH
+2025-08-18T21:38:21.410424758Z if [ -z "$PORT" ]; then
+2025-08-18T21:38:21.410427585Z 		export PORT=8080
+2025-08-18T21:38:21.410430331Z fi
+2025-08-18T21:38:21.410432727Z 
+2025-08-18T21:38:21.410435159Z npm start
+2025-08-18T21:38:24.564833700Z npm info using npm@10.9.2
+2025-08-18T21:38:24.564867414Z npm info using node@v20.19.3
+2025-08-18T21:38:29.693019264Z 
+2025-08-18T21:38:29.693056060Z > ai-maturity-web@0.1.0 start
+2025-08-18T21:38:29.693060426Z > next start
+2025-08-18T21:38:29.693063407Z 
+2025-08-18T21:38:29.773076694Z sh: 1: next: not found
+2025-08-18T21:38:30.325436490Z npm http fetch GET 200 https://registry.npmjs.org/npm 834ms
+2025-08-18T21:38:30.357159012Z npm notice
+2025-08-18T21:38:30.357196554Z npm notice New major version of npm available! 10.9.2 -> 11.5.2
+2025-08-18T21:38:30.357201509Z npm notice Changelog: https://github.com/npm/cli/releases/tag/v11.5.2
+2025-08-18T21:38:30.357204476Z npm notice To update run: npm install -g npm@11.5.2
+2025-08-18T21:38:30.357207112Z npm notice
+
+2025-08-18T21:41:03.473126219Z    _____                               
+2025-08-18T21:41:03.473174213Z   /  _  \ __________ _________   ____  
+2025-08-18T21:41:03.473177941Z  /  /_\  \\___   /  |  \_  __ \_/ __ \ 
+2025-08-18T21:41:03.473180804Z /    |    \/    /|  |  /|  | \/\  ___/ 
+2025-08-18T21:41:03.473183620Z \____|__  /_____ \____/ |__|    \___  >
+2025-08-18T21:41:03.473186620Z         \/      \/                  \/ 
+2025-08-18T21:41:03.473189242Z A P P   S E R V I C E   O N   L I N U X
+2025-08-18T21:41:03.473191860Z 
+2025-08-18T21:41:03.473194257Z Documentation: http://aka.ms/webapp-linux
+2025-08-18T21:41:03.473196756Z NodeJS quickstart: https://aka.ms/node-qs
+2025-08-18T21:41:03.473210888Z NodeJS Version : v20.19.3
+2025-08-18T21:41:03.473213811Z Note: Any data outside '/home' is not persisted
+2025-08-18T21:41:03.473216401Z 
+2025-08-18T21:41:06.539583454Z Starting OpenBSD Secure Shell server: sshd.
+2025-08-18T21:41:06.560677582Z WEBSITES_INCLUDE_CLOUD_CERTS is not set to true.
+2025-08-18T21:41:06.590983686Z Updating certificates in /etc/ssl/certs...
+2025-08-18T21:41:15.158546381Z rehash: warning: skipping ca-certificates.crt,it does not contain exactly one certificate or CRL
+2025-08-18T21:41:15.209632909Z 4 added, 0 removed; done.
+2025-08-18T21:41:15.210910242Z Running hooks in /etc/ca-certificates/update.d...
+2025-08-18T21:41:15.230163501Z done.
+2025-08-18T21:41:15.241612305Z CA certificates copied and updated successfully.
+2025-08-18T21:41:15.593217994Z Starting periodic command scheduler: cron.
+2025-08-18T21:41:15.964291718Z Could not find build manifest file at '/home/site/wwwroot/oryx-manifest.toml'
+2025-08-18T21:41:15.964317121Z Could not find operation ID in manifest. Generating an operation id...
+2025-08-18T21:41:15.964320513Z Build Operation ID: 073d671c-d55a-4729-bd87-6a18b8c81ff3
+2025-08-18T21:41:16.486582296Z Environment Variables for Application Insight's IPA Codeless Configuration exists..
+2025-08-18T21:41:16.486631237Z Writing output script to '/opt/startup/startup.sh'
+2025-08-18T21:41:16.675397538Z Running #!/bin/sh
+2025-08-18T21:41:16.675440793Z 
+2025-08-18T21:41:16.675444495Z # Enter the source directory to make sure the script runs where the user expects
+2025-08-18T21:41:16.675448315Z cd "/home/site/wwwroot"
+2025-08-18T21:41:16.675451193Z 
+2025-08-18T21:41:16.675454764Z export NODE_PATH=/usr/local/lib/node_modules:$NODE_PATH
+2025-08-18T21:41:16.675457644Z if [ -z "$PORT" ]; then
+2025-08-18T21:41:16.675460578Z 		export PORT=8080
+2025-08-18T21:41:16.675463621Z fi
+2025-08-18T21:41:16.675466268Z 
+2025-08-18T21:41:16.675469058Z npm start
+2025-08-18T21:41:19.548293219Z npm info using npm@10.9.2
+2025-08-18T21:41:19.566054778Z npm info using node@v20.19.3
+2025-08-18T21:41:24.223946219Z 
+2025-08-18T21:41:24.223999947Z > ai-maturity-web@0.1.0 start
+2025-08-18T21:41:24.224004680Z > next start
+2025-08-18T21:41:24.224007484Z 
+2025-08-18T21:41:24.283064470Z sh: 1: next: not found
+2025-08-18T21:41:24.876244616Z npm http fetch GET 200 https://registry.npmjs.org/npm 1074ms
+2025-08-18T21:41:24.915657294Z npm notice
+2025-08-18T21:41:24.915698851Z npm notice New major version of npm available! 10.9.2 -> 11.5.2
+2025-08-18T21:41:24.915703136Z npm notice Changelog: https://github.com/npm/cli/releases/tag/v11.5.2
+2025-08-18T21:41:24.915706161Z npm notice To update run: npm install -g npm@11.5.2
+2025-08-18T21:41:24.915708837Z npm notice
+

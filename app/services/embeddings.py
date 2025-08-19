@@ -10,7 +10,7 @@ from typing import List, Tuple, Optional, Dict, Any
 from dataclasses import dataclass
 from openai import AsyncAzureOpenAI
 from azure.identity import DefaultAzureCredential
-from ..config import config
+from config import config
 
 
 logger = logging.getLogger(__name__)

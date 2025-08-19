@@ -1,0 +1,2 @@
+=== PHASE 1 APP SERVICE DIAGNOSTICS ===
+503 CONFIRMED: All endpoints (/health, /, /docs) returning HTTP 503

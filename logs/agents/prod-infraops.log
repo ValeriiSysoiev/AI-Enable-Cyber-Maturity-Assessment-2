@@ -1,0 +1,10 @@
+=== PHASE 0 PREFLIGHT ===
+GitHub Auth: ✓ Logged in as ValeriiSysoiev
+Azure CLI: NOT INSTALLED - Cannot proceed with Azure operations
+Azure CLI: ✓ Installed via homebrew
+Azure Auth: REQUIRED - User needs to run 'az login'
+ERROR: Cannot proceed with Azure operations. Azure login required.
+Azure Auth: ✓ Authenticated as va.sysoiev@audit3a.com
+Subscription: 10233675-d493-4a97-9c81-4001e353a7bb (Azure subscription 1)
+Microsoft.App Provider: ✓ Registered (ACA fallback available)
+PROD API Found: api-cybermat-prd in rg-cybermat-prd (Running)

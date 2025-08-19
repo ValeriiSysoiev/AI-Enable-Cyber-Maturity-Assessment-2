@@ -1,0 +1,113 @@
+=== AGENT:LEGACYFINDER EXECUTION LOG ===
+Timestamp: 2025-08-19 19:47:00
+Agent: LegacyFinder
+Task: Scan codebase for legacy/demo markers and duplicate READMEs
+Status: COMPLETED
+
+=== LEGACY DEMO MARKER ANALYSIS ===
+
+EXTENSIVE LEGACY REFERENCES FOUND:
+- Pattern: (rg-aaa-demo|aaa-demo|acraaademo9lyu53|api-aaa-demo|web-aaa-demo|aca-aaa-demo|search-aaa-demo|openai-aaa-demo)
+- Total matches: 100+ references across multiple files
+
+=== PRIORITY CLEANUP TARGETS ===
+
+1. **Configuration Files**:
+   - .claude/settings.local.json - Contains search-aaa-demo reference
+   - README.md - Multiple aaa-demo references in deployment examples
+
+2. **Legacy Bundle Logs** (High Volume):
+   - logs/bundles/bundle-20250815-140708/* - Entire directory with aaa-demo configs
+     * api_config.json, web_config.json (resource group rg-aaa-demo references)
+     * api_revisions.json, web_revisions.json (container app names)
+     * bundle_info.txt, last_verify*.* (URLs and resource names)
+     * All referencing old demo environment: acraaademo9lyu53, api-aaa-demo, web-aaa-demo
+
+3. **Infrastructure References**:
+   - infra/locals.tf - Comments referencing "aaa-demo" example
+   - logs/refs/latest.json - Active references to aaa-demo resources
+
+4. **Script Configuration**:
+   - scripts/deploy_admin.sh - Default APP_API_NAME="api-aaa-demo"
+   - scripts/verify_live.sh - RG_NAME="rg-aaa-demo" 
+   - scripts/print_urls.sh - Truncated but likely contains demo references
+
+=== README DUPLICATION ANALYSIS ===
+
+**Primary READMEs (Project Level)**:
+- README.md (root) - Main project documentation
+- README.bak - Backup of root README
+
+**Secondary READMEs (Component Level)**:
+- e2e/load/README.md - Load testing documentation
+- docs/security/README.md - Security documentation  
+- logs/support/appservice-prod/README.md - Support documentation
+
+**Node Modules READMEs**: 500+ npm package READMEs (exclude from cleanup)
+
+=== CLEANUP STRATEGY RECOMMENDATIONS ===
+
+**IMMEDIATE ARCHIVE TARGETS (High Priority)**:
+1. **logs/bundles/bundle-20250815-140708/** - Entire demo bundle directory
+   - Action: Move to /archive/20250819/demo-bundles/
+   - Reason: Contains extensive aaa-demo configuration snapshots
+
+2. **README.bak** - Backup file
+   - Action: Move to /archive/20250819/
+   - Reason: Redundant backup of root README
+
+**REFERENCE UPDATES (Medium Priority)**:
+3. **scripts/deploy_admin.sh** - Line 11-12
+   - Action: Update default values to production names
+   - Current: APP_API_NAME="${APP_API_NAME:-api-aaa-demo}"
+   - Proposed: APP_API_NAME="${APP_API_NAME:-api-cybermat-prd-aca}"
+
+4. **scripts/verify_live.sh** - Line 23
+   - Action: Update RG_NAME to production
+   - Current: RG_NAME="rg-aaa-demo"  
+   - Proposed: RG_NAME="rg-cybermat-prd"
+
+5. **.claude/settings.local.json** - Line 11
+   - Action: Update search service name
+   - Current: "search-aaa-demo"
+   - Proposed: "search-cybermat-prd" (if applicable)
+
+6. **README.md** - Lines 488, 493-494, 499
+   - Action: Update examples to use production resource names
+   - Replace aaa-demo references with cybermat-prd equivalents
+
+**PRESERVE (Important)**:
+- infra/locals.tf - Keep comment as example only
+- logs/refs/latest.json - May be active reference file, verify before cleanup
+- All secondary component READMEs - Legitimate documentation
+
+=== ARCHIVE STRUCTURE PROPOSAL ===
+
+Create: /archive/20250819/
+├── demo-bundles/
+│   └── bundle-20250815-140708/ (entire directory)
+├── backup-files/
+│   └── README.bak
+└── cleanup-manifest.txt (this log)
+
+=== SIZE ANALYSIS ===
+Estimated space to be archived:
+- logs/bundles/bundle-20250815-140708/: ~500KB+ (multiple JSON/log files)
+- README.bak: ~50KB (estimated)
+- Total cleanup target: <1MB
+
+=== SAFETY RECOMMENDATIONS ===
+1. VERIFY logs/refs/latest.json is not actively used before archiving
+2. BACKUP current production resource names before updating scripts
+3. UPDATE references in small PRs (<300 LOC each)
+4. TEST script functionality after reference updates
+
+=== AGENT STATUS: ANALYSIS COMPLETE ===
+
+Legacy marker scan completed successfully.
+100+ demo references identified across 20+ files.
+Cleanup strategy prioritized by risk and impact.
+Ready for LegacyJanitor agent execution.
+
+End of Agent:LegacyFinder Log  
+=== LOG COMPLETE ===

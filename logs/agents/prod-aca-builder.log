@@ -1,0 +1,3 @@
+=== PHASE 1 BUILD & PUSH ===
+Fixed Dockerfile CMD to use api.main:app
+GitHub push blocked by large files. Using local Docker build approach.

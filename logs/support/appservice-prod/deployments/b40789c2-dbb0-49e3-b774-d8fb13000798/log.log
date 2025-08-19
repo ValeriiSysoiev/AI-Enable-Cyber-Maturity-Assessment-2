@@ -1,0 +1,53 @@
+2025-08-19T04:24:30.2863809Z,Updating submodules.,91d30204-9e7c-475d-9165-7d8acf2664e3,0
+2025-08-19T04:24:31.4063487Z,Preparing deployment for commit id 'b40789c2-d'.,bfeee5a2-4abe-410b-80cb-1e5912a14b5f,0
+2025-08-19T04:24:31.7641927Z,PreDeployment: context.CleanOutputPath False,3c1108a3-dc81-40ea-9e77-28047196d092,0
+2025-08-19T04:24:31.8928385Z,PreDeployment: context.OutputPath /home/site/wwwroot,c3deab7f-7122-48d8-85e1-620f3628f5ae,0
+2025-08-19T04:24:32.0475302Z,Repository path is /tmp/zipdeploy/extracted,1aea4408-6839-4aba-b93d-382d79b404ae,0
+2025-08-19T04:24:32.1752107Z,Running oryx build...,5b59c43e-7436-4cfb-9cef-83ed7c6f44f2,0
+	2025-08-19T04:24:32.1801006Z,Command: oryx build /tmp/zipdeploy/extracted -o /home/site/wwwroot --platform python --platform-version 3.11 -p virtualenv_name=antenv --log-file /tmp/build-debug.log  -i /tmp/8ddded84b67fdbe --compress-destination-dir | tee /tmp/oryx-build.log,,0
+	2025-08-19T04:24:34.9061163Z,Operation performed by Microsoft Oryx&comma; https://github.com/Microsoft/Oryx,,0
+	2025-08-19T04:24:34.9455791Z,You can report issues at https://github.com/Microsoft/Oryx/issues,,0
+	2025-08-19T04:24:34.9761245Z,,,0
+	2025-08-19T04:24:34.9980623Z,Oryx Version: 0.2.20250611.1+0649de32f1279969c9023dd41b389cce4bb94493&comma; Commit: 0649de32f1279969c9023dd41b389cce4bb94493&comma; ReleaseTagName: 20250611.1,,0
+	2025-08-19T04:24:35.0156239Z,,,0
+	2025-08-19T04:24:35.0379715Z,Build Operation ID: 562bebb042e172a7,,0
+	2025-08-19T04:24:35.0770066Z,Repository Commit : b40789c2-dbb0-49e3-b774-d8fb13000798,,0
+	2025-08-19T04:24:35.1077182Z,OS Type           : bullseye,,0
+	2025-08-19T04:24:35.1369981Z,Image Type        : githubactions,,0
+	2025-08-19T04:24:35.1673132Z,,,0
+	2025-08-19T04:24:35.1866049Z,Primary SDK Storage URL: https://oryx-cdn.microsoft.io,,0
+	2025-08-19T04:24:35.2067061Z,Backup SDK Storage URL: https://oryxsdks-cdn.azureedge.net,,0
+	2025-08-19T04:24:35.2561096Z,Detecting platforms...,,0
+	2025-08-19T04:24:35.2865834Z,External SDK provider is enabled.,,0
+	2025-08-19T04:24:35.4265506Z,Requesting metadata for platform python from external SDK provider,,0
+	2025-08-19T04:24:37.6574713Z,Requesting metadata for platform python from external SDK provider,,0
+	2025-08-19T04:24:38.3417646Z,Detected following platforms:,,0
+	2025-08-19T04:24:38.3644592Z,  python: 3.11.13,,0
+	2025-08-19T04:24:38.4023428Z,Requesting metadata for platform python from external SDK provider,,0
+	2025-08-19T04:24:40.1844394Z,Version '3.11.13' of platform 'python' is not installed. Generating script to install it...,,0
+	2025-08-19T04:24:41.0776006Z,,,0
+	2025-08-19T04:24:41.2762749Z,Using intermediate directory '/tmp/8ddded84b67fdbe'.,,0
+	2025-08-19T04:24:41.3434772Z,,,0
+	2025-08-19T04:24:41.3650712Z,Copying files to the intermediate directory...,,0
+	2025-08-19T04:24:41.9682557Z,Done in 0 sec(s).,,0
+	2025-08-19T04:24:42.0079020Z,,,0
+	2025-08-19T04:24:42.0480672Z,Source directory     : /tmp/8ddded84b67fdbe,,0
+	2025-08-19T04:24:42.0685703Z,Destination directory: /home/site/wwwroot,,0
+	2025-08-19T04:24:42.1573087Z,,,0
+	2025-08-19T04:24:42.1877726Z,,,0
+	2025-08-19T04:24:42.2072468Z,Downloading and extracting 'python' version '3.11.13' to '/tmp/oryx/platforms/python/3.11.13'...,,0
+	2025-08-19T04:24:42.2464028Z,Detected image debian flavor: bullseye.,,0
+	2025-08-19T04:24:42.2763556Z,Skipping download of python version 3.11.13 as it is available in external sdk provider cache...,,0
+	2025-08-19T04:24:42.2962870Z,Extracting contents...,,0
+	2025-08-19T04:25:02.5873117Z,Successfully extracted python version 3.11.13 from external sdk provider cache...,,0
+	2025-08-19T04:25:02.6565876Z,Done in 20 sec(s).,,0
+	2025-08-19T04:25:02.7771917Z,,,0
+	2025-08-19T04:25:02.8453571Z,image detector file exists&comma; platform is python..,,0
+	2025-08-19T04:25:02.8735378Z,OS detector file exists&comma; OS is bullseye..,,0
+	2025-08-19T04:25:03.8596363Z,Python Version: /tmp/oryx/platforms/python/3.11.13/bin/python3.11,,0
+	2025-08-19T04:25:03.8813301Z,Creating directory for command manifest file if it does not exist,,0
+	2025-08-19T04:25:04.3237361Z,Removing existing manifest file,,0
+	2025-08-19T04:25:04.5352423Z,Python Virtual Environment: antenv,,0
+	2025-08-19T04:25:04.5858423Z,Creating virtual environment...,,0
+	2025-08-19T04:25:29.1882223Z,Activating virtual environment...,,0
+	2025-08-19T04:25:29.2393765Z,Running pip install...,,0

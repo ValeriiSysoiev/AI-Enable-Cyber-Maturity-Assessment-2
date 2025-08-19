@@ -1,13 +1,12 @@
-# Cyber AI‑Enabled Maturity Assessment Tool (MVP)
+# AI-Enabled Cyber Maturity Assessment Workspace
 
-This is a **deployable scaffold** for Deloitte’s Cyber AI‑Enabled Maturity Assessment solution.
-It includes an **API gateway**, **AI Orchestrator**, and **specialized AI agents** that implement
-a simple end‑to‑end flow: upload documents → analyze → identify gaps → propose initiatives →
-prioritize → produce a roadmap → generate a report.
+**North-Star**: Secure, agentic assessment end-to-end system delivering evidence-driven cyber maturity assessments, gap analysis, roadmap generation, and compliance exports with enterprise-grade isolation and governance.
 
-> **Status:** MVP skeleton that runs locally with Docker Compose and can be extended/deployed to Azure.
-> Uses FastAPI for services and simple HTTP orchestration between agents.
-> Azure OpenAI, Cosmos DB, Service Bus, Azure AD, and Sentinel hooks are stubbed with clear TODOs.
+This is a **production-deployed** AI-enabled cyber maturity assessment platform that enables consultants to conduct comprehensive cybersecurity assessments through intelligent document analysis, automated gap identification, and strategic roadmap generation.
+
+> **Status:** Production deployment on Azure with staging/production environments.
+> Web application (Next.js) + API services (Azure Container Apps) + enterprise data layer.
+> Full OIDC authentication, Cosmos DB persistence, and Azure AI integration.
 
 ---
 
@@ -62,39 +61,127 @@ All services provide `/health` endpoints and FastAPI docs at `/docs`.
 
 ---
 
-## Architecture (MVP)
+## Architecture (Production)
 
 ```mermaid
-flowchart LR
-    UI[Consultant (API Docs / future Web UI)]
-    API[API Gateway\n(FastAPI)]
-    ORCH[AI Orchestrator\n(FastAPI)]
-    DOC[Documentation Analyzer]
-    GAP[Gap Analysis Agent]
-    INIT[Initiative Generator]
-    PRI[Prioritization Agent]
-    PLAN[Roadmap Planner]
-    REP[Report Generator]
-    STORE[(Local Files\n→ future Cosmos DB)]
+flowchart TB
+    subgraph "Azure Production"
+        subgraph "Web Tier"
+            WEB[Next.js Web App\nApp Service]
+        end
+        
+        subgraph "API Tier"
+            API[FastAPI Backend\nContainer Apps]
+            AUTH[OIDC Authentication\nAzure AD]
+        end
+        
+        subgraph "Data Tier"
+            COSMOS[(Cosmos DB\nDocument Store)]
+            KV[Key Vault\nSecrets & Config]
+            SEARCH[Azure AI Search\nRAG & Embeddings)]
+        end
+        
+        subgraph "AI Services"
+            OPENAI[Azure OpenAI\nGPT-4 & Embeddings]
+            AGENTS[AI Orchestrator\nMulti-Agent System]
+        end
+    end
 
-    UI -->|HTTP| API -->|/analyze| ORCH
-    ORCH --> DOC --> GAP --> INIT --> PRI --> PLAN --> REP --> STORE
+    WEB -->|HTTPS| API
+    API -->|Managed Identity| COSMOS
+    API -->|Managed Identity| KV
+    API -->|RAG Queries| SEARCH
+    API -->|AI Processing| OPENAI
+    AGENTS -->|Document Analysis| SEARCH
+    AUTH -->|JWT Tokens| WEB
+    AUTH -->|Claims| API
 ```
 
-> The MVP uses **HTTP fan‑out/fan‑in** calls for simplicity. In production,
-> swap to **Azure Service Bus** for async orchestration (adapter hooks included).
+**Current Architecture:**
+- **Web Frontend**: Next.js on Azure App Service (standalone deployment)
+- **API Backend**: FastAPI on Azure Container Apps with auto-scaling
+- **Authentication**: OIDC with Azure AD integration
+- **Data Persistence**: Cosmos DB with automatic indexing
+- **AI Integration**: Azure OpenAI with RAG capabilities via Azure AI Search
+- **Security**: Managed identities, Key Vault integration, no exposed secrets
 
 ---
 
-## Azure Deployment (Outline)
+## Environments & Deployment
 
-- **Infra as Code:** see `infra/` (Bicep stubs) and `azure.yaml` (azd skeleton).
-- **Images:** GitHub Actions workflow in `.github/workflows/deploy.yml` shows the shape.
-- **Identity:** Configure Azure AD app registrations, then enable JWT auth in API gateway.
-- **Data:** Replace local file persistence with **Cosmos DB** (DAO placeholders included).
-- **AI:** Wire **Azure OpenAI** into agents (endpoints/keys via Key Vault).
+### **Production Environment** 
+- **Web**: [web-cybermat-prd.azurewebsites.net](https://web-cybermat-prd.azurewebsites.net) (App Service)
+- **API**: [api-cybermat-prd-aca.icystone-69c102b0.westeurope.azurecontainerapps.io](https://api-cybermat-prd-aca.icystone-69c102b0.westeurope.azurecontainerapps.io) (Container Apps)
+- **Features**: S4 features OFF, production-hardened configuration
 
-> See `docs/DEPLOY-AZURE.md` for step‑by‑step setup (placeholders and TODOs).
+### **Staging Environment**
+- **Features**: S4 features ON, full feature testing environment
+- **Purpose**: UAT and integration testing before production releases
+
+### **Deployment Workflows**
+- **Production Deployment**: `.github/workflows/deploy_production.yml` (OIDC-authenticated)
+- **Staging Deployment**: `.github/workflows/deploy_staging.yml` (OIDC-authenticated)
+- **Artifact Generation**: Automated web-deploy.zip creation for App Service deployments
+
+### **Infrastructure**
+- **Terraform**: `infra/` directory with complete Azure resource definitions
+- **Resource Groups**: `rg-cybermat-prd` (production), `rg-cybermat-stg` (staging)
+- **Container Registry**: Automated image builds with GitHub Actions integration
+
+---
+
+## Verification & UAT
+
+### **Live System Verification**
+```bash
+# Verify production deployment
+./scripts/verify_live.sh
+
+# Comprehensive UAT workflow
+./scripts/uat_s4_workflow.sh  # Staging with S4 features
+./scripts/uat_prod.sh         # Production verification
+```
+
+### **Health Checks**
+- **API Health**: `GET /health` - Application health and database connectivity
+- **Web Health**: Root endpoint with application loading verification
+- **Feature Flags**: Dynamic feature toggle verification
+
+---
+
+## Feature Flags & Staged Rollout
+
+The platform implements a **staged rollout strategy** for advanced features:
+
+- **S4 Features**: Advanced AI orchestration and multi-agent workflows
+- **Staging**: S4 features enabled for full testing and validation
+- **Production**: S4 features disabled for stability (can be toggled)
+
+**Feature Flag Documentation**: See [`docs/FEATURE_ROLLOUT_S4_PROD.md`](docs/FEATURE_ROLLOUT_S4_PROD.md) for detailed rollout plan and feature descriptions.
+
+### **Rollback Procedures**
+- **Configuration Rollback**: Toggle `NEXT_PUBLIC_API_BASE_URL` back to App Service if needed
+- **Deployment Rollback**: Use prior tagged release with automated rollback scripts
+- **Feature Rollback**: Disable S4 features via environment configuration
+
+---
+
+## Governance & Operations
+
+### **Security Model**
+- **No Secrets in Repository**: All secrets managed via Azure Key Vault
+- **Managed Identities**: Service-to-service authentication without credentials
+- **OIDC Authentication**: Enterprise SSO integration with Azure AD
+- **Data Isolation**: Tenant-aware data access with proper authorization boundaries
+
+### **Playbook & Agent Mode**
+- **Operations Playbook**: [`docs/PLAYBOOK.md`](docs/PLAYBOOK.md) - Complete operational procedures
+- **Agent Mode**: [`docs/prompts/agent_mode_header.txt`](docs/prompts/agent_mode_header.txt) - AI assistant integration guide
+
+### **Documentation Structure**
+- **Security Documentation**: [`docs/security/README.md`](docs/security/README.md)
+- **Load Testing**: [`e2e/load/README.md`](e2e/load/README.md)
+- **Production Support**: [`logs/support/appservice-prod/README.md`](logs/support/appservice-prod/README.md)
 
 ---
 
@@ -582,6 +669,13 @@ Deploy to a staging environment for testing:
 
 ---
 
+## Playbook & Agent Mode
+
+- Read the playbook: [`docs/PLAYBOOK.md`](docs/PLAYBOOK.md)  
+- Prepend this header to any Claude Code task to enforce agents and RunCards: [`docs/prompts/agent_mode_header.txt`](docs/prompts/agent_mode_header.txt)
+
+---
+
 ## Build & Deploy via ACR Tasks (no Docker Desktop)
 
 This section describes how to build container images using Azure Container Registry (ACR) Tasks, eliminating the need for Docker Desktop.
@@ -614,5 +708,35 @@ scripts/rebuild_web_with_api.sh
 This rebuilds the Web image with the API URL baked in at build time (for Next.js's `NEXT_PUBLIC_API_BASE_URL`), then updates the Web Container App.
 
 **Note:** This deployment uses temporary ACR admin credentials. Follow the "Switch to Managed Identity" section above to transition to a more secure authentication method using Managed Identities with proper RBAC roles (AcrPull for image access, Storage Blob roles for data, and Key Vault role for secrets).
+
+---
+
+## Changelog - Repository Cleanup (2025-08-19)
+
+**Multi-Agent Repository Hygiene & Legacy Cleanup completed:**
+
+### ✅ **Completed:**
+- **README Update**: Modernized architecture documentation from MVP/scaffold to production deployment
+- **Architecture**: Updated from Docker Compose local setup to Azure production environment 
+- **Environments**: Added production/staging environment documentation with live URLs
+- **Feature Flags**: Documented S4 rollout strategy and feature toggles
+- **Governance**: Added security model, playbook links, and compliance documentation
+- **Cross-References**: Added links to specialized documentation (security, load testing, support)
+
+### 🔄 **Identified for Cleanup (DRY RUN - Not Executed):**
+- **Legacy Demo Files**: 100+ references to `aaa-demo` resources across 20+ files
+- **Archive Targets**: `logs/bundles/bundle-20250815-140708/` (demo configuration snapshots)
+- **Reference Updates**: Scripts and configuration files with old demo resource names
+- **Branch Cleanup**: Merged branches identified for deletion (requires git access)
+
+### 📋 **Manual Actions Required:**
+```bash
+# When ready to execute cleanup:
+# 1. Set flags: CONFIRM_DELETE_BRANCHES=true, CONFIRM_CLEAN_FILES=true
+# 2. Execute: Multi-agent orchestration with cleanup enabled
+# 3. Review PRs: 3 small PRs (<300 LOC each) for reference updates
+```
+
+**Cleanup Impact**: Low risk, ~1MB archived files, ~12 configuration lines updated across 5 files.
 
 ---

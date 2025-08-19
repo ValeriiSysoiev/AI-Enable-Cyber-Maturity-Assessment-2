@@ -1,0 +1,4 @@
+=== PHASE 2 F1 REPAIR - STARTUP COMMAND FIX ===
+uvicorn[standard]>=0.30 IS in requirements.txt - deployment issue
+F1 Applied: Changed to direct uvicorn startup
+F1 FAILED: Still returning 503. App Service has deeper issues.
