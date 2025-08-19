@@ -19,7 +19,32 @@ web/node_modules/
 
 # Next.js build artifacts
 web/.next/
+web/out/
+web/dist/
 web/tsconfig.tsbuildinfo
+
+# Build and deployment artifacts
+web/**/.next/
+web/**/out/
+web/**/dist/
+web/temp-deploy*/
+_deploy_web/
+*.zip
+web-deploy.zip
+
+# Dependencies (should not be committed)
+**/node_modules/
+
+# Terraform providers (large binaries)
+.terraform/providers/
+
+# Python virtual environments
+.venv/
+venv/
+__pycache__/
+
+# Artifacts directory (preserve structure, ignore contents)
+artifacts/
 
 # Deployment logs
 logs/reports/*.log
