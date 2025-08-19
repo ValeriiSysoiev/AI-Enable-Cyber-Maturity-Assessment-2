@@ -1,0 +1,82 @@
+=== API Health Verification Report - Mon 18 Aug 2025 21:32:49 MDT ===
+Attempt 1/6: Testing API health endpoint...
+HTTP Status: 000
+Response Body: 
+Waiting 30 seconds before retry...
+Attempt 2/6: Testing API health endpoint...
+HTTP Status: 503
+Response Body: <div style="display: block; margin: auto;  width: 600px; height: 500px; text-align: center; font-family: 'Courier', cursive, sans-serif;"><h1 style="color: 747474">:( Application Error</h1><p style="color:#666">If you are the application administrator, you can access the <a style="color: grey"href="https://api-cybermat-prd.scm.azurewebsites.net/detectors">diagnostic resources</a>.</div>
+Waiting 30 seconds before retry...
+Attempt 3/6: Testing API health endpoint...
+HTTP Status: 503
+Response Body: <div style="display: block; margin: auto;  width: 600px; height: 500px; text-align: center; font-family: 'Courier', cursive, sans-serif;"><h1 style="color: 747474">:( Application Error</h1><p style="color:#666">If you are the application administrator, you can access the <a style="color: grey"href="https://api-cybermat-prd.scm.azurewebsites.net/detectors">diagnostic resources</a>.</div>
+Waiting 30 seconds before retry...
+Attempt 4/6: Testing API health endpoint...
+HTTP Status: 503
+Response Body: <div style="display: block; margin: auto;  width: 600px; height: 500px; text-align: center; font-family: 'Courier', cursive, sans-serif;"><h1 style="color: 747474">:( Application Error</h1><p style="color:#666">If you are the application administrator, you can access the <a style="color: grey"href="https://api-cybermat-prd.scm.azurewebsites.net/detectors">diagnostic resources</a>.</div>
+Waiting 30 seconds before retry...
+Attempt 5/6: Testing API health endpoint...
+HTTP Status: 503
+Response Body: <div style="display: block; margin: auto;  width: 600px; height: 500px; text-align: center; font-family: 'Courier', cursive, sans-serif;"><h1 style="color: 747474">:( Application Error</h1><p style="color:#666">If you are the application administrator, you can access the <a style="color: grey"href="https://api-cybermat-prd.scm.azurewebsites.net/detectors">diagnostic resources</a>.</div>
+Waiting 30 seconds before retry...
+Attempt 6/6: Testing API health endpoint...
+HTTP Status: 503
+Response Body: <div style="display: block; margin: auto;  width: 600px; height: 500px; text-align: center; font-family: 'Courier', cursive, sans-serif;"><h1 style="color: 747474">:( Application Error</h1><p style="color:#666">If you are the application administrator, you can access the <a style="color: grey"href="https://api-cybermat-prd.scm.azurewebsites.net/detectors">diagnostic resources</a>.</div>
+FAILED: API health endpoint not responding after 6 attempts
+
+=== Testing Basic API Endpoints ===
+Testing /api/v1/engagements endpoint...
+HTTP Status: 000
+Response Body (first 200 chars): 
+
+Testing /version endpoint...
+HTTP Status: 000
+Response Body: 
+
+Testing /docs endpoint...
+HTTP Status: 000
+Response Body (first 200 chars): 
+
+=== CORS and Connectivity Analysis ===
+Testing base URL with headers...
+
+Testing with specific Origin header (web frontend simulation)...
+
+Network connectivity test...
+Server:		2001:568:ff09:10c::67
+Address:	2001:568:ff09:10c::67#53
+
+Non-authoritative answer:
+api-cybermat-prd.azurewebsites.net	canonical name = waws-prod-am2-757.sip.azurewebsites.windows.net.
+waws-prod-am2-757.sip.azurewebsites.windows.net	canonical name = waws-prod-am2-757-845d.westeurope.cloudapp.azure.com.
+Name:	waws-prod-am2-757-845d.westeurope.cloudapp.azure.com
+Address: 20.105.232.38
+
+
+=== SUMMARY AND ANALYSIS ===
+
+CRITICAL FINDINGS:
+1. API is experiencing APPLICATION ERROR (HTTP 503) across all tested endpoints
+2. The error indicates Azure App Service application failure, not infrastructure issues
+3. DNS resolution is working correctly (resolves to 20.105.232.38)
+4. Network connectivity is functional
+
+SPECIFIC TEST RESULTS:
+- /health endpoint: 6/6 attempts failed with HTTP 503 "Application Error"
+- /api/v1/engagements endpoint: Connection timeout (HTTP 000)
+- /version endpoint: Connection timeout (HTTP 000) 
+- /docs endpoint: Connection timeout (HTTP 000)
+
+ERROR PATTERN:
+All successful connections return Azure's standard Application Error page:
+":( Application Error - If you are the application administrator, you can access the diagnostic resources"
+
+ROOT CAUSE ASSESSMENT:
+- The API application itself is not running properly within the Azure App Service
+- This is NOT a deployment issue, but an application startup/runtime failure
+- The 503 status suggests the web server is running but the application failed to start
+
+DIAGNOSTIC RECOMMENDATION:
+Check Azure diagnostic resources at: https://api-cybermat-prd.scm.azurewebsites.net/detectors
+
+SEEDING READINESS STATUS: NOT READY

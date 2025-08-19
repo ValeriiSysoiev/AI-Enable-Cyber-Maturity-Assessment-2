@@ -1,0 +1,22 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Valerii Sysoiev <valsysoiev@gmail.com>
+Date: Mon, 18 Aug 2025 11:51:48 -0600
+Subject: [PATCH 66/90] fix: add staging environment to deploy-staging job
+
+- Job must declare environment: staging to access staging secrets
+- This allows the workflow to access AZURE_CONTAINER_REGISTRY_STAGING,
+  AZURE_RESOURCE_GROUP_STAGING, API_CONTAINER_APP_STAGING, and
+  WEB_CONTAINER_APP_STAGING secrets
+
+diff --git a/.github/workflows/deploy_staging.yml b/.github/workflows/deploy_staging.yml
+index be5a4f2b2f3190cbd43772b3c04fd0b5ca033103..eb5b56a1d00ae738e1a28f58a793ed6c30710daa 100644
+--- a/.github/workflows/deploy_staging.yml
++++ b/.github/workflows/deploy_staging.yml
+@@ -26,6 +26,7 @@ jobs:
+   deploy-staging:
+     runs-on: ubuntu-latest
+     timeout-minutes: 45
++    environment: staging
+     
+     steps:
+     - name: Checkout code

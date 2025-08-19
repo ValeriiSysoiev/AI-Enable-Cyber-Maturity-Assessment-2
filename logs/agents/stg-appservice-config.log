@@ -1,0 +1,229 @@
+=== CAPTURING CURRENT STG CONFIGURATION ===
+{
+  "appCommandLine": "node server.js",
+  "linuxFxVersion": "NODE|20-lts",
+  "name": "web-cybermat-stg",
+  "state": "Running"
+}
+[
+  {
+    "name": "SCM_DO_BUILD_DURING_DEPLOYMENT",
+    "value": "false"
+  },
+  {
+    "name": "WEBSITE_NODE_DEFAULT_VERSION",
+    "value": "20-lts"
+  },
+  {
+    "name": "NODE_ENV",
+    "value": "production"
+  },
+  {
+    "name": "NEXT_TELEMETRY_DISABLED",
+    "value": "1"
+  },
+  {
+    "name": "PORT",
+    "value": "8080"
+  },
+  {
+    "name": "WEBSITES_PORT",
+    "value": "8080"
+  },
+  {
+    "name": "WEBSITE_HTTPLOGGING_RETENTION_DAYS",
+    "value": "3"
+  }
+]
+=== APPLYING STG CONFIGURATIONS ===
+Linux runtime already set to NODE|20-lts - no change needed
+[
+  {
+    "name": "SCM_DO_BUILD_DURING_DEPLOYMENT",
+    "slotSetting": false,
+    "value": null
+  },
+  {
+    "name": "WEBSITE_NODE_DEFAULT_VERSION",
+    "slotSetting": false,
+    "value": null
+  },
+  {
+    "name": "NODE_ENV",
+    "slotSetting": false,
+    "value": null
+  },
+  {
+    "name": "NEXT_TELEMETRY_DISABLED",
+    "slotSetting": false,
+    "value": null
+  },
+  {
+    "name": "PORT",
+    "slotSetting": false,
+    "value": null
+  },
+  {
+    "name": "WEBSITES_PORT",
+    "slotSetting": false,
+    "value": null
+  },
+  {
+    "name": "WEBSITE_HTTPLOGGING_RETENTION_DAYS",
+    "slotSetting": false,
+    "value": null
+  }
+]
+{
+  "acrUseManagedIdentityCreds": false,
+  "acrUserManagedIdentityId": null,
+  "alwaysOn": false,
+  "apiDefinition": null,
+  "apiManagementConfig": null,
+  "appCommandLine": "node .next/standalone/server.js",
+  "appSettings": null,
+  "autoHealEnabled": false,
+  "autoHealRules": null,
+  "autoSwapSlotName": null,
+  "azureStorageAccounts": {},
+  "connectionStrings": null,
+  "cors": null,
+  "defaultDocuments": [
+    "Default.htm",
+    "Default.html",
+    "Default.asp",
+    "index.htm",
+    "index.html",
+    "iisstart.htm",
+    "default.aspx",
+    "index.php",
+    "hostingstart.html"
+  ],
+  "detailedErrorLoggingEnabled": false,
+  "documentRoot": null,
+  "elasticWebAppScaleLimit": 0,
+  "experiments": {
+    "rampUpRules": []
+  },
+  "ftpsState": "FtpsOnly",
+  "functionAppScaleLimit": null,
+  "functionsRuntimeScaleMonitoringEnabled": false,
+  "handlerMappings": null,
+  "healthCheckPath": null,
+  "http20Enabled": true,
+  "http20ProxyFlag": 0,
+  "httpLoggingEnabled": true,
+  "id": "/subscriptions/10233675-d493-4a97-9c81-4001e353a7bb/resourceGroups/rg-cybermat-stg/providers/Microsoft.Web/sites/web-cybermat-stg",
+  "ipSecurityRestrictions": [
+    {
+      "action": "Allow",
+      "description": "Allow all access",
+      "headers": null,
+      "ipAddress": "Any",
+      "name": "Allow all",
+      "priority": 2147483647,
+      "subnetMask": null,
+      "subnetTrafficTag": null,
+      "tag": null,
+      "vnetSubnetResourceId": null,
+      "vnetTrafficTag": null
+    }
+  ],
+  "ipSecurityRestrictionsDefaultAction": null,
+  "javaContainer": null,
+  "javaContainerVersion": null,
+  "javaVersion": null,
+  "keyVaultReferenceIdentity": null,
+  "kind": null,
+  "limits": null,
+  "linuxFxVersion": "NODE|20-lts",
+  "loadBalancing": "LeastRequests",
+  "localMySqlEnabled": false,
+  "location": "West Europe",
+  "logsDirectorySizeLimit": 100,
+  "machineKey": null,
+  "managedPipelineMode": "Integrated",
+  "managedServiceIdentityId": 7389,
+  "metadata": null,
+  "minTlsCipherSuite": null,
+  "minTlsVersion": "1.2",
+  "minimumElasticInstanceCount": 1,
+  "name": "web-cybermat-stg",
+  "netFrameworkVersion": "v4.0",
+  "nodeVersion": "",
+  "numberOfWorkers": 1,
+  "phpVersion": "",
+  "powerShellVersion": "",
+  "preWarmedInstanceCount": 0,
+  "publicNetworkAccess": "Enabled",
+  "publishingUsername": "REDACTED",
+  "push": null,
+  "pythonVersion": "",
+  "remoteDebuggingEnabled": false,
+  "remoteDebuggingVersion": "VS2022",
+  "requestTracingEnabled": false,
+  "requestTracingExpirationTime": null,
+  "resourceGroup": "rg-cybermat-stg",
+  "scmIpSecurityRestrictions": [
+    {
+      "action": "Allow",
+      "description": "Allow all access",
+      "headers": null,
+      "ipAddress": "Any",
+      "name": "Allow all",
+      "priority": 2147483647,
+      "subnetMask": null,
+      "subnetTrafficTag": null,
+      "tag": null,
+      "vnetSubnetResourceId": null,
+      "vnetTrafficTag": null
+    }
+  ],
+  "scmIpSecurityRestrictionsDefaultAction": null,
+  "scmIpSecurityRestrictionsUseMain": false,
+  "scmMinTlsVersion": "1.2",
+  "scmType": "None",
+  "tracingOptions": null,
+  "type": "Microsoft.Web/sites",
+  "use32BitWorkerProcess": true,
+  "virtualApplications": [
+    {
+      "physicalPath": "site\\wwwroot",
+      "preloadEnabled": false,
+      "virtualDirectories": null,
+      "virtualPath": "/"
+    }
+  ],
+  "vnetName": "",
+  "vnetPrivatePortsCount": 0,
+  "vnetRouteAllEnabled": false,
+  "webSocketsEnabled": false,
+  "websiteTimeZone": null,
+  "windowsFxVersion": null,
+  "xManagedServiceIdentityId": null
+}
+=== POST-CONFIGURATION STG STATE ===
+{
+  "appCommandLine": "node .next/standalone/server.js",
+  "linuxFxVersion": "NODE|20-lts",
+  "name": "web-cybermat-stg",
+  "state": "Running"
+}
+
+=== CONFIGURATION CHANGES SUMMARY ===
+STG Environment (web-cybermat-stg):
+- Linux Runtime: Already set to NODE|20-lts (no change)
+- App Settings: All required settings already configured (no change)
+- Startup Command: CHANGED from 'node server.js' to 'node .next/standalone/server.js'
+
+PROD Environment (web-cybermat-prd):
+- Linux Runtime: Already set to NODE|20-lts (no change)
+- App Settings: All required settings already configured (no change)
+- Startup Command: CHANGED from 'node server.js' to 'node .next/standalone/server.js'
+
+KEY CHANGES:
+1. Updated startup commands in both environments to point to standalone Next.js server
+2. All other configurations were already correctly set
+
+Configuration applied successfully to both environments.
+

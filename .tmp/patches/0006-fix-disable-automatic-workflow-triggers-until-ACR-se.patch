@@ -1,0 +1,23 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Valerii Sysoiev <valsysoiev@gmail.com>
+Date: Wed, 13 Aug 2025 17:21:18 -0600
+Subject: [PATCH 06/90] fix: disable automatic workflow triggers until ACR
+ secrets are configured
+
+
+diff --git a/.github/workflows/deploy.yml b/.github/workflows/deploy.yml
+index e55d3f1862bb188992f0c0107293c37b22bf119d..6293b213d3998deafd5d9975d7e41a12dd42bcf4 100644
+--- a/.github/workflows/deploy.yml
++++ b/.github/workflows/deploy.yml
+@@ -2,8 +2,9 @@ name: build-and-deploy
+ 
+ on:
+   workflow_dispatch:
+-  push:
+-    branches: [ main ]
++  # Disabled automatic triggers until secrets are configured
++  # push:
++  #   branches: [ main ]
+ 
+ jobs:
+   build:

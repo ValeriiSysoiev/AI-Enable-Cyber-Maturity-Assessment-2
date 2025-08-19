@@ -1,0 +1,133 @@
+{
+  "id": "/subscriptions/10233675-d493-4a97-9c81-4001e353a7bb/resourceGroups/rg-aaa-demo/providers/Microsoft.App/containerapps/web-aaa-demo",
+  "identity": {
+    "type": "UserAssigned",
+    "userAssignedIdentities": {
+      "/subscriptions/10233675-d493-4a97-9c81-4001e353a7bb/resourcegroups/rg-aaa-demo/providers/Microsoft.ManagedIdentity/userAssignedIdentities/id-web-aaa-demo": {
+        "clientId": "4ae2275b-eec0-4b8b-bd56-ce165d11d97d",
+        "principalId": "50116b4e-e659-40cf-bec9-f299fafc3490"
+      }
+    }
+  },
+  "location": "Canada Central",
+  "name": "web-aaa-demo",
+  "properties": {
+    "configuration": {
+      "activeRevisionsMode": "Single",
+      "dapr": null,
+      "identitySettings": [],
+      "ingress": {
+        "additionalPortMappings": null,
+        "allowInsecure": false,
+        "clientCertificateMode": null,
+        "corsPolicy": null,
+        "customDomains": null,
+        "exposedPort": 0,
+        "external": true,
+        "fqdn": "web-aaa-demo.bravewater-3d70a706.canadacentral.azurecontainerapps.io",
+        "ipSecurityRestrictions": null,
+        "stickySessions": null,
+        "targetPort": 3000,
+        "targetPortHttpScheme": null,
+        "traffic": [
+          {
+            "latestRevision": true,
+            "weight": 100
+          }
+        ],
+        "transport": "Auto"
+      },
+      "maxInactiveRevisions": 100,
+      "registries": [
+        {
+          "identity": "/subscriptions/10233675-d493-4a97-9c81-4001e353a7bb/resourcegroups/rg-aaa-demo/providers/Microsoft.ManagedIdentity/userAssignedIdentities/id-web-aaa-demo",
+          "passwordSecretRef": "",
+          "server": "acraaademo9lyu53.azurecr.io",
+          "username": ""
+        }
+      ],
+      "revisionTransitionThreshold": null,
+      "runtime": null,
+      "secrets": [
+        {
+          "name": "acraaademo9lyu53azurecrio-acraaademo9lyu53"
+        }
+      ],
+      "service": null,
+      "targetLabel": ""
+    },
+    "customDomainVerificationId": "7A687C58CE3A6608763224D14B2138425F990DF97889C54C9BB9160C4CF301A2",
+    "delegatedIdentities": [],
+    "environmentId": "/subscriptions/10233675-d493-4a97-9c81-4001e353a7bb/resourceGroups/rg-aaa-demo/providers/Microsoft.App/managedEnvironments/aca-aaa-demo",
+    "eventStreamEndpoint": "https://canadacentral.azurecontainerapps.dev/subscriptions/10233675-d493-4a97-9c81-4001e353a7bb/resourceGroups/rg-aaa-demo/containerApps/web-aaa-demo/eventstream",
+    "latestReadyRevisionName": "web-aaa-demo--0000014",
+    "latestRevisionFqdn": "web-aaa-demo--0000014.bravewater-3d70a706.canadacentral.azurecontainerapps.io",
+    "latestRevisionName": "web-aaa-demo--0000014",
+    "managedEnvironmentId": "/subscriptions/10233675-d493-4a97-9c81-4001e353a7bb/resourceGroups/rg-aaa-demo/providers/Microsoft.App/managedEnvironments/aca-aaa-demo",
+    "outboundIpAddresses": [
+      "52.237.61.48"
+    ],
+    "patchingMode": "Automatic",
+    "provisioningState": "Succeeded",
+    "runningStatus": "Running",
+    "template": {
+      "containers": [
+        {
+          "env": [
+            {
+              "name": "NEXT_PUBLIC_API_BASE",
+              "value": "https://api-aaa-demo.bravewater-3d70a706.canadacentral.azurecontainerapps.io"
+            },
+            {
+              "name": "NEXT_PUBLIC_AUTH_PROVIDER",
+              "value": "demo"
+            },
+            {
+              "name": "NEXT_PUBLIC_GIT_SHA",
+              "value": "d6585532"
+            },
+            {
+              "name": "NEXT_PUBLIC_BUILD_TIME",
+              "value": "2025-08-15T20:01:35Z"
+            },
+            {
+              "name": "NEXT_PUBLIC_APP_VERSION",
+              "value": "0.2.0"
+            }
+          ],
+          "image": "acraaademo9lyu53.azurecr.io/ai-maturity-web:v202508151402-d6585532",
+          "imageType": "ContainerImage",
+          "name": "web-aaa-demo",
+          "resources": {
+            "cpu": 0.25,
+            "ephemeralStorage": "1Gi",
+            "memory": "0.5Gi"
+          }
+        }
+      ],
+      "initContainers": null,
+      "revisionSuffix": "",
+      "scale": {
+        "cooldownPeriod": 300,
+        "maxReplicas": 10,
+        "minReplicas": 1,
+        "pollingInterval": 30,
+        "rules": null
+      },
+      "serviceBinds": null,
+      "terminationGracePeriodSeconds": null,
+      "volumes": null
+    },
+    "workloadProfileName": null
+  },
+  "resourceGroup": "rg-aaa-demo",
+  "systemData": {
+    "createdAt": "2025-08-14T01:34:26.9579328",
+    "createdBy": "dc900018-e548-4d1f-b416-a7a67310b1a5",
+    "createdByType": "Application",
+    "lastModifiedAt": "2025-08-15T20:05:53.2235919",
+    "lastModifiedBy": "va.sysoiev@audit3a.com",
+    "lastModifiedByType": "User"
+  },
+  "type": "Microsoft.App/containerApps"
+}

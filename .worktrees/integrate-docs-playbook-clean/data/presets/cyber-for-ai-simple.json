@@ -1,0 +1,67 @@
+{
+  "id": "cyber-for-ai-simple",
+  "name": "Cyber for AI (Simple)",
+  "version": "1.0",
+  "pillars": [
+    {
+      "id": "governance",
+      "name": "Governance & Responsible AI",
+      "capabilities": [
+        {
+          "id": "policy-mgmt",
+          "name": "Policy Management",
+          "questions": [
+            {
+              "id": "gov-01",
+              "text": "Is there an approved AI policy with roles, intake workflow, and risk approvals?",
+              "weight": 1.0,
+              "scale": "0-5"
+            },
+            {
+              "id": "gov-02",
+              "text": "Are AI risk assessments performed per use case and tracked in a risk register?",
+              "weight": 1.0,
+              "scale": "0-5"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "model_security",
+      "name": "Model & Prompt Security",
+      "capabilities": [
+        {
+          "id": "prompt-security",
+          "name": "Prompt Security",
+          "questions": [
+            {
+              "id": "mod-01",
+              "text": "Are prompt-injection and data-exfiltration tests executed per release with documented mitigations?",
+              "weight": 1.0,
+              "scale": "0-5"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "data_security",
+      "name": "Data Security & Privacy",
+      "capabilities": [
+        {
+          "id": "data-protection",
+          "name": "Data Protection",
+          "questions": [
+            {
+              "id": "data-01",
+              "text": "Is training/inference data classified, access-controlled, and protected by preventive DLP where appropriate?",
+              "weight": 1.0,
+              "scale": "0-5"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

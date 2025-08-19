@@ -20,7 +20,13 @@ COPY api/ ./api/
 COPY config/ ./config/
 COPY domain/ ./domain/
 COPY ai/ ./ai/
+COPY services/ ./services/
+COPY repos/ ./repos/
+COPY security/ ./security/
+COPY storage/ ./storage/
+COPY util/ ./util/
 COPY __init__.py .
+COPY test_api.py .
 
 EXPOSE 8000
-CMD ["python", "-c", "import sys; sys.path.insert(0, '/app'); import uvicorn; uvicorn.run('api.main:app', host='0.0.0.0', port=8000)"]
+CMD ["uvicorn", "api.main:app", "--host", "0.0.0.0", "--port", "8000"]

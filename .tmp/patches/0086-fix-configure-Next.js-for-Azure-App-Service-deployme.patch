@@ -1,0 +1,47 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Valerii Sysoiev <valsysoiev@gmail.com>
+Date: Mon, 18 Aug 2025 18:40:50 -0600
+Subject: [PATCH 86/90] fix: configure Next.js for Azure App Service deployment
+
+- Update start script to use PORT environment variable (default 8080)
+- Add Node.js 20.x engine requirement
+- Enable standalone output mode for optimal App Service deployment
+- Required for proper Next.js standalone builds on Azure
+
+Files: 2 changed, 4 insertions (+), 1 deletion (-)
+
+diff --git a/web/next.config.mjs b/web/next.config.mjs
+index 4d33b1f5c2ad0ea945f0bedcff9a05af1775ec96..7f181cb911b77829516fa06f8e58a6887e37e685 100644
+--- a/web/next.config.mjs
++++ b/web/next.config.mjs
+@@ -1,4 +1,7 @@
+ /** @type {import('next').NextConfig} */
+-const nextConfig = { reactStrictMode: true };
++const nextConfig = { 
++  reactStrictMode: true,
++  output: 'standalone'
++};
+ export default nextConfig;
+ 
+diff --git a/web/package.json b/web/package.json
+index d292576e4632250e5ac354c23007b8549ced30f5..83d4675a4899523b620c9889d097cc2f84dc6e32 100644
+--- a/web/package.json
++++ b/web/package.json
+@@ -5,7 +5,7 @@
+   "scripts": {
+     "dev": "next dev",
+     "build": "next build",
+-    "start": "next start",
++    "start": "next start -p ${PORT:-8080}",
+     "lint": "next lint",
+     "test:e2e": "playwright test",
+     "test:e2e:ui": "playwright test --ui",
+@@ -34,5 +34,8 @@
+     "eslint": "^8.0.0",
+     "eslint-config-next": "14.2.31",
+     "@playwright/test": "^1.40.0"
++  },
++  "engines": {
++    "node": ">=20.x"
+   }
+ }

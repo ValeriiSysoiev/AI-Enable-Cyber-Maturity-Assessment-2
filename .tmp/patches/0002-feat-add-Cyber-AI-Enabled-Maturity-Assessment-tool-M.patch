@@ -1,0 +1,1307 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Valerii Sysoiev <valsysoiev@gmail.com>
+Date: Fri, 8 Aug 2025 17:21:28 -0600
+Subject: [PATCH 02/90] feat: add Cyber AI-Enabled Maturity Assessment tool MVP
+ (API, orchestrator, agents, infra stubs)
+
+
+diff --git a/.github/workflows/deploy.yml b/.github/workflows/deploy.yml
+new file mode 100644
+index 0000000000000000000000000000000000000000..e55d3f1862bb188992f0c0107293c37b22bf119d
+--- /dev/null
++++ b/.github/workflows/deploy.yml
+@@ -0,0 +1,29 @@
++name: build-and-deploy
++
++on:
++  workflow_dispatch:
++  push:
++    branches: [ main ]
++
++jobs:
++  build:
++    runs-on: ubuntu-latest
++    steps:
++      - uses: actions/checkout@v4
++      - name: Set up QEMU
++        uses: docker/setup-qemu-action@v3
++      - name: Set up Docker Buildx
++        uses: docker/setup-buildx-action@v3
++      - name: Login to ACR
++        uses: azure/docker-login@v2
++        with:
++          login-server: ${{ secrets.ACR_LOGIN_SERVER }}
++          username: ${{ secrets.ACR_USERNAME }}
++          password: ${{ secrets.ACR_PASSWORD }}
++      - name: Build & push API
++        uses: docker/build-push-action@v6
++        with:
++          context: ./services/api
++          push: true
++          tags: ${{ secrets.ACR_LOGIN_SERVER }}/cyberai/api:latest
++      # Repeat build/push for all services... (or use a matrix)
+diff --git a/README.md b/README.md
+index 8d47d6bc9a55e15b0230e6a81caae9a51f6624ac..70a6b9baf3f79c0c493fb1f0248003461e8ed007 100644
+--- a/README.md
++++ b/README.md
+@@ -1 +1,117 @@
+-# AI-Enable-Cyber-Maturity-Assessment-2
+\ No newline at end of file
++# Cyber AI‑Enabled Maturity Assessment Tool (MVP)
++
++This is a **deployable scaffold** for Deloitte’s Cyber AI‑Enabled Maturity Assessment solution.
++It includes an **API gateway**, **AI Orchestrator**, and **specialized AI agents** that implement
++a simple end‑to‑end flow: upload documents → analyze → identify gaps → propose initiatives →
++prioritize → produce a roadmap → generate a report.
++
++> **Status:** MVP skeleton that runs locally with Docker Compose and can be extended/deployed to Azure.
++> Uses FastAPI for services and simple HTTP orchestration between agents.
++> Azure OpenAI, Cosmos DB, Service Bus, Azure AD, and Sentinel hooks are stubbed with clear TODOs.
++
++---
++
++## Quickstart (Local)
++
++**Prereqs:** Docker Desktop (or Docker Engine), Make (optional).
++
++```bash
++# 1) Unzip the project and cd into it
++cd cyber-ai-maturity-tool
++
++# 2) Start everything locally
++docker compose up --build -d
++
++# 3) Open UIs
++# API gateway docs:
++#   http://localhost:8000/docs
++# Orchestrator health:
++#   http://localhost:8010/health
++# Agents (example):
++#   Documentation Analyzer: http://localhost:8111/health
++#   Gap Analysis Agent:     http://localhost:8121/health
++#   Initiative Generator:   http://localhost:8131/health
++#   Prioritization Agent:   http://localhost:8141/health
++#   Roadmap Planner:        http://localhost:8151/health
++#   Report Generator:       http://localhost:8161/health
++```
++
++### Happy‑path demo
++1. **Create project** (POST `/projects` in API docs) – copy the returned `project_id`.
++2. **Upload a doc** (POST `/projects/{project_id}/documents`) – upload a `.txt` file.
++3. **Run analysis** (POST `/projects/{project_id}/analyze`) – the orchestrator calls agents.
++4. **Get report** (GET `/projects/{project_id}/report`) – returns markdown summary.
++
++You’ll also see artifacts under `./data/projects/<project_id>/` on your host machine.
++
++---
++
++## Services (Ports)
++
++- **API Gateway** (FastAPI): `:8000` – Projects, Documents, Orchestrate, Reports
++- **Orchestrator** (FastAPI): `:8010` – Coordinates calls to agents
++- **Agents** (FastAPI each):
++  - Documentation Analyzer: `:8111`
++  - Gap Analysis: `:8121`
++  - Initiative Generator: `:8131`
++  - Prioritization: `:8141`
++  - Roadmap Planner: `:8151`
++  - Report Generator: `:8161`
++
++All services provide `/health` endpoints and FastAPI docs at `/docs`.
++
++---
++
++## Architecture (MVP)
++
++```mermaid
++flowchart LR
++    UI[Consultant (API Docs / future Web UI)]
++    API[API Gateway\n(FastAPI)]
++    ORCH[AI Orchestrator\n(FastAPI)]
++    DOC[Documentation Analyzer]
++    GAP[Gap Analysis Agent]
++    INIT[Initiative Generator]
++    PRI[Prioritization Agent]
++    PLAN[Roadmap Planner]
++    REP[Report Generator]
++    STORE[(Local Files\n→ future Cosmos DB)]
++
++    UI -->|HTTP| API -->|/analyze| ORCH
++    ORCH --> DOC --> GAP --> INIT --> PRI --> PLAN --> REP --> STORE
++```
++
++> The MVP uses **HTTP fan‑out/fan‑in** calls for simplicity. In production,
++> swap to **Azure Service Bus** for async orchestration (adapter hooks included).
++
++---
++
++## Azure Deployment (Outline)
++
++- **Infra as Code:** see `infra/` (Bicep stubs) and `azure.yaml` (azd skeleton).
++- **Images:** GitHub Actions workflow in `.github/workflows/deploy.yml` shows the shape.
++- **Identity:** Configure Azure AD app registrations, then enable JWT auth in API gateway.
++- **Data:** Replace local file persistence with **Cosmos DB** (DAO placeholders included).
++- **AI:** Wire **Azure OpenAI** into agents (endpoints/keys via Key Vault).
++
++> See `docs/DEPLOY-AZURE.md` for step‑by‑step setup (placeholders and TODOs).
++
++---
++
++## Security & Compliance
++
++- Secrets via environment variables (local) → **Azure Key Vault** (prod).
++- TLS, CORS, RBAC, audit logging stubs.
++- Follow‑ups to implement: GDPR deletion workflow, DPA exports, Sentinel alerts.
++
++---
++
++## Roadmap
++
++- [ ] JWT auth against Azure AD (MSAL) on API gateway
++- [ ] Async orchestration (Service Bus), idempotent retries
++- [ ] Cosmos DB repository for projects/findings
++- [ ] Azure OpenAI integration for higher‑fidelity analysis
++- [ ] Web UI (React + MSAL) for projects, uploads, dashboards
++- [ ] Report export to **PowerPoint** and **Word** via templates
++```
+diff --git a/azure.yaml b/azure.yaml
+new file mode 100644
+index 0000000000000000000000000000000000000000..8afcb53d87568b17dd7929b7fda799c4cca10d2f
+--- /dev/null
++++ b/azure.yaml
+@@ -0,0 +1,56 @@
++# Azure Developer CLI skeleton (adjust names before running `azd up`)
++name: cyber-ai-maturity-tool
++metadata:
++  template: custom/cyber-ai-maturity
++services:
++  api:
++    project: ./services/api
++    language: py
++    docker:
++      path: ./services/api/Dockerfile
++      context: ./services/api
++  orchestrator:
++    project: ./services/orchestrator
++    language: py
++    docker:
++      path: ./services/orchestrator/Dockerfile
++      context: ./services/orchestrator
++  doc-analyzer:
++    project: ./services/agents/documentation_analyzer
++    language: py
++    docker:
++      path: ./services/agents/documentation_analyzer/Dockerfile
++      context: ./services/agents/documentation_analyzer
++  gap-analysis:
++    project: ./services/agents/gap_analysis
++    language: py
++    docker:
++      path: ./services/agents/gap_analysis/Dockerfile
++      context: ./services/agents/gap_analysis
++  initiative-gen:
++    project: ./services/agents/initiative_generation
++    language: py
++    docker:
++      path: ./services/agents/initiative_generation/Dockerfile
++      context: ./services/agents/initiative_generation
++  prioritization:
++    project: ./services/agents/prioritization
++    language: py
++    docker:
++      path: ./services/agents/prioritization/Dockerfile
++      context: ./services/agents/prioritization
++  roadmap-planner:
++    project: ./services/agents/roadmap_planner
++    language: py
++    docker:
++      path: ./services/agents/roadmap_planner/Dockerfile
++      context: ./services/agents/roadmap_planner
++  report-generator:
++    project: ./services/agents/report_generator
++    language: py
++    docker:
++      path: ./services/agents/report_generator/Dockerfile
++      context: ./services/agents/report_generator
++infra:
++  provider: bicep
++  path: infra
+diff --git a/common/__init__.py b/common/__init__.py
+new file mode 100644
+index 0000000000000000000000000000000000000000..a9a2c5b3bb437bff74e283b62c894075e8c15331
+--- /dev/null
++++ b/common/__init__.py
+@@ -0,0 +1 @@
++__all__ = []
+diff --git a/common/models.py b/common/models.py
+new file mode 100644
+index 0000000000000000000000000000000000000000..50acb136ef4678c5ac59ad5bc6953a1d13d35460
+--- /dev/null
++++ b/common/models.py
+@@ -0,0 +1,59 @@
++from pydantic import BaseModel, Field
++from typing import List, Optional, Dict
++from datetime import datetime
++import uuid
++
++def gen_id(prefix: str) -> str:
++    return f"{prefix}_{uuid.uuid4().hex[:12]}"
++
++class Document(BaseModel):
++    document_id: str = Field(default_factory=lambda: gen_id("doc"))
++    filename: str
++    content: Optional[str] = None   # raw text (for MVP)
++    uploaded_at: datetime = Field(default_factory=datetime.utcnow)
++
++class Project(BaseModel):
++    project_id: str = Field(default_factory=lambda: gen_id("proj"))
++    name: str
++    standard: str = "NIST CSF 2.0"  # or ISO27001
++    created_at: datetime = Field(default_factory=datetime.utcnow)
++    documents: List[Document] = Field(default_factory=list)
++
++class EvidenceItem(BaseModel):
++    control: str
++    description: str
++    confidence: float = 0.6
++
++class GapItem(BaseModel):
++    control: str
++    current: str = "Not Evidenced"
++    target: str = "Defined"
++    risk: str = "Medium"
++    rationale: str
++
++class Initiative(BaseModel):
++    title: str
++    description: str
++    related_controls: List[str]
++    impact: int = 3  # 1-5
++    effort: int = 3  # 1-5
++    dependencies: List[str] = Field(default_factory=list)
++
++class PrioritizedInitiative(BaseModel):
++    title: str
++    related_controls: List[str]
++    impact: int
++    effort: int
++    score: float  # e.g., impact/effort
++    rank: int
++
++class RoadmapItem(BaseModel):
++    title: str
++    quarter: str  # e.g. "Q1", "Q2", "Q3", "Q4"
++    depends_on: List[str] = Field(default_factory=list)
++
++class Report(BaseModel):
++    project_id: str
++    summary_markdown: str
++    generated_at: datetime = Field(default_factory=datetime.utcnow)
++    artifacts: Dict[str, str] = Field(default_factory=dict)  # filename -> path
+diff --git a/data/projects/demo/docs/sample.txt b/data/projects/demo/docs/sample.txt
+new file mode 100644
+index 0000000000000000000000000000000000000000..ee5b14a0e9b072f05cbb2776de39e766f366eec1
+--- /dev/null
++++ b/data/projects/demo/docs/sample.txt
+@@ -0,0 +1,3 @@
++Our company maintains an Information Security Policy approved by the governance committee.
++All access control leverages SSO and MFA. We rely on Splunk for security monitoring
++and conduct annual incident response tabletop exercises with PagerDuty.
+diff --git a/data/projects/demo/project.json b/data/projects/demo/project.json
+new file mode 100644
+index 0000000000000000000000000000000000000000..aba56372778d9c8c7dfc8d8832b33d2b7d9ae0a8
+--- /dev/null
++++ b/data/projects/demo/project.json
+@@ -0,0 +1,12 @@
++{
++  "project_id": "demo",
++  "name": "Demo Project",
++  "standard": "NIST CSF 2.0",
++  "documents": [
++    {
++      "document_id": "doc_demo",
++      "filename": "sample.txt",
++      "content": "Our company maintains an Information Security Policy approved by the governance committee.\nAll access control leverages SSO and MFA. We rely on Splunk for security monitoring\nand conduct annual incident response tabletop exercises with PagerDuty."
++    }
++  ]
++}
+diff --git a/docker-compose.yml b/docker-compose.yml
+new file mode 100644
+index 0000000000000000000000000000000000000000..7eb0d1f7049c5bf8e631ed1d65b85e4b79712bed
+--- /dev/null
++++ b/docker-compose.yml
+@@ -0,0 +1,59 @@
++services:
++  api:
++    build: ./services/api
++    ports: ["8000:8000"]
++    environment:
++      - DATA_DIR=/app/data
++      - ORCHESTRATOR_URL=http://orchestrator:8010
++    volumes:
++      - ./data:/app/data
++    depends_on:
++      - orchestrator
++
++  orchestrator:
++    build: ./services/orchestrator
++    ports: ["8010:8010"]
++    environment:
++      - DATA_DIR=/app/data
++      - DOC_ANALYZER_URL=http://doc-analyzer:8111
++      - GAP_ANALYSIS_URL=http://gap-analysis:8121
++      - INITIATIVE_URL=http://initiative-gen:8131
++      - PRIORITIZATION_URL=http://prioritization:8141
++      - ROADMAP_URL=http://roadmap-planner:8151
++      - REPORT_URL=http://report-generator:8161
++    volumes:
++      - ./data:/app/data
++    depends_on:
++      - doc-analyzer
++      - gap-analysis
++      - initiative-gen
++      - prioritization
++      - roadmap-planner
++      - report-generator
++
++  doc-analyzer:
++    build: ./services/agents/documentation_analyzer
++    ports: ["8111:8111"]
++
++  gap-analysis:
++    build: ./services/agents/gap_analysis
++    ports: ["8121:8121"]
++
++  initiative-gen:
++    build: ./services/agents/initiative_generation
++    ports: ["8131:8131"]
++
++  prioritization:
++    build: ./services/agents/prioritization
++    ports: ["8141:8141"]
++
++  roadmap-planner:
++    build: ./services/agents/roadmap_planner
++    ports: ["8151:8151"]
++
++  report-generator:
++    build: ./services/agents/report_generator
++    ports: ["8161:8161"]
++
++  # In production, you’ll replace local persistence with Cosmos DB and add
++  # Azure Service Bus. For local MVP we just write to ./data.
+diff --git a/docs/DEPLOY-AZURE.md b/docs/DEPLOY-AZURE.md
+new file mode 100644
+index 0000000000000000000000000000000000000000..5d4d919e511400c8b0dab3efe70602bd058cac83
+--- /dev/null
++++ b/docs/DEPLOY-AZURE.md
+@@ -0,0 +1,47 @@
++# Deploy to Azure (Outline)
++
++> This is a **starter**. You will need to plug identities, ACR images, and auth.
++
++## 1) Prereqs
++- Azure CLI (`az`), Azure Developer CLI (`azd`)
++- GitHub repo with OIDC to Azure (or a Service Principal secret)
++- ACR (Azure Container Registry) or use `azd` to create one
++
++## 2) Infra
++```bash
++azd init
++azd up
++```
++This will create Log Analytics, App Insights, Key Vault, Cosmos DB, Service Bus, and a Container Apps Environment.
++
++## 3) Build & Push Images
++Use GitHub Actions (see `.github/workflows/deploy.yml`) or local:
++```bash
++# example local build
++az acr build --registry <acrName> --image api:latest services/api
++# repeat for each service...
++```
++
++## 4) Container Apps
++Define Container Apps for each service to pull from ACR and set env vars:
++- API: `ORCHESTRATOR_URL`
++- ORCH: URLs for each agent
++- Shared: `DATA_DIR` (for persistent storage mount or switch to Cosmos DB)
++
++## 5) Identity / Auth
++- Register Azure AD app for API (audience) and for SPA (frontend).
++- Validate JWT in API (add FastAPI dependency to verify `Authorization: Bearer`).
++- Frontend uses MSAL to sign in and call API.
++
++## 6) Data
++- Replace local file persistence with Cosmos DB containers:
++  - `projects`, `evidence`, `gaps`, `initiatives`, `roadmap`, `reports`
++- Use Managed Identity for API/Orchestrator to access Cosmos and Key Vault.
++
++## 7) Azure OpenAI
++- Add endpoint and key in Key Vault; agents call `gpt-4o`/`o4-mini` for analysis.
++- Keep a strict prompt template with **explanations** for transparency.
++
++## 8) Monitoring
++- Container Apps → Log Analytics (already wired via environment).
++- Sentinel rules for error spikes or auth failures.
+diff --git a/infra/main.bicep b/infra/main.bicep
+new file mode 100644
+index 0000000000000000000000000000000000000000..c65d8275c2eb60b21ef2a17cdcb77c5c56719ffa
+--- /dev/null
++++ b/infra/main.bicep
+@@ -0,0 +1,70 @@
++// Bicep skeleton – expand with real parameters and identities for production
++param location string = resourceGroup().location
++param baseName string = 'cyberai${uniqueString(resourceGroup().id)}'
++
++// Log Analytics
++resource logws 'Microsoft.OperationalInsights/workspaces@2021-12-01-preview' = {
++  name: '${baseName}-log'
++  location: location
++  properties: { retentionInDays: 30 }
++}
++
++// Application Insights
++resource appins 'Microsoft.Insights/components@2020-02-02' = {
++  name: '${baseName}-appi'
++  location: location
++  kind: 'web'
++  properties: {
++    Application_Type: 'web'
++    WorkspaceResourceId: logws.id
++  }
++}
++
++// Key Vault
++resource kv 'Microsoft.KeyVault/vaults@2022-07-01' = {
++  name: '${baseName}-kv'
++  location: location
++  properties: {
++    sku: { name: 'standard', family: 'A' }
++    tenantId: subscription().tenantId
++    accessPolicies: []
++    enablePurgeProtection: true
++    enableRbacAuthorization: true
++  }
++}
++
++// Cosmos DB (stub account)
++resource cosmos 'Microsoft.DocumentDB/databaseAccounts@2023-04-15' = {
++  name: '${baseName}-cosmos'
++  location: location
++  kind: 'GlobalDocumentDB'
++  properties: {
++    databaseAccountOfferType: 'Standard'
++    locations: [ { locationName: location } ]
++    capabilities: [ { name: 'EnableServerless' } ]
++  }
++}
++
++// Service Bus (future async orchestration)
++resource sb 'Microsoft.ServiceBus/namespaces@2021-11-01' = {
++  name: '${baseName}-sb'
++  location: location
++  sku: { name: 'Basic', tier: 'Basic' }
++}
++
++// Container Apps Environment
++resource cae 'Microsoft.App/managedEnvironments@2024-02-02-preview' = {
++  name: '${baseName}-cae'
++  location: location
++  properties: {
++    appLogsConfiguration: {
++      destination: 'log-analytics'
++      logAnalyticsConfiguration: {
++        customerId: logws.properties.customerId
++        sharedKey: logws.listKeys().primarySharedKey
++      }
++    }
++  }
++}
++
++// Note: Define Container Apps per service referencing images pushed to ACR (not included in this stub).
+diff --git a/services/agents/documentation_analyzer/Dockerfile b/services/agents/documentation_analyzer/Dockerfile
+new file mode 100644
+index 0000000000000000000000000000000000000000..975b0ae5b151dc81d15616404c963e151f61fae2
+--- /dev/null
++++ b/services/agents/documentation_analyzer/Dockerfile
+@@ -0,0 +1,17 @@
++FROM python:3.11-slim
++
++WORKDIR /app
++ENV PYTHONDONTWRITEBYTECODE=1
++ENV PYTHONUNBUFFERED=1
++
++COPY requirements.txt /app/requirements.txt
++RUN pip install --no-cache-dir -r /app/requirements.txt
++
++COPY . /app
++
++# default values
++ENV HOST=0.0.0.0
++ENV PORT=8111
++
++EXPOSE 8000
++CMD ["sh", "-c", "uvicorn main:app --host ${HOST} --port ${PORT}"]
+diff --git a/services/agents/documentation_analyzer/main.py b/services/agents/documentation_analyzer/main.py
+new file mode 100644
+index 0000000000000000000000000000000000000000..73d5925c89a9442de2df70d31fa59a8085f3bd65
+--- /dev/null
++++ b/services/agents/documentation_analyzer/main.py
+@@ -0,0 +1,42 @@
++from fastapi import FastAPI
++from pydantic import BaseModel
++from typing import List, Dict
++import re
++
++app = FastAPI(title="Documentation Analyzer", version="0.1.0")
++
++class Doc(BaseModel):
++    filename: str
++    content: str
++
++class AnalyzeRequest(BaseModel):
++    documents: List[Doc]
++
++@app.get("/health")
++def health():
++    return {"ok": True}
++
++# Very naive keyword-based "evidence" extraction for MVP
++KEYWORDS = {
++    "ID.AM-1": ["asset", "inventory", "device", "system list"],
++    "ID.GV-1": ["policy", "governance", "committee", "charter"],
++    "PR.AC-1": ["access control", "iam", "rbac", "mfa", "sso"],
++    "DE.DP-1": ["monitoring", "detection", "siem", "splunk", "sentinel"],
++    "RS.RP-1": ["incident", "playbook", "response plan", "pagerduty", "dispatch"]
++}
++
++@app.post("/analyze")
++def analyze(req: AnalyzeRequest):
++    evidence = []
++    for doc in req.documents:
++        text = doc.content.lower()
++        for control, words in KEYWORDS.items():
++            if any(w in text for w in words):
++                snippet = next((line.strip() for line in text.splitlines() if any(w in line for w in words)), "evidence found")
++                evidence.append({
++                    "control": control,
++                    "description": f"{doc.filename}: contains keywords suggesting {control}",
++                    "confidence": 0.7,
++                    "snippet": snippet[:180]
++                })
++    return {"evidence": evidence}
+diff --git a/services/agents/documentation_analyzer/requirements.txt b/services/agents/documentation_analyzer/requirements.txt
+new file mode 100644
+index 0000000000000000000000000000000000000000..236e9e9dbd1990b4318dd62a3820c3efa2118427
+--- /dev/null
++++ b/services/agents/documentation_analyzer/requirements.txt
+@@ -0,0 +1,6 @@
++fastapi==0.111.0
++uvicorn[standard]==0.30.0
++pydantic==2.8.2
++python-multipart==0.0.9
++requests==2.32.3
++PyYAML==6.0.2
+diff --git a/services/agents/gap_analysis/Dockerfile b/services/agents/gap_analysis/Dockerfile
+new file mode 100644
+index 0000000000000000000000000000000000000000..bf27c8826bc610615f8869b15d9949bcc6ac1aa9
+--- /dev/null
++++ b/services/agents/gap_analysis/Dockerfile
+@@ -0,0 +1,17 @@
++FROM python:3.11-slim
++
++WORKDIR /app
++ENV PYTHONDONTWRITEBYTECODE=1
++ENV PYTHONUNBUFFERED=1
++
++COPY requirements.txt /app/requirements.txt
++RUN pip install --no-cache-dir -r /app/requirements.txt
++
++COPY . /app
++
++# default values
++ENV HOST=0.0.0.0
++ENV PORT=8121
++
++EXPOSE 8000
++CMD ["sh", "-c", "uvicorn main:app --host ${HOST} --port ${PORT}"]
+diff --git a/services/agents/gap_analysis/main.py b/services/agents/gap_analysis/main.py
+new file mode 100644
+index 0000000000000000000000000000000000000000..f8fd97de29e368940b9e904af923630b502c6248
+--- /dev/null
++++ b/services/agents/gap_analysis/main.py
+@@ -0,0 +1,36 @@
++from fastapi import FastAPI
++from pydantic import BaseModel
++from typing import List, Dict
++
++app = FastAPI(title="Gap Analysis Agent", version="0.1.0")
++
++class EvidenceItem(BaseModel):
++    control: str
++    description: str
++    confidence: float = 0.6
++
++class GapItem(BaseModel):
++    control: str
++    current: str = "Not Evidenced"
++    target: str = "Defined"
++    risk: str = "Medium"
++    rationale: str
++
++class GapRequest(BaseModel):
++    standard: str = "NIST CSF 2.0"
++    evidence: List[EvidenceItem]
++
++TARGET_CONTROLS = ["ID.AM-1", "ID.GV-1", "PR.AC-1", "DE.DP-1", "RS.RP-1"]
++
++@app.get("/health")
++def health():
++    return {"ok": True}
++
++@app.post("/analyze")
++def analyze(req: GapRequest):
++    present_controls = {e.control for e in req.evidence}
++    gaps: List[GapItem] = []
++    for ctl in TARGET_CONTROLS:
++        if ctl not in present_controls:
++            gaps.append(GapItem(control=ctl, rationale=f"No evidence detected for {ctl}"))
++    return {"gaps": [g.model_dump() for g in gaps]}
+diff --git a/services/agents/gap_analysis/requirements.txt b/services/agents/gap_analysis/requirements.txt
+new file mode 100644
+index 0000000000000000000000000000000000000000..236e9e9dbd1990b4318dd62a3820c3efa2118427
+--- /dev/null
++++ b/services/agents/gap_analysis/requirements.txt
+@@ -0,0 +1,6 @@
++fastapi==0.111.0
++uvicorn[standard]==0.30.0
++pydantic==2.8.2
++python-multipart==0.0.9
++requests==2.32.3
++PyYAML==6.0.2
+diff --git a/services/agents/initiative_generation/Dockerfile b/services/agents/initiative_generation/Dockerfile
+new file mode 100644
+index 0000000000000000000000000000000000000000..749c969720a438fcfb91d367ea4544fd40f6fe7f
+--- /dev/null
++++ b/services/agents/initiative_generation/Dockerfile
+@@ -0,0 +1,17 @@
++FROM python:3.11-slim
++
++WORKDIR /app
++ENV PYTHONDONTWRITEBYTECODE=1
++ENV PYTHONUNBUFFERED=1
++
++COPY requirements.txt /app/requirements.txt
++RUN pip install --no-cache-dir -r /app/requirements.txt
++
++COPY . /app
++
++# default values
++ENV HOST=0.0.0.0
++ENV PORT=8131
++
++EXPOSE 8000
++CMD ["sh", "-c", "uvicorn main:app --host ${HOST} --port ${PORT}"]
+diff --git a/services/agents/initiative_generation/main.py b/services/agents/initiative_generation/main.py
+new file mode 100644
+index 0000000000000000000000000000000000000000..9eb4a15cdd5f6e38b8d9738a87c0a776097b119c
+--- /dev/null
++++ b/services/agents/initiative_generation/main.py
+@@ -0,0 +1,69 @@
++from fastapi import FastAPI
++from pydantic import BaseModel
++from typing import List, Dict
++
++app = FastAPI(title="Initiative Generation Agent", version="0.1.0")
++
++class GapItem(BaseModel):
++    control: str
++    current: str = "Not Evidenced"
++    target: str = "Defined"
++    risk: str = "Medium"
++    rationale: str
++
++class InitRequest(BaseModel):
++    gaps: List[GapItem]
++
++@app.get("/health")
++def health():
++    return {"ok": True}
++
++def propose_initiatives_for_gap(gap: GapItem):
++    ctl = gap.control
++    if ctl == "ID.AM-1":
++        return [{
++            "title": "Establish Asset Inventory",
++            "description": "Deploy a centralized CMDB and implement auto-discovery.",
++            "related_controls": [ctl],
++            "impact": 4, "effort": 3
++        }]
++    if ctl == "ID.GV-1":
++        return [{
++            "title": "Formalize Security Governance",
++            "description": "Define ISMS governance charter, roles, and review cadence.",
++            "related_controls": [ctl],
++            "impact": 5, "effort": 2
++        }]
++    if ctl == "PR.AC-1":
++        return [{
++            "title": "Implement RBAC & MFA",
++            "description": "Harden IAM with RBAC, SSO/MFA, and periodic access reviews.",
++            "related_controls": [ctl],
++            "impact": 5, "effort": 3
++        }]
++    if ctl == "DE.DP-1":
++        return [{
++            "title": "SIEM Detection Use-Cases",
++            "description": "Onboard logs to Sentinel/Splunk and build detections.",
++            "related_controls": [ctl],
++            "impact": 4, "effort": 3
++        }]
++    if ctl == "RS.RP-1":
++        return [{
++            "title": "Incident Response Playbooks",
++            "description": "Create and test IR playbooks with annual tabletop exercises.",
++            "related_controls": [ctl],
++            "impact": 4, "effort": 2
++        }]
++    return [{
++        "title": f"Improve control {ctl}",
++        "description": "Define, implement, and monitor control baseline.",
++        "related_controls": [ctl], "impact": 3, "effort": 3
++    }]
++
++@app.post("/generate")
++def generate(req: InitRequest):
++    initiatives = []
++    for gap in req.gaps:
++        initiatives.extend(propose_initiatives_for_gap(gap))
++    return {"initiatives": initiatives}
+diff --git a/services/agents/initiative_generation/requirements.txt b/services/agents/initiative_generation/requirements.txt
+new file mode 100644
+index 0000000000000000000000000000000000000000..236e9e9dbd1990b4318dd62a3820c3efa2118427
+--- /dev/null
++++ b/services/agents/initiative_generation/requirements.txt
+@@ -0,0 +1,6 @@
++fastapi==0.111.0
++uvicorn[standard]==0.30.0
++pydantic==2.8.2
++python-multipart==0.0.9
++requests==2.32.3
++PyYAML==6.0.2
+diff --git a/services/agents/prioritization/Dockerfile b/services/agents/prioritization/Dockerfile
+new file mode 100644
+index 0000000000000000000000000000000000000000..a4de191f497af5af6b6cbc1c2630829986eb2f84
+--- /dev/null
++++ b/services/agents/prioritization/Dockerfile
+@@ -0,0 +1,17 @@
++FROM python:3.11-slim
++
++WORKDIR /app
++ENV PYTHONDONTWRITEBYTECODE=1
++ENV PYTHONUNBUFFERED=1
++
++COPY requirements.txt /app/requirements.txt
++RUN pip install --no-cache-dir -r /app/requirements.txt
++
++COPY . /app
++
++# default values
++ENV HOST=0.0.0.0
++ENV PORT=8141
++
++EXPOSE 8000
++CMD ["sh", "-c", "uvicorn main:app --host ${HOST} --port ${PORT}"]
+diff --git a/services/agents/prioritization/main.py b/services/agents/prioritization/main.py
+new file mode 100644
+index 0000000000000000000000000000000000000000..4d7f8c398ec02d4c219b4bb9a35ad73e43452024
+--- /dev/null
++++ b/services/agents/prioritization/main.py
+@@ -0,0 +1,36 @@
++from fastapi import FastAPI
++from pydantic import BaseModel
++from typing import List
++
++app = FastAPI(title="Prioritization Agent", version="0.1.0")
++
++class Initiative(BaseModel):
++    title: str
++    description: str
++    related_controls: List[str]
++    impact: int = 3
++    effort: int = 3
++
++class PrioRequest(BaseModel):
++    initiatives: List[Initiative]
++
++@app.get("/health")
++def health():
++    return {"ok": True}
++
++@app.post("/prioritize")
++def prioritize(req: PrioRequest):
++    scored = []
++    for it in req.initiatives:
++        score = it.impact / max(1, it.effort)
++        scored.append({
++            "title": it.title,
++            "related_controls": it.related_controls,
++            "impact": it.impact,
++            "effort": it.effort,
++            "score": round(score, 2)
++        })
++    scored.sort(key=lambda x: (-x["score"], -x["impact"]))
++    for i, s in enumerate(scored, start=1):
++        s["rank"] = i
++    return {"prioritized": scored}
+diff --git a/services/agents/prioritization/requirements.txt b/services/agents/prioritization/requirements.txt
+new file mode 100644
+index 0000000000000000000000000000000000000000..236e9e9dbd1990b4318dd62a3820c3efa2118427
+--- /dev/null
++++ b/services/agents/prioritization/requirements.txt
+@@ -0,0 +1,6 @@
++fastapi==0.111.0
++uvicorn[standard]==0.30.0
++pydantic==2.8.2
++python-multipart==0.0.9
++requests==2.32.3
++PyYAML==6.0.2
+diff --git a/services/agents/report_generator/Dockerfile b/services/agents/report_generator/Dockerfile
+new file mode 100644
+index 0000000000000000000000000000000000000000..9ac98b769696a1e269d09621f02114f21c318c98
+--- /dev/null
++++ b/services/agents/report_generator/Dockerfile
+@@ -0,0 +1,17 @@
++FROM python:3.11-slim
++
++WORKDIR /app
++ENV PYTHONDONTWRITEBYTECODE=1
++ENV PYTHONUNBUFFERED=1
++
++COPY requirements.txt /app/requirements.txt
++RUN pip install --no-cache-dir -r /app/requirements.txt
++
++COPY . /app
++
++# default values
++ENV HOST=0.0.0.0
++ENV PORT=8161
++
++EXPOSE 8000
++CMD ["sh", "-c", "uvicorn main:app --host ${HOST} --port ${PORT}"]
+diff --git a/services/agents/report_generator/main.py b/services/agents/report_generator/main.py
+new file mode 100644
+index 0000000000000000000000000000000000000000..9307f4d21f274c1bc9198df21b81146e483e3522
+--- /dev/null
++++ b/services/agents/report_generator/main.py
+@@ -0,0 +1,61 @@
++from fastapi import FastAPI
++from pydantic import BaseModel
++from typing import List, Dict
++from datetime import datetime
++
++app = FastAPI(title="Report Generator Agent", version="0.1.0")
++
++class Evidence(BaseModel):
++    control: str
++    description: str
++    confidence: float
++
++class Gap(BaseModel):
++    control: str
++    current: str
++    target: str
++    risk: str
++    rationale: str
++
++class Initiative(BaseModel):
++    title: str
++    related_controls: List[str]
++    impact: int
++    effort: int
++    score: float
++    rank: int
++
++class RoadmapItem(BaseModel):
++    title: str
++    quarter: str
++    depends_on: List[str] = []
++
++class GenerateRequest(BaseModel):
++    project_id: str
++    project_name: str
++    standard: str
++    evidence: List[Evidence]
++    gaps: List[Gap]
++    initiatives: List[Initiative]
++    roadmap: List[RoadmapItem]
++
++@app.get("/health")
++def health():
++    return {"ok": True}
++
++def md_section(title: str, body: str) -> str:
++    return f"## {title}\n\n{body}\n\n"
++
++@app.post("/generate")
++def generate(req: GenerateRequest):
++    # Very lightweight markdown summary for MVP
++    md = f"# Cyber Maturity Assessment – {req.project_name}\n\n"
++    md += f"**Standard:** {req.standard}  \n"
++    md += f"**Generated:** {datetime.utcnow().isoformat()}Z\n\n"
++
++    md += md_section("Evidence", "\n".join([f"- **{e.control}**: {e.description} (confidence {e.confidence})" for e in req.evidence]) or "_None_")
++    md += md_section("Gaps", "\n".join([f"- **{g.control}**: {g.current} → {g.target}. Risk: {g.risk}. {g.rationale}" for g in req.gaps]) or "_None_")
++    md += md_section("Prioritized Initiatives", "\n".join([f"{i.rank}. **{i.title}** (Ctrls: {', '.join(i.related_controls)}; Impact {i.impact}, Effort {i.effort}, Score {i.score})" for i in req.initiatives]) or "_None_")
++    md += md_section("Roadmap", "\n".join([f"- **{r.title}** → {r.quarter}" for r in req.roadmap]) or "_None_")
++
++    return {"project_id": req.project_id, "summary_markdown": md, "artifacts": {}}
+diff --git a/services/agents/report_generator/requirements.txt b/services/agents/report_generator/requirements.txt
+new file mode 100644
+index 0000000000000000000000000000000000000000..236e9e9dbd1990b4318dd62a3820c3efa2118427
+--- /dev/null
++++ b/services/agents/report_generator/requirements.txt
+@@ -0,0 +1,6 @@
++fastapi==0.111.0
++uvicorn[standard]==0.30.0
++pydantic==2.8.2
++python-multipart==0.0.9
++requests==2.32.3
++PyYAML==6.0.2
+diff --git a/services/agents/roadmap_planner/Dockerfile b/services/agents/roadmap_planner/Dockerfile
+new file mode 100644
+index 0000000000000000000000000000000000000000..8abd444a606b2216b56385768dce53406a70b4eb
+--- /dev/null
++++ b/services/agents/roadmap_planner/Dockerfile
+@@ -0,0 +1,17 @@
++FROM python:3.11-slim
++
++WORKDIR /app
++ENV PYTHONDONTWRITEBYTECODE=1
++ENV PYTHONUNBUFFERED=1
++
++COPY requirements.txt /app/requirements.txt
++RUN pip install --no-cache-dir -r /app/requirements.txt
++
++COPY . /app
++
++# default values
++ENV HOST=0.0.0.0
++ENV PORT=8151
++
++EXPOSE 8000
++CMD ["sh", "-c", "uvicorn main:app --host ${HOST} --port ${PORT}"]
+diff --git a/services/agents/roadmap_planner/main.py b/services/agents/roadmap_planner/main.py
+new file mode 100644
+index 0000000000000000000000000000000000000000..dfcbfdb47b48c548152eb070b1815badab9e7c35
+--- /dev/null
++++ b/services/agents/roadmap_planner/main.py
+@@ -0,0 +1,28 @@
++from fastapi import FastAPI
++from pydantic import BaseModel
++from typing import List
++
++app = FastAPI(title="Roadmap Planner Agent", version="0.1.0")
++
++class Prioritized(BaseModel):
++    title: str
++    related_controls: List[str]
++    impact: int
++    effort: int
++    score: float
++    rank: int
++
++class PlanRequest(BaseModel):
++    prioritized: List[Prioritized]
++
++@app.get("/health")
++def health():
++    return {"ok": True}
++
++@app.post("/plan")
++def plan(req: PlanRequest):
++    roadmap = []
++    for p in req.prioritized:
++        quarter = "Q1" if p.rank <= 2 else "Q2" if p.rank <= 4 else "Q3"
++        roadmap.append({"title": p.title, "quarter": quarter, "depends_on": []})
++    return {"roadmap": roadmap}
+diff --git a/services/agents/roadmap_planner/requirements.txt b/services/agents/roadmap_planner/requirements.txt
+new file mode 100644
+index 0000000000000000000000000000000000000000..236e9e9dbd1990b4318dd62a3820c3efa2118427
+--- /dev/null
++++ b/services/agents/roadmap_planner/requirements.txt
+@@ -0,0 +1,6 @@
++fastapi==0.111.0
++uvicorn[standard]==0.30.0
++pydantic==2.8.2
++python-multipart==0.0.9
++requests==2.32.3
++PyYAML==6.0.2
+diff --git a/services/api/Dockerfile b/services/api/Dockerfile
+new file mode 100644
+index 0000000000000000000000000000000000000000..b7b3cf16490329427e3b474a65f8c9210f5ab800
+--- /dev/null
++++ b/services/api/Dockerfile
+@@ -0,0 +1,17 @@
++FROM python:3.11-slim
++
++WORKDIR /app
++ENV PYTHONDONTWRITEBYTECODE=1
++ENV PYTHONUNBUFFERED=1
++
++COPY requirements.txt /app/requirements.txt
++RUN pip install --no-cache-dir -r /app/requirements.txt
++
++COPY . /app
++
++# default values
++ENV HOST=0.0.0.0
++ENV PORT=8000
++
++EXPOSE 8000
++CMD ["sh", "-c", "uvicorn main:app --host ${HOST} --port ${PORT}"]
+diff --git a/services/api/main.py b/services/api/main.py
+new file mode 100644
+index 0000000000000000000000000000000000000000..30a413215eced24e0ebaa374ffddd1d0102b63af
+--- /dev/null
++++ b/services/api/main.py
+@@ -0,0 +1,97 @@
++import os, json, shutil
++from typing import List
++from fastapi import FastAPI, UploadFile, File, HTTPException
++from fastapi.middleware.cors import CORSMiddleware
++from pydantic import BaseModel
++import requests
++
++from common.models import Project, Document, Report
++
++DATA_DIR = os.environ.get("DATA_DIR", "/app/data")
++ORCH_URL = os.environ.get("ORCHESTRATOR_URL", "http://localhost:8010")
++
++os.makedirs(DATA_DIR, exist_ok=True)
++
++app = FastAPI(title="Cyber AI Maturity – API Gateway", version="0.1.0")
++app.add_middleware(
++    CORSMiddleware,
++    allow_origins=["*"], allow_credentials=True,
++    allow_methods=["*"], allow_headers=["*"],
++)
++
++class NewProject(BaseModel):
++    name: str
++    standard: str = "NIST CSF 2.0"
++
++def _project_path(project_id: str) -> str:
++    return os.path.join(DATA_DIR, "projects", project_id)
++
++@app.get("/health")
++def health():
++    return {"ok": True}
++
++@app.post("/projects", response_model=Project)
++def create_project(payload: NewProject):
++    project = Project(name=payload.name, standard=payload.standard)
++    pdir = _project_path(project.project_id)
++    os.makedirs(pdir, exist_ok=True)
++    with open(os.path.join(pdir, "project.json"), "w", encoding="utf-8") as f:
++        f.write(project.model_dump_json(indent=2))
++    return project
++
++@app.get("/projects", response_model=List[Project])
++def list_projects():
++    projects_dir = os.path.join(DATA_DIR, "projects")
++    if not os.path.exists(projects_dir):
++        return []
++    out = []
++    for pid in os.listdir(projects_dir):
++        pjson = os.path.join(projects_dir, pid, "project.json")
++        if os.path.exists(pjson):
++            with open(pjson, "r", encoding="utf-8") as f:
++                out.append(Project.model_validate_json(f.read()))
++    return out
++
++@app.post("/projects/{project_id}/documents", response_model=Document)
++def upload_document(project_id: str, file: UploadFile = File(...)):
++    pdir = _project_path(project_id)
++    if not os.path.exists(pdir):
++        raise HTTPException(404, "Project not found")
++    docs_dir = os.path.join(pdir, "docs")
++    os.makedirs(docs_dir, exist_ok=True)
++    dest_path = os.path.join(docs_dir, file.filename)
++    with open(dest_path, "wb") as out:
++        shutil.copyfileobj(file.file, out)
++
++    # Load content if text-ish
++    content = None
++    if file.filename.lower().endswith((".txt", ".md")):
++        with open(dest_path, "r", encoding="utf-8", errors="ignore") as f:
++            content = f.read()
++
++    # Update project record
++    pjson = os.path.join(pdir, "project.json")
++    with open(pjson, "r", encoding="utf-8") as f:
++        project = Project.model_validate_json(f.read())
++    doc = Document(filename=file.filename, content=content)
++    project.documents.append(doc)
++    with open(pjson, "w", encoding="utf-8") as f:
++        f.write(project.model_dump_json(indent=2))
++
++    return doc
++
++@app.post("/projects/{project_id}/analyze")
++def analyze_project(project_id: str):
++    r = requests.post(f"{ORCH_URL}/orchestrate/analyze", json={"project_id": project_id})
++    if r.status_code != 200:
++        raise HTTPException(r.status_code, r.text)
++    return r.json()
++
++@app.get("/projects/{project_id}/report", response_model=Report)
++def get_report(project_id: str):
++    pdir = _project_path(project_id)
++    rep_path = os.path.join(pdir, "report.json")
++    if not os.path.exists(rep_path):
++        raise HTTPException(404, "Report not found. Run analysis first.")
++    with open(rep_path, "r", encoding="utf-8") as f:
++        return Report.model_validate_json(f.read())
+diff --git a/services/api/requirements.txt b/services/api/requirements.txt
+new file mode 100644
+index 0000000000000000000000000000000000000000..236e9e9dbd1990b4318dd62a3820c3efa2118427
+--- /dev/null
++++ b/services/api/requirements.txt
+@@ -0,0 +1,6 @@
++fastapi==0.111.0
++uvicorn[standard]==0.30.0
++pydantic==2.8.2
++python-multipart==0.0.9
++requests==2.32.3
++PyYAML==6.0.2
+diff --git a/services/orchestrator/Dockerfile b/services/orchestrator/Dockerfile
+new file mode 100644
+index 0000000000000000000000000000000000000000..b7b3cf16490329427e3b474a65f8c9210f5ab800
+--- /dev/null
++++ b/services/orchestrator/Dockerfile
+@@ -0,0 +1,17 @@
++FROM python:3.11-slim
++
++WORKDIR /app
++ENV PYTHONDONTWRITEBYTECODE=1
++ENV PYTHONUNBUFFERED=1
++
++COPY requirements.txt /app/requirements.txt
++RUN pip install --no-cache-dir -r /app/requirements.txt
++
++COPY . /app
++
++# default values
++ENV HOST=0.0.0.0
++ENV PORT=8000
++
++EXPOSE 8000
++CMD ["sh", "-c", "uvicorn main:app --host ${HOST} --port ${PORT}"]
+diff --git a/services/orchestrator/main.py b/services/orchestrator/main.py
+new file mode 100644
+index 0000000000000000000000000000000000000000..9651cedbc2f2ae4c251f358afe583c69cc05b36f
+--- /dev/null
++++ b/services/orchestrator/main.py
+@@ -0,0 +1,89 @@
++import os, json, time, glob
++import requests
++from fastapi import FastAPI, HTTPException
++from pydantic import BaseModel
++from typing import Dict, Any, List
++
++from common.models import Project, Report
++
++DATA_DIR = os.environ.get("DATA_DIR", "/app/data")
++
++DOC_ANALYZER = os.environ.get("DOC_ANALYZER_URL", "http://localhost:8111")
++GAP_ANALYSIS = os.environ.get("GAP_ANALYSIS_URL", "http://localhost:8121")
++INITIATIVE   = os.environ.get("INITIATIVE_URL",   "http://localhost:8131")
++PRIORITIZE   = os.environ.get("PRIORITIZATION_URL","http://localhost:8141")
++ROADMAP      = os.environ.get("ROADMAP_URL",      "http://localhost:8151")
++REPORT       = os.environ.get("REPORT_URL",       "http://localhost:8161")
++
++app = FastAPI(title="AI Orchestrator", version="0.1.0")
++
++def _project_path(project_id: str) -> str:
++    return os.path.join(DATA_DIR, "projects", project_id)
++
++class OrchestrateRequest(BaseModel):
++    project_id: str
++
++@app.get("/health")
++def health():
++    return {"ok": True}
++
++@app.post("/orchestrate/analyze")
++def orchestrate(req: OrchestrateRequest):
++    pdir = _project_path(req.project_id)
++    pjson = os.path.join(pdir, "project.json")
++    if not os.path.exists(pjson):
++        raise HTTPException(404, "Project not found")
++
++    with open(pjson, "r", encoding="utf-8") as f:
++        project = Project.model_validate_json(f.read())
++
++    # 1) Documentation Analyzer over all docs
++    docs_dir = os.path.join(pdir, "docs")
++    doc_texts = []
++    if os.path.exists(docs_dir):
++        for doc in project.documents:
++            # prefer stored content; fallback to reading file
++            if doc.content:
++                doc_texts.append({"filename": doc.filename, "content": doc.content})
++            else:
++                fpath = os.path.join(docs_dir, doc.filename)
++                if os.path.exists(fpath):
++                    try:
++                        with open(fpath, "r", encoding="utf-8", errors="ignore") as ftxt:
++                            doc_texts.append({"filename": doc.filename, "content": ftxt.read()})
++                    except Exception:
++                        pass
++
++    da = requests.post(f"{DOC_ANALYZER}/analyze", json={"documents": doc_texts}).json()
++
++    # 2) Gap Analysis
++    gaps = requests.post(f"{GAP_ANALYSIS}/analyze", json={
++        "standard": project.standard,
++        "evidence": da.get("evidence", [])
++    }).json()
++
++    # 3) Initiatives
++    inits = requests.post(f"{INITIATIVE}/generate", json={"gaps": gaps["gaps"]}).json()
++
++    # 4) Prioritization
++    prio = requests.post(f"{PRIORITIZE}/prioritize", json={"initiatives": inits["initiatives"]}).json()
++
++    # 5) Roadmap
++    road = requests.post(f"{ROADMAP}/plan", json={"prioritized": prio["prioritized"]}).json()
++
++    # 6) Report
++    rep = requests.post(f"{REPORT}/generate", json={
++        "project_id": project.project_id,
++        "project_name": project.name,
++        "standard": project.standard,
++        "evidence": da.get("evidence", []),
++        "gaps": gaps["gaps"],
++        "initiatives": prio["prioritized"],
++        "roadmap": road["roadmap"]
++    }).json()
++
++    # Persist report
++    with open(os.path.join(pdir, "report.json"), "w", encoding="utf-8") as f:
++        json.dump(rep, f, indent=2)
++
++    return {"status": "ok", "summary": {"evidence": len(da.get("evidence", [])), "gaps": len(gaps["gaps"]), "initiatives": len(prio["prioritized"]) }}
+diff --git a/services/orchestrator/requirements.txt b/services/orchestrator/requirements.txt
+new file mode 100644
+index 0000000000000000000000000000000000000000..236e9e9dbd1990b4318dd62a3820c3efa2118427
+--- /dev/null
++++ b/services/orchestrator/requirements.txt
+@@ -0,0 +1,6 @@
++fastapi==0.111.0
++uvicorn[standard]==0.30.0
++pydantic==2.8.2
++python-multipart==0.0.9
++requests==2.32.3
++PyYAML==6.0.2
