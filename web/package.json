@@ -5,7 +5,7 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
-    "start": "next start",
+    "start": "next start -p ${PORT:-8080}",
     "lint": "next lint",
     "test:e2e": "playwright test",
     "test:e2e:ui": "playwright test --ui",
@@ -34,5 +34,8 @@
     "eslint": "^8.0.0",
     "eslint-config-next": "14.2.31",
     "@playwright/test": "^1.40.0"
+  },
+  "engines": {
+    "node": ">=20.x"
   }
 }
