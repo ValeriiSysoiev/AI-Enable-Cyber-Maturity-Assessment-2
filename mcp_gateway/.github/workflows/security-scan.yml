@@ -1,0 +1,129 @@
+name: MCP Gateway Security Scan
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main ]
+  schedule:
+    # Run security scans daily at 2 AM UTC
+    - cron: '0 2 * * *'
+
+jobs:
+  security-scan:
+    runs-on: ubuntu-latest
+    permissions:
+      security-events: write
+      contents: read
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+    
+    - name: Install dependencies
+      run: |
+        cd services/mcp_gateway
+        pip install -r requirements.txt
+        pip install -r test-requirements.txt
+        pip install bandit[toml] safety semgrep
+    
+    - name: Run Bandit Security Linter
+      run: |
+        cd services/mcp_gateway
+        bandit -r . -f json -o bandit-report.json || true
+        bandit -r . -f txt
+      continue-on-error: true
+    
+    - name: Run Safety Check for Dependencies
+      run: |
+        cd services/mcp_gateway
+        safety check --json --output safety-report.json || true
+        safety check
+      continue-on-error: true
+    
+    - name: Run Semgrep Security Analysis
+      run: |
+        cd services/mcp_gateway
+        semgrep --config=auto --json --output=semgrep-report.json . || true
+        semgrep --config=auto .
+      continue-on-error: true
+    
+    - name: Run Security Tests
+      run: |
+        cd services/mcp_gateway
+        python -m pytest tests/test_security_comprehensive.py -v --tb=short
+        python -m pytest tests/test_security.py -v --tb=short
+    
+    - name: Upload Security Reports
+      uses: actions/upload-artifact@v3
+      if: always()
+      with:
+        name: security-reports
+        path: |
+          services/mcp_gateway/bandit-report.json
+          services/mcp_gateway/safety-report.json
+          services/mcp_gateway/semgrep-report.json
+    
+    - name: Security Gate Check
+      run: |
+        cd services/mcp_gateway
+        python scripts/security_gate_check.py
+
+  upload-guard-tests:
+    runs-on: ubuntu-latest
+    needs: security-scan
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+    
+    - name: Install dependencies
+      run: |
+        cd services/mcp_gateway
+        pip install -r requirements.txt
+        pip install -r test-requirements.txt
+    
+    - name: Run Upload Guard Tests
+      run: |
+        cd services/mcp_gateway
+        python -m pytest tests/test_security_comprehensive.py::TestOversizePayloadProtection -v
+        python -m pytest tests/test_security_comprehensive.py::TestMimeTypeValidation -v
+        python -m pytest tests/test_security_comprehensive.py::TestPathTraversalAttacks -v
+    
+    - name: Verify Security Controls
+      run: |
+        cd services/mcp_gateway
+        python scripts/verify_security_controls.py
+
+  secret-scan:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    
+    - name: Install TruffleHog
+      run: |
+        curl -sSfL https://raw.githubusercontent.com/trufflesecurity/trufflehog/main/scripts/install.sh | sh -s -- -b /usr/local/bin
+    
+    - name: Run TruffleHog Secret Scan
+      run: |
+        trufflehog git https://github.com/${{ github.repository }}.git --branch=${{ github.ref_name }} --only-verified --json > trufflehog-report.json || true
+        trufflehog git https://github.com/${{ github.repository }}.git --branch=${{ github.ref_name }} --only-verified
+    
+    - name: Upload Secret Scan Report
+      uses: actions/upload-artifact@v3
+      if: always()
+      with:
+        name: secret-scan-report
+        path: trufflehog-report.json
