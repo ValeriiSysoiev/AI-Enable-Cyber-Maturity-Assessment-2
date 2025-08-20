@@ -7,6 +7,7 @@ from typing import Dict, Any, List, Optional
 
 from common.models import Project, Report
 from mcp_client import create_mcp_client, IMcpClient, generate_correlation_id
+from mcp_connectors import create_mcp_connectors, MCPConnectors
 
 DATA_DIR = os.environ.get("DATA_DIR", "/app/data")
 
@@ -23,9 +24,10 @@ logger = logging.getLogger(__name__)
 
 app = FastAPI(title="AI Orchestrator", version="0.1.0")
 
-# Initialize MCP client
+# Initialize MCP client and connectors
 mcp_client: IMcpClient = create_mcp_client()
 mcp_enabled = os.environ.get("MCP_ENABLED", "false").lower() == "true"
+mcp_connectors: MCPConnectors = create_mcp_connectors(mcp_client)
 
 def _project_path(project_id: str) -> str:
     return os.path.join(DATA_DIR, "projects", project_id)
