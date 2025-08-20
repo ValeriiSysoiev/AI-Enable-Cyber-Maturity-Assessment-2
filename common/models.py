@@ -23,6 +23,7 @@ class EvidenceItem(BaseModel):
     control: str
     description: str
     confidence: float = 0.6
+    mcp_call_id: Optional[str] = None  # Track MCP operation that generated this evidence
 
 class GapItem(BaseModel):
     control: str
@@ -30,6 +31,7 @@ class GapItem(BaseModel):
     target: str = "Defined"
     risk: str = "Medium"
     rationale: str
+    mcp_call_id: Optional[str] = None  # Track MCP operation that generated this gap
 
 class Initiative(BaseModel):
     title: str
@@ -38,6 +40,7 @@ class Initiative(BaseModel):
     impact: int = 3  # 1-5
     effort: int = 3  # 1-5
     dependencies: List[str] = Field(default_factory=list)
+    mcp_call_id: Optional[str] = None  # Track MCP operation that generated this initiative
 
 class PrioritizedInitiative(BaseModel):
     title: str
@@ -57,3 +60,4 @@ class Report(BaseModel):
     summary_markdown: str
     generated_at: datetime = Field(default_factory=datetime.utcnow)
     artifacts: Dict[str, str] = Field(default_factory=dict)  # filename -> path
+    mcp_call_id: Optional[str] = None  # Track MCP operation that generated this report
