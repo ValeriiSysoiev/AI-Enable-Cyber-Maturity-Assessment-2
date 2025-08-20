@@ -1,14 +1,45 @@
 services:
+  web:
+    build: ./web
+    ports: ["3000:3000"]
+    environment:
+      - NEXT_PUBLIC_API_BASE_URL=http://localhost:8000
+    depends_on:
+      api:
+        condition: service_healthy
+    networks:
+      - ai-maturity-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000/"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    restart: unless-stopped
+
   api:
     build: ./services/api
     ports: ["8000:8000"]
     environment:
       - DATA_DIR=/app/data
       - ORCHESTRATOR_URL=http://orchestrator:8010
+      - MCP_ENABLED=false  # Set to true to enable MCP Gateway integration
+      - MCP_GATEWAY_URL=http://mcp-gateway:8200
+      - FEATURE_MCP_ENABLED=false  # Feature flag for MCP
     volumes:
       - ./data:/app/data
     depends_on:
-      - orchestrator
+      orchestrator:
+        condition: service_healthy
+    networks:
+      - ai-maturity-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    restart: unless-stopped
 
   orchestrator:
     build: ./services/orchestrator
@@ -24,36 +55,130 @@ services:
     volumes:
       - ./data:/app/data
     depends_on:
-      - doc-analyzer
-      - gap-analysis
-      - initiative-gen
-      - prioritization
-      - roadmap-planner
-      - report-generator
+      doc-analyzer:
+        condition: service_healthy
+      gap-analysis:
+        condition: service_healthy
+      initiative-gen:
+        condition: service_healthy
+      prioritization:
+        condition: service_healthy
+      roadmap-planner:
+        condition: service_healthy
+      report-generator:
+        condition: service_healthy
+    networks:
+      - ai-maturity-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8010/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    restart: unless-stopped
 
   doc-analyzer:
     build: ./services/agents/documentation_analyzer
     ports: ["8111:8111"]
+    networks:
+      - ai-maturity-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8111/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    restart: unless-stopped
 
   gap-analysis:
     build: ./services/agents/gap_analysis
     ports: ["8121:8121"]
+    networks:
+      - ai-maturity-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8121/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    restart: unless-stopped
 
   initiative-gen:
     build: ./services/agents/initiative_generation
     ports: ["8131:8131"]
+    networks:
+      - ai-maturity-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8131/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    restart: unless-stopped
 
   prioritization:
     build: ./services/agents/prioritization
     ports: ["8141:8141"]
+    networks:
+      - ai-maturity-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8141/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    restart: unless-stopped
 
   roadmap-planner:
     build: ./services/agents/roadmap_planner
     ports: ["8151:8151"]
+    networks:
+      - ai-maturity-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8151/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    restart: unless-stopped
 
   report-generator:
     build: ./services/agents/report_generator
     ports: ["8161:8161"]
+    networks:
+      - ai-maturity-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8161/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    restart: unless-stopped
 
-  # In production, you’ll replace local persistence with Cosmos DB and add
-  # Azure Service Bus. For local MVP we just write to ./data.
+  # MCP Gateway - optional service for Model Context Protocol integration
+  mcp-gateway:
+    build: ./services/mcp_gateway
+    ports: ["8200:8200"]
+    environment:
+      - MCP_ENABLED=true
+      - MCP_DATA_ROOT=/app/data
+      - MCP_MAX_FILE_SIZE_MB=10
+      - MCP_MAX_SEARCH_RESULTS=20
+      - MCP_GATEWAY_PORT=8200
+    volumes:
+      - ./data:/app/data
+    networks:
+      - ai-maturity-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8200/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    restart: unless-stopped
+    profiles:
+      - mcp  # Use 'docker-compose --profile mcp up' to include MCP Gateway
+
+networks:
+  ai-maturity-network:
+    driver: bridge
