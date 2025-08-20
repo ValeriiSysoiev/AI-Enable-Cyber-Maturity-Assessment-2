@@ -40,7 +40,7 @@ The MCP client shim enables the orchestrator to route service calls through an M
 ```bash
 # Enable MCP integration
 export MCP_ENABLED=true
-export MCP_GATEWAY_URL=http://localhost:8080
+export MCP_GATEWAY_URL=http://localhost:8200
 export MCP_TIMEOUT=60
 ```
 
