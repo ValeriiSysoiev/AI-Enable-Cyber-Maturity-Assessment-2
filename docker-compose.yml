@@ -10,7 +10,7 @@ services:
     networks:
       - ai-maturity-network
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:3000/"]
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:3000/')"]
       interval: 30s
       timeout: 10s
       retries: 3
@@ -18,7 +18,9 @@ services:
     restart: unless-stopped
 
   api:
-    build: ./services/api
+    build:
+      context: .
+      dockerfile: ./services/api/Dockerfile
     ports: ["8000:8000"]
     environment:
       - DATA_DIR=/app/data
@@ -34,7 +36,7 @@ services:
     networks:
       - ai-maturity-network
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/health')"]
       interval: 30s
       timeout: 10s
       retries: 3
@@ -42,7 +44,9 @@ services:
     restart: unless-stopped
 
   orchestrator:
-    build: ./services/orchestrator
+    build:
+      context: .
+      dockerfile: ./services/orchestrator/Dockerfile
     ports: ["8010:8010"]
     environment:
       - DATA_DIR=/app/data
@@ -52,6 +56,7 @@ services:
       - PRIORITIZATION_URL=http://prioritization:8141
       - ROADMAP_URL=http://roadmap-planner:8151
       - REPORT_URL=http://report-generator:8161
+      - PORT=8010
     volumes:
       - ./data:/app/data
     depends_on:
@@ -70,7 +75,7 @@ services:
     networks:
       - ai-maturity-network
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8010/health"]
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8010/health')"]
       interval: 30s
       timeout: 10s
       retries: 3
@@ -83,7 +88,7 @@ services:
     networks:
       - ai-maturity-network
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8111/health"]
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8111/health')"]
       interval: 30s
       timeout: 10s
       retries: 3
@@ -96,7 +101,7 @@ services:
     networks:
       - ai-maturity-network
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8121/health"]
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8121/health')"]
       interval: 30s
       timeout: 10s
       retries: 3
@@ -109,7 +114,7 @@ services:
     networks:
       - ai-maturity-network
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8131/health"]
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8131/health')"]
       interval: 30s
       timeout: 10s
       retries: 3
@@ -122,7 +127,7 @@ services:
     networks:
       - ai-maturity-network
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8141/health"]
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8141/health')"]
       interval: 30s
       timeout: 10s
       retries: 3
@@ -135,7 +140,7 @@ services:
     networks:
       - ai-maturity-network
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8151/health"]
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8151/health')"]
       interval: 30s
       timeout: 10s
       retries: 3
@@ -148,7 +153,7 @@ services:
     networks:
       - ai-maturity-network
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8161/health"]
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8161/health')"]
       interval: 30s
       timeout: 10s
       retries: 3
@@ -170,7 +175,7 @@ services:
     networks:
       - ai-maturity-network
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8200/health"]
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8200/health')"]
       interval: 30s
       timeout: 10s
       retries: 3
