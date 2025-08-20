@@ -15,6 +15,7 @@ from .models import Assessment, Answer
 from .schemas import AssessmentCreate, AssessmentResponse, AnswerUpsert, ScoreResponse, PillarScore
 from .scoring import compute_scores
 from .routes import assessments as assessments_router, orchestrations as orchestrations_router, engagements as engagements_router, documents, summary, presets as presets_router, version as version_router, admin_auth as admin_auth_router, gdpr as gdpr_router, admin_settings as admin_settings_router, evidence as evidence_router, csf as csf_router, workshops as workshops_router, minutes as minutes_router
+from services.mcp_gateway.main import router as mcp_gateway_router
 from domain.repository import InMemoryRepository
 from domain.file_repo import FileRepository
 from ai.llm import LLMClient
@@ -188,6 +189,26 @@ async def on_startup():
         preset_service.BUNDLED.update({k: v for k, v in bundled.items() if v.exists()})
     except Exception:
         pass
+    
+    # Initialize MCP Gateway configuration
+    try:
+        from services.mcp_gateway import init_mcp_config
+        mcp_config = init_mcp_config()
+        logger.info(
+            "MCP Gateway initialized",
+            extra={
+                "base_data_path": str(mcp_config.base_data_path),
+                "security_enabled": mcp_config.security.enable_path_jailing,
+                "content_redaction": mcp_config.security.enable_content_redaction,
+                "tools_enabled": {
+                    "filesystem": mcp_config.filesystem.enabled,
+                    "pdf_parser": mcp_config.pdf_parser.enabled,
+                    "search": mcp_config.search.enabled
+                }
+            }
+        )
+    except Exception as e:
+        logger.error(f"Failed to initialize MCP Gateway: {e}")
 
 
 @app.on_event("shutdown")
@@ -302,6 +323,9 @@ app.include_router(admin_auth_router.router)
 app.include_router(gdpr_router.router)
 app.include_router(admin_settings_router.router)
 app.include_router(evidence_router.router)
+
+# MCP Gateway router
+app.include_router(mcp_gateway_router)
 
 # S4 Feature routers - conditionally included based on feature flags
 from config import feature_flags
