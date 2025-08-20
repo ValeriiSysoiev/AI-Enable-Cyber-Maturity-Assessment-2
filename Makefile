@@ -1,5 +1,5 @@
 SHELL := /bin/bash
-.PHONY: venv deps dev demo demo-mcp deploy-admin urls smoke
+.PHONY: venv deps dev deploy-admin urls smoke demo demo-mcp demo-setup demo-mcp-setup demo-health demo-seed
 
 venv:
 	python3 -m venv .venv
@@ -13,46 +13,6 @@ dev:
 	[ -f .env ] || cp .env.example .env; \
 	. .venv/bin/activate && honcho start
 
-# Standard demo mode - preserves existing behavior
-demo:
-	@echo "Starting demo mode (standard orchestrator services)..."
-	@if ! docker compose ps | grep -q "Up"; then \
-		if lsof -Pi :3000 -sTCP:LISTEN -t >/dev/null 2>&1; then \
-			echo "Warning: Port 3000 is in use, web will fallback to 3001"; \
-		fi; \
-		if lsof -Pi :8000 -sTCP:LISTEN -t >/dev/null 2>&1; then \
-			echo "Error: Port 8000 (API) is already in use"; \
-			exit 1; \
-		fi; \
-		docker compose up --build -d; \
-	else \
-		echo "Services already running"; \
-	fi
-	@echo "Demo services started. API: http://localhost:8000"
-
-# MCP-enabled demo mode
-demo-mcp:
-	@echo "Starting demo mode with MCP Gateway enabled..."
-	@if ! docker compose ps | grep -q "Up"; then \
-		if lsof -Pi :3000 -sTCP:LISTEN -t >/dev/null 2>&1; then \
-			echo "Warning: Port 3000 is in use, web will fallback to 3001"; \
-		fi; \
-		if lsof -Pi :8000 -sTCP:LISTEN -t >/dev/null 2>&1; then \
-			echo "Error: Port 8000 (API) is already in use"; \
-			exit 1; \
-		fi; \
-		if lsof -Pi :8020 -sTCP:LISTEN -t >/dev/null 2>&1; then \
-			echo "Error: Port 8020 (MCP Gateway) is already in use"; \
-			exit 1; \
-		fi; \
-		MCP_ENABLED=true docker compose --profile mcp up --build -d; \
-	else \
-		echo "Services already running"; \
-	fi
-	@echo "MCP Demo services started. API: http://localhost:8000, MCP Gateway: http://localhost:8020"
-	@echo "Waiting for MCP Gateway health check..."
-	@timeout 60s bash -c 'until curl -s http://localhost:8020/health >/dev/null 2>&1; do sleep 2; done' || echo "Warning: MCP Gateway health check timeout"
-
 deploy-admin:
 	bash ./scripts/deploy_admin.sh
 
@@ -61,3 +21,45 @@ urls:
 
 smoke:
 	bash scripts/smoke.sh
+
+# Demo targets for local development
+demo: demo-setup demo-health demo-seed
+	@echo ""
+	@echo "🚀 Demo environment is ready!"
+	@echo "Open http://localhost:3000 to start exploring the AI-Enabled Cyber Maturity Assessment tool"
+
+# MCP-enabled demo targets
+demo-mcp: demo-mcp-setup demo-health demo-seed
+	@echo ""
+	@echo "🚀 Demo environment with MCP Gateway is ready!"
+	@echo "Open http://localhost:3000 to start exploring the AI-Enabled Cyber Maturity Assessment tool"
+	@echo "MCP Gateway is available at http://localhost:8200"
+	@echo "MCP Tools API documentation: http://localhost:8200/docs"
+
+demo-setup:
+	@echo "Starting demo environment..."
+	@echo "Checking for port conflicts..."
+	@if netstat -an | grep LISTEN | grep -q ":3000 "; then \
+		echo "⚠️  Port 3000 is already in use. Please stop the conflicting service."; \
+		netstat -an | grep ":3000 "; \
+		exit 1; \
+	fi
+	@if netstat -an | grep LISTEN | grep -q ":8000 "; then \
+		echo "⚠️  Port 8000 is already in use. Please stop the conflicting service."; \
+		netstat -an | grep ":8000 "; \
+		exit 1; \
+	fi
+	@echo "✅ Port check passed"
+	docker compose up -d --build
+
+demo-mcp-setup:
+	@echo "Starting demo environment with MCP Gateway..."
+	@export MCP=1 && docker compose --profile mcp up -d --build
+
+demo-health:
+	@echo "Running health checks..."
+	bash scripts/health_check_local.sh
+
+demo-seed:
+	@echo "Seeding demo data..."
+	bash scripts/seed_demo_data.sh
