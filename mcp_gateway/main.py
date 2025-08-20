@@ -154,10 +154,12 @@ async def startup_event():
     from mcp_tools.fs_tools import register_fs_tools
     from mcp_tools.pdf_tools import register_pdf_tools  
     from mcp_tools.search_tools import register_search_tools
+    from mcp_tools.sharepoint_tools import register_sharepoint_tools
     
     register_fs_tools(tool_registry, security_validator)
     register_pdf_tools(tool_registry, security_validator)
     register_search_tools(tool_registry, vector_store_manager)
+    register_sharepoint_tools(tool_registry, security_validator)
     
     logger.info(f"MCP Gateway started with {len(tool_registry.tools)} tools registered")
     logger.info(f"MCP enabled: {MCP_ENABLED}")
