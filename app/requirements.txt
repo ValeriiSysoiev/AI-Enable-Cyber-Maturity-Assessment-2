@@ -33,3 +33,11 @@ azure-servicebus>=7.12.0
 PyMuPDF>=1.24.0
 sentence-transformers>=2.7.0
 numpy>=1.24.0
+
+# Audio transcription dependencies
+SpeechRecognition>=3.10.0
+pydub>=0.25.1
+pyaudio>=0.2.11
+
+# PPTX generation dependencies
+python-pptx>=0.6.21
