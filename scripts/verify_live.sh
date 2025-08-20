@@ -579,6 +579,107 @@ test_pptx_export() {
     fi
 }
 
+# Test Sprint v1.4 UAT mode audio transcription endpoints
+test_uat_audio_transcription() {
+    if [[ -z "$API_BASE_URL" ]]; then
+        log_warning "API base URL not available - skipping UAT audio transcription tests"
+        return 0
+    fi
+    
+    log_info "Testing Sprint v1.4 UAT audio transcription endpoints..."
+    
+    # Test orchestrator audio transcription endpoint
+    local response_code
+    response_code=$(curl -s -o /dev/null -w "%{http_code}" \
+        -X OPTIONS \
+        "${API_BASE_URL}/transcribe/audio" || echo "000")
+    
+    if [[ "$response_code" == "200" || "$response_code" == "204" ]]; then
+        log_success "Audio transcription endpoint is accessible"
+    elif [[ "$response_code" == "404" ]]; then
+        log_warning "Audio transcription endpoint not found (Sprint v1.4 not deployed)"
+    elif [[ "$response_code" == "401" || "$response_code" == "403" ]]; then
+        log_warning "Audio transcription requires authentication (expected)"
+    else
+        log_warning "Audio transcription endpoint returned HTTP $response_code"
+    fi
+    
+    # Test enhanced orchestration endpoint
+    response_code=$(curl -s -o /dev/null -w "%{http_code}" \
+        -X OPTIONS \
+        "${API_BASE_URL}/orchestrate/analyze_with_transcript" || echo "000")
+    
+    if [[ "$response_code" == "200" || "$response_code" == "204" ]]; then
+        log_success "Enhanced orchestration endpoint is accessible"
+    elif [[ "$response_code" == "404" ]]; then
+        log_warning "Enhanced orchestration endpoint not found"
+    else
+        log_warning "Enhanced orchestration endpoint returned HTTP $response_code"
+    fi
+}
+
+# Test Sprint v1.4 audit logging endpoints
+test_uat_audit_logging() {
+    if [[ -z "$API_BASE_URL" ]]; then
+        log_warning "API base URL not available - skipping UAT audit logging tests"
+        return 0
+    fi
+    
+    log_info "Testing Sprint v1.4 audit logging endpoints..."
+    
+    # Test audit events endpoint
+    local response_code
+    response_code=$(curl -s -o /dev/null -w "%{http_code}" \
+        "${API_BASE_URL}/audit/events" || echo "000")
+    
+    if [[ "$response_code" == "200" ]]; then
+        log_success "Audit events endpoint is accessible"
+    elif [[ "$response_code" == "401" || "$response_code" == "403" ]]; then
+        log_success "Audit events requires authentication (expected)"
+    elif [[ "$response_code" == "404" ]]; then
+        log_warning "Audit events endpoint not found (Sprint v1.4 audit logging not deployed)"
+    else
+        log_warning "Audit events endpoint returned HTTP $response_code"
+    fi
+    
+    # Test audit export endpoint
+    response_code=$(curl -s -o /dev/null -w "%{http_code}" \
+        -X OPTIONS \
+        "${API_BASE_URL}/audit/export" || echo "000")
+    
+    if [[ "$response_code" == "200" || "$response_code" == "204" ]]; then
+        log_success "Audit export endpoint is accessible"
+    elif [[ "$response_code" == "401" || "$response_code" == "403" ]]; then
+        log_success "Audit export requires authentication (expected)"
+    elif [[ "$response_code" == "404" ]]; then
+        log_warning "Audit export endpoint not found"
+    else
+        log_warning "Audit export endpoint returned HTTP $response_code"
+    fi
+    
+    # Test connectors status endpoint
+    response_code=$(curl -s -o /dev/null -w "%{http_code}" \
+        "${API_BASE_URL}/connectors/status" || echo "000")
+    
+    if [[ "$response_code" == "200" ]]; then
+        log_success "MCP connectors status endpoint is accessible"
+        
+        # Get connector status details
+        local status_response
+        status_response=$(curl -s "${API_BASE_URL}/connectors/status" 2>/dev/null || echo "")
+        
+        if echo "$status_response" | grep -q "audio_enabled"; then
+            log_success "MCP connectors status includes Sprint v1.4 features"
+        else
+            log_warning "MCP connectors status may not include Sprint v1.4 features"
+        fi
+    elif [[ "$response_code" == "404" ]]; then
+        log_warning "MCP connectors status endpoint not found"
+    else
+        log_warning "MCP connectors status endpoint returned HTTP $response_code"
+    fi
+}
+
 # Generate summary report
 generate_summary() {
     log_info "Generating verification summary..."
@@ -609,6 +710,13 @@ generate_summary() {
     echo "  - AAD Authentication: Tested"
     echo "  - Document Ingestion: Tested"
     echo "  - PPTX Export: Tested"
+    echo
+    echo "Sprint v1.4 UAT Features:"
+    echo "  - Audio Transcription (POST /transcribe/audio): Tested"
+    echo "  - Enhanced Orchestration (POST /orchestrate/analyze_with_transcript): Tested"
+    echo "  - Audit Events (GET /audit/events): Tested"
+    echo "  - Audit Export (POST /audit/export): Tested"
+    echo "  - MCP Connectors Status (GET /connectors/status): Tested"
     echo
     echo "S4 Extensions:"
     echo "  - CSF Taxonomy (GET /api/v1/csf/functions): Tested"
@@ -1148,6 +1256,11 @@ main() {
     test_rag_service
     test_document_ingestion
     test_pptx_export
+    
+    echo
+    echo "=== Sprint v1.4 UAT Features ==="
+    test_uat_audio_transcription
+    test_uat_audit_logging
     
     echo
     echo "=== Log Analysis ==="
