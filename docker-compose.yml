@@ -5,10 +5,15 @@ services:
     environment:
       - DATA_DIR=/app/data
       - ORCHESTRATOR_URL=http://orchestrator:8010
+      - MCP_ENABLED=${MCP_ENABLED:-false}
+      - MCP_GATEWAY_URL=http://mcp-gateway:8020
     volumes:
       - ./data:/app/data
     depends_on:
       - orchestrator
+    profiles:
+      - ""
+      - mcp
 
   orchestrator:
     build: ./services/orchestrator
@@ -21,6 +26,8 @@ services:
       - PRIORITIZATION_URL=http://prioritization:8141
       - ROADMAP_URL=http://roadmap-planner:8151
       - REPORT_URL=http://report-generator:8161
+      - MCP_ENABLED=${MCP_ENABLED:-false}
+      - MCP_GATEWAY_URL=http://mcp-gateway:8020
     volumes:
       - ./data:/app/data
     depends_on:
@@ -30,6 +37,9 @@ services:
       - prioritization
       - roadmap-planner
       - report-generator
+    profiles:
+      - ""
+      - mcp
 
   doc-analyzer:
     build: ./services/agents/documentation_analyzer
@@ -55,5 +65,21 @@ services:
     build: ./services/agents/report_generator
     ports: ["8161:8161"]
 
-  # In production, you’ll replace local persistence with Cosmos DB and add
+  mcp-gateway:
+    build: ./services/mcp_gateway
+    ports: ["8020:8020"]
+    profiles:
+      - mcp
+    environment:
+      - MCP_ENABLED=${MCP_ENABLED:-true}
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8020/health')"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    networks:
+      - default
+
+  # In production, you'll replace local persistence with Cosmos DB and add
   # Azure Service Bus. For local MVP we just write to ./data.
