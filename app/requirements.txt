@@ -38,3 +38,6 @@ numpy>=1.24.0
 SpeechRecognition>=3.10.0
 pydub>=0.25.1
 pyaudio>=0.2.11
+
+# PPTX generation dependencies
+python-pptx>=0.6.21
