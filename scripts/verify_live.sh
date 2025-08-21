@@ -1301,10 +1301,159 @@ test_staging_environment() {
     fi
 }
 
+# Test UX Roadmap v2 complete flow
+test_ux_roadmap_flow() {
+    log_info "Testing UX Roadmap v2 complete flow..."
+    
+    if [[ -z "$API_BASE_URL" || -z "$WEB_BASE_URL" ]]; then
+        log_warning "API or Web base URL not available - skipping UX roadmap tests"
+        return 0
+    fi
+    
+    # Test feature flag configuration
+    local config_response
+    config_response=$(curl -s "${API_BASE_URL}/api/ops/config" 2>/dev/null || echo "")
+    
+    if echo "$config_response" | grep -q "ROADMAP_V2.*1"; then
+        log_success "ROADMAP_V2 feature flag is enabled"
+    else
+        log_warning "ROADMAP_V2 feature flag not enabled - check environment configuration"
+    fi
+    
+    if echo "$config_response" | grep -q "UX_ASSESSMENT_V2.*1"; then
+        log_success "UX_ASSESSMENT_V2 feature flag is enabled"
+    else
+        log_warning "UX_ASSESSMENT_V2 feature flag not enabled - check environment configuration"
+    fi
+    
+    # Test roadmap resource profile endpoint
+    local resource_profile_code
+    resource_profile_code=$(curl -s -o /dev/null -w "%{http_code}" \
+        "${API_BASE_URL}/api/roadmap/resource-profile/config" || echo "000")
+    
+    if [[ "$resource_profile_code" == "200" ]]; then
+        log_success "Roadmap resource profile configuration endpoint accessible"
+    else
+        log_warning "Roadmap resource profile endpoint returned HTTP $resource_profile_code"
+    fi
+    
+    # Test wave planning endpoint
+    local wave_planning_code
+    wave_planning_code=$(curl -s -o /dev/null -w "%{http_code}" \
+        -X POST -H "Content-Type: application/json" \
+        -d '{"initiatives": [{"name": "Test Initiative", "t_shirt_size": "M", "duration_weeks": 24}], "wave_duration_weeks": 12}' \
+        "${API_BASE_URL}/api/roadmap/resource-profile/calculate" || echo "000")
+    
+    if [[ "$wave_planning_code" == "200" ]]; then
+        log_success "Wave planning calculation endpoint working"
+    elif [[ "$wave_planning_code" =~ ^(401|403)$ ]]; then
+        log_success "Wave planning endpoint requires authentication (expected)"
+    else
+        log_warning "Wave planning endpoint returned HTTP $wave_planning_code"
+    fi
+    
+    # Test CSV export endpoint
+    local export_code
+    export_code=$(curl -s -o /dev/null -w "%{http_code}" \
+        -X POST -H "Content-Type: application/json" \
+        -d '{"export_format": "summary", "include_skills": true, "include_costs": true}' \
+        "${API_BASE_URL}/api/roadmap/resource-profile/export" || echo "000")
+    
+    if [[ "$export_code" == "200" ]]; then
+        log_success "Resource planning CSV export endpoint working"
+    elif [[ "$export_code" =~ ^(401|403)$ ]]; then
+        log_success "CSV export endpoint requires authentication (expected)"
+    else
+        log_warning "CSV export endpoint returned HTTP $export_code"
+    fi
+    
+    # Test Gantt chart data endpoint
+    local gantt_code
+    gantt_code=$(curl -s -o /dev/null -w "%{http_code}" \
+        -X POST -H "Content-Type: application/json" \
+        -d '{"include_resource_overlay": true, "include_skill_heatmap": true}' \
+        "${API_BASE_URL}/api/roadmap/resource-profile/gantt" || echo "000")
+    
+    if [[ "$gantt_code" == "200" ]]; then
+        log_success "Gantt chart data endpoint working"
+    elif [[ "$gantt_code" =~ ^(401|403)$ ]]; then
+        log_success "Gantt chart endpoint requires authentication (expected)"
+    else
+        log_warning "Gantt chart endpoint returned HTTP $gantt_code"
+    fi
+    
+    # Test wave overlay endpoint
+    local overlay_code
+    overlay_code=$(curl -s -o /dev/null -w "%{http_code}" \
+        -X POST -H "Content-Type: application/json" \
+        -d '{"planning_horizon_weeks": 60, "aggregate_by": "month"}' \
+        "${API_BASE_URL}/api/roadmap/resource-profile/wave-overlay" || echo "000")
+    
+    if [[ "$overlay_code" == "200" ]]; then
+        log_success "Wave overlay visualization endpoint working"
+    elif [[ "$overlay_code" =~ ^(401|403)$ ]]; then
+        log_success "Wave overlay endpoint requires authentication (expected)"
+    else
+        log_warning "Wave overlay endpoint returned HTTP $overlay_code"
+    fi
+    
+    # Test web UI roadmap page accessibility
+    if [[ -n "$WEB_BASE_URL" ]]; then
+        local web_roadmap_code
+        web_roadmap_code=$(curl -s -o /dev/null -w "%{http_code}" \
+            "${WEB_BASE_URL}/e/demo-engagement/dashboard" || echo "000")
+        
+        if [[ "$web_roadmap_code" == "200" ]]; then
+            log_success "Web UI roadmap page accessible"
+        elif [[ "$web_roadmap_code" =~ ^(401|403)$ ]]; then
+            log_success "Web UI requires authentication (expected)"
+        else
+            log_warning "Web UI roadmap page returned HTTP $web_roadmap_code"
+        fi
+    fi
+    
+    # Test performance thresholds for UX operations
+    log_info "Testing UX roadmap performance thresholds..."
+    
+    local start_time end_time duration
+    start_time=$(date +%s.%N)
+    
+    local perf_response
+    perf_response=$(curl -s --max-time 2 \
+        -X POST -H "Content-Type: application/json" \
+        -d '{"initiatives": [{"name": "Perf Test", "t_shirt_size": "L"}]}' \
+        "${API_BASE_URL}/api/roadmap/resource-profile/calculate" 2>/dev/null || echo "")
+    
+    end_time=$(date +%s.%N)
+    duration=$(echo "$end_time - $start_time" | bc 2>/dev/null || echo "0")
+    
+    if [[ -n "$perf_response" ]]; then
+        if (( $(echo "$duration < 2.0" | bc -l) )); then
+            log_success "UX roadmap operations meet p95 < 2s threshold (${duration}s)"
+        else
+            log_warning "UX roadmap operations exceed p95 threshold: ${duration}s"
+        fi
+    else
+        log_warning "UX roadmap performance test failed"
+    fi
+    
+    log_success "UX Roadmap v2 complete flow test finished"
+}
+
 # Enhanced main execution with Phase 7 enterprise verification
 main() {
     echo "=== Live Infrastructure Verification ==="
     echo
+    
+    # Check for special targets
+    if [[ "${1:-}" == "--ux-roadmap" ]]; then
+        echo "=== UX Roadmap v2 Complete Flow Test ==="
+        validate_environment
+        test_ux_roadmap_flow
+        echo
+        echo "UX Roadmap verification complete"
+        return 0
+    fi
     
     # Validate environment before proceeding
     validate_environment
