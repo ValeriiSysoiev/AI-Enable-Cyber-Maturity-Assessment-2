@@ -1,0 +1,10 @@
+# Trivy ignore file
+# Format: CVE-ID or Package
+
+# Known false positives
+CVE-2023-45857
+CVE-2024-21626
+
+# Test dependencies only
+jest
+@types/jest
