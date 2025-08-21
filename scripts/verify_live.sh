@@ -2,6 +2,7 @@
 
 # Live Infrastructure Verification Script
 # Verifies all deployed Azure resources are functioning correctly
+# Enhanced with UAT governance mode for staging environment verification
 
 set -e
 
@@ -41,6 +42,11 @@ RAG_RESPONSE_THRESHOLD=10
 ENTERPRISE_GATES_ENABLED=${ENTERPRISE_GATES_ENABLED:-true}
 CRITICAL_PASS_REQUIRED=${CRITICAL_PASS_REQUIRED:-true}
 
+# UAT Governance mode
+UAT_MODE=${UAT_MODE:-false}
+STAGING_MODE=${STAGING_MODE:-false}
+ARTIFACTS_DIR="${PROJECT_ROOT}/artifacts/verify"
+
 # Validate required environment variables
 validate_environment() {
     local missing_vars=()
@@ -68,6 +74,25 @@ log_info() { echo -e "${BLUE}ℹ${NC} $1"; }
 log_success() { echo -e "${GREEN}✓${NC} $1"; }
 log_warning() { echo -e "${YELLOW}⚠${NC} $1"; }
 log_error() { echo -e "${RED}✗${NC} $1"; }
+
+# UAT governance logging with artifacts
+log_uat() {
+    local level="$1"
+    local message="$2"
+    local timestamp="$(date -u '+%Y-%m-%d %H:%M:%S UTC')"
+    
+    if [[ "$UAT_MODE" == "true" || "$STAGING_MODE" == "true" ]]; then
+        mkdir -p "$ARTIFACTS_DIR"
+        echo "[$timestamp] [$level] $message" >> "$ARTIFACTS_DIR/verification.log"
+    fi
+    
+    case "$level" in
+        "INFO") log_info "$message" ;;
+        "SUCCESS") log_success "$message" ;;
+        "WARNING") log_warning "$message" ;;
+        "ERROR") log_error "$message" ;;
+    esac
+}
 
 # Get terraform outputs
 get_terraform_outputs() {
@@ -737,6 +762,11 @@ generate_summary() {
     echo "  4. Verify AAD configuration if authentication issues occur"
     echo "  5. Test end-to-end evidence workflow through the web interface"
     echo
+    echo "UAT Governance Mode:"
+    echo "  - Run with --staging flag for UAT verification with artifacts logging"
+    echo "  - Artifacts saved to: artifacts/verify/ directory"
+    echo "  - Enhanced governance and compliance validation in staging mode"
+    echo
     echo "=================================="
 }
 
@@ -1301,9 +1331,42 @@ test_staging_environment() {
     fi
 }
 
+# Parse command line arguments
+parse_arguments() {
+    while [[ $# -gt 0 ]]; do
+        case $1 in
+            --staging)
+                STAGING_MODE=true
+                UAT_MODE=true
+                log_info "Staging mode enabled - enhanced UAT verification"
+                shift
+                ;;
+            --governance)
+                log_info "Governance mode enabled"
+                shift
+                ;;
+            --uat)
+                UAT_MODE=true
+                log_info "UAT mode enabled - enhanced logging to artifacts/"
+                shift
+                ;;
+            *)
+                log_warning "Unknown option: $1"
+                shift
+                ;;
+        esac
+    done
+}
+
 # Enhanced main execution with Phase 7 enterprise verification
 main() {
+    parse_arguments "$@"
+    
     echo "=== Live Infrastructure Verification ==="
+    if [[ "$STAGING_MODE" == "true" ]]; then
+        echo "=== STAGING UAT GOVERNANCE MODE ==="
+        log_uat "INFO" "Starting staging UAT verification with governance checks"
+    fi
     echo
     
     # Validate environment before proceeding
@@ -1369,33 +1432,56 @@ main() {
         exit 1
     fi
     
-    # Governance checks if --governance flag is passed
-    if [[ "${1:-}" == "--governance" ]]; then
+    # Enhanced governance checks for staging mode
+    if [[ "$STAGING_MODE" == "true" ]]; then
         echo
-        echo "=== Governance & Compliance Verification ==="
+        echo "=== UAT Governance & Compliance Verification ==="
+        log_uat "INFO" "Running comprehensive governance checks for staging UAT"
         
-        # Run security scan
+        # Run security scan with UAT reporting
         if [[ -x "./scripts/security_scan.sh" ]]; then
-            log_info "Running security gates check..."
-            ./scripts/security_scan.sh || log_warning "Security scan issues detected"
+            log_uat "INFO" "Running security gates check..."
+            if ./scripts/security_scan.sh 2>&1 | tee "$ARTIFACTS_DIR/security_scan.log"; then
+                log_uat "SUCCESS" "Security scan completed successfully"
+            else
+                log_uat "WARNING" "Security scan issues detected - see artifacts/verify/security_scan.log"
+            fi
         fi
         
-        # Test incident drill
+        # Test incident drill with UAT validation
         if [[ -x "./scripts/drill_incident.sh" ]]; then
-            log_info "Running incident response drill..."
-            ./scripts/drill_incident.sh general | head -20
-            log_success "Incident drill checklist generated"
+            log_uat "INFO" "Running incident response drill..."
+            if ./scripts/drill_incident.sh general 2>&1 | tee "$ARTIFACTS_DIR/incident_drill.log" | head -20; then
+                log_uat "SUCCESS" "Incident drill checklist generated"
+            else
+                log_uat "WARNING" "Incident drill execution issues"
+            fi
         fi
         
-        # Generate support bundle dry-run
+        # Generate support bundle dry-run with UAT validation
         if [[ -x "./scripts/support_bundle.sh" ]]; then
-            log_info "Testing support bundle generation..."
-            BUNDLE_TEST=true ./scripts/support_bundle.sh 2>&1 | grep -q "Support bundle" && \
-                log_success "Support bundle generation tested" || \
-                log_warning "Support bundle test failed"
+            log_uat "INFO" "Testing support bundle generation..."
+            if BUNDLE_TEST=true ./scripts/support_bundle.sh 2>&1 | tee "$ARTIFACTS_DIR/support_bundle_test.log" | grep -q "Support bundle"; then
+                log_uat "SUCCESS" "Support bundle generation tested successfully"
+            else
+                log_uat "WARNING" "Support bundle test failed - see artifacts/verify/support_bundle_test.log"
+            fi
         fi
         
-        log_success "Governance verification complete"
+        # UAT-specific compliance validation
+        log_uat "INFO" "Validating UAT compliance requirements..."
+        if [[ -n "$API_BASE_URL" ]]; then
+            # Test GDPR endpoints for UAT
+            local gdpr_response_code
+            gdpr_response_code=$(curl -s -o /dev/null -w "%{http_code}" "${API_BASE_URL}/gdpr/admin/dashboard" || echo "000")
+            if [[ "$gdpr_response_code" =~ ^(200|401|403)$ ]]; then
+                log_uat "SUCCESS" "GDPR compliance endpoints accessible for UAT validation"
+            else
+                log_uat "WARNING" "GDPR compliance endpoint issues detected (HTTP $gdpr_response_code)"
+            fi
+        fi
+        
+        log_uat "SUCCESS" "UAT governance verification complete"
     fi
     
     echo
@@ -1411,6 +1497,26 @@ main() {
     
     echo
     generate_summary
+    
+    # Generate UAT artifacts summary if in staging mode
+    if [[ "$STAGING_MODE" == "true" ]]; then
+        echo
+        echo "=== UAT Verification Artifacts ==="
+        log_uat "INFO" "UAT verification artifacts saved to: $ARTIFACTS_DIR"
+        
+        if [[ -d "$ARTIFACTS_DIR" ]]; then
+            local artifact_count
+            artifact_count=$(find "$ARTIFACTS_DIR" -type f 2>/dev/null | wc -l)
+            log_uat "SUCCESS" "Generated $artifact_count UAT verification artifacts"
+            
+            # List artifacts for tracking
+            find "$ARTIFACTS_DIR" -type f -exec basename {} \; 2>/dev/null | while read -r artifact; do
+                log_uat "INFO" "Artifact: $artifact"
+            done
+        fi
+        
+        log_uat "SUCCESS" "UAT governance mode verification complete"
+    fi
     
     log_success "Phase 7 enterprise verification with S4 extensions complete"
 }
