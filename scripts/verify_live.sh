@@ -1209,6 +1209,59 @@ verify_s4_extensions() {
     fi
 }
 
+# Test staging environment with graceful Azure fallback
+test_staging_environment() {
+    log_info "Testing staging environment deployment..."
+    
+    # Check for staging URL environment variable
+    if [[ -n "$STAGING_URL" ]]; then
+        log_info "Testing staging URL: $STAGING_URL"
+        
+        local response_code
+        response_code=$(curl -s -o /dev/null -w "%{http_code}" \
+            --max-time 30 "$STAGING_URL" 2>/dev/null || echo "000")
+        
+        if [[ "$response_code" == "200" ]]; then
+            log_success "Staging environment accessible"
+        else
+            log_warning "Staging environment returned HTTP $response_code"
+        fi
+    else
+        log_info "STAGING_URL not configured - using Azure Container Apps detection"
+    fi
+    
+    # Check for MCP Gateway staging endpoint
+    if [[ -n "$MCP_GATEWAY_URL" ]]; then
+        log_info "Testing MCP Gateway URL: $MCP_GATEWAY_URL"
+        
+        local gateway_code
+        gateway_code=$(curl -s -o /dev/null -w "%{http_code}" \
+            --max-time 30 "${MCP_GATEWAY_URL}/health" 2>/dev/null || echo "000")
+        
+        if [[ "$gateway_code" == "200" ]]; then
+            log_success "MCP Gateway staging endpoint accessible"
+        else
+            log_warning "MCP Gateway staging endpoint returned HTTP $gateway_code"
+        fi
+    else
+        log_info "MCP_GATEWAY_URL not configured - skipping MCP Gateway staging test"
+    fi
+    
+    # Graceful Azure credential check (NO-OP when not configured)
+    if command -v az >/dev/null 2>&1; then
+        local azure_account
+        azure_account=$(az account show --query name -o tsv 2>/dev/null || echo "")
+        
+        if [[ -n "$azure_account" ]]; then
+            log_success "Azure CLI authenticated - staging verification available"
+        else
+            log_info "Azure CLI not authenticated - staging verification skipped (graceful NO-OP)"
+        fi
+    else
+        log_info "Azure CLI not installed - staging verification skipped (graceful NO-OP)"
+    fi
+}
+
 # Enhanced main execution with Phase 7 enterprise verification
 main() {
     echo "=== Live Infrastructure Verification ==="
@@ -1261,6 +1314,10 @@ main() {
     echo "=== Sprint v1.4 UAT Features ==="
     test_uat_audio_transcription
     test_uat_audit_logging
+    
+    echo
+    echo "=== Staging Environment ==="
+    test_staging_environment
     
     echo
     echo "=== Log Analysis ==="
