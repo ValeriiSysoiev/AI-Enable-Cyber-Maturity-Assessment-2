@@ -1369,6 +1369,35 @@ main() {
         exit 1
     fi
     
+    # Governance checks if --governance flag is passed
+    if [[ "${1:-}" == "--governance" ]]; then
+        echo
+        echo "=== Governance & Compliance Verification ==="
+        
+        # Run security scan
+        if [[ -x "./scripts/security_scan.sh" ]]; then
+            log_info "Running security gates check..."
+            ./scripts/security_scan.sh || log_warning "Security scan issues detected"
+        fi
+        
+        # Test incident drill
+        if [[ -x "./scripts/drill_incident.sh" ]]; then
+            log_info "Running incident response drill..."
+            ./scripts/drill_incident.sh general | head -20
+            log_success "Incident drill checklist generated"
+        fi
+        
+        # Generate support bundle dry-run
+        if [[ -x "./scripts/support_bundle.sh" ]]; then
+            log_info "Testing support bundle generation..."
+            BUNDLE_TEST=true ./scripts/support_bundle.sh 2>&1 | grep -q "Support bundle" && \
+                log_success "Support bundle generation tested" || \
+                log_warning "Support bundle test failed"
+        fi
+        
+        log_success "Governance verification complete"
+    fi
+    
     echo
     echo "=== Staging Environment Tests ==="
     test_staging_environment
