@@ -618,6 +618,10 @@ scripts/verify_live.sh --storage-only
 
 ## Staging Deployment Quickstart
 
+Automated staging deployment uses GitHub Actions with GHCR (GitHub Container Registry) and optional Azure Container Apps integration. Configure Azure environment variables for full deployment, or use GHCR-only mode for manual deployment flexibility.
+
+**Workflow Scope**: Updating workflow files requires a PAT with repo+workflow+read:org scope. Local/staging verification still works when workflow deployment is skipped.
+
 Deploy to a staging environment for testing:
 
 1. **Prerequisites:**
