@@ -176,6 +176,7 @@ The platform implements a **staged rollout strategy** for advanced features:
 - **Agent Mode**: [`docs/prompts/agent_mode_header.txt`](docs/prompts/agent_mode_header.txt) - AI assistant integration guide
 
 ### **Documentation Structure**
+- **UX Roadmap v2**: [`docs/ux-roadmap-v2.md`](docs/ux-roadmap-v2.md) - Comprehensive guide for roadmap UX v2 features
 - **Security Documentation**: [`docs/security/README.md`](docs/security/README.md)
 - **Load Testing**: [`e2e/load/README.md`](e2e/load/README.md)
 - **Production Support**: [`logs/support/appservice-prod/README.md`](logs/support/appservice-prod/README.md)
