@@ -686,10 +686,11 @@ Deploy to a staging environment for testing:
 
 ---
 
-## Playbook & Agent Mode
+## Team Playbook / Cursor
 
 - Read the playbook: [`docs/PLAYBOOK.md`](docs/PLAYBOOK.md)  
 - Prepend this header to any Claude Code task to enforce agents and RunCards: [`docs/prompts/agent_mode_header.txt`](docs/prompts/agent_mode_header.txt)
+- Cursor uses `scripts/cursor_safe_run.sh` to print STATUS BLOCKS and query PRs (no raw echo with quotes).
 
 ---
 
