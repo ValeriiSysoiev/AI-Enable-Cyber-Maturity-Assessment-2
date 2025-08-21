@@ -3,7 +3,9 @@ import { useEffect, useState, useMemo } from "react";
 import { useParams } from "next/navigation";
 import { getFunctions } from "@/lib/csf";
 import { useRequireAuth } from "@/components/AuthProvider";
+import SubcategoryDrawer from "@/components/SubcategoryDrawer";
 import type { CSFFunction, CSFSubcategory, CSFAssessmentItem } from "@/types/csf";
+import type { Evidence } from "@/types/evidence";
 
 // CSF Grid Component
 function CSFGrid({ 
@@ -62,11 +64,12 @@ function CSFGrid({
                         <button
                           key={subcategory.id}
                           onClick={() => onSubcategorySelect(subcategory)}
-                          className={`w-full text-left px-2 py-1 rounded text-xs hover:bg-blue-50 ${
+                          className={`w-full text-left px-2 py-1 rounded text-xs hover:bg-blue-50 focus:outline-none focus:ring-2 focus:ring-blue-500 ${
                             selectedSubcategory?.id === subcategory.id 
                               ? 'bg-blue-100 text-blue-700 font-medium' 
                               : 'text-gray-700'
                           }`}
+                          aria-label={`Select subcategory ${subcategory.id}: ${subcategory.title}`}
                         >
                           {subcategory.id} - {subcategory.title}
                         </button>
@@ -133,6 +136,8 @@ export default function AssessmentPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [selectedSubcategory, setSelectedSubcategory] = useState<CSFSubcategory | undefined>();
+  const [drawerOpen, setDrawerOpen] = useState(false);
+  const [correlationId] = useState(() => `csf-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`);
   
   // Require authentication
   const auth = useRequireAuth();
@@ -144,19 +149,47 @@ export default function AssessmentPage() {
   const loadCSFData = async () => {
     try {
       setLoading(true);
+      console.log(`[${correlationId}] Loading CSF data for engagement: ${engagementId}`);
       const csfFunctions = await getFunctions();
       setFunctions(csfFunctions);
+      console.log(`[${correlationId}] Loaded ${csfFunctions.length} CSF functions`);
       
       // Auto-expand first function for better UX
       if (csfFunctions.length > 0) {
         // This will be handled by initial state in CSFGrid component
       }
     } catch (err) {
-      console.error('Error loading CSF data:', err);
+      console.error(`[${correlationId}] Error loading CSF data:`, err);
       setError(err instanceof Error ? err.message : 'Failed to load CSF data');
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleSubcategorySelect = (subcategory: CSFSubcategory) => {
+    console.log(`[${correlationId}] Subcategory selected: ${subcategory.id}`);
+    setSelectedSubcategory(subcategory);
+    setDrawerOpen(true);
+  };
+
+  const handleDrawerClose = () => {
+    console.log(`[${correlationId}] Drawer closed`);
+    setDrawerOpen(false);
+  };
+
+  const handleScoreChange = (score: number) => {
+    console.log(`[${correlationId}] Score changed: ${score} for ${selectedSubcategory?.id}`);
+    // TODO: Implement score persistence
+  };
+
+  const handleRationaleChange = (rationale: string) => {
+    console.log(`[${correlationId}] Rationale changed for ${selectedSubcategory?.id}`);
+    // TODO: Implement rationale persistence
+  };
+
+  const handleEvidenceSelect = (evidence: Evidence) => {
+    console.log(`[${correlationId}] Evidence selected: ${evidence.filename}`);
+    // TODO: Implement evidence linking/preview
   };
 
   // Memoized statistics for performance
@@ -233,7 +266,7 @@ export default function AssessmentPage() {
           <div className="lg:col-span-2">
             <CSFGrid
               functions={functions}
-              onSubcategorySelect={setSelectedSubcategory}
+              onSubcategorySelect={handleSubcategorySelect}
               selectedSubcategory={selectedSubcategory}
             />
           </div>
@@ -252,6 +285,17 @@ export default function AssessmentPage() {
             )}
           </div>
         </div>
+
+        {/* Enhanced Subcategory Drawer */}
+        <SubcategoryDrawer
+          subcategory={selectedSubcategory}
+          isOpen={drawerOpen}
+          onClose={handleDrawerClose}
+          onScoreChange={handleScoreChange}
+          onRationaleChange={handleRationaleChange}
+          onEvidenceSelect={handleEvidenceSelect}
+          correlationId={correlationId}
+        />
       </div>
     </div>
   );
