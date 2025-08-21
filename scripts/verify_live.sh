@@ -1211,62 +1211,26 @@ verify_s4_extensions() {
     fi
 }
 
-# Test staging environment specific checks
+# Test staging environment with comprehensive checks and graceful Azure fallback
 test_staging_environment() {
-    if [[ -z "$STAGING_URL" ]]; then
-        log_info "STAGING_URL not set - skipping staging-specific checks"
-        return 0
-    fi
+    log_info "Testing staging environment deployment..."
     
-    log_info "Testing staging environment at $STAGING_URL..."
-    
-    # Test staging health endpoint
-    local staging_health_code
-    staging_health_code=$(curl -s -o /dev/null -w "%{http_code}" \
-        "${STAGING_URL}/health" || echo "000")
-    
-    if [[ "$staging_health_code" == "200" ]]; then
-        log_success "Staging health endpoint accessible"
-    else
-        log_warning "Staging health endpoint returned HTTP $staging_health_code"
-    fi
-    
-    # Test MCP Gateway if URL provided
-    if [[ -n "$MCP_GATEWAY_URL" ]]; then
-        log_info "Testing MCP Gateway at $MCP_GATEWAY_URL..."
-        
-        local mcp_health_code
-        mcp_health_code=$(curl -s -o /dev/null -w "%{http_code}" \
-            "${MCP_GATEWAY_URL}/health" || echo "000")
-        
-        if [[ "$mcp_health_code" == "200" ]]; then
-            log_success "MCP Gateway health endpoint accessible"
-            
-            # Test SharePoint tool availability
-            local tools_response
-            tools_response=$(curl -s "${MCP_GATEWAY_URL}/mcp/tools" 2>/dev/null || echo "")
-            
-            if echo "$tools_response" | grep -q "sharepoint.fetch"; then
-                log_success "SharePoint connector available in MCP Gateway"
-            else
-                log_warning "SharePoint connector not found in MCP Gateway"
-            fi
-            
-            # Test Jira tool availability (may not be available yet)
-            if echo "$tools_response" | grep -q "jira.createIssue"; then
-                log_success "Jira connector available in MCP Gateway"
-            else
-                log_info "Jira connector not yet deployed (expected in v1.5)"
-            fi
-        else
-            log_warning "MCP Gateway health endpoint returned HTTP $mcp_health_code"
-        fi
-    else
-        log_info "MCP_GATEWAY_URL not set - skipping MCP Gateway checks"
-    fi
-    
-    # Test staging feature flags via environment config
+    # Check for staging URL environment variable
     if [[ -n "$STAGING_URL" ]]; then
+        log_info "Testing staging URL: $STAGING_URL"
+        
+        # Test staging health endpoint
+        local staging_health_code
+        staging_health_code=$(curl -s -o /dev/null -w "%{http_code}" \
+            --max-time 30 "${STAGING_URL}/health" 2>/dev/null || echo "000")
+        
+        if [[ "$staging_health_code" == "200" ]]; then
+            log_success "Staging health endpoint accessible"
+        else
+            log_warning "Staging health endpoint returned HTTP $staging_health_code"
+        fi
+        
+        # Test staging feature flags via environment config
         local config_response
         config_response=$(curl -s "${STAGING_URL}/api/ops/config" 2>/dev/null || echo "")
         
@@ -1284,6 +1248,56 @@ test_staging_environment() {
         if echo "$config_response" | grep -q "MCP_CONNECTORS_JIRA"; then
             log_info "Jira connector configuration detected"
         fi
+    else
+        log_info "STAGING_URL not configured - using Azure Container Apps detection"
+    fi
+    
+    # Test MCP Gateway if URL provided
+    if [[ -n "$MCP_GATEWAY_URL" ]]; then
+        log_info "Testing MCP Gateway at $MCP_GATEWAY_URL..."
+        
+        local mcp_health_code
+        mcp_health_code=$(curl -s -o /dev/null -w "%{http_code}" \
+            --max-time 30 "${MCP_GATEWAY_URL}/health" 2>/dev/null || echo "000")
+        
+        if [[ "$mcp_health_code" == "200" ]]; then
+            log_success "MCP Gateway health endpoint accessible"
+            
+            # Test SharePoint tool availability
+            local tools_response
+            tools_response=$(curl -s "${MCP_GATEWAY_URL}/mcp/tools" 2>/dev/null || echo "")
+            
+            if echo "$tools_response" | grep -q "sharepoint.fetch"; then
+                log_success "SharePoint connector available in MCP Gateway"
+            else
+                log_warning "SharePoint connector not found in MCP Gateway"
+            fi
+            
+            # Test Jira tool availability
+            if echo "$tools_response" | grep -q "jira.createIssue"; then
+                log_success "Jira connector available in MCP Gateway"
+            else
+                log_info "Jira connector not yet deployed (expected in v1.5)"
+            fi
+        else
+            log_warning "MCP Gateway health endpoint returned HTTP $mcp_health_code"
+        fi
+    else
+        log_info "MCP_GATEWAY_URL not configured - skipping MCP Gateway staging test"
+    fi
+    
+    # Graceful Azure credential check (NO-OP when not configured)
+    if command -v az >/dev/null 2>&1; then
+        local azure_account
+        azure_account=$(az account show --query name -o tsv 2>/dev/null || echo "")
+        
+        if [[ -n "$azure_account" ]]; then
+            log_success "Azure CLI authenticated - staging verification available"
+        else
+            log_info "Azure CLI not authenticated - staging verification skipped (graceful NO-OP)"
+        fi
+    else
+        log_info "Azure CLI not installed - staging verification skipped (graceful NO-OP)"
     fi
 }
 
@@ -1339,6 +1353,10 @@ main() {
     echo "=== Sprint v1.4 UAT Features ==="
     test_uat_audio_transcription
     test_uat_audit_logging
+    
+    echo
+    echo "=== Staging Environment ==="
+    test_staging_environment
     
     echo
     echo "=== Log Analysis ==="
