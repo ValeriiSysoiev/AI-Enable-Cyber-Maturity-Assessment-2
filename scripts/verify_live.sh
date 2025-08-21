@@ -29,6 +29,8 @@ ACA_ENV_NAME="${AZURE_ACA_ENV_NAME:-}"
 COSMOS_ACCOUNT_NAME="${AZURE_COSMOS_ACCOUNT_NAME:-}"
 API_BASE_URL="${API_BASE_URL:-}"
 WEB_BASE_URL="${WEB_BASE_URL:-}"
+STAGING_URL="${STAGING_URL:-}"
+MCP_GATEWAY_URL="${MCP_GATEWAY_URL:-}"
 
 # Performance thresholds (in seconds)
 API_RESPONSE_THRESHOLD=5
@@ -1209,6 +1211,82 @@ verify_s4_extensions() {
     fi
 }
 
+# Test staging environment specific checks
+test_staging_environment() {
+    if [[ -z "$STAGING_URL" ]]; then
+        log_info "STAGING_URL not set - skipping staging-specific checks"
+        return 0
+    fi
+    
+    log_info "Testing staging environment at $STAGING_URL..."
+    
+    # Test staging health endpoint
+    local staging_health_code
+    staging_health_code=$(curl -s -o /dev/null -w "%{http_code}" \
+        "${STAGING_URL}/health" || echo "000")
+    
+    if [[ "$staging_health_code" == "200" ]]; then
+        log_success "Staging health endpoint accessible"
+    else
+        log_warning "Staging health endpoint returned HTTP $staging_health_code"
+    fi
+    
+    # Test MCP Gateway if URL provided
+    if [[ -n "$MCP_GATEWAY_URL" ]]; then
+        log_info "Testing MCP Gateway at $MCP_GATEWAY_URL..."
+        
+        local mcp_health_code
+        mcp_health_code=$(curl -s -o /dev/null -w "%{http_code}" \
+            "${MCP_GATEWAY_URL}/health" || echo "000")
+        
+        if [[ "$mcp_health_code" == "200" ]]; then
+            log_success "MCP Gateway health endpoint accessible"
+            
+            # Test SharePoint tool availability
+            local tools_response
+            tools_response=$(curl -s "${MCP_GATEWAY_URL}/mcp/tools" 2>/dev/null || echo "")
+            
+            if echo "$tools_response" | grep -q "sharepoint.fetch"; then
+                log_success "SharePoint connector available in MCP Gateway"
+            else
+                log_warning "SharePoint connector not found in MCP Gateway"
+            fi
+            
+            # Test Jira tool availability (may not be available yet)
+            if echo "$tools_response" | grep -q "jira.createIssue"; then
+                log_success "Jira connector available in MCP Gateway"
+            else
+                log_info "Jira connector not yet deployed (expected in v1.5)"
+            fi
+        else
+            log_warning "MCP Gateway health endpoint returned HTTP $mcp_health_code"
+        fi
+    else
+        log_info "MCP_GATEWAY_URL not set - skipping MCP Gateway checks"
+    fi
+    
+    # Test staging feature flags via environment config
+    if [[ -n "$STAGING_URL" ]]; then
+        local config_response
+        config_response=$(curl -s "${STAGING_URL}/api/ops/config" 2>/dev/null || echo "")
+        
+        if echo "$config_response" | grep -q "STAGING_ENV.*true"; then
+            log_success "Staging environment flag detected"
+        else
+            log_warning "Staging environment flag not detected"
+        fi
+        
+        # Check MCP connector flags
+        if echo "$config_response" | grep -q "MCP_CONNECTORS_SP"; then
+            log_info "SharePoint connector configuration detected"
+        fi
+        
+        if echo "$config_response" | grep -q "MCP_CONNECTORS_JIRA"; then
+            log_info "Jira connector configuration detected"
+        fi
+    fi
+}
+
 # Enhanced main execution with Phase 7 enterprise verification
 main() {
     echo "=== Live Infrastructure Verification ==="
@@ -1272,6 +1350,10 @@ main() {
         log_error "S4 VERIFICATION FAILED: S4 extension checks failed"
         exit 1
     fi
+    
+    echo
+    echo "=== Staging Environment Tests ==="
+    test_staging_environment
     
     echo
     echo "=== Critical Pass Validation ==="
