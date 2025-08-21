@@ -1,6 +1,6 @@
 """
-MCP Connectors for Enterprise Audio Transcription and PPTX Generation
-Provides integration between orchestrator and Sprint v1.4 MCP tools.
+MCP Connectors for Enterprise Audio, SharePoint, Jira, and PPTX Integration
+Provides integration between orchestrator and Sprint v1.5 MCP tools.
 """
 import os
 import logging
@@ -13,12 +13,14 @@ logger = logging.getLogger(__name__)
 
 class MCPConnectors:
     """
-    Enterprise MCP connectors for audio transcription and PPTX generation.
+    Enterprise MCP connectors for document processing and issue tracking.
     
-    Provides orchestrator integration with Sprint v1.4 MCP tools:
+    Provides orchestrator integration with Sprint v1.5 MCP tools:
     - audio.transcribe: Workshop audio → text transcription
-    - pii.scrub: GDPR/CCPA compliant content redaction
+    - pii.scrub: GDPR/CCPA compliant content redaction  
     - pptx.render: Executive roadmap presentation generation
+    - sharepoint.fetch: Document ingestion from SharePoint repositories
+    - jira.createIssue/updateIssue: Issue tracking and workflow automation
     """
     
     def __init__(self, mcp_client: IMcpClient):
@@ -29,13 +31,17 @@ class MCPConnectors:
         self.audio_enabled = os.environ.get("MCP_CONNECTORS_AUDIO", "false").lower() == "true"
         self.pptx_enabled = os.environ.get("MCP_CONNECTORS_PPTX", "false").lower() == "true"
         self.pii_scrub_enabled = os.environ.get("MCP_CONNECTORS_PII_SCRUB", "true").lower() == "true"
+        self.sharepoint_enabled = os.environ.get("MCP_CONNECTORS_SP", "false").lower() == "true"
+        self.jira_enabled = os.environ.get("MCP_CONNECTORS_JIRA", "false").lower() == "true"
         
         logger.info(
             "MCP Connectors initialized",
             extra={
                 "audio_enabled": self.audio_enabled,
                 "pptx_enabled": self.pptx_enabled,
-                "pii_scrub_enabled": self.pii_scrub_enabled
+                "pii_scrub_enabled": self.pii_scrub_enabled,
+                "sharepoint_enabled": self.sharepoint_enabled,
+                "jira_enabled": self.jira_enabled
             }
         )
     
@@ -504,6 +510,280 @@ class MCPConnectors:
                 })
         
         return concerns[:3]  # Limit to top 3
+    
+    async def fetch_sharepoint_documents(self, tenant_id: str, site_url: str, 
+                                       document_path: str, engagement_id: str,
+                                       file_types: Optional[List[str]] = None,
+                                       recursive: bool = False) -> Dict[str, Any]:
+        """
+        Fetch documents from SharePoint using MCP sharepoint.fetch tool.
+        
+        Args:
+            tenant_id: SharePoint tenant identifier
+            site_url: SharePoint site URL or path
+            document_path: Path to document or folder within SharePoint site
+            engagement_id: Engagement identifier for tracking
+            file_types: File types to include (default: all allowed types)
+            recursive: Recursively fetch documents from subfolders
+            
+        Returns:
+            Dict containing fetched documents with provenance metadata
+        """
+        if not self.sharepoint_enabled:
+            raise ValueError("SharePoint connector is disabled. Enable with MCP_CONNECTORS_SP=true")
+        
+        corr_id = generate_correlation_id()
+        
+        # Default to safe document types if not specified
+        if file_types is None:
+            file_types = [".pdf", ".docx", ".xlsx", ".pptx", ".txt", ".md"]
+        
+        payload = {
+            "tenant_id": tenant_id,
+            "site_url": site_url,
+            "document_path": document_path,
+            "recursive": recursive,
+            "file_types": file_types,
+            "mode": "DRY-RUN"  # Default to safe mode
+        }
+        
+        # Check for real SharePoint credentials
+        sharepoint_creds = [
+            os.environ.get("SHAREPOINT_CLIENT_ID"),
+            os.environ.get("SHAREPOINT_CLIENT_SECRET"),
+            os.environ.get("SHAREPOINT_TENANT")
+        ]
+        
+        if all(sharepoint_creds):
+            payload["mode"] = "REAL"
+            logger.info("Using REAL mode for SharePoint with provided credentials")
+        else:
+            logger.info("Using DRY-RUN mode for SharePoint (credentials not available)")
+        
+        try:
+            logger.info(
+                "Starting SharePoint document fetch via MCP",
+                extra={
+                    "engagement_id": engagement_id,
+                    "tenant_id": tenant_id,
+                    "site_url": site_url,
+                    "document_path": document_path,
+                    "mode": payload["mode"],
+                    "corr_id": corr_id
+                }
+            )
+            
+            result = await self.mcp_client.call("sharepoint.fetch", payload, engagement_id)
+            
+            logger.info(
+                "SharePoint document fetch completed via MCP",
+                extra={
+                    "engagement_id": engagement_id,
+                    "corr_id": corr_id,
+                    "success": result.get("success", False),
+                    "call_id": result.get("call_id"),
+                    "document_count": result.get("result", {}).get("count", 0)
+                }
+            )
+            
+            return result
+            
+        except Exception as e:
+            logger.error(
+                "SharePoint document fetch failed via MCP",
+                extra={
+                    "engagement_id": engagement_id,
+                    "corr_id": corr_id,
+                    "error": str(e)
+                }
+            )
+            raise
+    
+    async def create_jira_issue(self, project_key: str, summary: str, description: str,
+                               external_key: str, engagement_id: str,
+                               issue_type: str = "Task", priority: str = "Medium",
+                               labels: Optional[List[str]] = None) -> Dict[str, Any]:
+        """
+        Create Jira issue using MCP jira.createIssue tool.
+        
+        Args:
+            project_key: Jira project key (e.g., 'CYBER', 'SEC')
+            summary: Issue summary/title
+            description: Issue description/body
+            external_key: External identifier for idempotency
+            engagement_id: Engagement identifier for tracking
+            issue_type: Issue type (default: Task)
+            priority: Issue priority (default: Medium)
+            labels: Issue labels
+            
+        Returns:
+            Dict containing created issue information
+        """
+        if not self.jira_enabled:
+            raise ValueError("Jira connector is disabled. Enable with MCP_CONNECTORS_JIRA=true")
+        
+        corr_id = generate_correlation_id()
+        
+        payload = {
+            "project_key": project_key,
+            "issue_type": issue_type,
+            "summary": summary,
+            "description": description,
+            "priority": priority,
+            "labels": labels or [],
+            "external_key": external_key,
+            "mode": "DRY-RUN"  # Default to safe mode
+        }
+        
+        # Check for real Jira credentials
+        jira_creds = [
+            os.environ.get("JIRA_URL"),
+            os.environ.get("JIRA_USERNAME"),
+            os.environ.get("JIRA_API_TOKEN")
+        ]
+        
+        if all(jira_creds):
+            payload["mode"] = "REAL"
+            logger.info("Using REAL mode for Jira with provided credentials")
+        else:
+            logger.info("Using DRY-RUN mode for Jira (credentials not available)")
+        
+        try:
+            logger.info(
+                "Starting Jira issue creation via MCP",
+                extra={
+                    "engagement_id": engagement_id,
+                    "project_key": project_key,
+                    "external_key": external_key,
+                    "priority": priority,
+                    "mode": payload["mode"],
+                    "corr_id": corr_id
+                }
+            )
+            
+            result = await self.mcp_client.call("jira.createIssue", payload, engagement_id)
+            
+            logger.info(
+                "Jira issue creation completed via MCP",
+                extra={
+                    "engagement_id": engagement_id,
+                    "corr_id": corr_id,
+                    "success": result.get("success", False),
+                    "call_id": result.get("call_id"),
+                    "issue_key": result.get("result", {}).get("issue_key")
+                }
+            )
+            
+            return result
+            
+        except Exception as e:
+            logger.error(
+                "Jira issue creation failed via MCP",
+                extra={
+                    "engagement_id": engagement_id,
+                    "corr_id": corr_id,
+                    "error": str(e)
+                }
+            )
+            raise
+    
+    async def update_jira_issue(self, issue_key: str, external_key: str, 
+                               engagement_id: str, summary: Optional[str] = None,
+                               description: Optional[str] = None, status: Optional[str] = None,
+                               priority: Optional[str] = None, labels: Optional[List[str]] = None,
+                               comment: Optional[str] = None) -> Dict[str, Any]:
+        """
+        Update existing Jira issue using MCP jira.updateIssue tool.
+        
+        Args:
+            issue_key: Jira issue key to update
+            external_key: External identifier for tracking
+            engagement_id: Engagement identifier for tracking
+            summary: Updated issue summary (optional)
+            description: Updated issue description (optional)
+            status: Updated issue status (optional)
+            priority: Updated issue priority (optional)
+            labels: Updated issue labels (optional)
+            comment: Comment to add (optional)
+            
+        Returns:
+            Dict containing updated issue information
+        """
+        if not self.jira_enabled:
+            raise ValueError("Jira connector is disabled. Enable with MCP_CONNECTORS_JIRA=true")
+        
+        corr_id = generate_correlation_id()
+        
+        payload = {
+            "issue_key": issue_key,
+            "external_key": external_key,
+            "mode": "DRY-RUN"  # Default to safe mode
+        }
+        
+        # Add optional fields if provided
+        if summary:
+            payload["summary"] = summary
+        if description:
+            payload["description"] = description
+        if status:
+            payload["status"] = status
+        if priority:
+            payload["priority"] = priority
+        if labels is not None:
+            payload["labels"] = labels
+        if comment:
+            payload["comment"] = comment
+        
+        # Check for real Jira credentials
+        jira_creds = [
+            os.environ.get("JIRA_URL"),
+            os.environ.get("JIRA_USERNAME"),
+            os.environ.get("JIRA_API_TOKEN")
+        ]
+        
+        if all(jira_creds):
+            payload["mode"] = "REAL"
+            logger.info("Using REAL mode for Jira with provided credentials")
+        else:
+            logger.info("Using DRY-RUN mode for Jira (credentials not available)")
+        
+        try:
+            logger.info(
+                "Starting Jira issue update via MCP",
+                extra={
+                    "engagement_id": engagement_id,
+                    "issue_key": issue_key,
+                    "external_key": external_key,
+                    "mode": payload["mode"],
+                    "corr_id": corr_id
+                }
+            )
+            
+            result = await self.mcp_client.call("jira.updateIssue", payload, engagement_id)
+            
+            logger.info(
+                "Jira issue update completed via MCP",
+                extra={
+                    "engagement_id": engagement_id,
+                    "corr_id": corr_id,
+                    "success": result.get("success", False),
+                    "call_id": result.get("call_id"),
+                    "issue_key": issue_key
+                }
+            )
+            
+            return result
+            
+        except Exception as e:
+            logger.error(
+                "Jira issue update failed via MCP",
+                extra={
+                    "engagement_id": engagement_id,
+                    "corr_id": corr_id,
+                    "error": str(e)
+                }
+            )
+            raise
 
 
 # Factory function for creating MCP connectors
