@@ -61,3 +61,15 @@ export interface CSFDetailsPanel {
   onRationaleChange?: (rationale: string) => void;
   onEvidenceAdd?: (evidence: string) => void;
 }
+
+// Citation interface for evidence references
+export interface Citation {
+  document_id: string;
+  document_name: string;
+  page_number?: number;
+  chunk_index: number;
+  relevance_score: number;
+  excerpt: string;
+  url?: string;
+  metadata?: Record<string, any>;
+}
