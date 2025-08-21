@@ -616,6 +616,22 @@ scripts/verify_live.sh --storage-only
 
 ---
 
+## Production Hardening & Governance
+
+Enterprise-grade security, compliance, and operational excellence:
+
+- **Security Gates**: Secret scanning (TruffleHog), dependency analysis (Trivy), IaC security (Checkov)
+- **ABAC Authorization**: Engagement-scoped access control for sensitive resources and MCP tools  
+- **Incident Response**: AI-specific playbooks for hallucination, data leakage, prompt injection scenarios
+- **Support Bundles**: Automated diagnostic collection with PII anonymization for troubleshooting
+- **Access Reviews**: Scheduled compliance reporting and membership auditing by engagement
+- **Release Automation**: Auto-generated release notes from conventional commits and PR labels
+- **Performance Budgets**: Continuous regression testing with configurable thresholds
+
+**Governance Verification**: Run `./scripts/verify_live.sh --governance` to test security gates, incident response, and support bundle generation.
+
+---
+
 ## Staging Deployment Quickstart
 
 Automated staging deployment uses GitHub Actions with GHCR (GitHub Container Registry) and optional Azure Container Apps integration. Configure Azure environment variables for full deployment, or use GHCR-only mode for manual deployment flexibility.
