@@ -1,0 +1,26 @@
+{
+  "performance_budgets": {
+    "/health": {
+      "budget_ms": 200,
+      "description": "Health check endpoint"
+    },
+    "/docs": {
+      "budget_ms": 1000,
+      "description": "API documentation"
+    },
+    "/projects": {
+      "budget_ms": 2000,
+      "description": "Projects list API"
+    },
+    "/presets/": {
+      "budget_ms": 1500,
+      "description": "Assessment presets"
+    }
+  },
+  "regression_threshold": 20.0,
+  "ci_settings": {
+    "fail_on_regression": true,
+    "timeout_seconds": 30,
+    "retry_attempts": 2
+  }
+}
