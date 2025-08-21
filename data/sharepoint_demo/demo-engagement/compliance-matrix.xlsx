@@ -1,0 +1,12 @@
+PK                  [Content_Types].xml
+<Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types">
+<Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml" />
+<Default Extension="xml" ContentType="application/xml" />
+<Override PartName="/xl/workbook.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet.main+xml" />
+</Types>
+
+Demo Compliance Matrix
+Framework,Control,Status
+NIST CSF,ID.AM-1,Implemented
+NIST CSF,PR.AC-1,In Progress
+ISO 27001,A.9.1.1,Implemented
