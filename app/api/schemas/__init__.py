@@ -20,6 +20,17 @@ from .workshop import (
     WorkshopListResponse,
     StartWorkshopResponse
 )
+from .roadmap import (
+    ScoringWeights,
+    InitiativeScoring,
+    CompositeScore,
+    InitiativePrioritization,
+    PrioritizationRequest,
+    PrioritizationResponse,
+    WeightsConfigRequest,
+    WeightsConfigResponse,
+    ScoringAlgorithmInfo
+)
 
 __all__ = [
     "CountSummary",
@@ -43,5 +54,14 @@ __all__ = [
     "AttendeeResponse",
     "ConsentResponse",
     "WorkshopListResponse",
-    "StartWorkshopResponse"
+    "StartWorkshopResponse",
+    "ScoringWeights",
+    "InitiativeScoring",
+    "CompositeScore",
+    "InitiativePrioritization",
+    "PrioritizationRequest",
+    "PrioritizationResponse",
+    "WeightsConfigRequest",
+    "WeightsConfigResponse",
+    "ScoringAlgorithmInfo"
 ]
