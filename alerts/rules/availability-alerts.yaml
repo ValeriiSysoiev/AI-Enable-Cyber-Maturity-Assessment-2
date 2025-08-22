@@ -1,0 +1,126 @@
+# Availability Alert Rules for AECMA Production
+# Azure Monitor Alert Rule Templates
+
+alerts:
+  # Critical Availability Alert
+  - name: "AECMA-Availability-Critical"
+    description: "Service availability below SLO threshold (99.9%)"
+    severity: "Critical"
+    frequency: "PT5M"  # Every 5 minutes
+    timeWindow: "PT30M"  # 30-minute window
+    evaluationFrequency: "PT1M"  # Evaluate every minute
+    
+    query: |
+      ContainerAppConsoleLogs_CL
+      | where TimeGenerated > ago(30m)
+      | extend StatusCode = extract(@"HTTP/\d\.\d\s(\d{3})", 1, Log_s)
+      | where isnotnull(StatusCode)
+      | summarize 
+          TotalRequests = count(),
+          SuccessfulRequests = countif(StatusCode startswith "2" or StatusCode startswith "3"),
+          FailedRequests = countif(StatusCode startswith "5")
+      | extend AvailabilityPercent = (SuccessfulRequests * 100.0) / TotalRequests
+      | where AvailabilityPercent < 99.9
+    
+    threshold:
+      operator: "LessThan"
+      value: 99.9
+      aggregation: "Average"
+    
+    actions:
+      - actionGroupId: "ag-aecma-critical"
+        webhookProperties:
+          severity: "critical"
+          service: "aecma"
+          slo: "availability"
+
+  # Warning Availability Alert  
+  - name: "AECMA-Availability-Warning"
+    description: "Service availability approaching SLO threshold"
+    severity: "Warning"
+    frequency: "PT5M"
+    timeWindow: "PT15M"
+    evaluationFrequency: "PT1M"
+    
+    query: |
+      ContainerAppConsoleLogs_CL
+      | where TimeGenerated > ago(15m)
+      | extend StatusCode = extract(@"HTTP/\d\.\d\s(\d{3})", 1, Log_s)
+      | where isnotnull(StatusCode)
+      | summarize 
+          TotalRequests = count(),
+          SuccessfulRequests = countif(StatusCode startswith "2" or StatusCode startswith "3")
+      | extend AvailabilityPercent = (SuccessfulRequests * 100.0) / TotalRequests
+      | where AvailabilityPercent < 99.95
+    
+    threshold:
+      operator: "LessThan"
+      value: 99.95
+      aggregation: "Average"
+    
+    actions:
+      - actionGroupId: "ag-aecma-warning"
+        webhookProperties:
+          severity: "warning"
+          service: "aecma"
+          slo: "availability"
+
+  # Service Down Alert
+  - name: "AECMA-Service-Down"
+    description: "Service appears to be completely down"
+    severity: "Critical"
+    frequency: "PT1M"
+    timeWindow: "PT5M"
+    evaluationFrequency: "PT1M"
+    
+    query: |
+      ContainerAppConsoleLogs_CL
+      | where TimeGenerated > ago(5m)
+      | extend StatusCode = extract(@"HTTP/\d\.\d\s(\d{3})", 1, Log_s)
+      | where isnotnull(StatusCode)
+      | summarize RequestCount = count()
+      | where RequestCount == 0
+    
+    threshold:
+      operator: "Equal"
+      value: 0
+      aggregation: "Count"
+    
+    actions:
+      - actionGroupId: "ag-aecma-emergency"
+        webhookProperties:
+          severity: "emergency"
+          service: "aecma"
+          alert_type: "service_down"
+
+  # Error Budget Burn Rate
+  - name: "AECMA-Error-Budget-Fast-Burn"
+    description: "Error budget burning too fast (SLO at risk)"
+    severity: "Warning"
+    frequency: "PT1M"
+    timeWindow: "PT60M"
+    evaluationFrequency: "PT1M"
+    
+    query: |
+      ContainerAppConsoleLogs_CL
+      | where TimeGenerated > ago(1h)
+      | extend StatusCode = extract(@"HTTP/\d\.\d\s(\d{3})", 1, Log_s)
+      | where isnotnull(StatusCode)
+      | summarize 
+          TotalRequests = count(),
+          ErrorRequests = countif(StatusCode startswith "5")
+      | extend ErrorRate = (ErrorRequests * 100.0) / TotalRequests
+      | extend BurnRate = ErrorRate / 0.1  // 0.1% is our error budget
+      | where BurnRate > 36  // 36x normal burn rate
+    
+    threshold:
+      operator: "GreaterThan"
+      value: 36
+      aggregation: "Average"
+    
+    actions:
+      - actionGroupId: "ag-aecma-warning"
+        webhookProperties:
+          severity: "warning"
+          service: "aecma"
+          alert_type: "error_budget_burn"

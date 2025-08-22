@@ -1,0 +1,154 @@
+# Action Groups for AECMA Production Alerts
+# Azure Monitor Action Group Templates
+
+actionGroups:
+  # Critical Alerts - Immediate Response
+  - name: "ag-aecma-critical"
+    displayName: "AECMA Critical Alerts"
+    shortName: "aecma-crit"
+    enabled: true
+    
+    emailReceivers:
+      - name: "oncall-primary"
+        emailAddress: "oncall-primary@company.com"
+        useCommonAlertSchema: true
+      - name: "oncall-secondary"
+        emailAddress: "oncall-secondary@company.com"
+        useCommonAlertSchema: true
+    
+    smsReceivers:
+      - name: "oncall-sms"
+        countryCode: "1"
+        phoneNumber: "+1234567890"
+    
+    webhookReceivers:
+      - name: "slack-critical"
+        serviceUri: "https://hooks.slack.com/workflows/YOUR_WEBHOOK_URL"
+        useCommonAlertSchema: true
+        
+      - name: "pagerduty-critical"
+        serviceUri: "https://events.pagerduty.com/integration/YOUR_INTEGRATION_KEY/enqueue"
+        useCommonAlertSchema: false
+        httpHeaders:
+          Authorization: "Token token=YOUR_PAGERDUTY_TOKEN"
+    
+    azureFunctionReceivers:
+      - name: "incident-automation"
+        functionAppResourceId: "/subscriptions/{subscription}/resourceGroups/{rg}/providers/Microsoft.Web/sites/{function-app}"
+        functionName: "create-incident"
+        httpTriggerUrl: "https://your-function-app.azurewebsites.net/api/create-incident"
+        useCommonAlertSchema: true
+
+  # Warning Alerts - Standard Response
+  - name: "ag-aecma-warning"
+    displayName: "AECMA Warning Alerts"
+    shortName: "aecma-warn"
+    enabled: true
+    
+    emailReceivers:
+      - name: "team-lead"
+        emailAddress: "team-lead@company.com"
+        useCommonAlertSchema: true
+      - name: "devops-team"
+        emailAddress: "devops@company.com"
+        useCommonAlertSchema: true
+    
+    webhookReceivers:
+      - name: "slack-warnings"
+        serviceUri: "https://hooks.slack.com/workflows/YOUR_WARNING_WEBHOOK_URL"
+        useCommonAlertSchema: true
+      
+      - name: "teams-notifications"
+        serviceUri: "https://company.webhook.office.com/webhookb2/YOUR_TEAMS_WEBHOOK"
+        useCommonAlertSchema: true
+
+  # Emergency Alerts - Service Down
+  - name: "ag-aecma-emergency"
+    displayName: "AECMA Emergency Response"
+    shortName: "aecma-emrg"
+    enabled: true
+    
+    emailReceivers:
+      - name: "incident-commander"
+        emailAddress: "incident-commander@company.com"
+        useCommonAlertSchema: true
+      - name: "management-team"
+        emailAddress: "management@company.com"
+        useCommonAlertSchema: true
+    
+    smsReceivers:
+      - name: "emergency-sms-1"
+        countryCode: "1"
+        phoneNumber: "+1234567890"
+      - name: "emergency-sms-2"
+        countryCode: "1"
+        phoneNumber: "+1234567891"
+    
+    webhookReceivers:
+      - name: "pagerduty-emergency"
+        serviceUri: "https://events.pagerduty.com/integration/YOUR_EMERGENCY_KEY/enqueue"
+        useCommonAlertSchema: false
+        httpHeaders:
+          Authorization: "Token token=YOUR_PAGERDUTY_TOKEN"
+          X-Priority: "high"
+    
+    voiceReceivers:
+      - name: "emergency-call"
+        countryCode: "1"
+        phoneNumber: "+1234567890"
+
+  # Security Alerts - Specialized Response
+  - name: "ag-aecma-security"
+    displayName: "AECMA Security Alerts"
+    shortName: "aecma-sec"
+    enabled: true
+    
+    emailReceivers:
+      - name: "security-team"
+        emailAddress: "security@company.com"
+        useCommonAlertSchema: true
+      - name: "compliance-team"
+        emailAddress: "compliance@company.com"
+        useCommonAlertSchema: true
+    
+    webhookReceivers:
+      - name: "security-siem"
+        serviceUri: "https://your-siem.com/api/alerts"
+        useCommonAlertSchema: false
+        httpHeaders:
+          Authorization: "Bearer YOUR_SIEM_TOKEN"
+          X-Source: "aecma-production"
+
+# Action Group Assignment Matrix
+assignments:
+  availability:
+    critical: "ag-aecma-critical"
+    warning: "ag-aecma-warning"
+    emergency: "ag-aecma-emergency"
+  
+  latency:
+    critical: "ag-aecma-critical"
+    warning: "ag-aecma-warning"
+  
+  error_rate:
+    critical: "ag-aecma-critical"
+    warning: "ag-aecma-warning"
+  
+  security:
+    all_levels: "ag-aecma-security"
+  
+  infrastructure:
+    critical: "ag-aecma-critical"
+    warning: "ag-aecma-warning"
+
+# Escalation Configuration
+escalation:
+  # If no acknowledgment within timeframe
+  level1_timeout: "PT15M"  # 15 minutes
+  level2_timeout: "PT30M"  # 30 minutes
+  
+  escalation_actions:
+    level1_timeout:
+      - "ag-aecma-critical"
+    level2_timeout:
+      - "ag-aecma-emergency"
