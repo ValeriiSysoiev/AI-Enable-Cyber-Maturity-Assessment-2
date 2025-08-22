@@ -1333,9 +1333,33 @@ test_staging_environment() {
     return 0
 }
 
-# Test production environment with URL resolution and health checks
+# Enhanced 503 error banner display
+display_503_banner() {
+    local url="$1"
+    echo
+    echo "=================================================================="
+    echo "                        503 SERVICE UNAVAILABLE"
+    echo "=================================================================="
+    echo "Production service is currently unavailable at: $url"
+    echo "This typically indicates the application is starting up or under maintenance."
+    echo
+    echo "IMMEDIATE ACTIONS:"
+    echo "  1. Check application logs:"
+    echo "     az webapp log tail --name <your-app-name> --resource-group <rg-name>"
+    echo "  2. Apply production settings (if configuration issue):"
+    echo "     ./scripts/appservice_apply_prod_settings.sh"
+    echo "  3. Check container health:"
+    echo "     az containerapp show --name <app-name> --resource-group <rg-name>"
+    echo
+    echo "WAIT TIME: Service may take 2-5 minutes to become available after deployment"
+    echo "=================================================================="
+    echo
+}
+
+# Test production environment with enhanced error handling and retry logic
 test_production_environment() {
     log_info "Testing production environment deployment..."
+    log_uat "INFO" "Starting enhanced production verification with retry and 503 handling"
     
     local resolved_url=""
     
@@ -1348,73 +1372,125 @@ test_production_environment() {
         log_info "Computed production URL from Azure Container Apps: $resolved_url"
     else
         log_warning "No production URL configured and insufficient ACA variables"
+        log_uat "ERROR" "Production verification failed - no URL configured"
         return 1
     fi
     
     # Log computed URL for verification
     log_uat "INFO" "Computed production URL: $resolved_url"
     
-    # Health check with retry/backoff
+    # Enhanced health check with retry/exponential backoff and 503 handling
     local retry_count=0
     local max_retries=5
-    local backoff_seconds=10
+    local backoff_seconds=5
     local health_success=false
+    local temp_response temp_headers
+    temp_response=$(mktemp)
+    temp_headers=$(mktemp)
+    
+    # Cleanup temp files on exit
+    trap "rm -f '$temp_response' '$temp_headers'" RETURN
     
     while [[ $retry_count -lt $max_retries ]]; do
         log_info "Production health check attempt $((retry_count + 1))/$max_retries..."
+        log_uat "INFO" "Health check attempt $((retry_count + 1))/$max_retries for $resolved_url"
         
         local response_code
-        response_code=$(curl -s -o /dev/null -w "%{http_code}" \
+        response_code=$(curl -s -o "$temp_response" -D "$temp_headers" -w "%{http_code}" \
             --max-time 15 "${resolved_url}/" 2>/dev/null || echo "000")
         
+        log_uat "INFO" "Attempt $((retry_count + 1)): HTTP $response_code"
+        
+        # Accept 200-399 as successful responses
         if [[ "$response_code" =~ ^[23][0-9][0-9]$ ]]; then
             log_success "Production health check passed (HTTP $response_code)"
+            log_uat "SUCCESS" "Health check passed with HTTP $response_code"
             health_success=true
             break
+        elif [[ "$response_code" == "503" ]]; then
+            # Special handling for 503 Service Unavailable
+            display_503_banner "$resolved_url"
+            
+            log_uat "WARNING" "503 Service Unavailable detected - showing troubleshooting info"
+            log_info "Displaying curl headers for diagnostic information..."
+            
+            echo "=== CURL RESPONSE HEADERS ==="
+            cat "$temp_headers" 2>/dev/null || echo "No headers captured"
+            echo "============================="
+            echo
+            
+            if [[ $retry_count -eq $((max_retries - 1)) ]]; then
+                log_error "Production service remains unavailable after $max_retries attempts"
+                log_uat "ERROR" "503 Service Unavailable - maximum retries exceeded"
+                return 1
+            fi
+            
+            log_warning "503 detected, retrying in ${backoff_seconds}s... (attempt $((retry_count + 1))/$max_retries)"
         else
             log_warning "Production health check failed (HTTP $response_code), retrying in ${backoff_seconds}s..."
-            ((retry_count++))
-            [[ $retry_count -lt $max_retries ]] && sleep $backoff_seconds
+            log_uat "WARNING" "Health check failed with HTTP $response_code, retrying"
+        fi
+        
+        ((retry_count++))
+        
+        if [[ $retry_count -lt $max_retries ]]; then
+            sleep $backoff_seconds
+            # Exponential backoff: double the wait time each retry
+            backoff_seconds=$((backoff_seconds * 2))
         fi
     done
     
     if [[ "$health_success" != "true" ]]; then
         log_error "Production health check failed after $max_retries attempts"
-        log_uat "ERROR" "Production verification failed - URL unreachable: $resolved_url"
+        log_uat "ERROR" "Production verification failed - URL unreachable after $max_retries attempts: $resolved_url"
         return 1
     fi
     
-    # Optional health endpoint check
+    # Enhanced health endpoint check with improved status code handling
     local health_endpoint="${resolved_url}/health"
     log_info "Testing production health endpoint..."
+    log_uat "INFO" "Testing health endpoint: $health_endpoint"
+    
     local health_response_code
     health_response_code=$(curl -s -o /dev/null -w "%{http_code}" \
         --max-time 10 "$health_endpoint" 2>/dev/null || echo "000")
     
-    if [[ "$health_response_code" == "200" ]]; then
-        log_success "Production health endpoint accessible"
+    log_uat "INFO" "Health endpoint response: HTTP $health_response_code"
+    
+    # Accept 200-399 for health endpoint as well
+    if [[ "$health_response_code" =~ ^[23][0-9][0-9]$ ]]; then
+        log_success "Production health endpoint accessible (HTTP $health_response_code)"
+        log_uat "SUCCESS" "Health endpoint accessible"
     else
         log_warning "Production health endpoint returned HTTP $health_response_code"
+        log_uat "WARNING" "Health endpoint returned HTTP $health_response_code"
     fi
     
     # ABAC smoke test - test basic authentication flow
     log_info "Running ABAC smoke test..."
+    log_uat "INFO" "Testing ABAC authentication flow"
+    
     local auth_endpoint="${resolved_url}/api/auth/mode"
     local auth_response
     auth_response=$(curl -s "$auth_endpoint" 2>/dev/null || echo "")
     
     if [[ -n "$auth_response" ]]; then
         log_success "ABAC authentication mode endpoint accessible"
+        log_uat "SUCCESS" "ABAC authentication endpoint accessible"
+        
         if echo "$auth_response" | grep -q "aad"; then
             log_success "AAD authentication detected in production"
+            log_uat "INFO" "AAD authentication mode detected"
         else
             log_info "Demo authentication mode detected"
+            log_uat "INFO" "Demo authentication mode detected"
         fi
     else
         log_warning "ABAC authentication endpoint not accessible"
+        log_uat "WARNING" "ABAC authentication endpoint not accessible"
     fi
     
-    log_uat "SUCCESS" "Production environment verification passed"
+    log_uat "SUCCESS" "Production environment verification completed successfully"
     return 0
 }
 
