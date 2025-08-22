@@ -31,6 +31,14 @@ Navigate to **Settings → Secrets and variables → Actions → Variables** in 
 | `ACA_APP_API_PROD` | Production API container app name | `app-aecma-api-prod` | ✅ |
 | `ACA_APP_WEB_PROD` | Production web container app name | `app-aecma-web-prod` | ✅ |
 
+### Azure App Service (Production Resources - Alternative to Container Apps)
+
+| Variable | Description | Example Value | Required |
+|----------|-------------|---------------|----------|
+| `APPSVC_RG_PROD` | Production App Service resource group | `rg-aecma-appservice-prod` | ✅ |
+| `APPSVC_WEBAPP_WEB_PROD` | Production web app name | `webapp-aecma-web-prod` | ✅ |
+| `APPSVC_WEBAPP_API_PROD` | Production API app name | `webapp-aecma-api-prod` | ✅ |
+
 ### Service URLs
 
 | Variable | Description | Example Value | Required |
@@ -38,6 +46,20 @@ Navigate to **Settings → Secrets and variables → Actions → Variables** in 
 | `PROD_URL` | Production web application URL | `https://maturity.yourdomain.com` | ❌ |
 
 **Note**: If `PROD_URL` is not set, the system will compute it as `https://${ACA_APP_WEB_PROD}.${ACA_ENV_PROD}.azurecontainerapps.io`
+
+## How to Run: Deploy Production → Verify
+
+**Quick Checklist:**
+1. ✅ Set required repo variables for **App Service** OR **Container Apps** (see tables above)
+2. ✅ Configure Azure authentication: `AZURE_SUBSCRIPTION_ID`, `AZURE_TENANT_ID`, `AZURE_CLIENT_ID`
+3. ✅ Enable GHCR builds: `GHCR_ENABLED=1`
+4. ✅ Run: **Actions → Deploy Production** (manual workflow_dispatch)
+5. ✅ Wait for build_and_push_ghcr → deploy_appservice_prod/deploy_aca_prod
+6. ✅ Run verification: `./scripts/verify_live.sh --prod`
+7. ✅ Check logs in: `artifacts/verify/prod_verify.log`
+8. ✅ Auto-fix any issues and re-run verification until ALL GREEN
+9. ✅ Monitor production URL for 200-399 HTTP responses
+10. ✅ Ready for production traffic!
 
 ## Deployment Scenarios
 
@@ -144,6 +166,13 @@ Production environment supports:
 - **Industry standards**: Sector-specific compliance requirements
 
 ## Emergency Procedures
+
+### 503 Service Unavailable Fix
+
+If experiencing 503 errors in production:
+1. **Immediate fix**: Run `./scripts/appservice_apply_prod_settings.sh` to restore service configuration
+2. **Verify resolution**: Execute `./scripts/verify_live.sh --prod` to confirm service restoration
+3. **Monitor**: Check production URL returns 200-399 HTTP responses before considering resolved
 
 ### Incident Response
 
