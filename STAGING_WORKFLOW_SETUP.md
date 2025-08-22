@@ -1,0 +1,150 @@
+# Deploy Staging Workflow Setup
+
+## Manual Setup Required
+
+Due to GitHub OAuth scope limitations, please manually create `.github/workflows/deploy_staging.yml` with the following content:
+
+```yaml
+name: Deploy Staging
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  packages: write
+  id-token: write
+
+env:
+  GHCR_ENABLED: ${{ vars.GHCR_ENABLED }}
+  AZURE_SUBSCRIPTION_ID: ${{ vars.AZURE_SUBSCRIPTION_ID }}
+  AZURE_TENANT_ID: ${{ vars.AZURE_TENANT_ID }}
+  AZURE_CLIENT_ID: ${{ vars.AZURE_CLIENT_ID }}
+  ACA_RG: ${{ vars.ACA_RG }}
+  ACA_ENV: ${{ vars.ACA_ENV }}
+  ACA_APP_API: ${{ vars.ACA_APP_API }}
+  ACA_APP_WEB: ${{ vars.ACA_APP_WEB }}
+  STAGING_URL: ${{ vars.STAGING_URL }}
+
+jobs:
+  build_and_push_ghcr:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Check GHCR configuration
+        run: |
+          if [[ "${{ env.GHCR_ENABLED }}" == "1" ]]; then
+            echo "::notice::GHCR build enabled"
+          else
+            echo "::notice::GHCR build disabled (GHCR_ENABLED != 1)"
+            exit 0
+          fi
+      
+      - name: Set up Docker Buildx
+        if: env.GHCR_ENABLED == '1'
+        uses: docker/setup-buildx-action@v3
+      
+      - name: Log in to GitHub Container Registry
+        if: env.GHCR_ENABLED == '1'
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      
+      - name: Build and push API image
+        if: env.GHCR_ENABLED == '1'
+        uses: docker/build-push-action@v5
+        with:
+          context: ./api
+          push: true
+          tags: |
+            ghcr.io/${{ github.repository_owner }}/aecma-api:${{ github.sha }}
+            ghcr.io/${{ github.repository_owner }}/aecma-api:staging
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+      
+      - name: Build and push Web image
+        if: env.GHCR_ENABLED == '1'
+        uses: docker/build-push-action@v5
+        with:
+          context: ./web
+          push: true
+          tags: |
+            ghcr.io/${{ github.repository_owner }}/aecma-web:${{ github.sha }}
+            ghcr.io/${{ github.repository_owner }}/aecma-web:staging
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+  deploy_azure_aca:
+    runs-on: ubuntu-latest
+    needs: build_and_push_ghcr
+    environment: 
+      name: staging
+    if: ${{ env.AZURE_SUBSCRIPTION_ID != '' && env.AZURE_CLIENT_ID != '' && env.AZURE_TENANT_ID != '' && env.ACA_RG != '' && env.ACA_ENV != '' && env.ACA_APP_API != '' && env.ACA_APP_WEB != '' }}
+    
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Azure Login
+        uses: azure/login@v2
+        with:
+          client-id: ${{ env.AZURE_CLIENT_ID }}
+          tenant-id: ${{ env.AZURE_TENANT_ID }}
+          subscription-id: ${{ env.AZURE_SUBSCRIPTION_ID }}
+      
+      - name: Deploy API to Container Apps
+        run: |
+          echo "::notice::Deploying API to Container Apps..."
+          az containerapp update \
+            --name "$ACA_APP_API" \
+            --resource-group "$ACA_RG" \
+            --environment "$ACA_ENV" \
+            --image "ghcr.io/${{ github.repository_owner }}/aecma-api:${{ github.sha }}" || true
+      
+      - name: Deploy Web to Container Apps
+        run: |
+          echo "::notice::Deploying Web to Container Apps..."
+          az containerapp update \
+            --name "$ACA_APP_WEB" \
+            --resource-group "$ACA_RG" \
+            --environment "$ACA_ENV" \
+            --image "ghcr.io/${{ github.repository_owner }}/aecma-web:${{ github.sha }}" || true
+
+  print_url:
+    runs-on: ubuntu-latest
+    needs: [build_and_push_ghcr]
+    if: always()
+    
+    steps:
+      - name: Compute & print STAGING_URL
+        run: |
+          if [[ -n "${STAGING_URL}" ]]; then
+            echo "::notice::STAGING_URL=${STAGING_URL}"
+          elif [[ -n "${ACA_APP_WEB}" && -n "${ACA_ENV}" ]]; then
+            COMPUTED_URL="https://${ACA_APP_WEB}.${ACA_ENV}.azurecontainerapps.io"
+            echo "::notice::STAGING_URL=${COMPUTED_URL}"
+          else
+            echo "::notice::STAGING_URL=(not set)"
+          fi
+```
+
+## Key Features
+
+1. **Manual Trigger**: `workflow_dispatch` allows GitHub UI triggering
+2. **Conditional GHCR Build**: Only runs if `GHCR_ENABLED=1`
+3. **Graceful ACA Skip**: Deploys only when all Azure variables are set
+4. **Environment Integration**: Creates/uses staging environment
+5. **URL Computation**: Uses `STAGING_URL` or computes from ACA variables
+
+## Setup Instructions
+
+1. Create the workflow file: `.github/workflows/deploy_staging.yml`
+2. Set repository variables as needed:
+   - `GHCR_ENABLED=1` (required)
+   - `STAGING_URL` (for App Service path)
+   - Azure/ACA variables (for Container Apps path)
+3. Commit and push the workflow
+4. Use "Actions" tab → "Deploy Staging" → "Run workflow"
