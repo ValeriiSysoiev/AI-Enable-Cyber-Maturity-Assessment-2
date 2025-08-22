@@ -1,5 +1,14 @@
 # Staging Environment Deployment Guide
 
+## Quick Redeploy (TL;DR)
+
+1. Set repo variable `STAGING_URL` (App Service URL) or ACA vars for Container Apps Environment
+2. Run **Deploy Staging** workflow from GitHub Actions tab
+3. Verify: `./scripts/verify_live.sh --staging` 
+4. Local gates: `--mcp --uat --governance` for comprehensive testing
+5. Logs live in `artifacts/verify/staging_verify.log`
+6. Troubleshooting: See sections below or check workflow run logs
+
 ## Overview
 This guide covers two deployment paths for staging environment:
 1. **App Service Only** - Simple deployment without Azure Container Apps
