@@ -76,6 +76,7 @@ class AudioTranscriptionTool:
     def validate_consent(self, payload: Dict[str, Any]) -> bool:
         """
         Validate that proper consent has been provided for audio processing.
+        Enhanced with UAT-specific consent requirements for staging environment.
         
         Args:
             payload: Tool payload containing consent information
@@ -89,17 +90,62 @@ class AudioTranscriptionTool:
         consent_provided = payload.get("consent", False)
         consent_type = payload.get("consent_type", "")
         
-        if not consent_provided:
-            raise ValueError("Audio transcription requires explicit consent. Set 'consent': true in payload.")
+        # Enhanced UAT consent validation for staging environment
+        uat_mode = os.getenv("UAT_MODE", "false").lower() == "true"
+        staging_env = os.getenv("STAGING_ENV", "false").lower() == "true"
+        uat_consent_required = os.getenv("UAT_CONSENT_REQUIRED", "false").lower() == "true"
+        
+        if uat_mode or staging_env:
+            logger.info("UAT/Staging mode detected - enforcing enhanced consent validation", extra={
+                "uat_mode": uat_mode,
+                "staging_env": staging_env,
+                "uat_consent_required": uat_consent_required
+            })
+            
+            # Stricter consent requirements in UAT/staging
+            if not consent_provided:
+                raise ValueError(
+                    "UAT/Staging environment requires explicit audio transcription consent. "
+                    "Set 'consent': true in payload with appropriate consent_type."
+                )
+            
+            # UAT requires consent type to be specified
+            if uat_consent_required and not consent_type:
+                raise ValueError(
+                    "UAT environment requires consent_type to be specified. "
+                    "Valid types: workshop, interview, meeting, general"
+                )
+            
+            # UAT participant consent documentation
+            participant_consent = payload.get("participant_consent", {})
+            if uat_consent_required and not participant_consent.get("documented", False):
+                raise ValueError(
+                    "UAT environment requires documented participant consent. "
+                    "Set 'participant_consent': {'documented': true, 'participants': [...]} in payload."
+                )
+            
+            # Log enhanced UAT consent validation
+            logger.info("UAT consent validation completed", extra={
+                "consent_type": consent_type,
+                "participant_consent_documented": participant_consent.get("documented", False),
+                "participant_count": len(participant_consent.get("participants", [])),
+                "uat_compliance": True
+            })
+        else:
+            # Standard consent validation for non-UAT environments
+            if not consent_provided:
+                raise ValueError("Audio transcription requires explicit consent. Set 'consent': true in payload.")
         
         # Validate consent type for enterprise scenarios
         valid_consent_types = {"workshop", "interview", "meeting", "general"}
         if consent_type and consent_type not in valid_consent_types:
             raise ValueError(f"Invalid consent_type '{consent_type}'. Must be one of: {valid_consent_types}")
         
-        logger.info(f"Audio transcription consent validated", extra={
+        logger.info("Audio transcription consent validated", extra={
             "consent_type": consent_type,
-            "consent_provided": consent_provided
+            "consent_provided": consent_provided,
+            "uat_mode": uat_mode,
+            "staging_env": staging_env
         })
         
         return True
@@ -287,6 +333,79 @@ class AudioTranscriptionTool:
         confidences = [r.get("confidence", 0.0) for r in results if r.get("confidence")]
         return sum(confidences) / len(confidences) if confidences else 0.0
     
+    def _apply_pii_scrubbing(self, transcription_result: Dict[str, Any], pii_config: Dict[str, Any]) -> Dict[str, Any]:
+        """
+        Apply PII scrubbing to transcription results.
+        
+        Args:
+            transcription_result: Original transcription result
+            pii_config: PII scrubbing configuration
+            
+        Returns:
+            Dict: Transcription result with PII scrubbed
+        """
+        import re
+        
+        # Common PII patterns for transcription
+        pii_patterns = {
+            "email": r'\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b',
+            "phone": r'\b(?:\+?1[-.\s]?)?\(?\d{3}\)?[-.\s]?\d{3}[-.\s]?\d{4}\b',
+            "ssn": r'\b\d{3}-?\d{2}-?\d{4}\b',
+            "credit_card": r'\b\d{4}[-\s]?\d{4}[-\s]?\d{4}[-\s]?\d{4}\b',
+            "name_patterns": r'\b(?:my name is|I am|I\'m|call me|this is)\s+([A-Z][a-z]+(?:\s+[A-Z][a-z]+)*)\b'
+        }
+        
+        def scrub_text(text: str) -> str:
+            """Scrub PII from text using pattern matching."""
+            scrubbed = text
+            
+            # Apply pattern-based scrubbing
+            for pii_type, pattern in pii_patterns.items():
+                if pii_type == "name_patterns":
+                    # Special handling for name introductions
+                    scrubbed = re.sub(pattern, r'\1 [NAME_REDACTED]', scrubbed, flags=re.IGNORECASE)
+                else:
+                    scrubbed = re.sub(pattern, f'[{pii_type.upper()}_REDACTED]', scrubbed, flags=re.IGNORECASE)
+            
+            return scrubbed
+        
+        # Create scrubbed copy
+        scrubbed_result = transcription_result.copy()
+        
+        # Scrub main text
+        original_text = scrubbed_result.get("text", "")
+        scrubbed_text = scrub_text(original_text)
+        scrubbed_result["text"] = scrubbed_text
+        
+        # Scrub timestamp text segments
+        if "timestamps" in scrubbed_result:
+            scrubbed_timestamps = []
+            for timestamp in scrubbed_result["timestamps"]:
+                scrubbed_timestamp = timestamp.copy()
+                if "text" in scrubbed_timestamp:
+                    scrubbed_timestamp["text"] = scrub_text(scrubbed_timestamp["text"])
+                scrubbed_timestamps.append(scrubbed_timestamp)
+            scrubbed_result["timestamps"] = scrubbed_timestamps
+        
+        # Add PII scrubbing metadata
+        scrubbed_result["pii_scrubbing"] = {
+            "applied": True,
+            "patterns_used": list(pii_patterns.keys()),
+            "original_length": len(original_text),
+            "scrubbed_length": len(scrubbed_text),
+            "auto_enabled_uat": pii_config.get("auto_enabled_uat", False),
+            "timestamp": datetime.now(timezone.utc).isoformat()
+        }
+        
+        logger.info("PII scrubbing applied to transcription", extra={
+            "original_length": len(original_text),
+            "scrubbed_length": len(scrubbed_text),
+            "patterns_applied": len(pii_patterns),
+            "auto_enabled": pii_config.get("auto_enabled_uat", False)
+        })
+        
+        return scrubbed_result
+    
     def _mock_transcription(self, file_data: bytes, mime_type: str, options: Dict[str, Any]) -> Dict[str, Any]:
         """
         Mock transcription for development/testing when audio deps unavailable.
@@ -364,11 +483,30 @@ class AudioTranscriptionTool:
             language = options.get("language", "auto")
             include_timestamps = options.get("include_timestamps", True)
             
-            # Check PII scrubbing configuration
-            pii_scrub_enabled = payload.get("pii_scrub", {}).get("enabled", False)
+            # Enhanced PII scrubbing configuration for UAT
+            pii_scrub_config = payload.get("pii_scrub", {})
+            pii_scrub_enabled = pii_scrub_config.get("enabled", False)
+            
+            # Enforce PII scrubbing in UAT/staging environments
+            uat_mode = os.getenv("UAT_MODE", "false").lower() == "true"
+            staging_env = os.getenv("STAGING_ENV", "false").lower() == "true" 
+            pii_scrub_required = os.getenv("PII_SCRUB_ENABLED", "false").lower() == "true"
+            
+            if (uat_mode or staging_env) and pii_scrub_required and not pii_scrub_enabled:
+                logger.warning("UAT/Staging environment requires PII scrubbing - automatically enabling", extra={
+                    "uat_mode": uat_mode,
+                    "staging_env": staging_env,
+                    "pii_scrub_auto_enabled": True
+                })
+                pii_scrub_enabled = True
+                pii_scrub_config = {"enabled": True, "auto_enabled_uat": True}
             
             # Perform transcription
             transcription_result = self.transcribe_audio(audio_data, mime_type, options)
+            
+            # Apply PII scrubbing if enabled
+            if pii_scrub_enabled:
+                transcription_result = self._apply_pii_scrubbing(transcription_result, pii_scrub_config)
             
             # Calculate processing time
             processing_time = (datetime.now(timezone.utc) - start_time).total_seconds()
@@ -388,6 +526,8 @@ class AudioTranscriptionTool:
                     "timestamp": start_time.isoformat()
                 },
                 "pii_scrub_enabled": pii_scrub_enabled,
+                "pii_scrub_config": pii_scrub_config if pii_scrub_enabled else None,
+                "uat_enhanced_validation": uat_mode or staging_env,
                 "timestamp": datetime.now(timezone.utc).isoformat()
             }
             
