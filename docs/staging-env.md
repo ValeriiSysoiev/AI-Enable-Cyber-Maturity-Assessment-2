@@ -1,51 +1,94 @@
-# Staging Environment Specification
+# Staging Environment Setup Guide
 
 ## Overview
 
-The staging environment provides a production-like testing environment for the AI-Enabled Cyber Maturity Assessment platform, implementing the same architecture with engagement isolation, ABAC authorization, and comprehensive audit trails.
+This guide explains how to configure and deploy the staging environment using GitHub Actions with either Azure App Service or Azure Container Apps.
 
-## Architecture Mapping
+## Repository Variables Configuration
 
-### Production → Staging Component Alignment
+Navigate to **Settings → Secrets and variables → Actions → Variables** in your GitHub repository and configure the following variables:
 
-| Component | Production | Staging | Notes |
-|-----------|------------|---------|-------|
-| **Web App** | `web-prod` | `web-staging` | Next.js with SSR route guards |
-| **API Service** | `api-prod` | `api-staging` | FastAPI with ABAC enforcement |
-| **MCP Gateway** | `mcp-prod` | `mcp-staging` | Model Context Protocol tools |
-| **Container Environment** | `prod-env` | `staging-env` | Azure Container Apps |
-| **Resource Group** | `rg-prod` | `rg-staging` | Isolated Azure resources |
+### Required Variables (All Scenarios)
 
-## Required GitHub Variables
+| Variable | Description | Example Value |
+|----------|-------------|---------------|
+| `GHCR_ENABLED` | Enable GitHub Container Registry builds | `1` |
 
-### OIDC Authentication
-```
-AZURE_CLIENT_ID          # Service principal for staging OIDC
-AZURE_TENANT_ID          # Azure AD tenant ID  
-AZURE_SUBSCRIPTION_ID    # Staging subscription ID
+### Scenario A: App Service Staging Only
+
+For existing App Service deployments, set only the staging URL:
+
+| Variable | Description | Example Value |
+|----------|-------------|---------------|
+| `STAGING_URL` | Direct URL to your App Service staging slot | `https://myapp-staging.azurewebsites.net` |
+
+**Important**: Leave `ACA_ENV` empty to skip Container Apps deployment.
+
+### Scenario B: Container Apps Staging
+
+For full Azure Container Apps deployment:
+
+| Variable | Description | Example Value |
+|----------|-------------|---------------|
+| `AZURE_SUBSCRIPTION_ID` | Azure subscription ID | `12345678-1234-1234-1234-123456789012` |
+| `AZURE_TENANT_ID` | Azure AD tenant ID | `87654321-4321-4321-4321-210987654321` |
+| `AZURE_CLIENT_ID` | Service principal client ID | `abcdef12-3456-7890-abcd-ef1234567890` |
+| `ACA_RG` | Resource group name | `rg-aecma-staging` |
+| `ACA_ENV` | Container Apps environment name | `env-aecma-staging` |
+| `ACA_APP_API` | API container app name | `app-aecma-api-staging` |
+| `ACA_APP_WEB` | Web container app name | `app-aecma-web-staging` |
+| `STAGING_URL` | (Optional) Override computed URL | `https://custom-staging.domain.com` |
+
+## Deployment Paths
+
+### Path A: App Service Only
+
+1. **Configure Variables**:
+   - Set `GHCR_ENABLED=1`
+   - Set `STAGING_URL` to your App Service staging slot URL
+   - Leave `ACA_ENV` empty or unset
+
+2. **Workflow Behavior**:
+   - ✅ GHCR build/push runs (Docker images built and pushed)
+   - ❌ Azure Container Apps deploy step skips (due to missing `ACA_ENV`)
+   - ✅ GitHub staging environment auto-creates
+
+3. **Verification**:
+   ```bash
+   ./scripts/verify_live.sh --staging
+   ```
+
+### Path B: Container Apps Full Deploy
+
+1. **Configure Variables**:
+   - Set all `AZURE_*` variables with proper service principal credentials
+   - Set all `ACA_*` variables with your Container Apps resource names
+   - Optionally set `STAGING_URL` to override computed URL
+
+2. **Workflow Behavior**:
+   - ✅ GHCR build/push runs
+   - ✅ Azure Container Apps deploy runs (updates container images)
+   - ✅ GitHub staging environment auto-creates with computed URL
+
+3. **Verification**:
+   ```bash
+   ./scripts/verify_live.sh --staging
+   ```
+
+## Environment Auto-Creation
+
+The workflow includes an `environment` block that automatically creates a GitHub environment named "staging" when the workflow runs:
+
+```yaml
+environment:
+  name: staging
 ```
 
-### Container Registry
-```
-GHCR_ENABLED=1           # Enable GitHub Container Registry
-GHCR_TOKEN               # GitHub token with packages:write
-```
-
-### Azure Container Apps
-```
-ACA_RG                   # Resource group name (e.g., rg-aecma-staging)
-ACA_ENV                  # Container environment (e.g., cae-aecma-staging)
-ACA_APP_API              # API app name (e.g., api-staging)
-ACA_APP_WEB              # Web app name (e.g., web-staging)
-ACA_APP_MCP              # MCP Gateway app name (e.g., mcp-staging)
-```
-
-### Service URLs
-```
-STAGING_URL              # Main web app URL (e.g., https://web-staging.region.azurecontainerapps.io)
-API_BASE_URL             # API service URL (e.g., https://api-staging.region.azurecontainerapps.io)  
-MCP_GATEWAY_URL          # MCP Gateway URL (e.g., https://mcp-staging.region.azurecontainerapps.io)
-```
+This enables:
+- Environment-specific protection rules
+- Deployment approvals (if configured)
+- Environment-specific secrets and variables
+- Deployment history tracking
 
 ## Health Check Endpoints
 
