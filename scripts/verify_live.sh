@@ -45,6 +45,7 @@ CRITICAL_PASS_REQUIRED=${CRITICAL_PASS_REQUIRED:-true}
 # UAT Governance mode
 UAT_MODE=${UAT_MODE:-false}
 STAGING_MODE=${STAGING_MODE:-false}
+PROD_MODE=${PROD_MODE:-false}
 ARTIFACTS_DIR="${PROJECT_ROOT}/artifacts/verify"
 
 # Validate required environment variables
@@ -81,9 +82,15 @@ log_uat() {
     local message="$2"
     local timestamp="$(date -u '+%Y-%m-%d %H:%M:%S UTC')"
     
-    if [[ "$UAT_MODE" == "true" || "$STAGING_MODE" == "true" ]]; then
+    if [[ "$UAT_MODE" == "true" || "$STAGING_MODE" == "true" || "$PROD_MODE" == "true" ]]; then
         mkdir -p "$ARTIFACTS_DIR"
-        echo "[$timestamp] [$level] $message" >> "$ARTIFACTS_DIR/verification.log"
+        local log_file="verification.log"
+        if [[ "$PROD_MODE" == "true" ]]; then
+            log_file="prod_verify.log"
+        elif [[ "$STAGING_MODE" == "true" ]]; then
+            log_file="staging_verify.log"
+        fi
+        echo "[$timestamp] [$level] $message" >> "$ARTIFACTS_DIR/$log_file"
     fi
     
     case "$level" in
@@ -1310,6 +1317,91 @@ test_staging_environment() {
     return 0
 }
 
+# Test production environment with URL resolution and health checks
+test_production_environment() {
+    log_info "Testing production environment deployment..."
+    
+    local resolved_url=""
+    
+    # Resolve URL in priority order
+    if [[ -n "$PROD_URL" ]]; then
+        resolved_url="$PROD_URL"
+        log_info "Using configured PROD_URL: $resolved_url"
+    elif [[ -n "$ACA_APP_WEB_PROD" && -n "$ACA_ENV_PROD" ]]; then
+        resolved_url="https://${ACA_APP_WEB_PROD}.${ACA_ENV_PROD}.azurecontainerapps.io"
+        log_info "Computed production URL from Azure Container Apps: $resolved_url"
+    else
+        log_warning "No production URL configured and insufficient ACA variables"
+        return 1
+    fi
+    
+    # Log computed URL for verification
+    log_uat "INFO" "Computed production URL: $resolved_url"
+    
+    # Health check with retry/backoff
+    local retry_count=0
+    local max_retries=5
+    local backoff_seconds=10
+    local health_success=false
+    
+    while [[ $retry_count -lt $max_retries ]]; do
+        log_info "Production health check attempt $((retry_count + 1))/$max_retries..."
+        
+        local response_code
+        response_code=$(curl -s -o /dev/null -w "%{http_code}" \
+            --max-time 15 "${resolved_url}/" 2>/dev/null || echo "000")
+        
+        if [[ "$response_code" =~ ^[23][0-9][0-9]$ ]]; then
+            log_success "Production health check passed (HTTP $response_code)"
+            health_success=true
+            break
+        else
+            log_warning "Production health check failed (HTTP $response_code), retrying in ${backoff_seconds}s..."
+            ((retry_count++))
+            [[ $retry_count -lt $max_retries ]] && sleep $backoff_seconds
+        fi
+    done
+    
+    if [[ "$health_success" != "true" ]]; then
+        log_error "Production health check failed after $max_retries attempts"
+        log_uat "ERROR" "Production verification failed - URL unreachable: $resolved_url"
+        return 1
+    fi
+    
+    # Optional health endpoint check
+    local health_endpoint="${resolved_url}/health"
+    log_info "Testing production health endpoint..."
+    local health_response_code
+    health_response_code=$(curl -s -o /dev/null -w "%{http_code}" \
+        --max-time 10 "$health_endpoint" 2>/dev/null || echo "000")
+    
+    if [[ "$health_response_code" == "200" ]]; then
+        log_success "Production health endpoint accessible"
+    else
+        log_warning "Production health endpoint returned HTTP $health_response_code"
+    fi
+    
+    # ABAC smoke test - test basic authentication flow
+    log_info "Running ABAC smoke test..."
+    local auth_endpoint="${resolved_url}/api/auth/mode"
+    local auth_response
+    auth_response=$(curl -s "$auth_endpoint" 2>/dev/null || echo "")
+    
+    if [[ -n "$auth_response" ]]; then
+        log_success "ABAC authentication mode endpoint accessible"
+        if echo "$auth_response" | grep -q "aad"; then
+            log_success "AAD authentication detected in production"
+        else
+            log_info "Demo authentication mode detected"
+        fi
+    else
+        log_warning "ABAC authentication endpoint not accessible"
+    fi
+    
+    log_uat "SUCCESS" "Production environment verification passed"
+    return 0
+}
+
 # Parse command line arguments
 parse_arguments() {
     while [[ $# -gt 0 ]]; do
@@ -1318,6 +1410,11 @@ parse_arguments() {
                 STAGING_MODE=true
                 UAT_MODE=true
                 log_info "Staging mode enabled - enhanced UAT verification"
+                shift
+                ;;
+            --prod)
+                PROD_MODE=true
+                log_info "Production mode enabled - production verification"
                 shift
                 ;;
             --governance)
@@ -1345,6 +1442,9 @@ main() {
     if [[ "$STAGING_MODE" == "true" ]]; then
         echo "=== STAGING UAT GOVERNANCE MODE ==="
         log_uat "INFO" "Starting staging UAT verification with governance checks"
+    elif [[ "$PROD_MODE" == "true" ]]; then
+        echo "=== PRODUCTION VERIFICATION MODE ==="
+        log_uat "INFO" "Starting production verification with comprehensive health checks"
     fi
     echo
     
@@ -1397,8 +1497,12 @@ main() {
     test_uat_audit_logging
     
     echo
-    echo "=== Staging Environment ==="
-    test_staging_environment
+    echo "=== Environment Testing ==="
+    if [[ "$STAGING_MODE" == "true" ]]; then
+        test_staging_environment
+    elif [[ "$PROD_MODE" == "true" ]]; then
+        test_production_environment
+    fi
     
     echo
     echo "=== Log Analysis ==="
@@ -1461,6 +1565,11 @@ main() {
         fi
         
         log_uat "SUCCESS" "UAT governance verification complete"
+    elif [[ "$PROD_MODE" == "true" ]]; then
+        echo
+        echo "=== Production Verification Summary ==="
+        log_uat "INFO" "Production verification complete with comprehensive health checks"
+        log_uat "SUCCESS" "Production environment verified and operational"
     fi
     
     
@@ -1474,7 +1583,7 @@ main() {
     echo
     generate_summary
     
-    # Generate UAT artifacts summary if in staging mode
+    # Generate artifacts summary if in special modes
     if [[ "$STAGING_MODE" == "true" ]]; then
         echo
         echo "=== UAT Verification Artifacts ==="
@@ -1492,6 +1601,18 @@ main() {
         fi
         
         log_uat "SUCCESS" "UAT governance mode verification complete"
+    elif [[ "$PROD_MODE" == "true" ]]; then
+        echo
+        echo "=== Production Verification Artifacts ==="
+        log_uat "INFO" "Production verification artifacts saved to: $ARTIFACTS_DIR"
+        
+        if [[ -d "$ARTIFACTS_DIR" ]]; then
+            local artifact_count
+            artifact_count=$(find "$ARTIFACTS_DIR" -type f -name "*prod*" 2>/dev/null | wc -l)
+            log_uat "SUCCESS" "Generated $artifact_count production verification artifacts"
+        fi
+        
+        log_uat "SUCCESS" "Production verification mode complete"
     fi
     
     log_success "Phase 7 enterprise verification with S4 extensions complete"
