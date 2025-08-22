@@ -1241,94 +1241,73 @@ verify_s4_extensions() {
     fi
 }
 
-# Test staging environment with comprehensive checks and graceful Azure fallback
+# Test staging environment with URL resolution and health checks
 test_staging_environment() {
     log_info "Testing staging environment deployment..."
     
-    # Check for staging URL environment variable
+    local resolved_url=""
+    
+    # Resolve URL in priority order
     if [[ -n "$STAGING_URL" ]]; then
-        log_info "Testing staging URL: $STAGING_URL"
-        
-        # Test staging health endpoint
-        local staging_health_code
-        staging_health_code=$(curl -s -o /dev/null -w "%{http_code}" \
-            --max-time 30 "${STAGING_URL}/health" 2>/dev/null || echo "000")
-        
-        if [[ "$staging_health_code" == "200" ]]; then
-            log_success "Staging health endpoint accessible"
-        else
-            log_warning "Staging health endpoint returned HTTP $staging_health_code"
-        fi
-        
-        # Test staging feature flags via environment config
-        local config_response
-        config_response=$(curl -s "${STAGING_URL}/api/ops/config" 2>/dev/null || echo "")
-        
-        if echo "$config_response" | grep -q "STAGING_ENV.*true"; then
-            log_success "Staging environment flag detected"
-        else
-            log_warning "Staging environment flag not detected"
-        fi
-        
-        # Check MCP connector flags
-        if echo "$config_response" | grep -q "MCP_CONNECTORS_SP"; then
-            log_info "SharePoint connector configuration detected"
-        fi
-        
-        if echo "$config_response" | grep -q "MCP_CONNECTORS_JIRA"; then
-            log_info "Jira connector configuration detected"
-        fi
+        resolved_url="$STAGING_URL"
+        log_info "Using configured STAGING_URL: $resolved_url"
+    elif [[ -n "$ACA_APP_WEB" && -n "$ACA_ENV" ]]; then
+        resolved_url="https://${ACA_APP_WEB}.${ACA_ENV}.azurecontainerapps.io"
+        log_info "Computed staging URL from Azure Container Apps: $resolved_url"
     else
-        log_info "STAGING_URL not configured - using Azure Container Apps detection"
+        log_warning "No staging URL configured and insufficient ACA variables"
+        return 1
     fi
     
-    # Test MCP Gateway if URL provided
-    if [[ -n "$MCP_GATEWAY_URL" ]]; then
-        log_info "Testing MCP Gateway at $MCP_GATEWAY_URL..."
+    # Log computed URL for verification
+    log_uat "INFO" "Computed staging URL: $resolved_url"
+    
+    # Health check with retry/backoff
+    local retry_count=0
+    local max_retries=5
+    local backoff_seconds=5
+    local health_success=false
+    
+    while [[ $retry_count -lt $max_retries ]]; do
+        log_info "Health check attempt $((retry_count + 1))/$max_retries..."
         
-        local mcp_health_code
-        mcp_health_code=$(curl -s -o /dev/null -w "%{http_code}" \
-            --max-time 30 "${MCP_GATEWAY_URL}/health" 2>/dev/null || echo "000")
+        local response_code
+        response_code=$(curl -s -o /dev/null -w "%{http_code}" \
+            --max-time 10 "${resolved_url}/" 2>/dev/null || echo "000")
         
-        if [[ "$mcp_health_code" == "200" ]]; then
-            log_success "MCP Gateway health endpoint accessible"
-            
-            # Test SharePoint tool availability
-            local tools_response
-            tools_response=$(curl -s "${MCP_GATEWAY_URL}/mcp/tools" 2>/dev/null || echo "")
-            
-            if echo "$tools_response" | grep -q "sharepoint.fetch"; then
-                log_success "SharePoint connector available in MCP Gateway"
-            else
-                log_warning "SharePoint connector not found in MCP Gateway"
-            fi
-            
-            # Test Jira tool availability
-            if echo "$tools_response" | grep -q "jira.createIssue"; then
-                log_success "Jira connector available in MCP Gateway"
-            else
-                log_info "Jira connector not yet deployed (expected in v1.5)"
-            fi
+        if [[ "$response_code" =~ ^[23][0-9][0-9]$ ]]; then
+            log_success "Staging health check passed (HTTP $response_code)"
+            health_success=true
+            break
         else
-            log_warning "MCP Gateway health endpoint returned HTTP $mcp_health_code"
+            log_warning "Health check failed (HTTP $response_code), retrying in ${backoff_seconds}s..."
+            ((retry_count++))
+            [[ $retry_count -lt $max_retries ]] && sleep $backoff_seconds
         fi
-    else
-        log_info "MCP_GATEWAY_URL not configured - skipping MCP Gateway staging test"
+    done
+    
+    if [[ "$health_success" != "true" ]]; then
+        log_error "Staging health check failed after $max_retries attempts"
+        log_uat "ERROR" "Staging verification failed - URL unreachable: $resolved_url"
+        return 1
     fi
     
-    # Graceful Azure credential check (NO-OP when not configured)
-    if command -v az >/dev/null 2>&1; then
-        local azure_account
-        azure_account=$(az account show --query name -o tsv 2>/dev/null || echo "")
+    # Optional API health check if VERIFY_API_BASE_URL exists
+    if [[ -n "${VERIFY_API_BASE_URL:-}" ]]; then
+        log_info "Testing API health endpoint..."
+        local api_response_code
+        api_response_code=$(curl -s -o /dev/null -w "%{http_code}" \
+            --max-time 10 "${VERIFY_API_BASE_URL}/health" 2>/dev/null || echo "000")
         
-        if [[ -n "$azure_account" ]]; then
-            log_success "Azure CLI authenticated - staging verification available"
+        if [[ "$api_response_code" == "200" ]]; then
+            log_success "API health endpoint accessible"
         else
-            log_info "Azure CLI not authenticated - staging verification skipped (graceful NO-OP)"
+            log_warning "API health endpoint returned HTTP $api_response_code"
         fi
-    else
-        log_info "Azure CLI not installed - staging verification skipped (graceful NO-OP)"
     fi
+    
+    log_uat "SUCCESS" "Staging environment verification passed"
+    return 0
 }
 
 # Parse command line arguments
@@ -1484,9 +1463,6 @@ main() {
         log_uat "SUCCESS" "UAT governance verification complete"
     fi
     
-    echo
-    echo "=== Staging Environment Tests ==="
-    test_staging_environment
     
     echo
     echo "=== Critical Pass Validation ==="

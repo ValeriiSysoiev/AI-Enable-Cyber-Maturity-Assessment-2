@@ -633,24 +633,39 @@ Enterprise-grade security, compliance, and operational excellence:
 
 ---
 
-## Staging Deployment Quickstart
+## Staging Deploy
 
-Automated staging deployment uses GitHub Actions with GHCR (GitHub Container Registry) and optional Azure Container Apps integration. Configure Azure environment variables for full deployment, or use GHCR-only mode for manual deployment flexibility.
+Quick staging deployment using GitHub Actions workflow:
 
-**Workflow Scope**: Updating workflow files requires a PAT with repo+workflow+read:org scope. Local/staging verification still works when workflow deployment is skipped.
+### 1. Set Repository Variables
+Go to **Settings → Secrets and variables → Actions → Variables** and configure:
 
-Deploy to a staging environment for testing:
+**App Service Option:**
+- `GHCR_ENABLED=1`
+- `STAGING_URL=https://your-staging-app.azurewebsites.net`
 
-1. **Prerequisites:**
-   ```bash
-   # Set staging environment
-   export ENVIRONMENT=staging
-   export RESOURCE_GROUP=rg-aaa-staging
-   export ACR_NAME=acraaastaging
-   ```
+**Container Apps Option:**
+- `GHCR_ENABLED=1`
+- `AZURE_SUBSCRIPTION_ID`, `AZURE_TENANT_ID`, `AZURE_CLIENT_ID`
+- `ACA_RG`, `ACA_ENV`, `ACA_APP_API`, `ACA_APP_WEB`
 
-2. **Deploy infrastructure:**
-   ```bash
+### 2. Run Deployment
+Navigate to **Actions → Deploy Staging → Run workflow**
+
+### 3. Verify Staging
+```bash
+./scripts/verify_live.sh --staging
+```
+
+**Documentation**: See `/docs/staging-env.md` for complete setup guide.
+
+**Helper Tools:**
+- Diagnostics: `./scripts/diagnose_staging.sh`
+- Set variables: `./scripts/gh_set_repo_vars.sh`
+
+---
+
+## Production Deployment
    # Create resource group
    az group create -n $RESOURCE_GROUP -l eastus2
    
