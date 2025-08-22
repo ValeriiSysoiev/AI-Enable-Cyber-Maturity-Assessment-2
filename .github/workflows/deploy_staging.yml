@@ -17,6 +17,9 @@ env:
   ACA_ENV: ${{ vars.ACA_ENV }}
   ACA_APP_API: ${{ vars.ACA_APP_API }}
   ACA_APP_WEB: ${{ vars.ACA_APP_WEB }}
+  APPSVC_RG: ${{ vars.APPSVC_RG }}
+  APPSVC_WEBAPP_WEB: ${{ vars.APPSVC_WEBAPP_WEB }}
+  APPSVC_WEBAPP_API: ${{ vars.APPSVC_WEBAPP_API }}
   STAGING_URL: ${{ vars.STAGING_URL }}
 
 jobs:
@@ -106,6 +109,57 @@ jobs:
             --environment "$ACA_ENV" \
             --image "ghcr.io/${{ github.repository_owner }}/aecma-web:${{ github.sha }}" || true
 
+  deploy_appservice:
+    runs-on: ubuntu-latest
+    needs: build_and_push_ghcr
+    environment: 
+      name: staging
+    if: ${{ env.APPSVC_RG != '' && env.APPSVC_WEBAPP_WEB != '' && env.APPSVC_WEBAPP_API != '' }}
+    
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Azure login (OIDC)
+        uses: azure/login@v2
+        with:
+          client-id: ${{ env.AZURE_CLIENT_ID }}
+          tenant-id: ${{ env.AZURE_TENANT_ID }}
+          subscription-id: ${{ env.AZURE_SUBSCRIPTION_ID }}
+      
+      - name: Configure Web container (GHCR)
+        run: |
+          echo "::notice::Configuring Web App to use GHCR image..."
+          az webapp config container set \
+            -g "$APPSVC_RG" -n "$APPSVC_WEBAPP_WEB" \
+            --docker-custom-image-name "ghcr.io/${{ github.repository_owner }}/aecma-web:${{ github.sha }}" \
+            --docker-registry-server-url "https://ghcr.io" \
+            --docker-registry-server-user "${{ github.actor }}" \
+            --docker-registry-server-password "${{ secrets.GITHUB_TOKEN }}"
+      
+      - name: Configure API container (GHCR)
+        run: |
+          echo "::notice::Configuring API App to use GHCR image..."
+          az webapp config container set \
+            -g "$APPSVC_RG" -n "$APPSVC_WEBAPP_API" \
+            --docker-custom-image-name "ghcr.io/${{ github.repository_owner }}/aecma-api:${{ github.sha }}" \
+            --docker-registry-server-url "https://ghcr.io" \
+            --docker-registry-server-user "${{ github.actor }}" \
+            --docker-registry-server-password "${{ secrets.GITHUB_TOKEN }}"
+      
+      - name: Restart Web Apps
+        run: |
+          echo "::notice::Restarting Web Apps to apply new images..."
+          az webapp restart -g "$APPSVC_RG" -n "$APPSVC_WEBAPP_WEB" || true
+          az webapp restart -g "$APPSVC_RG" -n "$APPSVC_WEBAPP_API" || true
+      
+      - name: Print App Service URL (if STAGING_URL missing)
+        run: |
+          if [ -z "${STAGING_URL}" ]; then
+            echo "::notice::STAGING_URL=https://${APPSVC_WEBAPP_WEB}.azurewebsites.net"
+          else
+            echo "::notice::STAGING_URL=${STAGING_URL}"
+          fi
+
   print_url:
     runs-on: ubuntu-latest
     needs: [build_and_push_ghcr]
@@ -118,6 +172,9 @@ jobs:
             echo "::notice::STAGING_URL=${STAGING_URL}"
           elif [[ -n "${ACA_APP_WEB}" && -n "${ACA_ENV}" ]]; then
             COMPUTED_URL="https://${ACA_APP_WEB}.${ACA_ENV}.azurecontainerapps.io"
+            echo "::notice::STAGING_URL=${COMPUTED_URL}"
+          elif [[ -n "${APPSVC_WEBAPP_WEB}" ]]; then
+            COMPUTED_URL="https://${APPSVC_WEBAPP_WEB}.azurewebsites.net"
             echo "::notice::STAGING_URL=${COMPUTED_URL}"
           else
             echo "::notice::STAGING_URL=(not set)"
