@@ -1,0 +1,203 @@
+# Error Rate Alert Rules for AECMA Production
+# Azure Monitor Alert Rule Templates
+
+alerts:
+  # Critical Error Rate Alert
+  - name: "AECMA-Error-Rate-Critical"
+    description: "5xx error rate exceeds SLO threshold (1%)"
+    severity: "Critical"
+    frequency: "PT5M"
+    timeWindow: "PT10M"
+    evaluationFrequency: "PT1M"
+    
+    query: |
+      ContainerAppConsoleLogs_CL
+      | where TimeGenerated > ago(10m)
+      | extend StatusCode = extract(@"HTTP/\d\.\d\s(\d{3})", 1, Log_s)
+      | where isnotnull(StatusCode)
+      | summarize 
+          TotalRequests = count(),
+          ErrorRequests = countif(StatusCode startswith "5")
+      | extend ErrorRate = (ErrorRequests * 100.0) / TotalRequests
+      | where ErrorRate > 1.0
+    
+    threshold:
+      operator: "GreaterThan"
+      value: 1.0
+      aggregation: "Average"
+    
+    actions:
+      - actionGroupId: "ag-aecma-critical"
+        webhookProperties:
+          severity: "critical"
+          service: "aecma"
+          slo: "error_rate"
+
+  # Warning Error Rate Alert
+  - name: "AECMA-Error-Rate-Warning"
+    description: "5xx error rate approaching SLO threshold"
+    severity: "Warning"
+    frequency: "PT5M"
+    timeWindow: "PT10M"
+    evaluationFrequency: "PT1M"
+    
+    query: |
+      ContainerAppConsoleLogs_CL
+      | where TimeGenerated > ago(10m)
+      | extend StatusCode = extract(@"HTTP/\d\.\d\s(\d{3})", 1, Log_s)
+      | where isnotnull(StatusCode)
+      | summarize 
+          TotalRequests = count(),
+          ErrorRequests = countif(StatusCode startswith "5")
+      | extend ErrorRate = (ErrorRequests * 100.0) / TotalRequests
+      | where ErrorRate > 0.5
+    
+    threshold:
+      operator: "GreaterThan"
+      value: 0.5
+      aggregation: "Average"
+    
+    actions:
+      - actionGroupId: "ag-aecma-warning"
+        webhookProperties:
+          severity: "warning"
+          service: "aecma"
+          slo: "error_rate"
+
+  # Specific Error Code Alerts
+  - name: "AECMA-500-Errors-Spike"
+    description: "High number of HTTP 500 Internal Server Errors"
+    severity: "Critical"
+    frequency: "PT2M"
+    timeWindow: "PT5M"
+    evaluationFrequency: "PT1M"
+    
+    query: |
+      ContainerAppConsoleLogs_CL
+      | where TimeGenerated > ago(5m)
+      | where Log_s contains "500"
+      | extend StatusCode = extract(@"HTTP/\d\.\d\s(\d{3})", 1, Log_s)
+      | where StatusCode == "500"
+      | summarize ErrorCount = count()
+      | where ErrorCount > 10
+    
+    threshold:
+      operator: "GreaterThan"
+      value: 10
+      aggregation: "Count"
+    
+    actions:
+      - actionGroupId: "ag-aecma-critical"
+        webhookProperties:
+          severity: "critical"
+          service: "aecma"
+          error_type: "http_500"
+
+  - name: "AECMA-502-503-Errors"
+    description: "Service unavailable or bad gateway errors"
+    severity: "Critical"
+    frequency: "PT2M"
+    timeWindow: "PT5M"
+    evaluationFrequency: "PT1M"
+    
+    query: |
+      ContainerAppConsoleLogs_CL
+      | where TimeGenerated > ago(5m)
+      | extend StatusCode = extract(@"HTTP/\d\.\d\s(\d{3})", 1, Log_s)
+      | where StatusCode in ("502", "503")
+      | summarize ErrorCount = count()
+      | where ErrorCount > 5
+    
+    threshold:
+      operator: "GreaterThan"
+      value: 5
+      aggregation: "Count"
+    
+    actions:
+      - actionGroupId: "ag-aecma-critical"
+        webhookProperties:
+          severity: "critical"
+          service: "aecma"
+          error_type: "service_unavailable"
+
+  # Application-specific Errors
+  - name: "AECMA-Application-Errors"
+    description: "Application-level errors detected in logs"
+    severity: "Warning"
+    frequency: "PT5M"
+    timeWindow: "PT10M"
+    evaluationFrequency: "PT2M"
+    
+    query: |
+      ContainerAppConsoleLogs_CL
+      | where TimeGenerated > ago(10m)
+      | where Log_s contains "ERROR" or Log_s contains "CRITICAL"
+      | where Log_s !contains "HTTP"  // Exclude HTTP errors (handled separately)
+      | summarize ErrorCount = count()
+      | where ErrorCount > 20
+    
+    threshold:
+      operator: "GreaterThan"
+      value: 20
+      aggregation: "Count"
+    
+    actions:
+      - actionGroupId: "ag-aecma-warning"
+        webhookProperties:
+          severity: "warning"
+          service: "aecma"
+          error_type: "application"
+
+  # Authentication Failures
+  - name: "AECMA-Auth-Failures"
+    description: "High number of authentication failures"
+    severity: "Warning"
+    frequency: "PT5M"
+    timeWindow: "PT15M"
+    evaluationFrequency: "PT2M"
+    
+    query: |
+      ContainerAppConsoleLogs_CL
+      | where TimeGenerated > ago(15m)
+      | where Log_s contains "authentication failed" or Log_s contains "unauthorized" or Log_s contains "401"
+      | summarize FailureCount = count()
+      | where FailureCount > 50
+    
+    threshold:
+      operator: "GreaterThan"
+      value: 50
+      aggregation: "Count"
+    
+    actions:
+      - actionGroupId: "ag-aecma-security"
+        webhookProperties:
+          severity: "warning"
+          service: "aecma"
+          error_type: "authentication"
+
+  # Database Connection Errors
+  - name: "AECMA-Database-Errors"
+    description: "Database connection or query errors"
+    severity: "Critical"
+    frequency: "PT2M"
+    timeWindow: "PT5M"
+    evaluationFrequency: "PT1M"
+    
+    query: |
+      ContainerAppConsoleLogs_CL
+      | where TimeGenerated > ago(5m)
+      | where Log_s contains "database" and (Log_s contains "error" or Log_s contains "timeout" or Log_s contains "connection")
+      | summarize DatabaseErrorCount = count()
+      | where DatabaseErrorCount > 5
+    
+    threshold:
+      operator: "GreaterThan"
+      value: 5
+      aggregation: "Count"
+    
+    actions:
+      - actionGroupId: "ag-aecma-critical"
+        webhookProperties:
+          severity: "critical"
+          service: "aecma"
+          component: "database"
