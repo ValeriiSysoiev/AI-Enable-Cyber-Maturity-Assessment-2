@@ -743,4 +743,20 @@ This rebuilds the Web image with the API URL baked in at build time (for Next.js
 
 **Note:** This deployment uses temporary ACR admin credentials. Follow the "Switch to Managed Identity" section above to transition to a more secure authentication method using Managed Identities with proper RBAC roles (AcrPull for image access, Storage Blob roles for data, and Key Vault role for secrets).
 
+## Monitoring & Alerts
+
+Production monitoring setup with Log Analytics KQL queries and automated alerting:
+
+- **Health Monitoring**: Application health checks and availability tracking
+- **Performance Monitoring**: Response times, error rates, resource utilization
+- **Security Monitoring**: Authentication failures and suspicious activity detection
+- **Business Metrics**: User engagement and assessment completion rates
+
+**Documentation**: See `/docs/monitoring-alerts.md` for complete setup guide.
+
+**Key Dashboards**:
+- Executive: Uptime, performance trends, incident counts
+- Technical: System health, resource usage, security events
+- Business: User engagement, feature adoption, satisfaction
+
 ---
