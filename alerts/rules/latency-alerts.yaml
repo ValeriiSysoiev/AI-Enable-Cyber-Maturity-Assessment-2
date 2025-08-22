@@ -1,0 +1,153 @@
+# Latency Alert Rules for AECMA Production
+# Azure Monitor Alert Rule Templates
+
+alerts:
+  # Critical Latency Alert
+  - name: "AECMA-Latency-P95-Critical"
+    description: "P95 latency exceeds SLO threshold (2 seconds)"
+    severity: "Critical"
+    frequency: "PT5M"
+    timeWindow: "PT15M"
+    evaluationFrequency: "PT1M"
+    
+    query: |
+      ContainerAppConsoleLogs_CL
+      | where TimeGenerated > ago(15m)
+      | where Log_s contains "response_time"
+      | extend ResponseTime = todouble(extract(@"response_time[:\s]+(\d+\.?\d*)", 1, Log_s))
+      | where isnotnull(ResponseTime)
+      | summarize P95Latency = percentile(ResponseTime, 95)
+      | where P95Latency > 2000  // 2 seconds in milliseconds
+    
+    threshold:
+      operator: "GreaterThan"
+      value: 2000
+      aggregation: "Average"
+    
+    actions:
+      - actionGroupId: "ag-aecma-critical"
+        webhookProperties:
+          severity: "critical"
+          service: "aecma"
+          slo: "latency"
+          metric: "p95"
+
+  # Warning Latency Alert
+  - name: "AECMA-Latency-P95-Warning"
+    description: "P95 latency approaching SLO threshold"
+    severity: "Warning"
+    frequency: "PT5M"
+    timeWindow: "PT10M"
+    evaluationFrequency: "PT1M"
+    
+    query: |
+      ContainerAppConsoleLogs_CL
+      | where TimeGenerated > ago(10m)
+      | where Log_s contains "response_time"
+      | extend ResponseTime = todouble(extract(@"response_time[:\s]+(\d+\.?\d*)", 1, Log_s))
+      | where isnotnull(ResponseTime)
+      | summarize P95Latency = percentile(ResponseTime, 95)
+      | where P95Latency > 1500  // 1.5 seconds warning threshold
+    
+    threshold:
+      operator: "GreaterThan"
+      value: 1500
+      aggregation: "Average"
+    
+    actions:
+      - actionGroupId: "ag-aecma-warning"
+        webhookProperties:
+          severity: "warning"
+          service: "aecma"
+          slo: "latency"
+
+  # P99 Latency Alert
+  - name: "AECMA-Latency-P99-High"
+    description: "P99 latency indicates performance degradation"
+    severity: "Warning"
+    frequency: "PT5M"
+    timeWindow: "PT10M"
+    evaluationFrequency: "PT2M"
+    
+    query: |
+      ContainerAppConsoleLogs_CL
+      | where TimeGenerated > ago(10m)
+      | where Log_s contains "response_time"
+      | extend ResponseTime = todouble(extract(@"response_time[:\s]+(\d+\.?\d*)", 1, Log_s))
+      | where isnotnull(ResponseTime)
+      | summarize P99Latency = percentile(ResponseTime, 99)
+      | where P99Latency > 5000  // 5 seconds for P99
+    
+    threshold:
+      operator: "GreaterThan"
+      value: 5000
+      aggregation: "Average"
+    
+    actions:
+      - actionGroupId: "ag-aecma-warning"
+        webhookProperties:
+          severity: "warning"
+          service: "aecma"
+          metric: "p99_latency"
+
+  # Slow Database Queries
+  - name: "AECMA-Database-Slow-Queries"
+    description: "Database queries taking too long"
+    severity: "Warning"
+    frequency: "PT5M"
+    timeWindow: "PT10M"
+    evaluationFrequency: "PT2M"
+    
+    query: |
+      ContainerAppConsoleLogs_CL
+      | where TimeGenerated > ago(10m)
+      | where Log_s contains "query" and Log_s contains "ms"
+      | extend QueryTime = todouble(extract(@"(\d+\.?\d*)\s*ms", 1, Log_s))
+      | where QueryTime > 500  // 500ms threshold
+      | summarize SlowQueryCount = count(), AvgQueryTime = avg(QueryTime)
+      | where SlowQueryCount > 10
+    
+    threshold:
+      operator: "GreaterThan"
+      value: 10
+      aggregation: "Count"
+    
+    actions:
+      - actionGroupId: "ag-aecma-warning"
+        webhookProperties:
+          severity: "warning"
+          service: "aecma"
+          component: "database"
+
+  # API Endpoint Performance
+  - name: "AECMA-API-Endpoint-Slow"
+    description: "Specific API endpoints performing poorly"
+    severity: "Warning"
+    frequency: "PT10M"
+    timeWindow: "PT20M"
+    evaluationFrequency: "PT5M"
+    
+    query: |
+      ContainerAppConsoleLogs_CL
+      | where TimeGenerated > ago(20m)
+      | where Log_s contains "POST" or Log_s contains "GET"
+      | extend 
+          Method = extract(@"(GET|POST|PUT|DELETE)", 1, Log_s),
+          Path = extract(@"\"(GET|POST|PUT|DELETE)\s+([^\"]+)\"", 2, Log_s),
+          ResponseTime = todouble(extract(@"response_time[:\s]+(\d+\.?\d*)", 1, Log_s))
+      | where isnotnull(ResponseTime) and ResponseTime > 3000
+      | summarize SlowRequests = count() by Method, Path
+      | where SlowRequests > 5
+      | order by SlowRequests desc
+    
+    threshold:
+      operator: "GreaterThan"
+      value: 5
+      aggregation: "Count"
+    
+    actions:
+      - actionGroupId: "ag-aecma-warning"
+        webhookProperties:
+          severity: "warning"
+          service: "aecma"
+          component: "api_endpoints"
