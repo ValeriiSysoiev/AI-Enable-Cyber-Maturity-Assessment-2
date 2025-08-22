@@ -1269,12 +1269,16 @@ test_staging_environment() {
     elif [[ -n "$ACA_APP_WEB" && -n "$ACA_ENV" ]]; then
         resolved_url="https://${ACA_APP_WEB}.${ACA_ENV}.azurecontainerapps.io"
         log_info "Computed staging URL from Azure Container Apps: $resolved_url"
+    elif [[ -n "$APPSVC_WEBAPP_WEB" ]]; then
+        resolved_url="https://${APPSVC_WEBAPP_WEB}.azurewebsites.net"
+        log_info "Computed staging URL from App Service: $resolved_url"
     else
         log_error "No staging URL available. Please set one of:"
         echo "  export STAGING_URL=https://your-app.azurewebsites.net"
         echo "  OR"
-        echo "  export ACA_APP_WEB=your-app-name"
-        echo "  export ACA_ENV=your-aca-environment"
+        echo "  export ACA_APP_WEB=your-app-name && export ACA_ENV=your-aca-environment"
+        echo "  OR"
+        echo "  export APPSVC_WEBAPP_WEB=your-webapp-name"
         return 1
     fi
     
