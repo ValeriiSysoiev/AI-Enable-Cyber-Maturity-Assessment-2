@@ -1,0 +1,58 @@
+// Resource Utilization Queries for AECMA Production
+// Usage: Run in Log Analytics workspace
+
+// 1. CPU Utilization by Container
+Perf
+| where TimeGenerated > ago(1h)
+| where ObjectName == "Container" and CounterName == "CPU Usage %"
+| summarize 
+    AvgCPU = avg(CounterValue),
+    MaxCPU = max(CounterValue),
+    P95CPU = percentile(CounterValue, 95)
+    by InstanceName, bin(TimeGenerated, 5m)
+| render timechart
+
+// 2. Memory Usage Patterns
+Perf
+| where TimeGenerated > ago(1h)
+| where ObjectName == "Container" and CounterName == "Memory Usage MB"
+| summarize 
+    AvgMemory = avg(CounterValue),
+    MaxMemory = max(CounterValue),
+    P95Memory = percentile(CounterValue, 95)
+    by InstanceName, bin(TimeGenerated, 5m)
+| render timechart
+
+// 3. Resource Pressure Events
+ContainerAppSystemLogs_CL
+| where TimeGenerated > ago(24h)
+| where Log_s contains "OOMKilled" or Log_s contains "memory pressure" or Log_s contains "cpu throttled"
+| summarize EventCount = count() by EventType = case(
+    Log_s contains "OOMKilled", "Out of Memory",
+    Log_s contains "memory pressure", "Memory Pressure",
+    Log_s contains "cpu throttled", "CPU Throttled",
+    "Other"
+), bin(TimeGenerated, 1h)
+| render columnchart
+
+// 4. Container Resource Limits vs Usage
+Perf
+| where TimeGenerated > ago(1h)
+| where ObjectName == "Container"
+| summarize 
+    CPUUsage = avgif(CounterValue, CounterName == "CPU Usage %"),
+    MemoryUsage = avgif(CounterValue, CounterName == "Memory Usage MB")
+    by InstanceName
+| join kind=leftouter (
+    ContainerInventory
+    | where TimeGenerated > ago(1h)
+    | distinct ContainerName, CPULimit = CPULimitNanoCores/1000000000, MemoryLimit = MemoryLimitBytes/1048576
+) on $left.InstanceName == $right.ContainerName
+| project 
+    Container = InstanceName,
+    CPUUsagePercent = CPUUsage,
+    CPULimit,
+    MemoryUsageMB = MemoryUsage,
+    MemoryLimitMB = MemoryLimit,
+    CPUHeadroom = CPULimit - (CPUUsage/100 * CPULimit),
+    MemoryHeadroom = MemoryLimit - MemoryUsage

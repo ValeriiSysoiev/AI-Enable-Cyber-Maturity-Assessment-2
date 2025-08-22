@@ -1,0 +1,55 @@
+// Latency Analysis Queries for AECMA Production
+// Usage: Run in Log Analytics workspace
+
+// 1. P95 and P99 Latency (Last 1 hour)
+ContainerAppConsoleLogs_CL
+| where TimeGenerated > ago(1h)
+| where Log_s contains "response_time"
+| extend ResponseTime = todouble(extract(@"response_time[:\s]+(\d+\.?\d*)", 1, Log_s))
+| where isnotnull(ResponseTime)
+| summarize 
+    P50 = percentile(ResponseTime, 50),
+    P95 = percentile(ResponseTime, 95),
+    P99 = percentile(ResponseTime, 99),
+    Max = max(ResponseTime)
+    by bin(TimeGenerated, 5m)
+| render timechart
+
+// 2. Slow Queries (>2 seconds)
+ContainerAppConsoleLogs_CL
+| where TimeGenerated > ago(1h)
+| extend Duration = todouble(extract(@"duration[:\s]+(\d+\.?\d*)", 1, Log_s))
+| where Duration > 2000 // milliseconds
+| project TimeGenerated, ContainerAppName_s, Duration, Log_s
+| order by Duration desc
+| take 20
+
+// 3. API Endpoint Performance
+ContainerAppConsoleLogs_CL
+| where TimeGenerated > ago(1h)
+| where Log_s contains "GET" or Log_s contains "POST"
+| extend 
+    Method = extract(@"(GET|POST|PUT|DELETE)", 1, Log_s),
+    Path = extract(@"\"(GET|POST|PUT|DELETE)\s+([^\"]+)\"", 2, Log_s),
+    ResponseTime = todouble(extract(@"response_time[:\s]+(\d+\.?\d*)", 1, Log_s))
+| where isnotnull(ResponseTime)
+| summarize 
+    AvgTime = avg(ResponseTime),
+    P95Time = percentile(ResponseTime, 95),
+    Count = count()
+    by Method, Path
+| order by P95Time desc
+| take 20
+
+// 4. Database Query Performance
+ContainerAppConsoleLogs_CL
+| where TimeGenerated > ago(1h)
+| where Log_s contains "query" and Log_s contains "ms"
+| extend QueryTime = todouble(extract(@"(\d+\.?\d*)\s*ms", 1, Log_s))
+| where QueryTime > 100 // queries over 100ms
+| summarize 
+    AvgQueryTime = avg(QueryTime),
+    MaxQueryTime = max(QueryTime),
+    QueryCount = count()
+    by bin(TimeGenerated, 5m)
+| render timechart
