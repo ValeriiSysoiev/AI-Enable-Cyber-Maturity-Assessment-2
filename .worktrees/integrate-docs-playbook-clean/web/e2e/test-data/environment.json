@@ -1,9 +1,0 @@
-{
-  "timestamp": "2025-08-18T02:40:33.835Z",
-  "baseURL": "http://localhost:3000",
-  "environment": "test",
-  "features": {
-    "aad": false,
-    "api": false
-  }
-}
