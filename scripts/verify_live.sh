@@ -50,6 +50,12 @@ ARTIFACTS_DIR="${PROJECT_ROOT}/artifacts/verify"
 
 # Validate required environment variables
 validate_environment() {
+    # Skip Azure validation for staging mode with STAGING_URL
+    if [[ "$STAGING_MODE" == "true" && -n "$STAGING_URL" ]]; then
+        log_info "Staging mode with STAGING_URL - Azure context optional"
+        return 0
+    fi
+    
     local missing_vars=()
     
     if [[ -z "$RG_NAME" ]]; then
@@ -65,7 +71,9 @@ validate_environment() {
         echo "  export API_BASE_URL=<your-api-url>  # optional"
         echo "  export WEB_BASE_URL=<your-web-url>  # optional"
         echo ""
-        echo "Or run this script in a deployment context where these are set."
+        echo "Or for staging mode without Azure:"
+        echo "  export STAGING_URL=https://your-app.azurewebsites.net"
+        echo "  ./scripts/verify_live.sh --staging"
         exit 1
     fi
 }
@@ -1254,7 +1262,7 @@ test_staging_environment() {
     
     local resolved_url=""
     
-    # Resolve URL in priority order
+    # Resolve URL in priority order (Azure-optional)
     if [[ -n "$STAGING_URL" ]]; then
         resolved_url="$STAGING_URL"
         log_info "Using configured STAGING_URL: $resolved_url"
@@ -1262,7 +1270,11 @@ test_staging_environment() {
         resolved_url="https://${ACA_APP_WEB}.${ACA_ENV}.azurecontainerapps.io"
         log_info "Computed staging URL from Azure Container Apps: $resolved_url"
     else
-        log_warning "No staging URL configured and insufficient ACA variables"
+        log_error "No staging URL available. Please set one of:"
+        echo "  export STAGING_URL=https://your-app.azurewebsites.net"
+        echo "  OR"
+        echo "  export ACA_APP_WEB=your-app-name"
+        echo "  export ACA_ENV=your-aca-environment"
         return 1
     fi
     
