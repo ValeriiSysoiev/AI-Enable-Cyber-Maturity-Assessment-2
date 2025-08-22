@@ -1,0 +1,104 @@
+{
+  "version": "Notebook/1.0",
+  "items": [
+    {
+      "type": 1,
+      "content": {
+        "json": "# AECMA Production Monitoring Dashboard\n\nComprehensive monitoring for AI-Enabled Cyber Maturity Assessment platform"
+      },
+      "name": "header"
+    },
+    {
+      "type": 12,
+      "content": {
+        "version": "NotebookGroup/1.0",
+        "groupType": "editable",
+        "items": [
+          {
+            "type": 3,
+            "content": {
+              "version": "KqlItem/1.0",
+              "query": "ContainerAppConsoleLogs_CL\n| where TimeGenerated > ago(1h)\n| extend IsHealthy = case(\n    Log_s contains \"health\" and Log_s contains \"ok\", 1,\n    Log_s contains \"health\" and Log_s contains \"healthy\", 1,\n    Log_s contains \"health\" and (Log_s contains \"unhealthy\" or Log_s contains \"error\"), 0,\n    -1\n)\n| where IsHealthy >= 0\n| summarize \n    HealthyChecks = countif(IsHealthy == 1),\n    UnhealthyChecks = countif(IsHealthy == 0),\n    TotalChecks = count()\n    by bin(TimeGenerated, 5m), ContainerAppName_s\n| extend AvailabilityPercent = (HealthyChecks * 100.0) / TotalChecks",
+              "size": 0,
+              "title": "Service Availability",
+              "timeContext": {
+                "durationMs": 3600000
+              },
+              "queryType": 0,
+              "resourceType": "microsoft.operationalinsights/workspaces",
+              "visualization": "timechart"
+            },
+            "name": "availability-chart"
+          },
+          {
+            "type": 3,
+            "content": {
+              "version": "KqlItem/1.0",
+              "query": "ContainerAppConsoleLogs_CL\n| where TimeGenerated > ago(1h)\n| where Log_s contains \"response_time\"\n| extend ResponseTime = todouble(extract(@\"response_time[:\\s]+(\\d+\\.?\\d*)\", 1, Log_s))\n| where isnotnull(ResponseTime)\n| summarize \n    P50 = percentile(ResponseTime, 50),\n    P95 = percentile(ResponseTime, 95),\n    P99 = percentile(ResponseTime, 99)\n    by bin(TimeGenerated, 5m)",
+              "size": 0,
+              "title": "Response Time Percentiles",
+              "timeContext": {
+                "durationMs": 3600000
+              },
+              "queryType": 0,
+              "resourceType": "microsoft.operationalinsights/workspaces",
+              "visualization": "linechart"
+            },
+            "name": "latency-chart"
+          },
+          {
+            "type": 3,
+            "content": {
+              "version": "KqlItem/1.0",
+              "query": "ContainerAppConsoleLogs_CL\n| where TimeGenerated > ago(1h)\n| extend StatusCode = extract(@\"HTTP/\\d\\.\\d\\s(\\d{3})\", 1, Log_s)\n| where isnotnull(StatusCode)\n| summarize \n    Total = count(),\n    Errors5xx = countif(StatusCode startswith \"5\")\n    by bin(TimeGenerated, 5m)\n| extend ErrorRate = (Errors5xx * 100.0) / Total",
+              "size": 0,
+              "title": "5xx Error Rate",
+              "timeContext": {
+                "durationMs": 3600000
+              },
+              "queryType": 0,
+              "resourceType": "microsoft.operationalinsights/workspaces",
+              "visualization": "areachart"
+            },
+            "name": "error-rate-chart"
+          },
+          {
+            "type": 3,
+            "content": {
+              "version": "KqlItem/1.0",
+              "query": "Perf\n| where TimeGenerated > ago(1h)\n| where ObjectName == \"Container\" and CounterName == \"CPU Usage %\"\n| summarize \n    AvgCPU = avg(CounterValue),\n    MaxCPU = max(CounterValue)\n    by InstanceName, bin(TimeGenerated, 5m)",
+              "size": 0,
+              "title": "CPU Utilization",
+              "timeContext": {
+                "durationMs": 3600000
+              },
+              "queryType": 0,
+              "resourceType": "microsoft.operationalinsights/workspaces",
+              "visualization": "timechart"
+            },
+            "name": "cpu-chart"
+          },
+          {
+            "type": 3,
+            "content": {
+              "version": "KqlItem/1.0",
+              "query": "Perf\n| where TimeGenerated > ago(1h)\n| where ObjectName == \"Container\" and CounterName == \"Memory Usage MB\"\n| summarize \n    AvgMemory = avg(CounterValue),\n    MaxMemory = max(CounterValue)\n    by InstanceName, bin(TimeGenerated, 5m)",
+              "size": 0,
+              "title": "Memory Usage",
+              "timeContext": {
+                "durationMs": 3600000
+              },
+              "queryType": 0,
+              "resourceType": "microsoft.operationalinsights/workspaces",
+              "visualization": "timechart"
+            },
+            "name": "memory-chart"
+          }
+        ]
+      },
+      "name": "monitoring-group"
+    }
+  ],
+  "fallbackResourceIds": [],
+  "$schema": "https://github.com/Microsoft/Application-Insights-Workbooks/blob/master/schema/workbook.json"
+}

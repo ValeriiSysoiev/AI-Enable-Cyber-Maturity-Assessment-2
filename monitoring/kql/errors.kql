@@ -1,0 +1,40 @@
+// Error Analysis Queries for AECMA Production
+// Usage: Run in Log Analytics workspace
+
+// 1. Error Rate by Component (Last 1 hour)
+ContainerAppConsoleLogs_CL
+| where TimeGenerated > ago(1h)
+| where Log_s contains "ERROR" or Log_s contains "CRITICAL"
+| extend Component = case(
+    ContainerAppName_s contains "api", "API",
+    ContainerAppName_s contains "web", "Web",
+    "Unknown"
+)
+| summarize ErrorCount = count() by Component, bin(TimeGenerated, 5m)
+| render timechart
+
+// 2. Top 10 Error Messages
+ContainerAppConsoleLogs_CL
+| where TimeGenerated > ago(1h)
+| where Log_s contains "ERROR"
+| parse Log_s with * "[ERROR]" ErrorMessage
+| summarize Count = count() by ErrorMessage
+| top 10 by Count desc
+
+// 3. 5xx HTTP Errors
+ContainerAppConsoleLogs_CL
+| where TimeGenerated > ago(1h)
+| where Log_s contains "500" or Log_s contains "502" or Log_s contains "503"
+| extend StatusCode = extract(@"HTTP/\d\.\d\s(\d{3})", 1, Log_s)
+| where StatusCode startswith "5"
+| summarize Count = count() by StatusCode, bin(TimeGenerated, 5m)
+| render columnchart
+
+// 4. Failed Authentication Attempts
+ContainerAppConsoleLogs_CL
+| where TimeGenerated > ago(24h)
+| where Log_s contains "authentication failed" or Log_s contains "unauthorized"
+| extend User = extract(@"user[:\s]+(\S+)", 1, Log_s)
+| summarize FailedAttempts = count() by User, bin(TimeGenerated, 1h)
+| where FailedAttempts > 5
+| order by FailedAttempts desc
