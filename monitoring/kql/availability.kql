@@ -1,0 +1,53 @@
+// Availability and Health Queries for AECMA Production
+// Usage: Run in Log Analytics workspace
+
+// 1. Service Availability (5-minute windows)
+ContainerAppConsoleLogs_CL
+| where TimeGenerated > ago(1h)
+| extend IsHealthy = case(
+    Log_s contains "health" and Log_s contains "ok", 1,
+    Log_s contains "health" and Log_s contains "healthy", 1,
+    Log_s contains "health" and (Log_s contains "unhealthy" or Log_s contains "error"), 0,
+    -1
+)
+| where IsHealthy >= 0
+| summarize 
+    HealthyChecks = countif(IsHealthy == 1),
+    UnhealthyChecks = countif(IsHealthy == 0),
+    TotalChecks = count()
+    by bin(TimeGenerated, 5m), ContainerAppName_s
+| extend AvailabilityPercent = (HealthyChecks * 100.0) / TotalChecks
+| render timechart
+
+// 2. 5xx Error Rate
+ContainerAppConsoleLogs_CL
+| where TimeGenerated > ago(1h)
+| extend StatusCode = extract(@"HTTP/\d\.\d\s(\d{3})", 1, Log_s)
+| where isnotnull(StatusCode)
+| summarize 
+    Total = count(),
+    Errors5xx = countif(StatusCode startswith "5")
+    by bin(TimeGenerated, 5m)
+| extend ErrorRate = (Errors5xx * 100.0) / Total
+| project TimeGenerated, ErrorRate, Total, Errors5xx
+| render timechart
+
+// 3. Container Restart Events
+ContainerAppSystemLogs_CL
+| where TimeGenerated > ago(24h)
+| where Log_s contains "container restart" or Log_s contains "pod restart"
+| summarize RestartCount = count() by ContainerAppName_s, bin(TimeGenerated, 1h)
+| render columnchart
+
+// 4. Uptime Calculation (Last 30 days)
+ContainerAppConsoleLogs_CL
+| where TimeGenerated > ago(30d)
+| where Log_s contains "health"
+| extend IsUp = iff(Log_s contains "healthy" or Log_s contains "ok", 1, 0)
+| summarize 
+    TotalMinutes = count() * 5, // assuming 5-minute health checks
+    UpMinutes = sum(IsUp) * 5
+    by ContainerAppName_s
+| extend UptimePercent = (UpMinutes * 100.0) / TotalMinutes
+| project ContainerAppName_s, UptimePercent, TotalMinutes, UpMinutes
+| order by UptimePercent asc
