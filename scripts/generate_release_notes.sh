@@ -47,6 +47,8 @@ parse_commits() {
     categories[chore]="🔧 Chores"
     categories[ci]="👷 CI/CD"
     categories[security]="🔒 Security"
+    categories[release]="🚀 Release"
+    categories[prod]="🏭 Production"
     
     # Get commits in range
     local commits=$(git log --pretty=format:"%h|%s|%an|%ad" --date=short "$range" 2>/dev/null || echo "")
