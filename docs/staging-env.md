@@ -51,7 +51,21 @@ This guide covers two deployment paths for staging environment:
 ✓ Staging verification complete
 ```
 
-## Option 2: Azure Container Apps Path
+## Option 2: App Service Deploy
+
+For automated App Service deployment with GHCR images:
+
+### Variables Required
+- `APPSVC_RG` - Resource group containing App Services
+- `APPSVC_WEBAPP_WEB` - Web App Service name  
+- `APPSVC_WEBAPP_API` - API App Service name
+
+### Steps
+1. Set repo variables: `APPSVC_RG`, `APPSVC_WEBAPP_WEB`, `APPSVC_WEBAPP_API`
+2. Run **Deploy Staging** workflow 
+3. `./scripts/verify_live.sh --staging`
+
+## Option 3: Azure Container Apps Path
 
 ### Prerequisites
 - Azure subscription with OIDC configured
