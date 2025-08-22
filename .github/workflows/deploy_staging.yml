@@ -10,26 +10,46 @@ permissions:
   packages: write
   id-token: write
 
+# Read values from repository-level Actions Variables (Settings → Secrets and variables → Actions → Variables)
+# If a value is blank, the deploy job is skipped gracefully.
+env:
+  GHCR_ENABLED:            ${{ vars.GHCR_ENABLED || '1' }}
+  AZURE_SUBSCRIPTION_ID:   ${{ vars.AZURE_SUBSCRIPTION_ID }}
+  AZURE_TENANT_ID:         ${{ vars.AZURE_TENANT_ID }}
+  AZURE_CLIENT_ID:         ${{ vars.AZURE_CLIENT_ID }}
+  ACA_RG:                  ${{ vars.ACA_RG }}
+  ACA_ENV:                 ${{ vars.ACA_ENV }}
+  ACA_APP_API:             ${{ vars.ACA_APP_API }}
+  ACA_APP_WEB:             ${{ vars.ACA_APP_WEB }}
+  STAGING_URL:             ${{ vars.STAGING_URL }}
+
 jobs:
   build_and_push_ghcr:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+
       - name: Check GHCR toggle
+        shell: bash
         run: |
           if [ "${GHCR_ENABLED:-1}" != "1" ]; then
             echo "::notice::GHCR disabled; skipping image build/push"; exit 0; fi
+
       - name: Login to GHCR
         uses: docker/login-action@v3
         with:
           registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
+
       - name: Build & push API
+        shell: bash
         run: |
           docker build -t ghcr.io/${{ github.repository_owner }}/aecma-api:${{ github.sha }} ./app
           docker push ghcr.io/${{ github.repository_owner }}/aecma-api:${{ github.sha }}
+
       - name: Build & push Web
+        shell: bash
         run: |
           docker build -t ghcr.io/${{ github.repository_owner }}/aecma-web:${{ github.sha }} ./web
           docker push ghcr.io/${{ github.repository_owner }}/aecma-web:${{ github.sha }}
@@ -37,21 +57,47 @@ jobs:
   deploy_azure_aca:
     needs: build_and_push_ghcr
     runs-on: ubuntu-latest
+
+    # Auto-create/use the GitHub "staging" Environment on first run.
+    # (If you don't see Environments in the UI, this will create it implicitly.)
+    environment:
+      name: staging
+
+    # Skip deploy if required variables are not set
     if: ${{ env.AZURE_SUBSCRIPTION_ID != '' && env.AZURE_CLIENT_ID != '' && env.AZURE_TENANT_ID != '' && env.ACA_RG != '' && env.ACA_ENV != '' && env.ACA_APP_API != '' && env.ACA_APP_WEB != '' }}
+
     steps:
       - name: Azure login (OIDC)
         uses: azure/login@v2
         with:
-          client-id: ${{ env.AZURE_CLIENT_ID }}
-          tenant-id: ${{ env.AZURE_TENANT_ID }}
+          client-id:     ${{ env.AZURE_CLIENT_ID }}
+          tenant-id:     ${{ env.AZURE_TENANT_ID }}
           subscription-id: ${{ env.AZURE_SUBSCRIPTION_ID }}
+
       - name: Deploy API
+        shell: bash
         run: |
           az containerapp update \
-            --name $ACA_APP_API --resource-group $ACA_RG --environment $ACA_ENV \
-            --image ghcr.io/${{ github.repository_owner }}/aecma-api:${{ github.sha }} || true
+            --name "$ACA_APP_API" \
+            --resource-group "$ACA_RG" \
+            --environment "$ACA_ENV" \
+            --image "ghcr.io/${{ github.repository_owner }}/aecma-api:${{ github.sha }}" || true
+
       - name: Deploy Web
+        shell: bash
         run: |
           az containerapp update \
-            --name $ACA_APP_WEB --resource-group $ACA_RG --environment $ACA_ENV \
-            --image ghcr.io/${{ github.repository_owner }}/aecma-web:${{ github.sha }} || true
+            --name "$ACA_APP_WEB" \
+            --resource-group "$ACA_RG" \
+            --environment "$ACA_ENV" \
+            --image "ghcr.io/${{ github.repository_owner }}/aecma-web:${{ github.sha }}" || true
+
+      - name: Compute & print staging URL
+        id: staging_url
+        shell: bash
+        run: |
+          if [[ -n "${STAGING_URL}" ]]; then
+            echo "STAGING_URL=${STAGING_URL}"
+          else
+            echo "STAGING_URL=https://${ACA_APP_WEB}.${ACA_ENV}.azurecontainerapps.io"
+          fi
