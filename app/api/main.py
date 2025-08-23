@@ -55,6 +55,21 @@ async def on_startup():
     )
     logger = logging.getLogger(__name__)
     
+    # Check and log CI/ML mode configuration
+    ci_mode = os.getenv('CI_MODE', '0') == '1'
+    ml_disabled = os.getenv('DISABLE_ML', '0') == '1'
+    
+    if ci_mode or ml_disabled:
+        logger.info(
+            "Application starting in CI/lightweight mode",
+            extra={
+                "ci_mode": ci_mode,
+                "ml_disabled": ml_disabled,
+                "heavy_deps_skipped": True,
+                "performance_mode": "optimized"
+            }
+        )
+    
     create_db_and_tables()
     # Wire up new domain dependencies
     app.state.repo = FileRepository()
