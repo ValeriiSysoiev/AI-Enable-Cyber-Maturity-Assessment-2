@@ -1,0 +1,37 @@
+{
+  "exclude": [
+    "**/node_modules/**",
+    "**/.next/**",
+    "**/dist/**",
+    "**/out/**",
+    "**/build/**",
+    "**/.git/**",
+    "**/.cache/**",
+    "**/coverage/**",
+    "**/*.min.js",
+    "**/*.bundle.js"
+  ],
+  "failThreshold": "high",
+  "ignorePatterns": [
+    "test-*.js",
+    "*.test.ts",
+    "*.spec.ts",
+    "*.test.tsx",
+    "*.spec.tsx",
+    "*.test.js",
+    "*.spec.js",
+    "__tests__/**",
+    "__mocks__/**"
+  ],
+  "rules": {
+    "no-eval": "error",
+    "no-unsafe-innerHTML": "error",
+    "no-hardcoded-secrets": "error",
+    "sql-injection": "error",
+    "xss": "error",
+    "path-traversal": "error",
+    "command-injection": "error"
+  },
+  "timeout": 300,
+  "maxFileSize": "5MB"
+}
