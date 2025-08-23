@@ -179,4 +179,3 @@ jobs:
           else
             echo "::notice::STAGING_URL=(not set)"
           fi
-```
