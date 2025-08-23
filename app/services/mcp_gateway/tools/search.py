@@ -3,12 +3,25 @@ MCP Search tools implementation.
 Provides text embedding and vector search using sentence-transformers.
 """
 import json
-import numpy as np
+import os
 from pathlib import Path
 from typing import Dict, Any, Optional, List, Tuple
 from pydantic import BaseModel, Field
-from sentence_transformers import SentenceTransformer
 from util.logging import get_correlated_logger, log_operation
+
+# Conditional imports for heavy ML dependencies
+try:
+    import numpy as np
+    from sentence_transformers import SentenceTransformer
+    HAS_ML_DEPENDENCIES = True
+except ImportError:
+    # Mock classes for CI environment without heavy ML dependencies
+    np = None
+    SentenceTransformer = None
+    HAS_ML_DEPENDENCIES = False
+
+# Check if ML features are disabled via environment variables
+ML_DISABLED = os.getenv('DISABLE_ML', '0') == '1' or os.getenv('CI_MODE', '0') == '1'
 
 from ..config import MCPConfig, MCPOperationContext
 from ..security import MCPSecurityValidator, redact_sensitive_content
@@ -72,9 +85,25 @@ class MCPSearchTool:
         self.config = config
         self.tool_config = config.search
         self._models = {}  # Cache for loaded models
+        
+        # Check if ML features are available and enabled
+        if ML_DISABLED or not HAS_ML_DEPENDENCIES:
+            self._ml_available = False
+        else:
+            self._ml_available = True
+    
+    def _check_ml_available(self):
+        """Check if ML features are available and raise appropriate error if not"""
+        if not self._ml_available:
+            if ML_DISABLED:
+                raise ValueError("ML features are disabled via environment variables (DISABLE_ML=1 or CI_MODE=1)")
+            else:
+                raise ValueError("ML dependencies not available. Install sentence-transformers and numpy for vector search features.")
     
     def _get_model(self, model_name: str) -> SentenceTransformer:
         """Get or load sentence transformer model"""
+        self._check_ml_available()
+        
         if model_name not in self._models:
             try:
                 self._models[model_name] = SentenceTransformer(model_name)
@@ -115,6 +144,9 @@ class MCPSearchTool:
             )
             
             try:
+                # Check if ML features are available
+                self._check_ml_available()
+                
                 # Validate input texts
                 if not request.texts:
                     raise ValueError("No texts provided for embedding")
@@ -234,6 +266,9 @@ class MCPSearchTool:
             )
             
             try:
+                # Check if ML features are available
+                self._check_ml_available()
+                
                 # Validate query
                 if not request.query.strip():
                     raise ValueError("Query cannot be empty")
