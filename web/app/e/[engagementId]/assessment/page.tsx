@@ -135,7 +135,7 @@ export default function AssessmentPage() {
   const [functions, setFunctions] = useState<CSFFunction[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [selectedSubcategory, setSelectedSubcategory] = useState<CSFSubcategory | undefined>();
+  const [selectedSubcategory, setSelectedSubcategory] = useState<CSFSubcategory | null>(null);
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [correlationId] = useState(() => `csf-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`);
   
