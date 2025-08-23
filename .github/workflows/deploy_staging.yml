@@ -58,7 +58,7 @@ jobs:
           context: ./api
           push: true
           tags: |
-            ghcr.io/${{ github.repository_owner }}/aecma-api: ${{ github.sha }}
+            ghcr.io/${{ github.repository_owner }}/aecma-api:${{ github.sha }}
             ghcr.io/${{ github.repository_owner }}/aecma-api:staging
           cache-from: type=gha
           cache-to: type=gha,mode=max
@@ -80,7 +80,7 @@ jobs:
     needs: build_and_push_ghcr
     environment: 
       name: staging
-    if: ${{ env.AZURE_SUBSCRIPTION_ID != '' && env.AZURE_CLIENT_ID != '' && env.AZURE_TENANT_ID!= '' && env.ACA_RG != '' && env.ACA_ENV != '' && env.ACA_APP_API != '' && env.ACA_APP_WEB != '' }}
+    if: ${{ env.AZURE_SUBSCRIPTION_ID != '' && env.AZURE_CLIENT_ID != '' && env.AZURE_TENANT_ID != '' && env.ACA_RG != '' && env.ACA_ENV != '' && env.ACA_APP_API != '' && env.ACA_APP_WEB != '' }}
     
     steps:
       - uses: actions/checkout@v4
@@ -170,13 +170,13 @@ jobs:
       - name: Compute & print STAGING_URL
         run: |
           if [[ -n "${STAGING_URL}" ]]; then
-            echo "::notice::STAGING_URL=${STAGING_URL}"
+            echo "::notice::STAGING_URL=${STAGING_UXL}"
           elif [[ -n "${ACA_APP_WEB}" && -n "${ACA_ENV}" ]]; then
             COMPUTED_URL="https://${ACA_APP_WEB}.${ACA_ENV}.azurecontainerapps.io"
             echo "::notice::STAGING_URL=${COMPUTED_URL}"
           elif [[ -n "${APPSVC_WEBAPP_WEB}" ]]; then
             COMPUTED_URL="https://${APPSVC_WEBAPP_WEB}.azurewebsites.net"
-            echo "::notice::STAGING_URL=${COMPUTED_URL}"
+            echo "::notice::STAGING_URL=${COMPUTED_UXL}"
           else
-            echo "::notice::STAGING_URL=(not set)"
+            echo "::notice::STAGING_UX]=(not set)"
           fi
