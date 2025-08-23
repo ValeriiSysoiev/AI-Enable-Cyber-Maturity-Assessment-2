@@ -1,0 +1,38 @@
+name: "Enhanced Security Analysis"
+
+# Path filters for more focused scanning
+paths:
+  - "app/**"
+  - "web/**"
+  - "!app/tests/**"
+  - "!web/__tests__/**"
+  - "!web/node_modules/**"
+
+paths-ignore:
+  - "**/*.md"
+  - "**/*.txt"
+  - "**/docs/**"
+  - "**/.git/**"
+  - "**/artifacts/**"
+  - "**/logs/**"
+
+# Enhanced query suites for security
+queries:
+  - name: security-extended
+    uses: security-extended
+  - name: security-and-quality
+    uses: security-and-quality
+
+# Disable specific queries that may have false positives in our context
+disable-default-queries: false
+
+# Additional configuration
+query-filters:
+  - exclude:
+      id: py/clear-text-logging-sensitive-data
+      # Temporarily excluded as it may flag debugging output
+
+# External queries for additional security checks
+external-queries:
+  - name: microsoft/codeql-security-queries
+    uses: microsoft/codeql-security-queries

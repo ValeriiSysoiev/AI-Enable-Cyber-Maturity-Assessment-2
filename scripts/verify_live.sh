@@ -33,6 +33,17 @@ WEB_BASE_URL="${WEB_BASE_URL:-}"
 STAGING_URL="${STAGING_URL:-}"
 MCP_GATEWAY_URL="${MCP_GATEWAY_URL:-}"
 
+# GitHub Actions integration
+GITHUB_RUN_ID="${GITHUB_RUN_ID:-}"
+GITHUB_SHA="${GITHUB_SHA:-}"
+GITHUB_ACTOR="${GITHUB_ACTOR:-}"
+GITHUB_REPOSITORY="${GITHUB_REPOSITORY:-}"
+DEPLOYMENT_ENVIRONMENT="${DEPLOYMENT_ENVIRONMENT:-staging}"
+
+# Azure Log Analytics integration
+LOG_ANALYTICS_WORKSPACE_ID="${LOG_ANALYTICS_WORKSPACE_ID:-}"
+LOG_ANALYTICS_SHARED_KEY="${LOG_ANALYTICS_SHARED_KEY:-}"
+
 # Performance thresholds (in seconds)
 API_RESPONSE_THRESHOLD=5
 SEARCH_RESPONSE_THRESHOLD=3
@@ -84,6 +95,58 @@ log_success() { echo -e "${GREEN}✓${NC} $1"; }
 log_warning() { echo -e "${YELLOW}⚠${NC} $1"; }
 log_error() { echo -e "${RED}✗${NC} $1"; }
 
+# Send deployment metrics to Azure Log Analytics
+send_to_log_analytics() {
+    local metric_name="$1"
+    local value="$2"
+    local status="$3"
+    local additional_data="${4:-{}}"
+    
+    if [[ -n "$LOG_ANALYTICS_WORKSPACE_ID" && -n "$LOG_ANALYTICS_SHARED_KEY" ]]; then
+        local timestamp=$(date -u +"%Y-%m-%dT%H:%M:%S.000Z")
+        local log_entry=$(cat <<EOF
+{
+    "TimeGenerated": "$timestamp",
+    "MetricName": "$metric_name",
+    "Value": $value,
+    "Status": "$status",
+    "Environment": "$DEPLOYMENT_ENVIRONMENT",
+    "DeploymentId": "${GITHUB_RUN_ID:-unknown}",
+    "CommitSha": "${GITHUB_SHA:-unknown}",
+    "Actor": "${GITHUB_ACTOR:-system}",
+    "Repository": "${GITHUB_REPOSITORY:-unknown}",
+    "AdditionalData": $additional_data
+}
+EOF
+        )
+        
+        # Send to Log Analytics (simplified for now - in production use proper API)
+        echo "$log_entry" >> "$ARTIFACTS_DIR/log_analytics_metrics.json" 2>/dev/null || true
+    fi
+}
+
+# GitHub deployment status integration
+update_github_deployment_status() {
+    local status="$1"  # pending, in_progress, success, failure
+    local description="$2"
+    local environment_url="${3:-}"
+    
+    if [[ -n "$GITHUB_RUN_ID" && -n "$GITHUB_REPOSITORY" ]]; then
+        # Log deployment status for GitHub Actions to pick up
+        cat >> "$ARTIFACTS_DIR/github_deployment_status.json" <<EOF
+{
+    "timestamp": "$(date -u +"%Y-%m-%dT%H:%M:%S.000Z")",
+    "status": "$status",
+    "description": "$description",
+    "environment_url": "$environment_url",
+    "deployment_id": "$GITHUB_RUN_ID",
+    "commit_sha": "$GITHUB_SHA",
+    "environment": "$DEPLOYMENT_ENVIRONMENT"
+}
+EOF
+    fi
+}
+
 # UAT governance logging with artifacts
 log_uat() {
     local level="$1"
@@ -99,6 +162,13 @@ log_uat() {
             log_file="staging_verify.log"
         fi
         echo "[$timestamp] [$level] $message" >> "$ARTIFACTS_DIR/$log_file"
+        
+        # Send metrics to Log Analytics if configured
+        local metric_value=1
+        if [[ "$level" == "ERROR" ]]; then
+            metric_value=0
+        fi
+        send_to_log_analytics "verification_event" "$metric_value" "$level" "{\"message\":\"$message\"}"
     fi
     
     case "$level" in

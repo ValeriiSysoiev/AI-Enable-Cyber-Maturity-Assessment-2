@@ -163,7 +163,11 @@ const EvidenceItem: React.FC<EvidenceItemProps> = ({
                       onKeyDown={(e) => {
                         if (e.key === 'Enter' || e.key === ' ') {
                           e.preventDefault();
-                          handleCitationClick(citation, e);
+                          // Create a synthetic mouse event for the citation click
+                          const syntheticEvent = {
+                            stopPropagation: () => e.stopPropagation(),
+                          } as React.MouseEvent;
+                          handleCitationClick(citation, syntheticEvent);
                         }
                       }}
                     >
