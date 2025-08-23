@@ -24,7 +24,7 @@ RUN npm run build
 FROM node:20-alpine AS runner
 WORKDIR /app
 ENV NODE_ENV=production
-# Default to port 3000, but allow override
+# Ensure Next.js starts on port 3000 by default, allow override
 ENV PORT=3000
 # Re-expose public env var for runtime (also embedded at build time)
 ARG NEXT_PUBLIC_API_BASE_URL=""
