@@ -1,0 +1,19 @@
+name: validate
+on: [push, pull_request]
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: 
+          node-version: "18"
+          cache: "npm"
+          cache-dependency-path: "web/package-lock.json"
+      - name: web install/build
+        run: |
+          if [ -f web/package.json ]; then
+            cd web
+            npm ci
+            npm run build --if-present
+          fi
