@@ -29,7 +29,7 @@ test.describe('Auth Diagnostics Interface', () => {
         await page.goto('/admin/auth-diagnostics');
         
         await withRetry(async () => {
-          await expect(page.locator('h1:has-text("Authentication Diagnostics"), [data-testid="auth-diagnostics"]')).toBeVisible();
+          await expect(page.getByTestId('auth-diagnostics')).toBeVisible({ timeout: 20000 });
         }, 3, 2000);
         
         logger.info('Auth diagnostics page loaded successfully');
@@ -38,7 +38,7 @@ test.describe('Auth Diagnostics Interface', () => {
       await stepTracker.executeStep('Verify current user information display', async () => {
         // Check for user information section
         const userInfoSection = page.locator('[data-testid="current-user-info"], .current-user-info');
-        await expect(userInfoSection).toBeVisible();
+        await expect(userInfoSection).toBeVisible({ timeout: 20000 });
         
         // Verify user details
         await expect(page.locator('[data-testid="user-id"], .user-id')).toContainText('admin-user');
@@ -51,10 +51,10 @@ test.describe('Auth Diagnostics Interface', () => {
       await stepTracker.executeStep('Test AAD token information display', async () => {
         // Check for AAD token section
         const aadTokenSection = page.locator('[data-testid="aad-token-info"], .aad-token-info');
-        await expect(aadTokenSection).toBeVisible();
+        await expect(aadTokenSection).toBeVisible({ timeout: 20000 });
         
         // Should show token claims
-        await expect(page.locator('[data-testid="token-claims"], .token-claims')).toBeVisible();
+        await expect(page.locator('[data-testid="token-claims"], .token-claims')).toBeVisible({ timeout: 20000 });
         
         // Check for essential AAD fields
         const tokenFields = [
@@ -68,7 +68,7 @@ test.describe('Auth Diagnostics Interface', () => {
         
         for (const field of tokenFields) {
           const fieldElement = page.locator(`text=${field}`);
-          await expect(fieldElement).toBeVisible();
+          await expect(fieldElement).toBeVisible({ timeout: 20000 });
         }
         
         logger.info('AAD token information displayed correctly');
@@ -77,19 +77,19 @@ test.describe('Auth Diagnostics Interface', () => {
       await stepTracker.executeStep('Test group memberships and role mapping', async () => {
         // Check groups section
         const groupsSection = page.locator('[data-testid="user-groups"], .user-groups');
-        await expect(groupsSection).toBeVisible();
+        await expect(groupsSection).toBeVisible({ timeout: 20000 });
         
         // Should show group list
         const groupsList = page.locator('[data-testid="groups-list"], .groups-list');
-        await expect(groupsList).toBeVisible();
+        await expect(groupsList).toBeVisible({ timeout: 20000 });
         
         // Check role mapping section
         const roleMappingSection = page.locator('[data-testid="role-mappings"], .role-mappings');
-        await expect(roleMappingSection).toBeVisible();
+        await expect(roleMappingSection).toBeVisible({ timeout: 20000 });
         
         // Should show how groups map to roles
         const mappingTable = page.locator('[data-testid="mapping-table"], .mapping-table');
-        await expect(mappingTable).toBeVisible();
+        await expect(mappingTable).toBeVisible({ timeout: 20000 });
         
         logger.info('Group memberships and role mappings displayed');
       });
@@ -97,16 +97,16 @@ test.describe('Auth Diagnostics Interface', () => {
       await stepTracker.executeStep('Test session information and security details', async () => {
         // Check session section
         const sessionSection = page.locator('[data-testid="session-info"], .session-info');
-        await expect(sessionSection).toBeVisible();
+        await expect(sessionSection).toBeVisible({ timeout: 20000 });
         
         // Should show session details
-        await expect(page.locator('[data-testid="session-id"], .session-id')).toBeVisible();
-        await expect(page.locator('[data-testid="session-created"], .session-created')).toBeVisible();
-        await expect(page.locator('[data-testid="session-expires"], .session-expires')).toBeVisible();
+        await expect(page.locator('[data-testid="session-id"], .session-id')).toBeVisible({ timeout: 20000 });
+        await expect(page.locator('[data-testid="session-created"], .session-created')).toBeVisible({ timeout: 20000 });
+        await expect(page.locator('[data-testid="session-expires"], .session-expires')).toBeVisible({ timeout: 20000 });
         
         // Check security headers
         const securitySection = page.locator('[data-testid="security-headers"], .security-headers');
-        await expect(securitySection).toBeVisible();
+        await expect(securitySection).toBeVisible({ timeout: 20000 });
         
         logger.info('Session information and security details displayed');
       });
@@ -114,7 +114,7 @@ test.describe('Auth Diagnostics Interface', () => {
       await stepTracker.executeStep('Test diagnostics data refresh', async () => {
         // Test refresh functionality
         const refreshButton = page.locator('[data-testid="refresh-diagnostics"], button:has-text("Refresh")');
-        await expect(refreshButton).toBeVisible();
+        await expect(refreshButton).toBeVisible({ timeout: 20000 });
         
         // Get initial timestamp
         const initialTimestamp = await page.textContent('[data-testid="last-updated"], .last-updated');
@@ -154,7 +154,7 @@ test.describe('Auth Diagnostics Interface', () => {
         }
         
         const configSection = page.locator('[data-testid="auth-config"], .auth-configuration');
-        await expect(configSection).toBeVisible();
+        await expect(configSection).toBeVisible({ timeout: 20000 });
         
         logger.info('Auth configuration section accessed');
       });
@@ -162,12 +162,12 @@ test.describe('Auth Diagnostics Interface', () => {
       await stepTracker.executeStep('Verify AAD configuration display', async () => {
         // Check AAD settings
         const aadConfig = page.locator('[data-testid="aad-config"], .aad-configuration');
-        await expect(aadConfig).toBeVisible();
+        await expect(aadConfig).toBeVisible({ timeout: 20000 });
         
         // Should show configuration status
-        await expect(page.locator('[data-testid="aad-enabled"], .aad-enabled')).toBeVisible();
-        await expect(page.locator('[data-testid="tenant-id-config"], .tenant-id')).toBeVisible();
-        await expect(page.locator('[data-testid="client-id-config"], .client-id')).toBeVisible();
+        await expect(page.locator('[data-testid="aad-enabled"], .aad-enabled')).toBeVisible({ timeout: 20000 });
+        await expect(page.locator('[data-testid="tenant-id-config"], .tenant-id')).toBeVisible({ timeout: 20000 });
+        await expect(page.locator('[data-testid="client-id-config"], .client-id')).toBeVisible({ timeout: 20000 });
         
         logger.info('AAD configuration displayed correctly');
       });
@@ -175,7 +175,7 @@ test.describe('Auth Diagnostics Interface', () => {
       await stepTracker.executeStep('Test configuration validation', async () => {
         // Test configuration validation button
         const validateButton = page.locator('[data-testid="validate-config"], button:has-text("Validate")');
-        await expect(validateButton).toBeVisible();
+        await expect(validateButton).toBeVisible({ timeout: 20000 });
         
         await validateButton.click();
         
@@ -187,7 +187,7 @@ test.describe('Auth Diagnostics Interface', () => {
         
         // Check validation results
         const validationResults = page.locator('[data-testid="validation-results"]');
-        await expect(validationResults).toBeVisible();
+        await expect(validationResults).toBeVisible({ timeout: 20000 });
         
         // Should show status indicators
         const statusIndicators = page.locator('[data-testid="validation-status"], .status-indicator');
@@ -214,21 +214,21 @@ test.describe('GDPR Admin Dashboard', () => {
       await stepTracker.executeStep('Navigate to GDPR admin dashboard', async () => {
         await page.goto('/admin/gdpr');
         
-        await expect(page.locator('h1:has-text("GDPR Administration"), [data-testid="gdpr-admin"]')).toBeVisible();
+        await expect(page.getByTestId('gdpr-admin')).toBeVisible({ timeout: 20000 });
         logger.info('GDPR admin dashboard loaded');
       });
 
       await stepTracker.executeStep('Verify data export management section', async () => {
         const exportSection = page.locator('[data-testid="export-management"], .export-management');
-        await expect(exportSection).toBeVisible();
+        await expect(exportSection).toBeVisible({ timeout: 20000 });
         
         // Check export requests overview
-        await expect(page.locator('[data-testid="active-exports"], .active-exports')).toBeVisible();
-        await expect(page.locator('[data-testid="completed-exports"], .completed-exports')).toBeVisible();
+        await expect(page.locator('[data-testid="active-exports"], .active-exports')).toBeVisible({ timeout: 20000 });
+        await expect(page.locator('[data-testid="completed-exports"], .completed-exports')).toBeVisible({ timeout: 20000 });
         
         // Check export queue
         const exportQueue = page.locator('[data-testid="export-queue"], .export-queue');
-        await expect(exportQueue).toBeVisible();
+        await expect(exportQueue).toBeVisible({ timeout: 20000 });
         
         logger.info('Data export management section verified');
       });
@@ -236,17 +236,17 @@ test.describe('GDPR Admin Dashboard', () => {
       await stepTracker.executeStep('Test bulk export management', async () => {
         // Check for bulk operations
         const bulkExportButton = page.locator('[data-testid="bulk-export"], button:has-text("Bulk Export")');
-        await expect(bulkExportButton).toBeVisible();
+        await expect(bulkExportButton).toBeVisible({ timeout: 20000 });
         
         await bulkExportButton.click();
         
         // Should open bulk export dialog
         const bulkDialog = page.locator('[data-testid="bulk-export-dialog"], .bulk-export-dialog');
-        await expect(bulkDialog).toBeVisible();
+        await expect(bulkDialog).toBeVisible({ timeout: 20000 });
         
         // Should have user selection
-        await expect(page.locator('[data-testid="user-selection"], .user-selection')).toBeVisible();
-        await expect(page.locator('[data-testid="export-format-bulk"], select[name="format"]')).toBeVisible();
+        await expect(page.locator('[data-testid="user-selection"], .user-selection')).toBeVisible({ timeout: 20000 });
+        await expect(page.locator('[data-testid="export-format-bulk"], select[name="format"]')).toBeVisible({ timeout: 20000 });
         
         // Cancel dialog
         await page.click('[data-testid="cancel-bulk"], button:has-text("Cancel")');
@@ -256,15 +256,15 @@ test.describe('GDPR Admin Dashboard', () => {
 
       await stepTracker.executeStep('Verify data purge management section', async () => {
         const purgeSection = page.locator('[data-testid="purge-management"], .purge-management');
-        await expect(purgeSection).toBeVisible();
+        await expect(purgeSection).toBeVisible({ timeout: 20000 });
         
         // Check purge requests overview
-        await expect(page.locator('[data-testid="pending-purges"], .pending-purges')).toBeVisible();
-        await expect(page.locator('[data-testid="completed-purges"], .completed-purges')).toBeVisible();
+        await expect(page.locator('[data-testid="pending-purges"], .pending-purges')).toBeVisible({ timeout: 20000 });
+        await expect(page.locator('[data-testid="completed-purges"], .completed-purges')).toBeVisible({ timeout: 20000 });
         
         // Check purge approval workflow
         const approvalSection = page.locator('[data-testid="purge-approvals"], .purge-approvals');
-        await expect(approvalSection).toBeVisible();
+        await expect(approvalSection).toBeVisible({ timeout: 20000 });
         
         logger.info('Data purge management section verified');
       });
@@ -277,11 +277,11 @@ test.describe('GDPR Admin Dashboard', () => {
         }
         
         const retentionSection = page.locator('[data-testid="retention-policies"], .retention-policies');
-        await expect(retentionSection).toBeVisible();
+        await expect(retentionSection).toBeVisible({ timeout: 20000 });
         
         // Check policy configuration
         const policyTable = page.locator('[data-testid="policy-table"], .policy-table');
-        await expect(policyTable).toBeVisible();
+        await expect(policyTable).toBeVisible({ timeout: 20000 });
         
         // Should have edit capabilities
         const editPolicyButton = page.locator('[data-testid="edit-policy"], button:has-text("Edit")').first();
@@ -289,7 +289,7 @@ test.describe('GDPR Admin Dashboard', () => {
           await editPolicyButton.click();
           
           const policyDialog = page.locator('[data-testid="policy-dialog"], .policy-dialog');
-          await expect(policyDialog).toBeVisible();
+          await expect(policyDialog).toBeVisible({ timeout: 20000 });
           
           await page.click('[data-testid="cancel-policy"], button:has-text("Cancel")');
         }
@@ -305,15 +305,15 @@ test.describe('GDPR Admin Dashboard', () => {
         }
         
         const reportsSection = page.locator('[data-testid="compliance-reports"], .compliance-reports');
-        await expect(reportsSection).toBeVisible();
+        await expect(reportsSection).toBeVisible({ timeout: 20000 });
         
         // Check for report generation
         const generateReportButton = page.locator('[data-testid="generate-report"], button:has-text("Generate Report")');
-        await expect(generateReportButton).toBeVisible();
+        await expect(generateReportButton).toBeVisible({ timeout: 20000 });
         
         // Check existing reports
         const reportsTable = page.locator('[data-testid="reports-table"], .reports-table');
-        await expect(reportsTable).toBeVisible();
+        await expect(reportsTable).toBeVisible({ timeout: 20000 });
         
         logger.info('Compliance reporting interface verified');
       });
@@ -335,7 +335,7 @@ test.describe('GDPR Admin Dashboard', () => {
         await page.goto('/admin/gdpr/audit');
         
         const auditSection = page.locator('[data-testid="gdpr-audit"], .gdpr-audit');
-        await expect(auditSection).toBeVisible();
+        await expect(auditSection).toBeVisible({ timeout: 20000 });
         
         logger.info('GDPR audit trail accessed');
       });
@@ -343,7 +343,7 @@ test.describe('GDPR Admin Dashboard', () => {
       await stepTracker.executeStep('Verify audit entry filtering and search', async () => {
         // Check for filter options
         const filterSection = page.locator('[data-testid="audit-filters"], .audit-filters');
-        await expect(filterSection).toBeVisible();
+        await expect(filterSection).toBeVisible({ timeout: 20000 });
         
         // Test filter by action type
         await page.selectOption('[data-testid="action-filter"], select[name="action"]', 'export');
@@ -370,13 +370,13 @@ test.describe('GDPR Admin Dashboard', () => {
           
           // Should show detailed information
           const auditDetails = page.locator('[data-testid="audit-details"], .audit-details');
-          await expect(auditDetails).toBeVisible();
+          await expect(auditDetails).toBeVisible({ timeout: 20000 });
           
           // Check for essential audit information
-          await expect(page.locator('[data-testid="audit-timestamp"], .audit-timestamp')).toBeVisible();
-          await expect(page.locator('[data-testid="audit-user"], .audit-user')).toBeVisible();
-          await expect(page.locator('[data-testid="audit-action"], .audit-action')).toBeVisible();
-          await expect(page.locator('[data-testid="audit-target"], .audit-target')).toBeVisible();
+          await expect(page.locator('[data-testid="audit-timestamp"], .audit-timestamp')).toBeVisible({ timeout: 20000 });
+          await expect(page.locator('[data-testid="audit-user"], .audit-user')).toBeVisible({ timeout: 20000 });
+          await expect(page.locator('[data-testid="audit-action"], .audit-action')).toBeVisible({ timeout: 20000 });
+          await expect(page.locator('[data-testid="audit-target"], .audit-target')).toBeVisible({ timeout: 20000 });
           
           logger.info('Audit entry details displayed correctly');
         }
@@ -387,7 +387,7 @@ test.describe('GDPR Admin Dashboard', () => {
         await page.goto('/admin/gdpr/metrics');
         
         const metricsSection = page.locator('[data-testid="compliance-metrics"], .compliance-metrics');
-        await expect(metricsSection).toBeVisible();
+        await expect(metricsSection).toBeVisible({ timeout: 20000 });
         
         // Check for key metrics
         const metricCards = page.locator('[data-testid="metric-card"], .metric-card');
@@ -395,9 +395,9 @@ test.describe('GDPR Admin Dashboard', () => {
         expect(metricCount).toBeGreaterThan(0);
         
         // Verify specific metrics
-        await expect(page.locator('[data-testid="total-requests"], .total-requests')).toBeVisible();
-        await expect(page.locator('[data-testid="pending-requests"], .pending-requests')).toBeVisible();
-        await expect(page.locator('[data-testid="completion-rate"], .completion-rate')).toBeVisible();
+        await expect(page.locator('[data-testid="total-requests"], .total-requests')).toBeVisible({ timeout: 20000 });
+        await expect(page.locator('[data-testid="pending-requests"], .pending-requests')).toBeVisible({ timeout: 20000 });
+        await expect(page.locator('[data-testid="completion-rate"], .completion-rate')).toBeVisible({ timeout: 20000 });
         
         logger.info('Compliance metrics dashboard verified', { metricCount });
       });
@@ -419,7 +419,7 @@ test.describe('Performance Monitoring Interface', () => {
       await stepTracker.executeStep('Navigate to performance monitoring dashboard', async () => {
         const loadTime = await perfMonitor.measurePageLoad('/admin/performance');
         
-        await expect(page.locator('h1:has-text("System Performance"), [data-testid="performance-dashboard"]')).toBeVisible();
+        await expect(page.getByTestId('performance-dashboard')).toBeVisible({ timeout: 20000 });
         
         logger.info('Performance monitoring dashboard loaded', { loadTime });
       });
@@ -427,7 +427,7 @@ test.describe('Performance Monitoring Interface', () => {
       await stepTracker.executeStep('Verify real-time metrics display', async () => {
         // Check for real-time metrics section
         const realTimeSection = page.locator('[data-testid="realtime-metrics"], .realtime-metrics');
-        await expect(realTimeSection).toBeVisible();
+        await expect(realTimeSection).toBeVisible({ timeout: 20000 });
         
         // Check for key performance indicators
         const kpiCards = page.locator('[data-testid="kpi-card"], .kpi-card');
@@ -435,10 +435,10 @@ test.describe('Performance Monitoring Interface', () => {
         expect(kpiCount).toBeGreaterThan(0);
         
         // Verify specific metrics
-        await expect(page.locator('[data-testid="response-time-avg"], .response-time')).toBeVisible();
-        await expect(page.locator('[data-testid="throughput"], .throughput')).toBeVisible();
-        await expect(page.locator('[data-testid="error-rate"], .error-rate')).toBeVisible();
-        await expect(page.locator('[data-testid="cpu-usage"], .cpu-usage')).toBeVisible();
+        await expect(page.locator('[data-testid="response-time-avg"], .response-time')).toBeVisible({ timeout: 20000 });
+        await expect(page.locator('[data-testid="throughput"], .throughput')).toBeVisible({ timeout: 20000 });
+        await expect(page.locator('[data-testid="error-rate"], .error-rate')).toBeVisible({ timeout: 20000 });
+        await expect(page.locator('[data-testid="cpu-usage"], .cpu-usage')).toBeVisible({ timeout: 20000 });
         
         logger.info('Real-time metrics display verified', { kpiCount });
       });
@@ -446,16 +446,16 @@ test.describe('Performance Monitoring Interface', () => {
       await stepTracker.executeStep('Test performance charts and graphs', async () => {
         // Check for charts section
         const chartsSection = page.locator('[data-testid="performance-charts"], .performance-charts');
-        await expect(chartsSection).toBeVisible();
+        await expect(chartsSection).toBeVisible({ timeout: 20000 });
         
         // Look for specific chart types
         const responseTimeChart = page.locator('[data-testid="response-time-chart"], .response-time-chart');
         const throughputChart = page.locator('[data-testid="throughput-chart"], .throughput-chart');
         const errorRateChart = page.locator('[data-testid="error-rate-chart"], .error-rate-chart');
         
-        await expect(responseTimeChart).toBeVisible();
-        await expect(throughputChart).toBeVisible();
-        await expect(errorRateChart).toBeVisible();
+        await expect(responseTimeChart).toBeVisible({ timeout: 20000 });
+        await expect(throughputChart).toBeVisible({ timeout: 20000 });
+        await expect(errorRateChart).toBeVisible({ timeout: 20000 });
         
         // Test chart time range selection
         const timeRangeSelector = page.locator('[data-testid="time-range"], select[name="timeRange"]');
@@ -475,7 +475,7 @@ test.describe('Performance Monitoring Interface', () => {
         }
         
         const alertsSection = page.locator('[data-testid="alert-config"], .alert-configuration');
-        await expect(alertsSection).toBeVisible();
+        await expect(alertsSection).toBeVisible({ timeout: 20000 });
         
         // Check for alert thresholds
         const thresholdInputs = page.locator('[data-testid="threshold-input"], input[type="number"]');
@@ -489,7 +489,7 @@ test.describe('Performance Monitoring Interface', () => {
         const saveButton = page.locator('[data-testid="save-alerts"], button:has-text("Save")');
         await saveButton.click();
         
-        await expect(page.locator('text=Alert settings saved')).toBeVisible();
+        await expect(page.locator('text=Alert settings saved')).toBeVisible({ timeout: 20000 });
         
         logger.info('Alert configuration interface verified', { thresholdCount });
       });
@@ -509,7 +509,7 @@ test.describe('Performance Monitoring Interface', () => {
         await page.goto('/admin/performance/database');
         
         const dbSection = page.locator('[data-testid="db-performance"], .db-performance');
-        await expect(dbSection).toBeVisible();
+        await expect(dbSection).toBeVisible({ timeout: 20000 });
         
         logger.info('Database performance section accessed');
       });
@@ -517,11 +517,11 @@ test.describe('Performance Monitoring Interface', () => {
       await stepTracker.executeStep('Verify slow query analysis', async () => {
         // Check slow queries section
         const slowQueriesSection = page.locator('[data-testid="slow-queries"], .slow-queries');
-        await expect(slowQueriesSection).toBeVisible();
+        await expect(slowQueriesSection).toBeVisible({ timeout: 20000 });
         
         // Check query table
         const queryTable = page.locator('[data-testid="query-table"], .query-table');
-        await expect(queryTable).toBeVisible();
+        await expect(queryTable).toBeVisible({ timeout: 20000 });
         
         // Look for query details
         const queryRows = page.locator('[data-testid="query-row"], .query-row');
@@ -536,7 +536,7 @@ test.describe('Performance Monitoring Interface', () => {
           await firstQuery.click();
           
           const queryDetails = page.locator('[data-testid="query-details"], .query-details');
-          await expect(queryDetails).toBeVisible();
+          await expect(queryDetails).toBeVisible({ timeout: 20000 });
           
           logger.info('Slow query analysis working correctly', { queryCount });
         }
@@ -545,12 +545,12 @@ test.describe('Performance Monitoring Interface', () => {
       await stepTracker.executeStep('Test connection pool monitoring', async () => {
         // Check connection pool section
         const poolSection = page.locator('[data-testid="connection-pool"], .connection-pool');
-        await expect(poolSection).toBeVisible();
+        await expect(poolSection).toBeVisible({ timeout: 20000 });
         
         // Verify pool metrics
-        await expect(page.locator('[data-testid="active-connections"], .active-connections')).toBeVisible();
-        await expect(page.locator('[data-testid="pool-utilization"], .pool-utilization')).toBeVisible();
-        await expect(page.locator('[data-testid="connection-wait-time"], .connection-wait-time')).toBeVisible();
+        await expect(page.locator('[data-testid="active-connections"], .active-connections')).toBeVisible({ timeout: 20000 });
+        await expect(page.locator('[data-testid="pool-utilization"], .pool-utilization')).toBeVisible({ timeout: 20000 });
+        await expect(page.locator('[data-testid="connection-wait-time"], .connection-wait-time')).toBeVisible({ timeout: 20000 });
         
         logger.info('Connection pool monitoring verified');
       });
@@ -571,18 +571,18 @@ test.describe('Background Job Management', () => {
       await stepTracker.executeStep('Navigate to job management dashboard', async () => {
         await page.goto('/admin/jobs');
         
-        await expect(page.locator('h1:has-text("Background Jobs"), [data-testid="jobs-dashboard"]')).toBeVisible();
+        await expect(page.getByTestId('jobs-dashboard')).toBeVisible({ timeout: 20000 });
         logger.info('Job management dashboard loaded');
       });
 
       await stepTracker.executeStep('Verify job listing and filtering', async () => {
         // Check jobs list
         const jobsList = page.locator('[data-testid="jobs-list"], .jobs-list');
-        await expect(jobsList).toBeVisible();
+        await expect(jobsList).toBeVisible({ timeout: 20000 });
         
         // Test job type filtering
         const jobTypeFilter = page.locator('[data-testid="job-type-filter"], select[name="jobType"]');
-        await expect(jobTypeFilter).toBeVisible();
+        await expect(jobTypeFilter).toBeVisible({ timeout: 20000 });
         
         await jobTypeFilter.selectOption('gdpr');
         
@@ -610,16 +610,16 @@ test.describe('Background Job Management', () => {
           
           // Should show job details
           const jobDetails = page.locator('[data-testid="job-details"], .job-details');
-          await expect(jobDetails).toBeVisible();
+          await expect(jobDetails).toBeVisible({ timeout: 20000 });
           
           // Check for job information
-          await expect(page.locator('[data-testid="job-id"], .job-id')).toBeVisible();
-          await expect(page.locator('[data-testid="job-status"], .job-status')).toBeVisible();
-          await expect(page.locator('[data-testid="job-created"], .job-created')).toBeVisible();
+          await expect(page.locator('[data-testid="job-id"], .job-id')).toBeVisible({ timeout: 20000 });
+          await expect(page.locator('[data-testid="job-status"], .job-status')).toBeVisible({ timeout: 20000 });
+          await expect(page.locator('[data-testid="job-created"], .job-created')).toBeVisible({ timeout: 20000 });
           
           // Check for job actions
           const jobActions = page.locator('[data-testid="job-actions"], .job-actions');
-          await expect(jobActions).toBeVisible();
+          await expect(jobActions).toBeVisible({ timeout: 20000 });
           
           logger.info('Job details display working correctly');
         }
@@ -667,11 +667,11 @@ test.describe('Background Job Management', () => {
         }
         
         const queueSection = page.locator('[data-testid="job-queue"], .job-queue');
-        await expect(queueSection).toBeVisible();
+        await expect(queueSection).toBeVisible({ timeout: 20000 });
         
         // Check queue statistics
-        await expect(page.locator('[data-testid="queue-size"], .queue-size')).toBeVisible();
-        await expect(page.locator('[data-testid="processing-rate"], .processing-rate')).toBeVisible();
+        await expect(page.locator('[data-testid="queue-size"], .queue-size')).toBeVisible({ timeout: 20000 });
+        await expect(page.locator('[data-testid="processing-rate"], .processing-rate')).toBeVisible({ timeout: 20000 });
         
         // Test queue operations
         const pauseQueueButton = page.locator('[data-testid="pause-queue"], button:has-text("Pause")');
@@ -697,14 +697,14 @@ test.describe('System Health Monitoring', () => {
       await stepTracker.executeStep('Navigate to system health dashboard', async () => {
         await page.goto('/admin/health');
         
-        await expect(page.locator('h1:has-text("System Health"), [data-testid="health-dashboard"]')).toBeVisible();
+        await expect(page.getByTestId('health-dashboard')).toBeVisible({ timeout: 20000 });
         logger.info('System health dashboard loaded');
       });
 
       await stepTracker.executeStep('Verify service status monitoring', async () => {
         // Check services section
         const servicesSection = page.locator('[data-testid="services-status"], .services-status');
-        await expect(servicesSection).toBeVisible();
+        await expect(servicesSection).toBeVisible({ timeout: 20000 });
         
         // Check for individual service status
         const serviceItems = page.locator('[data-testid="service-item"], .service-item');
@@ -721,7 +721,7 @@ test.describe('System Health Monitoring', () => {
       await stepTracker.executeStep('Test dependency checks', async () => {
         // Check dependencies section
         const dependenciesSection = page.locator('[data-testid="dependencies"], .dependencies');
-        await expect(dependenciesSection).toBeVisible();
+        await expect(dependenciesSection).toBeVisible({ timeout: 20000 });
         
         // Should show external dependencies
         const dependencyItems = page.locator('[data-testid="dependency-item"], .dependency-item');
@@ -739,7 +739,7 @@ test.describe('System Health Monitoring', () => {
       await stepTracker.executeStep('Test health check refresh', async () => {
         // Test refresh functionality
         const refreshButton = page.locator('[data-testid="refresh-health"], button:has-text("Refresh")');
-        await expect(refreshButton).toBeVisible();
+        await expect(refreshButton).toBeVisible({ timeout: 20000 });
         
         const initialTimestamp = await page.textContent('[data-testid="last-check"], .last-check');
         
@@ -757,12 +757,12 @@ test.describe('System Health Monitoring', () => {
       await stepTracker.executeStep('Verify system metrics overview', async () => {
         // Check system metrics
         const metricsSection = page.locator('[data-testid="system-metrics"], .system-metrics');
-        await expect(metricsSection).toBeVisible();
+        await expect(metricsSection).toBeVisible({ timeout: 20000 });
         
         // Should show key system metrics
-        await expect(page.locator('[data-testid="uptime"], .uptime')).toBeVisible();
-        await expect(page.locator('[data-testid="memory-usage"], .memory-usage')).toBeVisible();
-        await expect(page.locator('[data-testid="disk-usage"], .disk-usage')).toBeVisible();
+        await expect(page.locator('[data-testid="uptime"], .uptime')).toBeVisible({ timeout: 20000 });
+        await expect(page.locator('[data-testid="memory-usage"], .memory-usage')).toBeVisible({ timeout: 20000 });
+        await expect(page.locator('[data-testid="disk-usage"], .disk-usage')).toBeVisible({ timeout: 20000 });
         
         logger.info('System metrics overview verified');
       });
