@@ -24,17 +24,19 @@ RUN npm run build
 FROM node:20-alpine AS runner
 WORKDIR /app
 ENV NODE_ENV=production
-# Ensure Next.js starts on port 3000 by default
+# Ensure Next.js starts on port 3000 by default, allow override
 ENV PORT=3000
 # Re-expose public env var for runtime (also embedded at build time)
 ARG NEXT_PUBLIC_API_BASE_URL=""
 ENV NEXT_PUBLIC_API_BASE_URL=$NEXT_PUBLIC_API_BASE_URL
 
-# Copy production build
+# Install only production dependencies to ensure next CLI is available
 COPY --from=builder /app/package.json ./
-COPY --from=builder /app/node_modules ./node_modules
+RUN npm ci --only=production && npm cache clean --force
+
+# Copy built application
 COPY --from=builder /app/.next ./.next
 COPY --from=builder /app/public ./public
 
 EXPOSE 3000
-CMD ["npm", "run", "start"]
+CMD ["sh", "-c", "npx next start -p ${PORT:-3000}"]
