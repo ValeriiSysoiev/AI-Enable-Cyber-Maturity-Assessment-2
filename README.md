@@ -173,6 +173,7 @@ The platform implements a **staged rollout strategy** for advanced features:
 
 ### **Playbook & Agent Mode**
 - **Operations Playbook**: [`docs/PLAYBOOK.md`](docs/PLAYBOOK.md) - Complete operational procedures
+- **Operate with Claude (Claude-First)**: See the [Claude-First Prompt Cheatsheet](docs/team-playbook.md#appendix--claude-first-prompt-cheatsheet-v22)
 - **Agent Mode**: [`docs/prompts/agent_mode_header.txt`](docs/prompts/agent_mode_header.txt) - AI assistant integration guide
 
 ### **Documentation Structure**
