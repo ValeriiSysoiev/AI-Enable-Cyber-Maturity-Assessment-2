@@ -280,7 +280,7 @@ startxref
         await expect(page.locator('text="File Preview"')).toBeVisible();
         
         // Check for MCP-enhanced preview features
-        const hasEnhancedFeatures = await page.locator('text=/Enhanced|coming soon|preview capabilities|MCP/'').isVisible();
+        const hasEnhancedFeatures = await page.locator('text=/Enhanced|coming soon|preview capabilities|MCP/').isVisible();
         expect(hasEnhancedFeatures).toBeTruthy();
       } else {
         console.log('No evidence files found for snippet rendering test');
