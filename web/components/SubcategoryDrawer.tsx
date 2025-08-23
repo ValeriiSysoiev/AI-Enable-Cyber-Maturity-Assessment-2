@@ -222,14 +222,13 @@ export default function SubcategoryDrawer({
 
     // Use react-window for virtualization with large evidence lists
     return (
-      <div className="h-96" ref={evidenceListRef}>
+      <div className="h-96" ref={evidenceListRef} role="listbox" aria-label="Evidence files">
         <List
           height={384}
+          width="100%"
           itemCount={memoizedEvidenceList.length}
           itemSize={80}
           itemData={memoizedEvidenceList}
-          role="listbox"
-          aria-label="Evidence files"
         >
           {EvidenceRow}
         </List>

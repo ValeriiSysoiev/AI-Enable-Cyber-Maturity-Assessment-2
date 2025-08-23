@@ -1,0 +1,32 @@
+rules:
+  - id: hardcoded-secret
+    pattern-either:
+      - pattern: password = "..."
+      - pattern: api_key = "..."
+      - pattern: secret = "..."
+      - pattern: token = "..."
+    message: Potential hardcoded secret detected
+    languages: [python, javascript, typescript]
+    severity: WARNING
+    
+  - id: sql-injection-risk
+    pattern-either:
+      - pattern: execute($SQL)
+      - pattern: cursor.execute($SQL)
+    message: Potential SQL injection vulnerability
+    languages: [python]
+    severity: ERROR
+    
+  - id: unsafe-eval
+    pattern: eval(...)
+    message: Use of eval() is unsafe
+    languages: [javascript, typescript]
+    severity: ERROR
+    
+  - id: weak-crypto
+    pattern-either:
+      - pattern: md5(...)
+      - pattern: sha1(...)
+    message: Weak cryptographic hash function
+    languages: [python, javascript, typescript]
+    severity: WARNING

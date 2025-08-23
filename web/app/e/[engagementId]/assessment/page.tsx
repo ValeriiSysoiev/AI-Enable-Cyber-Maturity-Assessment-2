@@ -15,7 +15,7 @@ function CSFGrid({
 }: {
   functions: CSFFunction[];
   onSubcategorySelect: (subcategory: CSFSubcategory) => void;
-  selectedSubcategory?: CSFSubcategory;
+  selectedSubcategory: CSFSubcategory | null;
 }) {
   const [expandedFunctions, setExpandedFunctions] = useState<Set<string>>(new Set());
   
