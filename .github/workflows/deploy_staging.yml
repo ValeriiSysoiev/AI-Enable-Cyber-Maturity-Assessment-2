@@ -1,3 +1,4 @@
+# Deployment workflow for staging environment
 name: Deploy Staging
 
 on:
@@ -57,7 +58,7 @@ jobs:
           context: ./api
           push: true
           tags: |
-            ghcr.io/${{ github.repository_owner }}/aecma-api:${{ github.sha }}
+            ghcr.io/${{ github.repository_owner }}/aecma-api: ${{ github.sha }}
             ghcr.io/${{ github.repository_owner }}/aecma-api:staging
           cache-from: type=gha
           cache-to: type=gha,mode=max
@@ -79,7 +80,7 @@ jobs:
     needs: build_and_push_ghcr
     environment: 
       name: staging
-    if: ${{ env.AZURE_SUBSCRIPTION_ID != '' && env.AZURE_CLIENT_ID != '' && env.AZURE_TENANT_ID != '' && env.ACA_RG != '' && env.ACA_ENV != '' && env.ACA_APP_API != '' && env.ACA_APP_WEB != '' }}
+    if: ${{ env.AZURE_SUBSCRIPTION_ID != '' && env.AZURE_CLIENT_ID != '' && env.AZURE_TENANT_ID!= '' && env.ACA_RG != '' && env.ACA_ENV != '' && env.ACA_APP_API != '' && env.ACA_APP_WEB != '' }}
     
     steps:
       - uses: actions/checkout@v4
@@ -154,7 +155,7 @@ jobs:
       
       - name: Print App Service URL (if STAGING_URL missing)
         run: |
-          if [ -z "${STAGING_URL}" ]; then
+          if [ -z "${STABIGG_URL}" ]; then
             echo "::notice::STAGING_URL=https://${APPSVC_WEBAPP_WEB}.azurewebsites.net"
           else
             echo "::notice::STAGING_URL=${STAGING_URL}"
