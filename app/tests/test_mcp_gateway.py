@@ -4,6 +4,7 @@ Tests filesystem, PDF parsing, and search tools with security validation.
 """
 import pytest
 import json
+import os
 import tempfile
 import shutil
 from pathlib import Path
@@ -344,6 +345,32 @@ class TestMCPSearchTool:
         result = await search_tool.query_embeddings(query_request, context)
         assert not result.success
         assert "not found" in result.message.lower()
+    
+    @pytest.mark.asyncio
+    @patch.dict('os.environ', {"CI_MODE": "1", "DISABLE_ML": "1"})
+    async def test_ml_disabled_in_ci_mode(self, config_and_context):
+        """Test that ML features are properly disabled in CI mode"""
+        config, context = config_and_context
+        search_tool = MCPSearchTool(config)
+        
+        # Test embedding request fails gracefully when ML is disabled
+        embed_request = SearchEmbedRequest(texts=["test text"])
+        context.operation = "embed"
+        
+        result = await search_tool.embed_texts(embed_request, context)
+        assert not result.success
+        assert "disabled" in result.message.lower() or "not available" in result.message.lower()
+        
+        # Test query request also fails gracefully
+        query_request = SearchQueryRequest(
+            query="test query",
+            embedding_file="test_embeddings.json"
+        )
+        context.operation = "query"
+        
+        result = await search_tool.query_embeddings(query_request, context)
+        assert not result.success
+        assert "disabled" in result.message.lower() or "not available" in result.message.lower()
 
 
 class TestMCPEndpoints:
