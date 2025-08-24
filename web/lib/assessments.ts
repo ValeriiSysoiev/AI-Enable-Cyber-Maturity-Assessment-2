@@ -1,4 +1,4 @@
-const BASE = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:8000";
+const BASE = "/api/proxy";
 
 export interface Assessment {
   id: string;
@@ -32,7 +32,8 @@ export async function createAssessment(name: string, presetId: string): Promise<
   const res = await fetch(`${BASE}/assessments`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ name, preset_id: presetId })
+    body: JSON.stringify({ name, preset_id: presetId }),
+    cache: 'no-store'
   });
   if (!res.ok) {
     throw new Error("Failed to create assessment");
@@ -44,7 +45,8 @@ export async function saveAnswer(assessmentId: string, payload: Answer): Promise
   const res = await fetch(`${BASE}/assessments/${assessmentId}/answers`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(payload)
+    body: JSON.stringify(payload),
+    cache: 'no-store'
   });
   if (!res.ok) {
     throw new Error("Failed to save answer");
@@ -52,7 +54,9 @@ export async function saveAnswer(assessmentId: string, payload: Answer): Promise
 }
 
 export async function getScores(assessmentId: string): Promise<ScoreData> {
-  const res = await fetch(`${BASE}/assessments/${assessmentId}/scores`);
+  const res = await fetch(`${BASE}/assessments/${assessmentId}/scores`, {
+    cache: 'no-store'
+  });
   if (!res.ok) {
     throw new Error("Failed to get scores");
   }
@@ -60,7 +64,9 @@ export async function getScores(assessmentId: string): Promise<ScoreData> {
 }
 
 export async function getAssessment(assessmentId: string): Promise<Assessment> {
-  const res = await fetch(`${BASE}/assessments/${assessmentId}`);
+  const res = await fetch(`${BASE}/assessments/${assessmentId}`, {
+    cache: 'no-store'
+  });
   if (!res.ok) {
     throw new Error("Failed to get assessment");
   }

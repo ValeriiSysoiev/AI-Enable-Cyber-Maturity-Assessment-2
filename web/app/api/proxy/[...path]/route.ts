@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getAuthHeaders } from '@/components/AuthProvider';
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:8000';
+const API_BASE_URL = process.env.PROXY_TARGET_API_BASE_URL || 'http://localhost:8000';
 
 export async function GET(request: NextRequest, { params }: { params: { path: string[] } }) {
   return handleRequest(request, params.path, 'GET');
