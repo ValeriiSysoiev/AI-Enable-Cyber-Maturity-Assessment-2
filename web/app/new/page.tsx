@@ -22,10 +22,19 @@ export default function NewAssessmentPage() {
 
   async function loadPresets() {
     try {
-      const r = await fetch('/api/proxy/presets', { 
+      // Try API proxy first, fallback to direct presets endpoint
+      let r = await fetch('/api/proxy/presets', { 
         headers: authHeaders(),
         cache: 'no-store'
       });
+      
+      if (!r.ok) {
+        console.warn('API proxy failed, trying fallback presets endpoint');
+        r = await fetch('/api/presets', { 
+          cache: 'no-store'
+        });
+      }
+      
       if (!r.ok) {
         throw new Error(`Failed to fetch presets: ${r.status}`);
       }
