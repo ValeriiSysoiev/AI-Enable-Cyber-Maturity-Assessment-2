@@ -49,3 +49,14 @@ artifacts/
 # Deployment logs
 logs/reports/*.log
 logs/reports/*.md
+
+# Backup files from Azure investigation
+backup-*.json
+LogFiles/
+deployments/
+webapp-logs.zip
+*.log
+
+# Debug artifacts
+web/app/api/debug/
+web/app/api/test-env/
