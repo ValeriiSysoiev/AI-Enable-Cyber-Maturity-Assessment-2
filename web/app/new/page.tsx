@@ -1,8 +1,9 @@
 "use client";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { fetchPreset, API_BASE, authHeaders } from "@/lib/api";
+import { fetchPreset, authHeaders } from "@/lib/api";
 import { createAssessment } from "@/lib/assessments";
+import ApiErrorBoundary from "@/components/ApiErrorBoundary";
 
 type PresetOption = { id: string; name: string; version: string; source: string; counts: { pillars: number; capabilities: number; questions: number } };
 
@@ -21,7 +22,10 @@ export default function NewAssessmentPage() {
 
   async function loadPresets() {
     try {
-      const r = await fetch(`${API_BASE}/presets`, { headers: authHeaders() });
+      const r = await fetch('/api/proxy/presets', { 
+        headers: authHeaders(),
+        cache: 'no-store'
+      });
       if (!r.ok) {
         throw new Error(`Failed to fetch presets: ${r.status}`);
       }
@@ -68,7 +72,8 @@ export default function NewAssessmentPage() {
     }
   }
   return (
-    <main className="p-8 space-y-4">
+    <ApiErrorBoundary>
+      <main className="p-8 space-y-4">
       <h1 className="text-2xl font-semibold">New Assessment — Scope</h1>
       <div className="space-y-2">
         <label className="block text-sm font-medium">Profile</label>
@@ -115,6 +120,7 @@ export default function NewAssessmentPage() {
           </button>
         </div>
       )}
-    </main>
+      </main>
+    </ApiErrorBoundary>
   );
 }

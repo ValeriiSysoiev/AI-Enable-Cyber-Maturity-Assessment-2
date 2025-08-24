@@ -6,6 +6,7 @@ import { redirect } from 'next/navigation';
 import { headers } from 'next/headers';
 import Link from 'next/link';
 import { Suspense } from 'react';
+import ApiErrorBoundary from '@/components/ApiErrorBoundary';
 
 // Mock session data for demo mode
 interface MockUser {
@@ -48,42 +49,21 @@ interface Engagement {
 
 async function fetchEngagements(userEmail: string, correlationId: string): Promise<Engagement[]> {
   try {
-    const apiBaseUrl = process.env.API_BASE_URL || 'http://localhost:8000';
+    const response = await fetch('/api/proxy/engagements', {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-User-Email': userEmail,
+        'X-Correlation-ID': correlationId
+      },
+      cache: 'no-store'
+    });
     
-    // For S1, we'll use mock data since JWT isn't fully wired
-    // In production, this would call the real API with JWT token
-    const mockEngagements: Engagement[] = [
-      {
-        id: 'eng-001',
-        name: 'Cybersecurity Maturity Assessment - Q4 2024',
-        description: 'Comprehensive assessment of current cybersecurity posture',
-        status: 'active',
-        created_at: '2024-10-01T00:00:00Z',
-        updated_at: '2024-12-15T00:00:00Z',
-        member_count: 5,
-        user_role: 'Member'
-      },
-      {
-        id: 'eng-002',
-        name: 'SOC 2 Compliance Assessment',
-        description: 'Assessment for SOC 2 Type II compliance readiness',
-        status: 'active',
-        created_at: '2024-11-15T00:00:00Z',
-        updated_at: '2024-12-20T00:00:00Z',
-        member_count: 3,
-        user_role: 'LEM'
-      },
-      {
-        id: 'eng-003',
-        name: 'Zero Trust Architecture Review',
-        description: 'Review of Zero Trust implementation progress',
-        status: 'planning',
-        created_at: '2024-12-01T00:00:00Z',
-        updated_at: '2024-12-10T00:00:00Z',
-        member_count: 4,
-        user_role: 'Member'
-      }
-    ];
+    if (!response.ok) {
+      throw new Error(`Failed to fetch engagements: ${response.status}`);
+    }
+    
+    const engagements = await response.json();
     
     // Log the request with correlation ID
     console.log(JSON.stringify({
@@ -93,13 +73,13 @@ async function fetchEngagements(userEmail: string, correlationId: string): Promi
       message: 'Fetched engagements',
       correlation_id: correlationId,
       user_email: userEmail,
-      engagement_count: mockEngagements.length,
+      engagement_count: engagements.length,
       route: '/engagements',
       status: 200,
-      latency_ms: 10
+      latency_ms: response.headers.get('x-response-time') || 'unknown'
     }));
     
-    return mockEngagements;
+    return engagements;
   } catch (error) {
     console.log(JSON.stringify({
       timestamp: new Date().toISOString(),
@@ -323,9 +303,11 @@ export default async function EngagementsPage() {
         </div>
         
         {/* Engagements List */}
-        <Suspense fallback={<LoadingState />}>
-          <EngagementsList userEmail={user.email} correlationId={correlationId} />
-        </Suspense>
+        <ApiErrorBoundary>
+          <Suspense fallback={<LoadingState />}>
+            <EngagementsList userEmail={user.email} correlationId={correlationId} />
+          </Suspense>
+        </ApiErrorBoundary>
         
         {/* Help Section */}
         <div className="mt-8 bg-blue-50 border border-blue-200 rounded-lg p-4">
