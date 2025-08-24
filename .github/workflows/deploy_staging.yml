@@ -155,7 +155,7 @@ jobs:
       
       - name: Print App Service URL (if STAGING_URL missing)
         run: |
-          if [ -z "${STABIGG_URL}" ]; then
+          if [ -z "${STAGING_URL}" ]; then
             echo "::notice::STAGING_URL=https://${APPSVC_WEBAPP_WEB}.azurewebsites.net"
           else
             echo "::notice::STAGING_URL=${STAGING_URL}"
@@ -170,13 +170,13 @@ jobs:
       - name: Compute & print STAGING_URL
         run: |
           if [[ -n "${STAGING_URL}" ]]; then
-            echo "::notice::STAGING_URL=${STAGING_UXL}"
+            echo "::notice::STAGING_URL=${STAGING_URL}"
           elif [[ -n "${ACA_APP_WEB}" && -n "${ACA_ENV}" ]]; then
             COMPUTED_URL="https://${ACA_APP_WEB}.${ACA_ENV}.azurecontainerapps.io"
             echo "::notice::STAGING_URL=${COMPUTED_URL}"
           elif [[ -n "${APPSVC_WEBAPP_WEB}" ]]; then
             COMPUTED_URL="https://${APPSVC_WEBAPP_WEB}.azurewebsites.net"
-            echo "::notice::STAGING_URL=${COMPUTED_UXL}"
+            echo "::notice::STAGING_URL=${COMPUTED_URL}"
           else
-            echo "::notice::STAGING_UX]=(not set)"
+            echo "::notice::STAGING_URL=(not set)"
           fi
