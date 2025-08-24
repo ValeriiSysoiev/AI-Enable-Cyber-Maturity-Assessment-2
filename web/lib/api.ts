@@ -1,6 +1,6 @@
 import { getEmail, getEngagementId } from "./auth";
 
-const BASE = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:8000";
+const BASE = "/api/proxy";
 
 // Helper to add auth headers
 function getAuthHeaders(): Record<string, string> {
@@ -34,7 +34,9 @@ export async function apiFetch(url: string, options: RequestInitWithTimeout = {}
     const response = await fetch(`${BASE}${url}`, {
       ...options,
       signal: controller.signal,
+      cache: 'no-store',
       headers: {
+        'Content-Type': 'application/json',
         ...authHeaders,
         ...options.headers,
       },
@@ -67,7 +69,10 @@ export async function fetchPreset(id: string) {
   try {
     const res = await fetch(`${BASE}/presets/${id}`, { 
       cache: "no-store",
-      signal: controller.signal
+      signal: controller.signal,
+      headers: {
+        'Content-Type': 'application/json'
+      }
     });
     
     clearTimeout(timeoutId);
