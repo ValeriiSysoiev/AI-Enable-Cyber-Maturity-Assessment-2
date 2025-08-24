@@ -45,6 +45,9 @@ COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
 # Copy public files if they exist
 COPY --from=builder --chown=nextjs:nodejs /app/public ./public
 
+# Copy startup script for Azure App Service environment variable workaround
+COPY --from=builder --chown=nextjs:nodejs /app/startup.sh ./startup.sh
+
 # Switch to non-root user
 USER nextjs
 
@@ -55,7 +58,5 @@ EXPOSE 3000
 HEALTHCHECK --interval=30s --timeout=3s --start-period=15s --retries=3 \
   CMD curl -f http://localhost:${PORT:-3000}/ || exit 1
 
-# Start the application using the generated server.js from standalone build
-# This uses Node.js directly without requiring Next.js CLI in production
-# The standalone build respects the PORT environment variable
-CMD ["node", "server.js"]
+# Start the application using startup script that handles Azure App Service environment variables
+CMD ["sh", "./startup.sh"]
