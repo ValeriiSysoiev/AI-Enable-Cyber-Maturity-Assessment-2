@@ -103,7 +103,7 @@ jobs:
             sleep 30
             
             echo "🔍 Checking production deployment status..."
-            if curl -s --max-time 10 https://aecma-prod.azurewebsites.net/api/version | grep -q "${{ github.sha }}"; then
+            if curl -s --max-time 10 https://web-cybermat-prd.azurewebsites.net/api/version | grep -q "${{ github.sha }}"; then
               echo "✅ Production deployment successful - version matches"
             else
               echo "⚠️  Production version check failed or still updating"

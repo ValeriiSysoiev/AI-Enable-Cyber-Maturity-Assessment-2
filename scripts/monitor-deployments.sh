@@ -62,7 +62,7 @@ check_workflow "Production Release" "release.yml"
 echo "🌐 PRODUCTION STATUS"
 echo "$(printf '%.0s-' {1..50})"
 
-prod_url="https://aecma-prod.azurewebsites.net"
+prod_url="https://web-cybermat-prd.azurewebsites.net"
 
 # Health check
 if curl -s --max-time 5 "$prod_url/health" > /dev/null 2>&1; then
@@ -105,7 +105,7 @@ echo ""
 echo "🧪 STAGING STATUS"
 echo "$(printf '%.0s-' {1..50})"
 
-staging_url="https://aecma-staging.azurewebsites.net"
+staging_url="https://web-cybermat-stg.azurewebsites.net"
 
 # Health check
 if curl -s --max-time 5 "$staging_url/health" > /dev/null 2>&1; then
