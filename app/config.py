@@ -3,7 +3,7 @@ Configuration settings for the AI-Enabled Cyber Maturity Assessment application.
 Includes Azure AI Search, OpenAI, and RAG service configurations.
 """
 import os
-from typing import Optional
+from typing import Optional, List
 from pydantic import BaseModel, Field
 from pydantic_settings import BaseSettings
 

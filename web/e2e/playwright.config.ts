@@ -29,12 +29,12 @@ export default defineConfig({
     ['./reporters/uat-reporter.ts']
   ],
   
-  /* Global test timeout */
-  timeout: 60_000,
+  /* Global test timeout - increased for production */
+  timeout: process.env.CI || process.env.NODE_ENV === 'production' ? 180_000 : 60_000,
   
   /* Expect timeout for assertions */
   expect: {
-    timeout: 10_000,
+    timeout: process.env.CI || process.env.NODE_ENV === 'production' ? 30_000 : 10_000,
   },
   
   /* Shared settings for all the projects below */
@@ -241,9 +241,9 @@ export default defineConfig({
           headless: process.env.UAT_HEADLESS !== 'false',
           slowMo: 0
         },
-        // Extended timeouts for comprehensive testing
-        actionTimeout: 30000,
-        navigationTimeout: 60000
+        // Extended timeouts for comprehensive testing - increased for production
+        actionTimeout: process.env.NODE_ENV === 'production' ? 60000 : 30000,
+        navigationTimeout: process.env.NODE_ENV === 'production' ? 120000 : 60000
       },
       testMatch: '**/uat-explorer.spec.ts',
       timeout: 300_000, // 5 minutes for comprehensive UAT

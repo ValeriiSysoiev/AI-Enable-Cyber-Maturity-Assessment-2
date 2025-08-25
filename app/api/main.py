@@ -377,6 +377,19 @@ def load_preset(preset_id: str) -> dict:
 
 # Health endpoint moved to version router
 
+# Additional health endpoints for compatibility
+@app.get("/health") 
+async def health_redirect():
+    """Health endpoint redirect for root path compatibility"""
+    from .routes.version import health_check
+    return await health_check()
+
+@app.get("/api/health") 
+async def api_health_redirect():
+    """Health endpoint redirect for API prefix compatibility"""
+    from .routes.version import health_check
+    return await health_check()
+
 
 @app.post("/assessments", response_model=AssessmentResponse)
 def create_assessment(assessment: AssessmentCreate, session: Session = Depends(get_session)):

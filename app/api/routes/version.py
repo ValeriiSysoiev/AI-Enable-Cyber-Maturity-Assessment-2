@@ -14,7 +14,7 @@ from config import config
 from services.rag_service import create_rag_service
 
 
-router = APIRouter(tags=["system"])
+router = APIRouter(prefix="/api", tags=["system"])
 logger = logging.getLogger(__name__)
 
 
