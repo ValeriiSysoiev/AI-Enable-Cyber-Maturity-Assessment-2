@@ -1,11 +1,19 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { cookies } from 'next/headers';
 
 /**
  * Demo authentication API route
- * Sets a cookie to simulate user authentication for S1 demo
+ * Sets a cookie to simulate user authentication for demo mode
+ * Only used when DEMO_E2E=1
  */
 export async function POST(request: NextRequest) {
+  // Only allow demo signin in demo mode
+  if (process.env.DEMO_E2E !== '1') {
+    return NextResponse.json(
+      { error: 'Demo signin is disabled' },
+      { status: 403 }
+    );
+  }
+
   try {
     const { email } = await request.json();
     
@@ -34,13 +42,13 @@ export async function POST(request: NextRequest) {
       service: 'web',
       message: 'Demo user signed in',
       user_email: email.trim(),
-      route: '/api/auth/signin',
+      route: '/api/demo/signin',
       status: 200
     }));
     
     return response;
   } catch (error) {
-    console.error('Sign in error:', error);
+    console.error('Demo sign in error:', error);
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }
