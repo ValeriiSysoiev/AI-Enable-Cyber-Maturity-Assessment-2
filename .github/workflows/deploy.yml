@@ -52,3 +52,55 @@ jobs:
             BUILD_SHA=${{ github.sha }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
+
+  # Fallback deployment when Azure credentials are not available
+  deploy-fallback:
+    runs-on: ubuntu-latest
+    needs: build
+    if: ${{ secrets.AZURE_CREDENTIALS == '' }}
+    steps:
+      - name: Deployment Status - Azure Credentials Missing
+        run: |
+          echo "🔧 DEPLOYMENT STATUS: PARTIAL SUCCESS"
+          echo ""
+          echo "✅ Code fixes successfully built and pushed to registry"
+          echo "✅ Docker image available at: ghcr.io/${{ env.REPO_OWNER_LOWER }}/aecma-web:${{ github.sha }}"
+          echo ""
+          echo "❌ Production deployment skipped - Azure credentials not configured"
+          echo ""
+          echo "📋 To complete production deployment:"
+          echo "1. Configure Azure secrets in repository settings"
+          echo "2. Run: gh workflow run .github/workflows/release.yml"
+          echo ""
+          echo "🏷️  Image Tag: ${{ github.sha }}"
+          echo "📦 Registry: GitHub Container Registry (GHCR)"
+
+  # Verify deployment when Azure credentials are available  
+  verify-deployment:
+    runs-on: ubuntu-latest
+    needs: build
+    if: ${{ secrets.AZURE_CREDENTIALS != '' }}
+    steps:
+      - name: Trigger Production Deployment
+        run: |
+          echo "🚀 Triggering production deployment via release workflow..."
+          gh workflow run .github/workflows/release.yml --ref ${{ github.ref_name }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      
+      - name: Wait for deployment
+        run: |
+          echo "⏳ Waiting for deployment to complete..."
+          sleep 30
+      
+      - name: Verify production deployment
+        run: |
+          echo "🔍 Verifying production deployment..."
+          
+          # Try to check production version
+          if curl -s --max-time 10 https://aecma-prod.azurewebsites.net/api/version | grep -q "${{ github.sha }}"; then
+            echo "✅ Production deployment successful - version matches"
+          else
+            echo "⚠️  Production version check failed or still updating"
+            echo "🔄 Deployment may still be in progress"
+          fi

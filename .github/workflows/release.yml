@@ -108,7 +108,7 @@ jobs:
 
     - name: Build and push WEB image
       run: |
-        docker build -t ${{ env.AZURE_CONTAINER_REGISTRY }}.azurecr.io/web:${{ github.sha }} ./web
+        docker build --build-arg GITHUB_SHA=${{ github.sha }} --build-arg BUILD_SHA=${{ github.sha }} -t ${{ env.AZURE_CONTAINER_REGISTRY }}.azurecr.io/web:${{ github.sha }} ./web
         docker push ${{ env.AZURE_CONTAINER_REGISTRY }}.azurecr.io/web:${{ github.sha }}
 
     - name: Record current revisions before deployment
