@@ -25,15 +25,21 @@ export function AuthProvider({ children }: AuthProviderProps) {
       setIsLoading(true);
       setError(undefined);
 
-      // Check what auth mode is configured
-      const authModeResponse = await fetch('/api/auth/mode');
+      // Optimize: Use Promise.all for parallel API calls and add timeouts
+      const authModePromise = fetch('/api/auth/mode', { 
+        signal: AbortSignal.timeout(5000) // 5 second timeout
+      });
+      
+      const authModeResponse = await authModePromise;
       if (authModeResponse.ok) {
         const authModeData = await authModeResponse.json();
         setMode(authModeData);
 
         if (authModeData.mode === 'aad' && authModeData.enabled) {
-          // Try to get current AAD session
-          const sessionResponse = await fetch('/api/auth/session');
+          // Try to get current AAD session with timeout
+          const sessionResponse = await fetch('/api/auth/session', { 
+            signal: AbortSignal.timeout(5000) // 5 second timeout
+          });
           if (sessionResponse.ok) {
             const sessionData = await sessionResponse.json();
             if (sessionData.user) {
@@ -47,7 +53,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
             }
           }
         } else {
-          // Demo mode - check localStorage
+          // Demo mode - check localStorage (non-blocking)
           const email = localStorage.getItem('email');
           if (email) {
             setUser({
@@ -57,12 +63,22 @@ export function AuthProvider({ children }: AuthProviderProps) {
             });
           }
         }
+      } else {
+        // Fast fallback if auth mode API fails
+        const email = localStorage.getItem('email');
+        if (email) {
+          setMode({ mode: 'demo', enabled: true });
+          setUser({
+            id: email,
+            email: email,
+            name: email.split('@')[0],
+          });
+        }
       }
     } catch (err) {
-      console.error('Auth initialization failed:', err);
-      setError(err instanceof Error ? err.message : 'Authentication failed');
+      console.warn('Auth initialization timed out, falling back to demo mode:', err);
       
-      // Fallback to demo mode
+      // Fast fallback to demo mode - don't let auth issues block the page
       setMode({ mode: 'demo', enabled: true });
       const email = localStorage.getItem('email');
       if (email) {

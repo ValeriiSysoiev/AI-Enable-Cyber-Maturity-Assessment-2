@@ -21,10 +21,11 @@ export default function QuestionCard({ question }: QuestionCardProps) {
     setLoading(true);
     setError(null);
     try {
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:8000"}/assist/autofill`, {
+      const res = await fetch(`/api/proxy/assist/autofill`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ question_text: question.text })
+        body: JSON.stringify({ question_text: question.text }),
+        signal: AbortSignal.timeout(20000) // 20 second timeout for AI assist
       });
       if (res.ok) {
         const data = await res.json();

@@ -2,10 +2,18 @@
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/components/AuthProvider";
+import { usePerformanceTracker } from "@/lib/performance";
 
 export default function HomePage() {
   const router = useRouter();
   const { isAuthenticated, isLoading, mode } = useAuth();
+  const performanceTracker = usePerformanceTracker();
+
+  useEffect(() => {
+    // Track page load performance
+    performanceTracker.monitorPageLoad();
+    performanceTracker.trackWebVitals();
+  }, [performanceTracker]);
 
   useEffect(() => {
     if (!isLoading) {
@@ -22,7 +30,10 @@ export default function HomePage() {
   if (isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-500"></div>
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-blue-500 mx-auto mb-4"></div>
+          <p className="text-gray-600">Loading...</p>
+        </div>
       </div>
     );
   }

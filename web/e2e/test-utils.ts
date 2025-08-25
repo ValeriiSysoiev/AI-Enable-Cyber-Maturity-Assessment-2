@@ -1,6 +1,7 @@
 import { Page, TestInfo, expect } from '@playwright/test';
 import fs from 'fs';
 import path from 'path';
+import { sanitizeFilePath, createSanitizedLogEntry } from './utils/path-sanitizer';
 
 /**
  * Test utilities for enhanced error handling and logging
@@ -130,7 +131,7 @@ export class ErrorRecovery {
       // Capture screenshot
       const screenshotPath = `error-screenshot-${Date.now()}.png`;
       await this.page.screenshot({ path: screenshotPath, fullPage: true });
-      this.logger.info('Error screenshot captured', { path: screenshotPath });
+      this.logger.info('Error screenshot captured', createSanitizedLogEntry('Screenshot saved', screenshotPath));
     } catch (screenshotError) {
       this.logger.warn('Failed to capture error screenshot', { error: screenshotError });
     }
@@ -140,7 +141,7 @@ export class ErrorRecovery {
       const html = await this.page.content();
       const htmlPath = `error-html-${Date.now()}.html`;
       fs.writeFileSync(htmlPath, html);
-      this.logger.info('Error HTML captured', { path: htmlPath });
+      this.logger.info('Error HTML captured', createSanitizedLogEntry('HTML content saved', htmlPath));
     } catch (htmlError) {
       this.logger.warn('Failed to capture error HTML', { error: htmlError });
     }

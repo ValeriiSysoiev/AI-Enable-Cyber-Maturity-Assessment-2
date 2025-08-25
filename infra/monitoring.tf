@@ -280,6 +280,175 @@ output "application_insights_connection_string" {
   sensitive   = true
 }
 
+# Container CPU utilization alert for API service
+resource "azurerm_monitor_metric_alert" "api_cpu_utilization" {
+  name                = "api-cpu-utilization-${local.name_prefix}"
+  resource_group_name = azurerm_resource_group.rg.name
+  scopes              = [azurerm_container_app.api.id]
+  description         = "Alert when API container CPU utilization is high"
+  tags                = local.common_tags
+
+  criteria {
+    metric_namespace = "Microsoft.App/containerapps"
+    metric_name      = "CpuPercentage"
+    aggregation      = "Average"
+    operator         = "GreaterThan"
+    threshold        = var.alert_container_cpu_threshold
+
+    dimension {
+      name     = "RevisionName"
+      operator = "Include"
+      values   = ["*"]
+    }
+  }
+
+  window_size        = "PT5M"
+  frequency          = "PT1M"
+  severity           = 2
+  auto_mitigate      = true
+
+  action {
+    action_group_id = azurerm_monitor_action_group.alerts.id
+  }
+}
+
+# Container memory utilization alert for API service
+resource "azurerm_monitor_metric_alert" "api_memory_utilization" {
+  name                = "api-memory-utilization-${local.name_prefix}"
+  resource_group_name = azurerm_resource_group.rg.name
+  scopes              = [azurerm_container_app.api.id]
+  description         = "Alert when API container memory utilization is high"
+  tags                = local.common_tags
+
+  criteria {
+    metric_namespace = "Microsoft.App/containerapps"
+    metric_name      = "MemoryPercentage"
+    aggregation      = "Average"
+    operator         = "GreaterThan"
+    threshold        = var.alert_container_memory_threshold
+
+    dimension {
+      name     = "RevisionName"
+      operator = "Include" 
+      values   = ["*"]
+    }
+  }
+
+  window_size        = "PT5M"
+  frequency          = "PT1M"
+  severity           = 2
+  auto_mitigate      = true
+
+  action {
+    action_group_id = azurerm_monitor_action_group.alerts.id
+  }
+}
+
+# Web application response time alert
+resource "azurerm_monitor_metric_alert" "web_response_time" {
+  name                = "web-response-time-${local.name_prefix}"
+  resource_group_name = azurerm_resource_group.rg.name
+  scopes              = [azurerm_container_app.web.id]
+  description         = "Alert when web application response time is high"
+  tags                = local.common_tags
+
+  criteria {
+    metric_namespace = "Microsoft.App/containerapps"
+    metric_name      = "RequestDuration"
+    aggregation      = "Average"
+    operator         = "GreaterThan"
+    threshold        = var.alert_http_response_time_threshold * 1000  # Convert to milliseconds
+
+    dimension {
+      name     = "RevisionName"
+      operator = "Include"
+      values   = ["*"]
+    }
+  }
+
+  window_size        = "PT5M"
+  frequency          = "PT1M"
+  severity           = 3
+  auto_mitigate      = true
+
+  action {
+    action_group_id = azurerm_monitor_action_group.alerts.id
+  }
+}
+
+# Container scaling alert - monitor when auto-scaling is active
+resource "azurerm_monitor_metric_alert" "api_scaling_active" {
+  name                = "api-scaling-active-${local.name_prefix}"
+  resource_group_name = azurerm_resource_group.rg.name
+  scopes              = [azurerm_container_app.api.id]
+  description         = "Alert when API service is actively scaling due to load"
+  tags                = local.common_tags
+
+  criteria {
+    metric_namespace = "Microsoft.App/containerapps"
+    metric_name      = "Replicas"
+    aggregation      = "Average"
+    operator         = "GreaterThan"
+    threshold        = 5  # Alert when scaled beyond 5 replicas
+
+    dimension {
+      name     = "RevisionName"
+      operator = "Include"
+      values   = ["*"]
+    }
+  }
+
+  window_size        = "PT5M"
+  frequency          = "PT1M"
+  severity           = 4  # Informational
+  auto_mitigate      = true
+
+  action {
+    action_group_id = azurerm_monitor_action_group.alerts.id
+  }
+}
+
+# Startup failure alert for containers
+resource "azurerm_monitor_scheduled_query_rules_alert_v2" "container_startup_failures" {
+  name                = "container-startup-failures-${local.name_prefix}"
+  resource_group_name = azurerm_resource_group.rg.name
+  location            = local.location
+  description         = "Alert on container startup failures and crash loops"
+  tags                = local.common_tags
+
+  scopes                = [azurerm_log_analytics_workspace.log.id]
+  display_name          = "Container Startup Failures"
+  enabled               = true
+  severity              = 1  # Critical
+  evaluation_frequency  = "PT1M"
+  window_duration       = "PT5M"
+  auto_mitigation_enabled = false
+
+  criteria {
+    query = <<-QUERY
+      ContainerAppConsoleLogs_CL
+      | where TimeGenerated > ago(5m)
+      | where Log_s contains "failed to start" or Log_s contains "crash" or Log_s contains "exit code"
+      | where ContainerAppName_s startswith "api-${local.name_prefix}" or ContainerAppName_s startswith "web-${local.name_prefix}"
+      | summarize count() by ContainerAppName_s, bin(TimeGenerated, 1m)
+      | where count_ > 0
+    QUERY
+
+    time_aggregation_method = "Count"
+    threshold               = 1.0
+    operator                = "GreaterThanOrEqual"
+
+    failing_periods {
+      minimum_failing_periods_to_trigger_alert = 1
+      number_of_evaluation_periods             = 1
+    }
+  }
+
+  action {
+    action_groups = [azurerm_monitor_action_group.alerts.id]
+  }
+}
+
 output "log_analytics_workspace_id" {
   description = "ID of Log Analytics workspace"
   value       = azurerm_log_analytics_workspace.log.id

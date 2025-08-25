@@ -1,6 +1,7 @@
 import { getEmail, getEngagementId } from "./auth";
 
-export const API_BASE = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:8000";
+// ALWAYS use proxy routes instead of direct external API calls to avoid timeout issues
+const API_BASE = "/api/proxy";
 
 function getAuthHeaders(): Record<string, string> {
   const email = getEmail();
@@ -25,7 +26,8 @@ export async function createAssessment(name: string, framework: string = "NIST-C
       "Content-Type": "application/json",
       ...getAuthHeaders()
     },
-    body: JSON.stringify({ name: trimmedName, framework })
+    body: JSON.stringify({ name: trimmedName, framework }),
+    signal: AbortSignal.timeout(15000) // 15 second timeout for assessment creation
   });
   if (!res.ok) throw new Error(`createAssessment failed: ${res.status}`);
   return res.json();
@@ -38,7 +40,8 @@ export async function runAnalyze(assessmentId: string, content: string) {
       "Content-Type": "application/json",
       ...getAuthHeaders()
     },
-    body: JSON.stringify({ assessment_id: assessmentId, content })
+    body: JSON.stringify({ assessment_id: assessmentId, content }),
+    signal: AbortSignal.timeout(30000) // 30 second timeout for analysis
   });
   if (!res.ok) throw new Error(`analyze failed: ${res.status}`);
   const data = await res.json();
@@ -52,7 +55,8 @@ export async function runRecommend(assessmentId: string) {
       "Content-Type": "application/json",
       ...getAuthHeaders()
     },
-    body: JSON.stringify({ assessment_id: assessmentId })
+    body: JSON.stringify({ assessment_id: assessmentId }),
+    signal: AbortSignal.timeout(30000) // 30 second timeout for recommendations
   });
   if (!res.ok) throw new Error(`recommend failed: ${res.status}`);
   const data = await res.json();

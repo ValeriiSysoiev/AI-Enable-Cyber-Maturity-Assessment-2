@@ -3,7 +3,6 @@
 import { useState, useEffect } from "react";
 import { useRouter, usePathname } from "next/navigation";
 import { getEmail, getEngagementId, setEngagementId } from "@/lib/auth";
-import { API_BASE } from "@/lib/orchestration";
 
 interface Engagement {
   id: string;
@@ -24,7 +23,10 @@ export default function EngagementSwitcher() {
     const email = getEmail();
     const engId = getEngagementId();
     if (email) {
-      loadEngagements();
+      // Defer engagement loading to not block initial page render
+      setTimeout(() => {
+        loadEngagements();
+      }, 100);
       setCurrentEngagementId(engId);
     }
   }, []);
@@ -39,11 +41,13 @@ export default function EngagementSwitcher() {
         return;
       }
       
-      const res = await fetch(`${API_BASE}/engagements`, {
+      // Use server-side proxy route instead of direct external API call
+      const res = await fetch('/api/proxy/engagements', {
         headers: {
           "X-User-Email": email,
           "X-Engagement-ID": getEngagementId() || "bootstrap",
         },
+        signal: AbortSignal.timeout(8000), // 8 second timeout for engagement loading
       });
       if (res.ok) {
         const data = await res.json();
