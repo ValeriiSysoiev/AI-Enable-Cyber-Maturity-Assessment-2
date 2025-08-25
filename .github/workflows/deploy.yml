@@ -59,6 +59,9 @@ jobs:
     needs: build
     if: ${{ secrets.AZURE_CREDENTIALS == '' }}
     steps:
+      - name: Set lowercase repository owner
+        run: echo "REPO_OWNER_LOWER=$(echo ${{ github.repository_owner }} | tr '[:upper:]' '[:lower:]')" >> $GITHUB_ENV
+        
       - name: Deployment Status - Azure Credentials Missing
         run: |
           echo "🔧 DEPLOYMENT STATUS: PARTIAL SUCCESS"
@@ -81,6 +84,8 @@ jobs:
     needs: build
     if: ${{ secrets.AZURE_CREDENTIALS != '' }}
     steps:
+      - uses: actions/checkout@v4
+      
       - name: Trigger Production Deployment
         run: |
           echo "🚀 Triggering production deployment via release workflow..."

@@ -173,7 +173,7 @@ echo "$(printf '%.0s-' {1..50})"
 echo "• Trigger deployment: gh workflow run .github/workflows/deploy.yml"
 echo "• Check logs: gh run list --limit 5"
 echo "• Verify deployment: ./scripts/verify-deployment.sh"
-echo "• View in browser: open https://github.com/$(gh repo view --json owner,name -q '.owner.login + \"/\" + .name')/actions"
+echo "• View in browser: open https://github.com/$(gh repo view --json owner,name -q '.owner.login + "/" + .name')/actions"
 
 echo ""
 echo "Last updated: $(date)"
