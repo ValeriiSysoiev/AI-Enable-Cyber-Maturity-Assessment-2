@@ -10,12 +10,12 @@ from ..schemas import AssessmentPreset
 router = APIRouter(prefix="/presets", tags=["presets"])
 
 @router.get("/")
-def list_presets():
-    return svc.list_presets()
+async def list_presets():
+    return await svc.list_presets()
 
 @router.get("/{preset_id}")
-def get_preset(preset_id: str):
-    return svc.get_preset(preset_id)
+async def get_preset(preset_id: str):
+    return await svc.get_preset(preset_id)
 
 @router.post("/upload")
 async def upload_preset(request: Request, file: UploadFile | None = File(default=None)):
@@ -35,5 +35,5 @@ async def upload_preset(request: Request, file: UploadFile | None = File(default
         except Exception as e:
             raise HTTPException(400, f"Invalid JSON body: {e}")
 
-    preset = svc.save_uploaded_preset(data)
+    preset = await svc.save_uploaded_preset(data)
     return JSONResponse({"id": preset.id, "name": preset.name, "version": preset.version})
