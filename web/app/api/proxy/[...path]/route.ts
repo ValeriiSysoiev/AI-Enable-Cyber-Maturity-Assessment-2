@@ -1,5 +1,4 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getAuthHeaders } from '@/components/AuthProvider';
 
 const API_BASE_URL = process.env.PROXY_TARGET_API_BASE_URL || 'http://localhost:8000';
 
@@ -29,8 +28,19 @@ async function handleRequest(request: NextRequest, path: string[], method: strin
       url.searchParams.set(key, value);
     });
 
-    // Get auth headers (will work for both demo and AAD modes)
-    const authHeaders = getAuthHeaders();
+    // Get auth headers from the incoming request
+    const authHeaders: Record<string, string> = {};
+    
+    // Extract auth headers from the incoming request
+    const userEmail = request.headers.get('X-User-Email');
+    const engagementId = request.headers.get('X-Engagement-ID');
+    
+    if (userEmail) {
+      authHeaders['X-User-Email'] = userEmail;
+    }
+    if (engagementId) {
+      authHeaders['X-Engagement-ID'] = engagementId;
+    }
     
     // Get additional headers from the request
     const requestHeaders: Record<string, string> = {};

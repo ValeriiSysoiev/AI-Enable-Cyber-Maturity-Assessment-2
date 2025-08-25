@@ -24,7 +24,9 @@ export default defineConfig({
     ['html', { outputFolder: 'playwright-report' }],
     ['junit', { outputFile: 'test-results/junit.xml' }],
     ['github'], // GitHub Actions integration
-    ['list']
+    ['list'],
+    // Custom UAT Reporter for comprehensive telemetry
+    ['./reporters/uat-reporter.ts']
   ],
   
   /* Global test timeout */
@@ -227,6 +229,25 @@ export default defineConfig({
       },
       testMatch: '**/rag.spec.ts',
       timeout: 120_000,
+    },
+    
+    /* UAT Explorer - Production-safe comprehensive testing */
+    {
+      name: 'uat-explorer',
+      use: { 
+        ...devices['Desktop Chrome'],
+        // Use headless mode for production UAT
+        launchOptions: {
+          headless: process.env.UAT_HEADLESS !== 'false',
+          slowMo: 0
+        },
+        // Extended timeouts for comprehensive testing
+        actionTimeout: 30000,
+        navigationTimeout: 60000
+      },
+      testMatch: '**/uat-explorer.spec.ts',
+      timeout: 300_000, // 5 minutes for comprehensive UAT
+      retries: process.env.CI ? 2 : 1, // Allow retries for reliability
     },
     
     /* Setup project for enterprise features */
