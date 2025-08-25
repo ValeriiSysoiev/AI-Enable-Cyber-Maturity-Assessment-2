@@ -67,13 +67,26 @@ export async function fetchPreset(id: string) {
   const timeoutId = setTimeout(() => controller.abort(), DEFAULT_TIMEOUT);
   
   try {
-    const res = await fetch(`${BASE}/presets/${id}`, { 
+    // Try API proxy first
+    let res = await fetch(`${BASE}/presets/${id}`, { 
       cache: "no-store",
       signal: controller.signal,
       headers: {
         'Content-Type': 'application/json'
       }
     });
+    
+    // If proxy fails, try direct fallback endpoint
+    if (!res.ok) {
+      console.warn('API proxy failed for preset, trying fallback endpoint');
+      res = await fetch(`/api/presets/${id}`, { 
+        cache: "no-store",
+        signal: controller.signal,
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      });
+    }
     
     clearTimeout(timeoutId);
     
