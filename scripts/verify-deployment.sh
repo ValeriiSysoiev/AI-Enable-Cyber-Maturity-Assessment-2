@@ -6,8 +6,8 @@
 set -e
 
 EXPECTED_SHA="${1:-$(git rev-parse HEAD)}"
-PROD_URL="${2:-https://aecma-prod.azurewebsites.net}"
-STAGING_URL="${3:-https://aecma-staging.azurewebsites.net}"
+PROD_URL="${2:-https://web-cybermat-prd.azurewebsites.net}"
+STAGING_URL="${3:-https://web-cybermat-stg.azurewebsites.net}"
 
 echo "🔍 DEPLOYMENT VERIFICATION"
 echo "=========================="
