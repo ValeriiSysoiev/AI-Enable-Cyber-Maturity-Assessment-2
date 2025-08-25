@@ -1,18 +1,35 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import { signIn } from "next-auth/react";
 
 export default function SignIn() {
   const [email, setEmail] = useState("");
+  const [isAAD, setIsAAD] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   const router = useRouter();
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  useEffect(() => {
+    // Check auth mode
+    fetch('/api/auth/mode')
+      .then(res => res.json())
+      .then(data => {
+        setIsAAD(data.mode === 'aad' && data.enabled);
+        setIsLoading(false);
+      })
+      .catch(() => {
+        setIsAAD(false);
+        setIsLoading(false);
+      });
+  }, []);
+
+  const handleDemoSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (email.trim()) {
       try {
-        // Call API route to set authentication cookie
-        const response = await fetch('/api/auth/signin', {
+        // Call demo API route to set authentication cookie
+        const response = await fetch('/api/demo/signin', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -21,6 +38,8 @@ export default function SignIn() {
         });
         
         if (response.ok) {
+          // Also set localStorage for client-side state
+          localStorage.setItem('email', email.trim());
           router.push("/engagements");
         } else {
           console.error('Failed to sign in');
@@ -30,6 +49,44 @@ export default function SignIn() {
       }
     }
   };
+
+  const handleAADSignIn = () => {
+    // Use NextAuth signIn for AAD
+    signIn('azure-ad', { callbackUrl: '/engagements' });
+  };
+
+  if (isLoading) {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-gray-50">
+        <div>Loading...</div>
+      </div>
+    );
+  }
+
+  if (isAAD) {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-gray-50">
+        <div className="w-full max-w-md space-y-8">
+          <div>
+            <h2 className="mt-6 text-center text-3xl font-bold tracking-tight text-gray-900">
+              Sign in to AI Maturity Assessment
+            </h2>
+            <p className="mt-2 text-center text-sm text-gray-600">
+              Use your organizational account to continue
+            </p>
+          </div>
+          <div className="mt-8">
+            <button
+              onClick={handleAADSignIn}
+              className="group relative flex w-full justify-center rounded-md border border-transparent bg-indigo-600 py-2 px-4 text-sm font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+            >
+              Sign in with Azure Active Directory
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-gray-50">
@@ -42,7 +99,7 @@ export default function SignIn() {
             Enter your email to continue (demo)
           </p>
         </div>
-        <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
+        <form className="mt-8 space-y-6" onSubmit={handleDemoSubmit}>
           <div className="-space-y-px rounded-md shadow-sm">
             <div>
               <label htmlFor="email" className="sr-only">
