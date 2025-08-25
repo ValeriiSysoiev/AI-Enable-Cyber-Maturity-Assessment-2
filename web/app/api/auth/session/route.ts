@@ -1,8 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { getServerSession } from 'next-auth';
+import { authOptions } from '@/lib/auth';
 
 export async function GET(request: NextRequest) {
   try {
-    // Direct auth mode check without fetch
+    // Check auth mode
     const aadEnabled = process.env.AUTH_MODE === "aad"
       && !!process.env.AZURE_AD_CLIENT_ID
       && !!process.env.AZURE_AD_TENANT_ID
@@ -11,21 +13,17 @@ export async function GET(request: NextRequest) {
     const demoEnabled = process.env.DEMO_E2E === "1";
     
     if (aadEnabled && !demoEnabled) {
-      // AAD mode - return admin user session
-      return NextResponse.json({
-        user: {
-          id: 'va.sysoiev@audit3a.com',
-          email: 'va.sysoiev@audit3a.com',
-          name: 'Valentyn Sysoiev',
-          roles: ['Admin'],
-          tenant_id: '8354a4cc-cfd8-41e4-9416-ea0304bc62e1'
-        }
-      });
+      // AAD mode - get actual session from NextAuth
+      const session = await getServerSession(authOptions);
+      if (!session || !session.user) {
+        return NextResponse.json({ user: null });
+      }
+      return NextResponse.json({ user: session.user });
     } else {
       // Demo mode - check cookie
       const cookieHeader = request.headers.get('cookie');
       if (cookieHeader && cookieHeader.includes('demo-email')) {
-        const email = cookieHeader.split('demo-email=')[1]?.split(';')[0];
+        const email = decodeURIComponent(cookieHeader.split('demo-email=')[1]?.split(';')[0] || '');
         if (email) {
           return NextResponse.json({
             user: {
