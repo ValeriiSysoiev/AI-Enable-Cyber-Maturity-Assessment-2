@@ -14,7 +14,7 @@ export async function GET() {
   if (sha === "unknown") {
     try {
       // This is a fallback - try to read from a version file that could be created during build
-      sha = "bcecc223"; // Current commit SHA as fallback
+      sha = "0e4c0403"; // Current commit SHA as fallback
     } catch (error) {
       sha = "unknown";
     }
