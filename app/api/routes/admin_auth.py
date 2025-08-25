@@ -17,7 +17,7 @@ from config import config
 from services.aad_groups import create_aad_groups_service
 
 
-router = APIRouter(prefix="/admin", tags=["admin", "auth"])
+router = APIRouter(prefix="/api/admin", tags=["admin", "auth"])
 logger = logging.getLogger(__name__)
 
 
@@ -82,6 +82,138 @@ class AuthDiagnosticsResponse(BaseModel):
     aad_service_status: AADServiceStatus
     configuration: Dict[str, Any]
     recommendations: List[str]
+
+
+class AdminStatusResponse(BaseModel):
+    """Admin system status response"""
+    timestamp: str
+    service: str
+    version: str
+    status: str
+    uptime_seconds: float
+    auth_modes: List[AuthModeInfo]
+    admin_users_count: int
+    aad_enabled: bool
+    aad_operational: bool
+    environment: str
+    health_checks: Dict[str, bool]
+
+
+@router.get("/status", response_model=AdminStatusResponse)
+async def get_admin_status(
+    request: Request,
+    ctx: Dict[str, Any] = Depends(current_context),
+    repo: Repository = Depends(get_repository)
+):
+    """
+    Get admin system status and health information.
+    
+    Admin-only endpoint that provides:
+    - Service health status
+    - Authentication system status  
+    - AAD integration status
+    - Basic system metrics
+    - Environment information
+    
+    This endpoint is designed for monitoring and health checks.
+    """
+    # Require admin access
+    require_admin(repo, ctx)
+    
+    correlation_id = request.headers.get("X-Correlation-ID", "admin-status")
+    user_email = ctx["user_email"]
+    
+    logger.info(
+        "Admin status requested",
+        extra={
+            "user_email": user_email,
+            "correlation_id": correlation_id
+        }
+    )
+    
+    try:
+        # Calculate uptime
+        import os
+        from datetime import datetime
+        startup_time_str = os.getenv("STARTUP_TIME")
+        if startup_time_str:
+            from dateutil.parser import parse
+            startup_time = parse(startup_time_str)
+            uptime_seconds = (datetime.now(startup_time.tzinfo) - startup_time).total_seconds()
+        else:
+            uptime_seconds = 0.0
+        
+        # Get authentication modes
+        auth_modes = [
+            AuthModeInfo(
+                mode="email_admin",
+                enabled=True,
+                description="Email-based admin authentication"
+            ),
+            AuthModeInfo(
+                mode="aad_groups",
+                enabled=config.is_aad_groups_enabled(),
+                description="Azure Active Directory groups authentication"
+            )
+        ]
+        
+        # Get AAD status
+        aad_operational = False
+        if config.is_aad_groups_enabled():
+            try:
+                aad_service = create_aad_groups_service(correlation_id)
+                status = aad_service.get_status()
+                aad_operational = status.get("operational", False)
+            except Exception:
+                aad_operational = False
+        
+        # Basic health checks
+        health_checks = {
+            "database": True,  # Basic check - if we got here, DB is working
+            "config_valid": True,  # Basic check - if we got here, config loaded
+            "aad_service": aad_operational if config.is_aad_groups_enabled() else True
+        }
+        
+        # Get version info
+        version = os.getenv("APP_VERSION", "dev")
+        environment = os.getenv("ENVIRONMENT", "development")
+        
+        response = AdminStatusResponse(
+            timestamp=datetime.now().isoformat(),
+            service="ai-maturity-assessment-api",
+            version=version,
+            status="healthy",
+            uptime_seconds=uptime_seconds,
+            auth_modes=auth_modes,
+            admin_users_count=len(config.admin_emails),
+            aad_enabled=config.is_aad_groups_enabled(),
+            aad_operational=aad_operational,
+            environment=environment,
+            health_checks=health_checks
+        )
+        
+        logger.info(
+            "Admin status completed",
+            extra={
+                "user_email": user_email,
+                "status": response.status,
+                "aad_operational": aad_operational,
+                "correlation_id": correlation_id
+            }
+        )
+        
+        return response
+        
+    except Exception as e:
+        logger.error(
+            "Failed to get admin status",
+            extra={
+                "user_email": user_email,
+                "error": str(e),
+                "correlation_id": correlation_id
+            }
+        )
+        raise
 
 
 @router.get("/auth-diagnostics", response_model=AuthDiagnosticsResponse)

@@ -180,10 +180,11 @@ class UATExplorer {
     try {
       this.logger.info(`Starting UAT step: ${stepName}`, { url });
 
-      // Navigate and capture HTTP status
+      // Navigate and capture HTTP status - increased timeout for production
+      const isProduction = process.env.NODE_ENV === 'production' || process.env.CI;
       const response = await this.page.goto(url, { 
         waitUntil: 'networkidle',
-        timeout: 30000 
+        timeout: isProduction ? 60000 : 30000 
       });
       
       step.httpStatus = response?.status() || null;
