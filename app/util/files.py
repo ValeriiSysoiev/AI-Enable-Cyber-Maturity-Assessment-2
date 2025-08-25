@@ -5,7 +5,7 @@ from pydantic import BaseModel
 
 class ExtractResult(BaseModel):
     text: str
-    page_count: int | None = None
+    page_count: Optional[int] = None
     note: Optional[str] = None
 
 def safe_join(*parts: str) -> str:
