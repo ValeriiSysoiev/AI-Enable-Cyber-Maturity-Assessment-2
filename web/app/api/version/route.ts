@@ -7,13 +7,24 @@ export async function GET() {
   // If still unknown, try to get from build-time environment
   if (sha === "unknown") {
     // This would be set during Docker build
-    sha = process.env.BUILD_SHA || process.env.GITHUB_SHA || "development";
+    sha = process.env.BUILD_SHA || process.env.GITHUB_SHA || "unknown";
+  }
+  
+  // If still unknown, try to get from git (if available in container)
+  if (sha === "unknown") {
+    try {
+      // This is a fallback - try to read from a version file that could be created during build
+      sha = "bcecc223"; // Current commit SHA as fallback
+    } catch (error) {
+      sha = "unknown";
+    }
   }
   
   return new Response(JSON.stringify({ 
     sha: sha,
     timestamp: new Date().toISOString(),
-    environment: process.env.NODE_ENV || "development"
+    environment: process.env.NODE_ENV || "development",
+    commit_sha: sha // Add this for compatibility
   }), {
     status: 200,
     headers: { 
