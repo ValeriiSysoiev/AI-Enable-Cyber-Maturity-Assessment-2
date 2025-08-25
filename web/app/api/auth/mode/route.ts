@@ -9,7 +9,8 @@ export async function GET() {
   
   const demoEnabled = process.env.DEMO_E2E === "1";
   
-  // If AAD is enabled and demo is disabled, use AAD
+  // If AAD is properly configured and demo is disabled, use AAD
+  // Otherwise fall back to demo mode to prevent 405 errors
   const authMode = (aadEnabled && !demoEnabled) ? 'aad' : 'demo';
   
   return NextResponse.json({

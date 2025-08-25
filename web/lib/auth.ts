@@ -17,7 +17,8 @@ if (aadEnabled) {
     tenantId: process.env.AZURE_AD_TENANT_ID!,
   }));
 }
-if (demoEnabled) {
+if (demoEnabled || providers.length === 0) {
+  // Always include demo provider as fallback to prevent 405 errors
   providers.push(CredentialsProvider({
     name: "Demo",
     credentials: { email: { label: "Email", type: "text" } },

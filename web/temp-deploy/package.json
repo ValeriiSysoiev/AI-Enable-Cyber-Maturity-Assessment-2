@@ -5,7 +5,7 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
-    "start": "next start -p ${PORT:-8080}",
+    "start": "node server.js",
     "lint": "next lint",
     "test:e2e": "playwright test",
     "test:e2e:ui": "playwright test --ui",
@@ -16,24 +16,33 @@
     "test:e2e:engagements": "playwright test engagements.spec.ts",
     "test:e2e:integration": "playwright test integration.spec.ts",
     "test:e2e:rag": "playwright test rag.spec.ts",
+    "test:e2e:uat": "playwright test --project=uat-explorer",
+    "test:e2e:uat:demo": "DEMO_E2E=1 playwright test --project=uat-explorer",
+    "test:e2e:uat:production": "UAT_HEADLESS=true playwright test --project=uat-explorer",
+    "test:e2e:uat:validate": "node scripts/validate-uat-setup.js",
+    "test:e2e:uat:github": "node e2e/utils/test-github-integration.js",
     "test:e2e:report": "playwright show-report"
   },
   "dependencies": {
+    "@octokit/rest": "^22.0.0",
     "next": "14.2.31",
+    "next-auth": "^4.24.11",
     "react": "18.3.1",
     "react-dom": "18.3.1",
+    "react-window": "^1.8.10",
     "recharts": "^2.12.0"
   },
   "devDependencies": {
-    "typescript": "^5.4.0",
-    "@types/react": "^18.2.0",
+    "@playwright/test": "^1.40.0",
     "@types/node": "^20.11.0",
-    "tailwindcss": "^3.4.0",
-    "postcss": "^8.4.0",
+    "@types/react": "^18.2.0",
+    "@types/react-window": "^1.8.8",
     "autoprefixer": "^10.4.0",
     "eslint": "^8.0.0",
     "eslint-config-next": "14.2.31",
-    "@playwright/test": "^1.40.0"
+    "postcss": "^8.4.0",
+    "tailwindcss": "^3.4.0",
+    "typescript": "^5.4.0"
   },
   "engines": {
     "node": ">=20.x"
