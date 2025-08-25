@@ -12,13 +12,17 @@ from pydantic import BaseModel
 
 from api.security import current_context, require_admin, get_user_groups, get_user_roles, is_admin_enhanced
 from domain.repository import Repository
-from repos.factory import get_repository
 from config import config
 from services.aad_groups import create_aad_groups_service
 
 
 router = APIRouter(prefix="/api/admin", tags=["admin", "auth"])
 logger = logging.getLogger(__name__)
+
+
+def get_repository(request: Request) -> Repository:
+    """Get repository from app state"""
+    return request.app.state.repo
 
 
 class AuthModeInfo(BaseModel):
