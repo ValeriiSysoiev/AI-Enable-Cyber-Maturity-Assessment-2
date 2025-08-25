@@ -10,6 +10,12 @@ RUN npm ci
 ARG NEXT_PUBLIC_API_BASE_URL=""
 ENV NEXT_PUBLIC_API_BASE_URL=$NEXT_PUBLIC_API_BASE_URL
 
+# Build args for version information
+ARG GITHUB_SHA=""
+ARG BUILD_SHA=""
+ENV GITHUB_SHA=$GITHUB_SHA
+ENV BUILD_SHA=$BUILD_SHA
+
 # Copy source code and build
 COPY . .
 # Ensure public directory exists for Next.js
@@ -29,6 +35,12 @@ ENV NEXT_TELEMETRY_DISABLED=1
 # Re-expose public env vars for runtime (also embedded at build time)
 ARG NEXT_PUBLIC_API_BASE_URL=""
 ENV NEXT_PUBLIC_API_BASE_URL=$NEXT_PUBLIC_API_BASE_URL
+
+# Re-expose version information for runtime
+ARG GITHUB_SHA=""
+ARG BUILD_SHA=""
+ENV GITHUB_SHA=$GITHUB_SHA
+ENV BUILD_SHA=$BUILD_SHA
 
 # Create non-root user for security
 RUN addgroup --system --gid 1001 nodejs
