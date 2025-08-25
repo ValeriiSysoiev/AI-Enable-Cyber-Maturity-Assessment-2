@@ -27,7 +27,9 @@ export default function EngagementSwitcher() {
       setTimeout(() => {
         loadEngagements();
       }, 100);
-      setCurrentEngagementId(engId);
+      if (engId) {
+        setCurrentEngagementId(engId);
+      }
     }
   }, []);
 

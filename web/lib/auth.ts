@@ -67,3 +67,37 @@ export const authOptions: AuthOptions = {
     signIn: "/signin",
   }
 };
+
+// Client-side utility functions
+export function isAdmin(): boolean {
+  if (typeof window === 'undefined') return false;
+  
+  // Check localStorage for admin role (demo mode)
+  const email = localStorage.getItem('email');
+  const adminEmails = ['admin@example.com', 'va.sysoiev@audit3a.com'];
+  
+  return email ? adminEmails.includes(email.toLowerCase()) : false;
+}
+
+export function getEmail(): string | null {
+  if (typeof window === 'undefined') return null;
+  return localStorage.getItem('email');
+}
+
+export function getEngagementId(): string | null {
+  if (typeof window === 'undefined') return null;
+  return localStorage.getItem('engagementId');
+}
+
+export function setEngagementId(id: string): void {
+  if (typeof window === 'undefined') return;
+  localStorage.setItem('engagementId', id);
+}
+
+export function requireEmail(): string {
+  const email = getEmail();
+  if (!email) {
+    throw new Error('Email is required');
+  }
+  return email;
+}
