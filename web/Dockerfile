@@ -7,19 +7,8 @@ COPY package.json package-lock.json* ./
 RUN npm ci
 
 # Build args that surface through environment for Next.js at build time
-ARG NEXT_PUBLIC_API_BASE_URL="/api/proxy"
+ARG NEXT_PUBLIC_API_BASE_URL=""
 ENV NEXT_PUBLIC_API_BASE_URL=$NEXT_PUBLIC_API_BASE_URL
-
-# CRITICAL: Set environment variables in BUILD stage so Next.js can see them
-ENV AUTH_MODE=aad
-ENV DEMO_E2E=0
-ENV NEXT_PUBLIC_ADMIN_E2E=0
-ENV AZURE_AD_CLIENT_ID=e58a1568-a1cc-4f42-a773-94ede30964fe
-ENV AZURE_AD_TENANT_ID=8354a4cc-cfd8-41e4-9416-ea0304bc62e1
-ENV AZURE_AD_CLIENT_SECRET=WN58Q~6PhUzuhq6wavETZtd.TQ1YccxJ7GcqvchX
-ENV NEXTAUTH_URL=https://web-cybermat-prd.azurewebsites.net
-ENV NEXTAUTH_SECRET=@Microsoft.KeyVault(VaultName=kv-cybermat-prd;SecretName=nextauth-secret)
-ENV AUTH_TRUST_HOST=true
 
 # Copy source code and build
 COPY . .
@@ -37,21 +26,8 @@ ENV NODE_ENV=production
 ENV PORT=3000
 ENV NEXT_TELEMETRY_DISABLED=1
 
-# RUNTIME ENVIRONMENT VARIABLES - Must match build stage
-# These are needed at runtime for the Next.js server
-ENV AUTH_MODE=aad
-ENV DEMO_E2E=0
-ENV NEXT_PUBLIC_ADMIN_E2E=0
-ENV AZURE_AD_CLIENT_ID=e58a1568-a1cc-4f42-a773-94ede30964fe
-ENV AZURE_AD_TENANT_ID=8354a4cc-cfd8-41e4-9416-ea0304bc62e1
-ENV AZURE_AD_CLIENT_SECRET=WN58Q~6PhUzuhq6wavETZtd.TQ1YccxJ7GcqvchX
-ENV NEXTAUTH_URL=https://web-cybermat-prd.azurewebsites.net
-ENV NEXTAUTH_SECRET=@Microsoft.KeyVault(VaultName=kv-cybermat-prd;SecretName=nextauth-secret)
-ENV NEXT_PUBLIC_API_BASE_URL=/api/proxy
-ENV AUTH_TRUST_HOST=true
-
 # Re-expose public env vars for runtime (also embedded at build time)
-ARG NEXT_PUBLIC_API_BASE_URL="/api/proxy"
+ARG NEXT_PUBLIC_API_BASE_URL=""
 ENV NEXT_PUBLIC_API_BASE_URL=$NEXT_PUBLIC_API_BASE_URL
 
 # Create non-root user for security
@@ -69,8 +45,6 @@ COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
 # Copy public files if they exist
 COPY --from=builder --chown=nextjs:nodejs /app/public ./public
 
-# No startup script needed - using ENV commands directly
-
 # Switch to non-root user
 USER nextjs
 
@@ -81,5 +55,7 @@ EXPOSE 3000
 HEALTHCHECK --interval=30s --timeout=3s --start-period=15s --retries=3 \
   CMD curl -f http://localhost:${PORT:-3000}/ || exit 1
 
-# Start the application directly - environment variables are set via ENV commands
+# Start the application using the generated server.js from standalone build
+# This uses Node.js directly without requiring Next.js CLI in production
+# The standalone build respects the PORT environment variable
 CMD ["node", "server.js"]

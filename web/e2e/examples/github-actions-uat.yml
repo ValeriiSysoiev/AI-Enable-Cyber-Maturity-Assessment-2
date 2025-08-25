@@ -1,0 +1,209 @@
+# Example GitHub Actions workflow for UAT Explorer
+# Save this as .github/workflows/uat-explorer.yml
+
+name: UAT Explorer - Continuous Testing
+
+on:
+  schedule:
+    # Run every 4 hours
+    - cron: '0 */4 * * *'
+  workflow_dispatch: # Allow manual runs
+  push:
+    branches: [ main ]
+    paths: [ 'web/**' ]
+
+env:
+  WEB_BASE_URL: ${{ secrets.WEB_BASE_URL || 'https://your-staging-environment.com' }}
+
+jobs:
+  uat-explorer:
+    name: UAT Explorer Tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    
+    strategy:
+      matrix:
+        auth-mode: [demo, aad]
+      fail-fast: false # Continue testing both modes even if one fails
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: 'web/package-lock.json'
+
+      - name: Install dependencies
+        working-directory: web
+        run: npm ci
+
+      - name: Install Playwright browsers
+        working-directory: web
+        run: npx playwright install chromium
+
+      - name: Validate UAT setup
+        working-directory: web
+        run: npm run test:e2e:uat:validate
+
+      - name: Run UAT Explorer (Demo Mode)
+        if: matrix.auth-mode == 'demo'
+        working-directory: web
+        run: |
+          export DEMO_E2E=1
+          export UAT_HEADLESS=true
+          npm run test:e2e:uat:production
+        continue-on-error: true # Don't fail the job, we want to analyze results
+
+      - name: Run UAT Explorer (AAD Mode)
+        if: matrix.auth-mode == 'aad'
+        working-directory: web
+        run: |
+          export UAT_HEADLESS=true
+          npm run test:e2e:uat:production
+        continue-on-error: true # Don't fail the job, we want to analyze results
+
+      - name: Upload UAT artifacts
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: uat-results-${{ matrix.auth-mode }}-${{ github.run_number }}
+          path: |
+            web/artifacts/uat/
+            web/e2e/test-results/
+          retention-days: 30
+
+      - name: Parse UAT results
+        if: always()
+        working-directory: web
+        run: |
+          echo "## UAT Explorer Results (${{ matrix.auth-mode }} mode)" >> $GITHUB_STEP_SUMMARY
+          
+          if [ -f "artifacts/uat/uat_summary.json" ]; then
+            SUCCESS=$(cat artifacts/uat/uat_summary.json | jq -r '.success')
+            CRITICAL_ISSUES=$(cat artifacts/uat/uat_summary.json | jq -r '.criticalIssues')
+            HIGH_ISSUES=$(cat artifacts/uat/uat_summary.json | jq -r '.highIssues')
+            SUCCESS_RATE=$(cat artifacts/uat/uat_summary.json | jq -r '.summary.successRate')
+            
+            echo "- **Overall Success**: $SUCCESS" >> $GITHUB_STEP_SUMMARY
+            echo "- **Success Rate**: ${SUCCESS_RATE}%" >> $GITHUB_STEP_SUMMARY
+            echo "- **Critical Issues**: $CRITICAL_ISSUES" >> $GITHUB_STEP_SUMMARY
+            echo "- **High Priority Issues**: $HIGH_ISSUES" >> $GITHUB_STEP_SUMMARY
+            
+            # Set job status based on critical issues
+            if [ "$CRITICAL_ISSUES" -gt "0" ]; then
+              echo "❌ Critical issues found - marking job as failed" >> $GITHUB_STEP_SUMMARY
+              exit 1
+            elif [ "$SUCCESS" = "false" ]; then
+              echo "⚠️ Some tests failed but no critical issues" >> $GITHUB_STEP_SUMMARY
+              exit 1
+            else
+              echo "✅ All tests passed successfully" >> $GITHUB_STEP_SUMMARY
+            fi
+          else
+            echo "❌ UAT summary file not found - tests may have failed to run" >> $GITHUB_STEP_SUMMARY
+            exit 1
+          fi
+
+      - name: Comment PR with results (if PR)
+        if: github.event_name == 'pull_request' && always()
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const path = 'web/artifacts/uat/uat_summary.json';
+            
+            if (fs.existsSync(path)) {
+              const summary = JSON.parse(fs.readFileSync(path, 'utf8'));
+              
+              const comment = `## 🔍 UAT Explorer Results (${{ matrix.auth-mode }} mode)
+              
+              **Overall Status**: ${summary.success ? '✅ PASSED' : '❌ FAILED'}
+              **Success Rate**: ${summary.summary.successRate.toFixed(1)}%
+              **Critical Issues**: ${summary.criticalIssues}
+              **High Priority Issues**: ${summary.highIssues}
+              **Performance Issues**: ${summary.performanceIssues}
+              
+              ${summary.topIssues.length > 0 ? '### Top Issues:\n' + summary.topIssues.map(issue => `- **${issue.severity.toUpperCase()}**: ${issue.message} (${issue.count}x)`).join('\n') : '✅ No issues detected'}
+              
+              <details>
+              <summary>📊 Detailed Results</summary>
+              
+              - **Total Tests**: ${summary.summary.totalTests}
+              - **Passed**: ${summary.summary.passedTests}
+              - **Failed**: ${summary.summary.failedTests}
+              - **Duration**: ${Math.round(summary.summary.duration / 1000)}s
+              
+              </details>
+              `;
+              
+              github.rest.issues.createComment({
+                issue_number: context.issue.number,
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                body: comment
+              });
+            }
+
+  # Aggregate results from both modes
+  uat-summary:
+    name: UAT Summary
+    runs-on: ubuntu-latest
+    needs: uat-explorer
+    if: always()
+    
+    steps:
+      - name: Download all artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: uat-results
+
+      - name: Generate combined summary
+        run: |
+          echo "# 🔍 UAT Explorer Summary - Run ${{ github.run_number }}" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Timestamp**: $(date -u)" >> $GITHUB_STEP_SUMMARY
+          echo "**Trigger**: ${{ github.event_name }}" >> $GITHUB_STEP_SUMMARY
+          echo "**Branch**: ${{ github.ref_name }}" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          
+          # Process each mode's results
+          for mode in demo aad; do
+            summary_file="uat-results/uat-results-${mode}-${{ github.run_number }}/uat_summary.json"
+            if [ -f "$summary_file" ]; then
+              SUCCESS=$(cat "$summary_file" | jq -r '.success')
+              CRITICAL=$(cat "$summary_file" | jq -r '.criticalIssues')
+              
+              if [ "$SUCCESS" = "true" ] && [ "$CRITICAL" = "0" ]; then
+                echo "✅ **${mode^^} Mode**: All tests passed" >> $GITHUB_STEP_SUMMARY
+              else
+                echo "❌ **${mode^^} Mode**: Issues detected ($CRITICAL critical)" >> $GITHUB_STEP_SUMMARY
+              fi
+            else
+              echo "❓ **${mode^^} Mode**: Results not available" >> $GITHUB_STEP_SUMMARY
+            fi
+          done
+
+      - name: Set workflow status
+        run: |
+          # Determine if we should fail the workflow based on critical issues
+          SHOULD_FAIL=false
+          
+          for mode in demo aad; do
+            summary_file="uat-results/uat-results-${mode}-${{ github.run_number }}/uat_summary.json"
+            if [ -f "$summary_file" ]; then
+              CRITICAL=$(cat "$summary_file" | jq -r '.criticalIssues')
+              if [ "$CRITICAL" -gt "0" ]; then
+                SHOULD_FAIL=true
+                break
+              fi
+            fi
+          done
+          
+          if [ "$SHOULD_FAIL" = "true" ]; then
+            echo "Critical issues detected - failing workflow"
+            exit 1
+          fi
