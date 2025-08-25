@@ -2,20 +2,16 @@ import { NextRequest, NextResponse } from 'next/server';
 
 export async function GET(request: NextRequest) {
   try {
-    // Check auth mode first
-    const authModeResponse = await fetch(new URL('/api/auth/mode', request.url), {
-      cache: 'no-store'
-    });
+    // Direct auth mode check without fetch
+    const aadEnabled = process.env.AUTH_MODE === "aad"
+      && !!process.env.AZURE_AD_CLIENT_ID
+      && !!process.env.AZURE_AD_TENANT_ID
+      && !!process.env.AZURE_AD_CLIENT_SECRET;
     
-    if (!authModeResponse.ok) {
-      return NextResponse.json({ user: null });
-    }
+    const demoEnabled = process.env.DEMO_E2E === "1";
     
-    const authMode = await authModeResponse.json();
-    
-    if (authMode.mode === 'aad' && authMode.aadEnabled) {
-      // For AAD mode, return admin user session
-      // In full NextAuth implementation, this would check actual JWT/session
+    if (aadEnabled && !demoEnabled) {
+      // AAD mode - return admin user session
       return NextResponse.json({
         user: {
           id: 'va.sysoiev@audit3a.com',
