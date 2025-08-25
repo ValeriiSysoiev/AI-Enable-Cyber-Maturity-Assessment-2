@@ -20,17 +20,21 @@ export async function GET(request: NextRequest) {
       }
       return NextResponse.json({ user: session.user });
     } else {
-      // Demo mode - check cookie
+      // Demo mode - check cookie (not hardcoded)
       const cookieHeader = request.headers.get('cookie');
       if (cookieHeader && cookieHeader.includes('demo-email')) {
         const email = decodeURIComponent(cookieHeader.split('demo-email=')[1]?.split(';')[0] || '');
-        if (email) {
+        if (email && email.trim()) {
+          // Determine admin role based on email
+          const adminEmails = ['admin@example.com', 'va.sysoiev@audit3a.com'];
+          const isAdmin = adminEmails.includes(email.toLowerCase());
+          
           return NextResponse.json({
             user: {
               id: email,
               email: email,
               name: email.split('@')[0],
-              roles: ['Member']
+              roles: isAdmin ? ['Admin'] : ['Member']
             }
           });
         }
