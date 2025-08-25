@@ -1,27 +1,81 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { rateLimiters, withRateLimit } from '@/lib/rate-limiter';
 
 const API_BASE_URL = process.env.PROXY_TARGET_API_BASE_URL || 'http://localhost:8000';
 
-export async function GET(request: NextRequest, { params }: { params: { path: string[] } }) {
+// SSRF Protection: Allowed base URLs for proxy requests
+const ALLOWED_BASE_URLS = [
+  'http://localhost:8000',
+  'https://api-cybermat-prd.azurewebsites.net',
+  'https://api-cybermat-dev.azurewebsites.net',
+  'https://api-cybermat-staging.azurewebsites.net'
+];
+
+// SSRF Protection: Block dangerous protocols and private IPs
+const BLOCKED_PROTOCOLS = ['file:', 'ftp:', 'sftp:', 'ldap:', 'dict:', 'gopher:'];
+const PRIVATE_IP_REGEX = /^(10\.|192\.168\.|172\.(1[6-9]|2[0-9]|3[0-1])\.|127\.|0\.|169\.254\.|::1|fc00::|fe80::)/;
+
+function validateProxyTarget(url: string): boolean {
+  try {
+    const parsedUrl = new URL(url);
+    
+    // Block dangerous protocols
+    if (BLOCKED_PROTOCOLS.includes(parsedUrl.protocol)) {
+      console.warn(`Blocked dangerous protocol: ${parsedUrl.protocol}`);
+      return false;
+    }
+    
+    // Block private IP ranges (prevent SSRF to internal services)
+    if (PRIVATE_IP_REGEX.test(parsedUrl.hostname)) {
+      console.warn(`Blocked private IP: ${parsedUrl.hostname}`);
+      return false;
+    }
+    
+    // Only allow specific base URLs
+    const baseUrl = `${parsedUrl.protocol}//${parsedUrl.host}`;
+    if (!ALLOWED_BASE_URLS.includes(baseUrl)) {
+      console.warn(`Blocked non-allowed base URL: ${baseUrl}`);
+      return false;
+    }
+    
+    return true;
+  } catch (error) {
+    console.warn(`Invalid URL format: ${url}`);
+    return false;
+  }
+}
+
+const rateLimitedHandleRequest = withRateLimit(rateLimiters.proxy);
+
+export const GET = rateLimitedHandleRequest(async (request: NextRequest, { params }: { params: { path: string[] } }) => {
   return handleRequest(request, params.path, 'GET');
-}
+});
 
-export async function POST(request: NextRequest, { params }: { params: { path: string[] } }) {
+export const POST = rateLimitedHandleRequest(async (request: NextRequest, { params }: { params: { path: string[] } }) => {
   return handleRequest(request, params.path, 'POST');
-}
+});
 
-export async function PUT(request: NextRequest, { params }: { params: { path: string[] } }) {
+export const PUT = rateLimitedHandleRequest(async (request: NextRequest, { params }: { params: { path: string[] } }) => {
   return handleRequest(request, params.path, 'PUT');
-}
+});
 
-export async function DELETE(request: NextRequest, { params }: { params: { path: string[] } }) {
+export const DELETE = rateLimitedHandleRequest(async (request: NextRequest, { params }: { params: { path: string[] } }) => {
   return handleRequest(request, params.path, 'DELETE');
-}
+});
 
 async function handleRequest(request: NextRequest, path: string[], method: string) {
   try {
     const apiPath = path.join('/');
     const url = new URL(`${API_BASE_URL}/${apiPath}`);
+    
+    // SSRF Protection: Validate the target URL
+    if (!validateProxyTarget(url.toString())) {
+      console.error('SSRF attempt blocked:', url.toString());
+      return NextResponse.json(
+        { detail: 'Access to this resource is not allowed' },
+        { status: 403 }
+      );
+    }
     
     // Copy query parameters
     request.nextUrl.searchParams.forEach((value, key) => {

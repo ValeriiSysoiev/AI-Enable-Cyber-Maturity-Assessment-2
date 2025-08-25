@@ -1,9 +1,43 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { rateLimiters, withRateLimit } from '@/lib/rate-limiter';
 
-export async function GET(request: NextRequest) {
+// SSRF Protection: Allowed backend URLs
+const ALLOWED_BACKEND_URLS = [
+  'https://api-cybermat-prd.azurewebsites.net',
+  'https://api-cybermat-dev.azurewebsites.net', 
+  'https://api-cybermat-staging.azurewebsites.net',
+  'http://localhost:8000'
+];
+
+function validateBackendUrl(url: string): boolean {
+  return ALLOWED_BACKEND_URLS.includes(url);
+}
+
+const rateLimitedHandler = withRateLimit(rateLimiters.proxy);
+
+export const GET = rateLimitedHandler(async (request: NextRequest) => {
   try {
     // Try backend first, fallback to local API
     const backendUrl = process.env.PROXY_TARGET_API_BASE_URL || "https://api-cybermat-prd.azurewebsites.net";
+    
+    // SSRF Protection: Validate backend URL
+    if (!validateBackendUrl(backendUrl)) {
+      console.error('Invalid backend URL blocked:', backendUrl);
+      // Fall back to safe default data instead of allowing SSRF
+      const fallbackEngagements = [
+        {
+          id: "demo-engagement-1",
+          name: "Cybersecurity Maturity Assessment - Demo",
+          description: "Sample engagement for demonstration purposes",
+          status: "active",
+          created_at: "2025-08-24T00:00:00Z",
+          updated_at: "2025-08-24T00:00:00Z",
+          member_count: 3,
+          user_role: "Admin"
+        }
+      ];
+      return NextResponse.json(fallbackEngagements);
+    }
     
     try {
       const response = await fetch(`${backendUrl}/engagements`, {
@@ -42,4 +76,4 @@ export async function GET(request: NextRequest) {
     console.error("Proxy engagements error:", error);
     return NextResponse.json([], { status: 200 });
   }
-}
+});

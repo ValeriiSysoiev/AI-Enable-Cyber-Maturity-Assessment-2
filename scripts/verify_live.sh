@@ -44,10 +44,12 @@ DEPLOYMENT_ENVIRONMENT="${DEPLOYMENT_ENVIRONMENT:-staging}"
 LOG_ANALYTICS_WORKSPACE_ID="${LOG_ANALYTICS_WORKSPACE_ID:-}"
 LOG_ANALYTICS_SHARED_KEY="${LOG_ANALYTICS_SHARED_KEY:-}"
 
-# Performance thresholds (in seconds)
-API_RESPONSE_THRESHOLD=5
-SEARCH_RESPONSE_THRESHOLD=3
-RAG_RESPONSE_THRESHOLD=10
+# Performance thresholds (in seconds) - Optimized for enhanced infrastructure
+API_RESPONSE_THRESHOLD=3  # Reduced from 5 with better resources
+SEARCH_RESPONSE_THRESHOLD=2  # Reduced from 3 for tighter performance
+RAG_RESPONSE_THRESHOLD=8   # Reduced from 10 with optimized container resources
+CONTAINER_STARTUP_THRESHOLD=120  # Maximum container startup time
+HTTP_RESPONSE_THRESHOLD=2  # Maximum acceptable HTTP response time
 
 # Enterprise gates - critical pass criteria
 ENTERPRISE_GATES_ENABLED=${ENTERPRISE_GATES_ENABLED:-true}
@@ -1170,6 +1172,110 @@ test_container_app_config() {
     fi
 }
 
+# Test container performance and resource utilization
+test_container_performance() {
+    log_info "Testing container performance and resource utilization..."
+    
+    if [[ -z "$ACA_ENV_NAME" ]]; then
+        log_warning "Container Apps environment name not available - skipping performance tests"
+        return 0
+    fi
+    
+    # Check API container metrics
+    log_info "Checking API container performance metrics..."
+    local api_replica_count
+    api_replica_count=$(az containerapp show \
+        --resource-group "$RG_NAME" \
+        --name "api-${local.client_code:-AAA}-${local.env:-demo}" \
+        --query "properties.template.scale.minReplicas" -o tsv 2>/dev/null || echo "0")
+    
+    if [[ "$api_replica_count" -ge 2 ]]; then
+        log_success "API container has adequate minimum replicas: $api_replica_count"
+    else
+        log_warning "API container minimum replicas ($api_replica_count) may be insufficient for production"
+    fi
+    
+    # Check Web container metrics
+    log_info "Checking Web container performance metrics..."
+    local web_replica_count
+    web_replica_count=$(az containerapp show \
+        --resource-group "$RG_NAME" \
+        --name "web-${local.client_code:-AAA}-${local.env:-demo}" \
+        --query "properties.template.scale.minReplicas" -o tsv 2>/dev/null || echo "0")
+    
+    if [[ "$web_replica_count" -ge 2 ]]; then
+        log_success "Web container has adequate minimum replicas: $web_replica_count"
+    else
+        log_warning "Web container minimum replicas ($web_replica_count) may be insufficient for production"
+    fi
+    
+    # Test startup performance
+    if [[ -n "$API_BASE_URL" ]]; then
+        log_info "Testing API startup performance..."
+        local startup_start_time startup_end_time startup_duration
+        startup_start_time=$(date +%s.%N)
+        
+        local health_attempts=0
+        local max_startup_attempts=12
+        local startup_success=false
+        
+        while [[ $health_attempts -lt $max_startup_attempts ]]; do
+            local startup_response_code
+            startup_response_code=$(curl -s -o /dev/null -w "%{http_code}" \
+                --max-time 10 "${API_BASE_URL}/health" 2>/dev/null || echo "000")
+            
+            if [[ "$startup_response_code" == "200" ]]; then
+                startup_success=true
+                break
+            fi
+            
+            ((health_attempts++))
+            sleep 10
+        done
+        
+        startup_end_time=$(date +%s.%N)
+        startup_duration=$(echo "$startup_end_time - $startup_start_time" | bc 2>/dev/null || echo "0")
+        
+        if [[ "$startup_success" == "true" ]]; then
+            log_success "API startup completed in ${startup_duration}s"
+            
+            if (( $(echo "$startup_duration > $CONTAINER_STARTUP_THRESHOLD" | bc -l) )); then
+                log_warning "API startup time (${startup_duration}s) exceeds threshold (${CONTAINER_STARTUP_THRESHOLD}s)"
+            fi
+        else
+            log_error "API failed to start within timeout period"
+        fi
+    fi
+    
+    # Test concurrent request handling
+    if [[ -n "$API_BASE_URL" ]]; then
+        log_info "Testing concurrent request handling..."
+        local concurrent_start_time concurrent_end_time concurrent_duration
+        concurrent_start_time=$(date +%s.%N)
+        
+        # Launch 5 concurrent health checks
+        local concurrent_pids=()
+        for i in {1..5}; do
+            (curl -s -o /dev/null "${API_BASE_URL}/health" 2>/dev/null) &
+            concurrent_pids+=($!)
+        done
+        
+        # Wait for all concurrent requests
+        for pid in "${concurrent_pids[@]}"; do
+            wait "$pid"
+        done
+        
+        concurrent_end_time=$(date +%s.%N)
+        concurrent_duration=$(echo "$concurrent_end_time - $concurrent_start_time" | bc 2>/dev/null || echo "0")
+        
+        log_success "Concurrent requests completed in ${concurrent_duration}s"
+        
+        if (( $(echo "$concurrent_duration > $HTTP_RESPONSE_THRESHOLD" | bc -l) )); then
+            log_warning "Concurrent response time (${concurrent_duration}s) exceeds threshold (${HTTP_RESPONSE_THRESHOLD}s)"
+        fi
+    fi
+}
+
 # Test enterprise AAD groups functionality
 test_aad_groups() {
     if [[ -z "$API_BASE_URL" ]]; then
@@ -1843,6 +1949,10 @@ main() {
     verify_monitoring
     verify_rag_prerequisites
     test_container_app_config
+    
+    echo
+    echo "=== Container Performance Verification ==="
+    test_container_performance
     
     echo
     echo "=== Phase 7 Enterprise Features Verification ==="

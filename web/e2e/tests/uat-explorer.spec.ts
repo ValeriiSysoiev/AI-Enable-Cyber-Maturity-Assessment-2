@@ -237,6 +237,7 @@ class UATExplorer {
       this.logger.error(`UAT step failed: ${stepName}`, {
         error: step.error,
         url: step.url,
+        sanitizedScreenshotPath: step.screenshotPath ? step.screenshotPath.split('/').slice(-2).join('/') : undefined,
         httpStatus: step.httpStatus
       });
 

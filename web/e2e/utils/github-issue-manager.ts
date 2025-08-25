@@ -1,6 +1,7 @@
 import { Octokit } from '@octokit/rest';
 import crypto from 'crypto';
 import path from 'path';
+import { sanitizeFilePath } from './path-sanitizer';
 
 /**
  * GitHub Issue Manager for UAT Reporter
@@ -210,7 +211,7 @@ export class GitHubIssueManager {
       recentLogs.forEach(log => {
         const logEmoji = log.type === 'error' ? '🔴' : log.type === 'warning' ? '🟡' : '🔵';
         const timestamp = new Date(log.timestamp).toISOString();
-        body += `${logEmoji} **${log.type.toUpperCase()}** [${timestamp}]: ${log.message}\n`;
+        body += `${logEmoji} **${log.type.toUpperCase()}** [${timestamp}]: ${GitHubIssueManager.scrubSensitiveData(log.message)}\n`;
       });
       if (logs.length > 10) {
         body += `\n_... and ${logs.length - 10} more log entries_\n`;
@@ -221,7 +222,9 @@ export class GitHubIssueManager {
     if (screenshots.length > 0) {
       body += `## Screenshots\n\n`;
       screenshots.forEach(screenshot => {
-        body += `- **${screenshot.name}**: \`${screenshot.path}\`\n`;
+        // Sanitize screenshot paths to prevent path disclosure
+        const sanitizedPath = sanitizeFilePath(screenshot.path);
+        body += `- **${GitHubIssueManager.scrubSensitiveData(screenshot.name)}**: \`${sanitizedPath}\`\n`;
       });
       body += `\n> Note: Screenshots are available in the test artifacts directory.\n\n`;
     }
@@ -399,7 +402,11 @@ export class GitHubIssueManager {
       });
 
     } catch (error) {
-      throw new Error(`Failed to update GitHub issue #${issueNumber}: ${error}`);
+      // Scrub any sensitive information from error messages  
+      const errorMessage = error instanceof Error ? 
+        GitHubIssueManager.scrubSensitiveData(error.message) : 
+        'Unknown error';
+      throw new Error(`Failed to update GitHub issue #${issueNumber}: ${errorMessage}`);
     }
   }
 
@@ -442,21 +449,104 @@ export class GitHubIssueManager {
     if (!this.config.token) {
       throw new Error('GitHub token not configured. Set GITHUB_TOKEN environment variable.');
     }
+    
+    // Scrub sensitive data from issue data before processing
+    const scrubbedIssueData = {
+      ...issueData,
+      failureReason: GitHubIssueManager.scrubSensitiveData(issueData.failureReason),
+      logs: issueData.logs.map(log => ({
+        ...log,
+        message: GitHubIssueManager.scrubSensitiveData(log.message)
+      })),
+      steps: issueData.steps.map(step => ({
+        ...step,
+        error: step.error ? GitHubIssueManager.scrubSensitiveData(step.error) : step.error
+      }))
+    };
 
-    const signature = this.generateFailureSignature(issueData);
+    const signature = this.generateFailureSignature(scrubbedIssueData);
     const existingIssue = await this.findExistingIssue(signature);
 
     if (existingIssue) {
-      await this.updateIssue(existingIssue, issueData);
+      await this.updateIssue(existingIssue, scrubbedIssueData);
       return { issueNumber: existingIssue, action: 'updated' };
     } else {
-      const issueNumber = await this.createIssue(issueData, signature);
+      const issueNumber = await this.createIssue(scrubbedIssueData, signature);
       return { issueNumber, action: 'created' };
     }
   }
 
   /**
-   * Validate GitHub configuration
+   * Validate GitHub token format and security
+   */
+  private static validateGitHubToken(token: string): boolean {
+    // GitHub tokens should start with specific prefixes
+    const validPrefixes = ['ghp_', 'gho_', 'ghu_', 'ghs_', 'ghr_'];
+    
+    // Check token format
+    if (!validPrefixes.some(prefix => token.startsWith(prefix))) {
+      console.error('Invalid GitHub token format. Token must start with a valid prefix.');
+      return false;
+    }
+    
+    // Check minimum length (GitHub tokens are typically 40+ characters)
+    if (token.length < 40) {
+      console.error('GitHub token appears to be too short.');
+      return false;
+    }
+    
+    return true;
+  }
+  
+  /**
+   * Scrub sensitive data and prevent XSS from strings
+   */
+  private static scrubSensitiveData(text: string): string {
+    if (typeof text !== 'string') {
+      return String(text);
+    }
+    
+    // XSS Prevention: HTML encode dangerous characters
+    text = text
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#x27;')
+      .replace(/\//g, '&#x2F;');
+    
+    // Scrub potential GitHub tokens
+    const tokenPattern = /gh[pousr]_[A-Za-z0-9_]{36,}/g;
+    text = text.replace(tokenPattern, '[REDACTED-GITHUB-TOKEN]');
+    
+    // Scrub other common sensitive patterns
+    const patterns = [
+      { regex: /(?:password|pwd|pass)["'\s]*[:=]["'\s]*([^\s"']+)/gi, replacement: 'password="[REDACTED]"' },
+      { regex: /(?:secret|key)["'\s]*[:=]["'\s]*([^\s"']+)/gi, replacement: 'secret="[REDACTED]"' },
+      { regex: /(?:token)["'\s]*[:=]["'\s]*([^\s"']+)/gi, replacement: 'token="[REDACTED]"' },
+      { regex: /[A-Za-z0-9+\/]{40,}={0,2}/g, replacement: '[REDACTED-BASE64]' }, // Base64 encoded secrets
+      { regex: /\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b/g, replacement: '[REDACTED-EMAIL]' }, // Email addresses
+      { regex: /\b(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\b/g, replacement: '[REDACTED-IP]' } // IP addresses
+    ];
+    
+    patterns.forEach(({ regex, replacement }) => {
+      text = text.replace(regex, replacement);
+    });
+    
+    // Remove potential script injections and dangerous content
+    text = text.replace(/javascript:/gi, '[REMOVED-JAVASCRIPT]');
+    text = text.replace(/vbscript:/gi, '[REMOVED-VBSCRIPT]');
+    text = text.replace(/on\w+\s*=/gi, '[REMOVED-EVENT-HANDLER]');
+    text = text.replace(/<script[^>]*>.*?<\/script>/gis, '[REMOVED-SCRIPT-TAG]');
+    text = text.replace(/<iframe[^>]*>.*?<\/iframe>/gis, '[REMOVED-IFRAME-TAG]');
+    text = text.replace(/<object[^>]*>.*?<\/object>/gis, '[REMOVED-OBJECT-TAG]');
+    text = text.replace(/<embed[^>]*>/gis, '[REMOVED-EMBED-TAG]');
+    
+    return text;
+  }
+
+  /**
+   * Validate GitHub configuration with enhanced security checks
    */
   static validateConfig(): GitHubIssueConfig | null {
     const token = process.env.GITHUB_TOKEN;
@@ -464,6 +554,23 @@ export class GitHubIssueManager {
     const repo = process.env.GITHUB_REPO;
 
     if (!token || !owner || !repo) {
+      return null;
+    }
+    
+    // Validate token format and security
+    if (!this.validateGitHubToken(token)) {
+      console.error('GitHub token validation failed. Please check your GITHUB_TOKEN environment variable.');
+      return null;
+    }
+    
+    // Validate owner and repo names (prevent injection)
+    const validNamePattern = /^[a-zA-Z0-9._-]+$/;
+    if (!validNamePattern.test(owner)) {
+      console.error('Invalid GitHub owner name format.');
+      return null;
+    }
+    if (!validNamePattern.test(repo)) {
+      console.error('Invalid GitHub repository name format.');
       return null;
     }
 
@@ -514,4 +621,5 @@ export class GitHubIssueManager {
 
     return sanitized;
   }
+  
 }

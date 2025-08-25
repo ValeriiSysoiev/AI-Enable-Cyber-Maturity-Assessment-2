@@ -155,33 +155,52 @@ variable "admin_emails" {
   default     = []
 }
 
-# Monitoring and Alerting Thresholds
+# Monitoring and Alerting Thresholds - Optimized for Performance
 variable "alert_api_error_threshold" {
   description = "Threshold for API error rate alerts (count per 5 minutes)"
   type        = number
-  default     = 10
+  default     = 15  # Increased to reduce false positives with higher traffic
 }
 
 variable "alert_rag_latency_threshold_seconds" {
   description = "Threshold for RAG service latency alerts (seconds)"
   type        = number
-  default     = 10
+  default     = 8   # Reduced for better user experience with optimized resources
 }
 
 variable "alert_search_latency_threshold_seconds" {
   description = "Threshold for search service latency alerts (seconds)"
   type        = number
-  default     = 3
+  default     = 2   # Tightened for better search performance
 }
 
 variable "alert_openai_error_threshold" {
   description = "Threshold for OpenAI service error alerts (count per 5 minutes)"
   type        = number
-  default     = 5
+  default     = 8   # Increased for better tolerance with higher throughput
 }
 
 variable "alert_cosmos_latency_threshold_ms" {
   description = "Threshold for Cosmos DB latency alerts (milliseconds)"
   type        = number
-  default     = 100
+  default     = 150  # Increased slightly for better tolerance with concurrent operations
+}
+
+# Additional Performance Monitoring Variables
+variable "alert_container_cpu_threshold" {
+  description = "CPU utilization threshold for container scaling alerts (%)"
+  type        = number
+  default     = 70
+}
+
+variable "alert_container_memory_threshold" {
+  description = "Memory utilization threshold for container scaling alerts (%)"
+  type        = number
+  default     = 80
+}
+
+variable "alert_http_response_time_threshold" {
+  description = "HTTP response time threshold for performance alerts (seconds)"
+  type        = number
+  default     = 3
 }

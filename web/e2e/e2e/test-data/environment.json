@@ -1,6 +1,6 @@
 {
-  "timestamp": "2025-08-25T17:15:36.663Z",
-  "baseURL": "http://localhost:3000",
+  "timestamp": "2025-08-25T17:54:03.479Z",
+  "baseURL": "https://web-cybermat-prd.azurewebsites.net",
   "environment": "test",
   "features": {
     "aad": false,

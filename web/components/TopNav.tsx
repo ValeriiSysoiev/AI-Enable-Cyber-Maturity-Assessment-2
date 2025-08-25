@@ -67,8 +67,10 @@ export default function TopNav() {
 
   async function checkAdminStatus() {
     try {
-      // Check if user can access admin endpoints by trying to get admin diagnostics
-      const response = await fetch('/api/admin/auth-diagnostics');
+      // Check if user can access admin endpoints with timeout
+      const response = await fetch('/api/admin/auth-diagnostics', { 
+        signal: AbortSignal.timeout(3000) // 3 second timeout
+      });
       setIsAdmin(response.ok);
     } catch {
       setIsAdmin(false);
@@ -77,13 +79,16 @@ export default function TopNav() {
 
   async function fetchSystemStatus() {
     try {
-      const response = await fetch('/api/admin/status');
+      // Fetch system status with timeout - this is non-critical for page load
+      const response = await fetch('/api/admin/status', { 
+        signal: AbortSignal.timeout(3000) // 3 second timeout
+      });
       if (response.ok) {
         const status = await response.json();
         setSystemStatus(status);
       }
     } catch {
-      // Ignore errors fetching system status
+      // Ignore errors fetching system status - this is optional
     }
   }
 

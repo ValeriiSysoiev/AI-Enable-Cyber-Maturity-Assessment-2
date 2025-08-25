@@ -8,15 +8,15 @@ resource "azurerm_container_app" "api" {
 
   # Template configuration
   template {
-    min_replicas = 1
-    max_replicas = 3
+    min_replicas = 2  # Increased for availability and faster response
+    max_replicas = 10  # Higher ceiling for traffic spikes
 
     # API container configuration
     container {
       name   = "api"
       image  = "mcr.microsoft.com/azuredocs/containerapps-helloworld:latest"  # Placeholder - replaced by deployment scripts
-      cpu    = "0.25"
-      memory = "0.5Gi"
+      cpu    = "0.75"  # Increased from 0.25 for better performance
+      memory = "1.5Gi"  # Increased from 0.5Gi for RAG processing and caching
 
       # Environment variables for RAG and AAD functionality
       env {
@@ -131,12 +131,65 @@ resource "azurerm_container_app" "api" {
         name = "ALLOWED_ORIGINS"
         value = join(",", var.api_allowed_origins)
       }
+      
+      # Performance optimization environment variables
+      env {
+        name  = "UVICORN_WORKERS"
+        value = "2"  # Multiple workers for better concurrent processing
+      }
+      
+      env {
+        name  = "PYTHONUNBUFFERED"
+        value = "1"  # Faster log output
+      }
+      
+      env {
+        name  = "STARTUP_TIMEOUT"
+        value = "120"  # Extended startup time for complex initialization
+      }
+      
+      # Health check and startup probe configuration
+      startup_probe {
+        transport               = "HTTP"
+        port                   = 8000
+        path                   = "/health"
+        interval_seconds       = 10
+        timeout_seconds        = 5
+        failure_threshold      = 6  # Allow 60 seconds for startup
+        success_threshold      = 1
+      }
+      
+      liveness_probe {
+        transport               = "HTTP"
+        port                   = 8000
+        path                   = "/health"
+        interval_seconds       = 30
+        timeout_seconds        = 10
+        failure_threshold      = 3
+        success_threshold      = 1
+      }
+      
+      readiness_probe {
+        transport               = "HTTP"
+        port                   = 8000
+        path                   = "/health"
+        interval_seconds       = 10
+        timeout_seconds        = 5
+        failure_threshold      = 3
+        success_threshold      = 1
+      }
     }
 
-    # HTTP scale rule
+    # Optimized HTTP scale rule for production performance
     http_scale_rule {
       name                = "http-scale"
-      concurrent_requests = 30
+      concurrent_requests = 50  # Increased threshold with higher CPU/memory
+    }
+    
+    # CPU scale rule for resource-intensive operations
+    http_scale_rule {
+      name                = "cpu-scale"
+      concurrent_requests = 25
     }
   }
 
@@ -183,14 +236,14 @@ resource "azurerm_container_app" "web" {
   tags                         = local.common_tags
 
   template {
-    min_replicas = 1
-    max_replicas = 2
+    min_replicas = 2  # Increased for availability
+    max_replicas = 8  # Higher ceiling for web traffic spikes
 
     container {
       name   = "web"
       image  = "mcr.microsoft.com/azuredocs/containerapps-helloworld:latest"  # Placeholder - replaced by deployment scripts
-      cpu    = "0.25"
-      memory = "0.5Gi"
+      cpu    = "0.5"   # Increased for Next.js SSR performance
+      memory = "1Gi"   # Increased for build cache and assets
 
       # Environment variables for authentication
       env {
@@ -222,11 +275,65 @@ resource "azurerm_container_app" "web" {
         name = "AZURE_CLIENT_ID"
         value = azurerm_user_assigned_identity.web.client_id
       }
+      
+      # Next.js performance optimization
+      env {
+        name  = "NODE_ENV"
+        value = "production"
+      }
+      
+      env {
+        name  = "NEXT_TELEMETRY_DISABLED"
+        value = "1"  # Disable telemetry for faster startup
+      }
+      
+      env {
+        name  = "PORT"
+        value = "3000"
+      }
+      
+      # Health probes for web application
+      startup_probe {
+        transport               = "HTTP"
+        port                   = 3000
+        path                   = "/health"
+        interval_seconds       = 10
+        timeout_seconds        = 5
+        failure_threshold      = 12  # Allow 120 seconds for Next.js startup
+        success_threshold      = 1
+      }
+      
+      liveness_probe {
+        transport               = "HTTP"
+        port                   = 3000
+        path                   = "/health"
+        interval_seconds       = 30
+        timeout_seconds        = 10
+        failure_threshold      = 3
+        success_threshold      = 1
+      }
+      
+      readiness_probe {
+        transport               = "HTTP"
+        port                   = 3000
+        path                   = "/health"
+        interval_seconds       = 10
+        timeout_seconds        = 5
+        failure_threshold      = 3
+        success_threshold      = 1
+      }
     }
 
+    # Optimized HTTP scale rule for web traffic patterns
     http_scale_rule {
       name                = "http-scale"
-      concurrent_requests = 50
+      concurrent_requests = 75  # Higher threshold with increased resources
+    }
+    
+    # Additional scale rule for steady-state traffic
+    http_scale_rule {
+      name                = "steady-scale"
+      concurrent_requests = 40
     }
   }
 
