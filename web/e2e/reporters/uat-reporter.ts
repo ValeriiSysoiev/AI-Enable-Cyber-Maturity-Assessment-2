@@ -545,7 +545,7 @@ export default class UATReporter implements Reporter {
     const baseUrl = process.env.WEB_BASE_URL || 'http://localhost:3000';
     let environment: 'staging' | 'production' | 'development' = 'development';
     
-    if (baseUrl.includes('staging') || process.env.NODE_ENV === 'staging') {
+    if (baseUrl.includes('staging')) {
       environment = 'staging';
     } else if (baseUrl.includes('prod') || process.env.NODE_ENV === 'production') {
       environment = 'production';
