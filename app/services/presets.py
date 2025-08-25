@@ -26,6 +26,53 @@ def _slug(s: str) -> str:
     s = re.sub(r"[^a-z0-9]+", "-", s)
     return s.strip("-")[:40] or "preset"
 
+def _transform_legacy_preset(data: Dict[str, Any]) -> Dict[str, Any]:
+    """Transform legacy preset format to current AssessmentPreset schema format"""
+    if "questions" in data and "pillars" in data:
+        # This is the legacy format where questions are grouped separately
+        legacy_questions = data.get("questions", {})
+        pillars = []
+        
+        for pillar in data["pillars"]:
+            pillar_id = pillar["id"]
+            questions_for_pillar = legacy_questions.get(pillar_id, [])
+            
+            # Create a single capability per pillar with all questions
+            capabilities = []
+            if questions_for_pillar:
+                capability = {
+                    "id": f"{pillar_id}-capability",
+                    "name": pillar["name"],
+                    "questions": [
+                        {
+                            "id": q["id"],
+                            "text": q["text"],
+                            "weight": 1.0,
+                            "scale": "0-5"
+                        }
+                        for q in questions_for_pillar
+                    ]
+                }
+                capabilities.append(capability)
+            
+            transformed_pillar = {
+                "id": pillar["id"],
+                "name": pillar["name"],
+                "capabilities": capabilities
+            }
+            pillars.append(transformed_pillar)
+        
+        # Return transformed data with required fields
+        return {
+            "id": data["id"],
+            "name": data["name"],
+            "version": data.get("version", "1.0"),
+            "pillars": pillars
+        }
+    
+    # If it's already in the correct format, return as-is
+    return data
+
 async def list_presets() -> List[Dict[str, Any]]:
     """List all available presets with caching for performance"""
     if not config.cache.enabled:
@@ -54,7 +101,9 @@ def _list_presets_uncached() -> List[Dict[str, Any]]:
     for pid, path in BUNDLED.items():
         data = _load_json(path)
         try:
-            preset = AssessmentPreset(**data)
+            # Transform legacy format if needed
+            transformed_data = _transform_legacy_preset(data)
+            preset = AssessmentPreset(**transformed_data)
             counts = {
                 "pillars": len(preset.pillars),
                 "capabilities": sum(len(p.capabilities) for p in preset.pillars),
@@ -68,7 +117,9 @@ def _list_presets_uncached() -> List[Dict[str, Any]]:
     for p in DATA_DIR.glob("*.json"):
         data = _load_json(p)
         try:
-            preset = AssessmentPreset(**data)
+            # Transform legacy format if needed
+            transformed_data = _transform_legacy_preset(data)
+            preset = AssessmentPreset(**transformed_data)
             counts = {
                 "pillars": len(preset.pillars),
                 "capabilities": sum(len(p.capabilities) for p in preset.pillars),
@@ -111,11 +162,15 @@ def _get_preset_uncached(preset_id: str) -> AssessmentPreset:
     # uploaded takes precedence
     up = DATA_DIR / f"{preset_id}.json"
     if up.exists():
-        return AssessmentPreset(**_load_json(up))
+        data = _load_json(up)
+        transformed_data = _transform_legacy_preset(data)
+        return AssessmentPreset(**transformed_data)
     # then bundled
     path = BUNDLED.get(preset_id)
     if path and path.exists():
-        return AssessmentPreset(**_load_json(path))
+        data = _load_json(path)
+        transformed_data = _transform_legacy_preset(data)
+        return AssessmentPreset(**transformed_data)
     raise HTTPException(404, "Preset not found")
 
 async def save_uploaded_preset(data: dict) -> AssessmentPreset:

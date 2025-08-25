@@ -519,6 +519,49 @@ test_api_connectivity() {
     fi
 }
 
+# Test deployment SHA verification for ACR/CLI deployments
+test_deployment_sha() {
+    log_info "Verifying deployment SHA consistency..."
+    
+    # Check expected SHA from git
+    local expected_sha
+    expected_sha=$(git rev-parse --short HEAD 2>/dev/null || echo "unknown")
+    log_info "Expected SHA from git HEAD: $expected_sha"
+    
+    # Check web app version endpoint
+    if [[ -n "$WEB_BASE_URL" ]]; then
+        local web_version
+        web_version=$(curl -s --max-time 10 "${WEB_BASE_URL}/api/version" 2>/dev/null || echo "")
+        
+        if [[ -n "$web_version" ]]; then
+            local web_sha
+            web_sha=$(echo "$web_version" | jq -r '.sha' 2>/dev/null || echo "unknown")
+            log_info "Web app deployed SHA: $web_sha"
+            
+            if [[ "$web_sha" == "$expected_sha"* ]]; then
+                log_success "Web app deployment SHA matches expected SHA"
+            else
+                log_warning "Web app SHA ($web_sha) does not match expected SHA ($expected_sha)"
+            fi
+        else
+            log_warning "Web app version endpoint not accessible"
+        fi
+    fi
+    
+    # Check assessments/new page fix
+    if [[ -n "$WEB_BASE_URL" ]]; then
+        local assessments_status
+        assessments_status=$(curl -s --max-time 10 -o /dev/null -w "%{http_code}" \
+            "${WEB_BASE_URL}/assessments/new" 2>/dev/null || echo "000")
+        
+        if [[ "$assessments_status" =~ ^[23][0-9][0-9]$ ]]; then
+            log_success "Assessments new page accessible (HTTP $assessments_status)"
+        else
+            log_warning "Assessments new page returned HTTP $assessments_status"
+        fi
+    fi
+}
+
 # Test RAG service functionality
 test_rag_service() {
     if [[ -z "$API_BASE_URL" ]]; then
@@ -876,6 +919,10 @@ main() {
     test_search_connectivity
     test_api_connectivity
     test_aad_authentication
+    
+    echo
+    echo "=== Deployment Verification ==="
+    test_deployment_sha
     
     echo
     echo "=== RAG and Evidence Features ==="
