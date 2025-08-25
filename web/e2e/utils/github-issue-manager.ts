@@ -537,10 +537,10 @@ export class GitHubIssueManager {
     text = text.replace(/javascript:/gi, '[REMOVED-JAVASCRIPT]');
     text = text.replace(/vbscript:/gi, '[REMOVED-VBSCRIPT]');
     text = text.replace(/on\w+\s*=/gi, '[REMOVED-EVENT-HANDLER]');
-    text = text.replace(/<script[^>]*>.*?<\/script>/gis, '[REMOVED-SCRIPT-TAG]');
-    text = text.replace(/<iframe[^>]*>.*?<\/iframe>/gis, '[REMOVED-IFRAME-TAG]');
-    text = text.replace(/<object[^>]*>.*?<\/object>/gis, '[REMOVED-OBJECT-TAG]');
-    text = text.replace(/<embed[^>]*>/gis, '[REMOVED-EMBED-TAG]');
+    text = text.replace(/<script[^>]*>.*?<\/script>/gi, '[REMOVED-SCRIPT-TAG]');
+    text = text.replace(/<iframe[^>]*>.*?<\/iframe>/gi, '[REMOVED-IFRAME-TAG]');
+    text = text.replace(/<object[^>]*>.*?<\/object>/gi, '[REMOVED-OBJECT-TAG]');
+    text = text.replace(/<embed[^>]*>/gi, '[REMOVED-EMBED-TAG]');
     
     return text;
   }
