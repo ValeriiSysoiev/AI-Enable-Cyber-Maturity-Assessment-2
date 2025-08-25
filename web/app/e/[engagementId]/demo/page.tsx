@@ -47,7 +47,7 @@ export default function EngagementDemo() {
 
   useEffect(() => {
     const initAuth = async () => {
-      const email = await requireEmail(router);
+      const email = requireEmail();
       if (email && engagementId) {
         // Set the engagement ID for API calls
         setEngagementId(engagementId);
