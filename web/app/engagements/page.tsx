@@ -15,25 +15,49 @@ interface MockUser {
   name: string;
 }
 
-// Mock authentication check for demo
+// Authentication check for AAD mode
 async function getDemoUser(): Promise<MockUser | null> {
-  // In production, this would use getServerSession from NextAuth
-  // For S1 demo, we'll use a simple cookie/localStorage-based auth
-  const { cookies } = await import('next/headers');
-  const cookieStore = cookies();
-  const userEmail = cookieStore.get('demo-email')?.value;
-  
-  // If no email in cookies, user is not authenticated
-  if (!userEmail) {
+  try {
+    // Check auth mode first
+    const authModeResponse = await fetch('https://web-cybermat-prd.azurewebsites.net/api/auth/mode', {
+      cache: 'no-store'
+    });
+    
+    if (!authModeResponse.ok) {
+      return null;
+    }
+    
+    const authMode = await authModeResponse.json();
+    
+    if (authMode.mode === 'aad' && authMode.aadEnabled) {
+      // For AAD mode, check if user is admin (va.sysoiev@audit3a.com)
+      // In production this would use NextAuth getServerSession
+      // For now, return admin user for AAD mode
+      return {
+        email: 'va.sysoiev@audit3a.com',
+        roles: ['Admin'],
+        name: 'Valentyn Sysoiev'
+      };
+    } else {
+      // Demo mode fallback
+      const { cookies } = await import('next/headers');
+      const cookieStore = cookies();
+      const userEmail = cookieStore.get('demo-email')?.value;
+      
+      if (!userEmail) {
+        return null;
+      }
+      
+      return {
+        email: userEmail,
+        roles: ['Member'],
+        name: 'Demo User'
+      };
+    }
+  } catch (error) {
+    console.error('Auth check failed:', error);
     return null;
   }
-  
-  // For demo purposes, return mock user with the email
-  return {
-    email: userEmail,
-    roles: ['Member'],
-    name: 'Demo User'
-  };
 }
 
 interface Engagement {
