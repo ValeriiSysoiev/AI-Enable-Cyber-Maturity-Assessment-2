@@ -21,25 +21,46 @@ export async function POST(request: NextRequest) {
     
     console.log('Forwarding to engagements API:', engagementData);
     
-    // Create engagement directly (bypass backend API dependency)
-    console.log('Creating engagement locally (bypassing backend API)');
+    // Try backend API first, fallback to local creation
+    let engagement;
     
-    const newEngagement = {
-      id: `engagement-${Date.now()}`,
-      name: engagementData.name || "New Assessment",
-      description: engagementData.description || "",
-      preset_id: engagementData.preset_id,
-      status: "draft",
-      created_at: new Date().toISOString(),
-      updated_at: new Date().toISOString(),
-      member_count: 1,
-      user_role: "Admin"
-    };
-    
-    console.log('Created engagement locally:', newEngagement);
-    
-    // Use the engagement directly (no need to simulate response)
-    const engagement = newEngagement;
+    try {
+      console.log('Attempting to forward to backend API...');
+      const response = await fetch(`${request.nextUrl.origin}/api/engagements`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-User-Email': userEmail || 'va.sysoiev@audit3a.com'
+        },
+        body: JSON.stringify(engagementData)
+      });
+      
+      console.log('Backend API response:', response.status, response.statusText);
+      
+      if (response.ok) {
+        engagement = await response.json();
+        console.log('Backend API success:', engagement);
+      } else {
+        throw new Error(`Backend API failed: ${response.status}`);
+      }
+    } catch (backendError) {
+      console.log('Backend API unavailable, creating locally:', backendError);
+      
+      // Fallback: Create engagement locally
+      engagement = {
+        id: `engagement-${Date.now()}`,
+        name: engagementData.name || "New Assessment",
+        description: engagementData.description || "",
+        preset_id: engagementData.preset_id,
+        status: "draft",
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+        member_count: 1,
+        user_role: "Admin"
+      };
+      
+      console.log('Created engagement locally as fallback:', engagement);
+    }
     console.log('Engagement created:', engagement);
     
     // Map engagement response to assessment format
