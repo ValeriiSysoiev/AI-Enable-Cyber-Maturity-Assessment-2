@@ -29,8 +29,19 @@ async function getDemoUser(): Promise<MockUser | null> {
   }
   
   // Check if user is admin based on ADMIN_EMAILS environment variable
-  const adminEmails = process.env.ADMIN_EMAILS?.split(',').map(e => e.trim().toLowerCase()) || [];
-  const isAdmin = adminEmails.includes(userEmail.toLowerCase().trim());
+  // Handle potential undefined environment variable gracefully
+  let isAdmin = false;
+  try {
+    const adminEmailsEnv = process.env.ADMIN_EMAILS;
+    if (adminEmailsEnv) {
+      const adminEmails = adminEmailsEnv.split(',').map(e => e.trim().toLowerCase());
+      isAdmin = adminEmails.includes(userEmail.toLowerCase().trim());
+    }
+  } catch (error) {
+    console.warn('Failed to check admin emails:', error);
+    // Fallback: treat as regular user
+    isAdmin = false;
+  }
   
   // Return user with proper role based on admin status
   return {
