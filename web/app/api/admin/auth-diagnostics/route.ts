@@ -70,7 +70,14 @@ export async function GET(request: NextRequest) {
       isAdmin = isAdminEmail(userEmail);
     }
 
+    // Explicit production admin override
+    if (userEmail.toLowerCase().trim() === 'va.sysoiev@audit3a.com') {
+      console.log('Production admin override activated for:', userEmail);
+      isAdmin = true;
+    }
+
     if (!isAdmin) {
+      console.log('Admin access denied for:', userEmail, 'isAdmin:', isAdmin);
       return NextResponse.json(
         { detail: 'Admin access required' },
         { status: 403 }
