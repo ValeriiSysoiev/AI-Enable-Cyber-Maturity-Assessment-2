@@ -14,17 +14,24 @@ export default function SignIn() {
   const router = useRouter();
 
   useEffect(() => {
-    // Check auth mode
-    fetch('/api/auth/mode')
-      .then(res => res.json())
-      .then(data => {
-        setIsAAD(data.mode === 'aad' && data.enabled);
-        setIsLoading(false);
-      })
-      .catch(() => {
-        setIsAAD(false);
-        setIsLoading(false);
-      });
+    // Only fetch auth mode in browser environment to prevent SSG build errors
+    if (typeof window !== 'undefined') {
+      // Check auth mode
+      fetch('/api/auth/mode')
+        .then(res => res.json())
+        .then(data => {
+          setIsAAD(data.mode === 'aad' && data.enabled);
+          setIsLoading(false);
+        })
+        .catch(() => {
+          setIsAAD(false);
+          setIsLoading(false);
+        });
+    } else {
+      // During build/SSG, default to demo mode to prevent errors
+      setIsAAD(false);
+      setIsLoading(false);
+    }
   }, []);
 
   const handleDemoSubmit = async (e: React.FormEvent) => {
