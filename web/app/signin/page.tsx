@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import { signIn } from "next-auth/react";
 
 // Force dynamic rendering to prevent static generation issues with API calls
 export const dynamic = 'force-dynamic';
@@ -68,11 +69,19 @@ export default function SignIn() {
     }
   };
 
-  const handleAADSignIn = () => {
-    // Use NextAuth signIn for AAD - only in browser environment
-    if (typeof window !== 'undefined') {
-      // Direct redirect to NextAuth signin endpoint to avoid client-side issues
-      window.location.href = '/api/auth/signin/azure-ad?callbackUrl=' + encodeURIComponent('/engagements');
+  const handleAADSignIn = async () => {
+    try {
+      // Use NextAuth signIn function for proper CSRF handling
+      await signIn('azure-ad', { 
+        callbackUrl: '/engagements',
+        redirect: true 
+      });
+    } catch (error) {
+      console.error('AAD sign in error:', error);
+      // Fallback to direct redirect if NextAuth signIn fails
+      if (typeof window !== 'undefined') {
+        window.location.href = '/api/auth/signin/azure-ad?callbackUrl=' + encodeURIComponent('/engagements');
+      }
     }
   };
 
