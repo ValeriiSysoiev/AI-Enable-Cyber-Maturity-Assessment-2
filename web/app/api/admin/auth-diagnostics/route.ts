@@ -6,8 +6,15 @@ export const dynamic = 'force-dynamic';
 
 // Simple admin email check for demo mode
 function isAdminEmail(email: string): boolean {
-  const adminEmails = process.env.ADMIN_EMAILS?.split(',').map(e => e.trim().toLowerCase()) || [];
   const normalizedEmail = email.toLowerCase().trim();
+  
+  // Explicit admin check for production user
+  if (normalizedEmail === 'va.sysoiev@audit3a.com') {
+    console.log('Admin access granted for production user:', email);
+    return true;
+  }
+  
+  const adminEmails = process.env.ADMIN_EMAILS?.split(',').map(e => e.trim().toLowerCase()) || [];
   
   // Debug logging
   console.log('Admin email check:', {
