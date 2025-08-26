@@ -106,12 +106,10 @@ export function AuthProvider({ children }: AuthProviderProps) {
   async function signOut() {
     try {
       if (mode.mode === 'aad') {
-        // AAD sign out
-        const response = await fetch('/api/auth/signout', { method: 'POST' });
-        if (response.ok) {
-          setUser(null);
-          window.location.href = '/';
-        }
+        // Use NextAuth signOut function for proper AAD logout
+        const { signOut: nextAuthSignOut } = await import('next-auth/react');
+        await nextAuthSignOut({ callbackUrl: '/signin' });
+        setUser(null);
       } else {
         // Demo mode sign out
         localStorage.removeItem('email');
