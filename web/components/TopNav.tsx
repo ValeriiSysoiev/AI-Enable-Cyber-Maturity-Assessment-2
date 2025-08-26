@@ -100,7 +100,9 @@ export default function TopNav() {
 
   async function handleSignOut() {
     if (auth.mode.mode === 'aad') {
-      window.location.href = '/api/auth/signout';
+      // Use NextAuth signOut function for proper AAD logout
+      const { signOut } = await import('next-auth/react');
+      await signOut({ callbackUrl: '/signin' });
     } else {
       localStorage.removeItem('email');
       localStorage.removeItem('engagementId');
