@@ -108,7 +108,17 @@ jobs:
 
     - name: Build and push WEB image
       run: |
-        docker build --build-arg GITHUB_SHA=${{ github.sha }} --build-arg BUILD_SHA=${{ github.sha }} -t ${{ env.AZURE_CONTAINER_REGISTRY }}.azurecr.io/web:${{ github.sha }} ./web
+        docker build \
+          --build-arg GITHUB_SHA=${{ github.sha }} \
+          --build-arg BUILD_SHA=${{ github.sha }} \
+          --build-arg AUTH_MODE=${{ secrets.AUTH_MODE || 'aad' }} \
+          --build-arg AZURE_AD_CLIENT_ID=${{ secrets.AZURE_AD_CLIENT_ID }} \
+          --build-arg AZURE_AD_TENANT_ID=${{ secrets.AZURE_AD_TENANT_ID }} \
+          --build-arg AZURE_AD_CLIENT_SECRET=${{ secrets.AZURE_AD_CLIENT_SECRET }} \
+          --build-arg DEMO_E2E=${{ secrets.DEMO_E2E || '0' }} \
+          --build-arg NEXTAUTH_URL=${{ secrets.NEXTAUTH_URL || 'https://web-cybermat-prd.azurewebsites.net' }} \
+          --build-arg NEXTAUTH_SECRET=${{ secrets.NEXTAUTH_SECRET }} \
+          -t ${{ env.AZURE_CONTAINER_REGISTRY }}.azurecr.io/web:${{ github.sha }} ./web
         docker push ${{ env.AZURE_CONTAINER_REGISTRY }}.azurecr.io/web:${{ github.sha }}
 
     - name: Record current revisions before deployment
