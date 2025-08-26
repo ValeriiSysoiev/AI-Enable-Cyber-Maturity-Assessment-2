@@ -102,12 +102,12 @@ jobs:
             echo "⏳ Waiting for deployment to start..."
             sleep 30
             
-            echo "🔍 Checking production deployment status..."
-            if curl -s --max-time 10 https://web-cybermat-prd.azurewebsites.net/api/version | grep -q "${{ github.sha }}"; then
-              echo "✅ Production deployment successful - version matches"
+            echo "🔍 Verifying production deployment..."
+            if ./scripts/verify-version-sync.sh https://web-cybermat-prd.azurewebsites.net ${{ github.sha }}; then
+              echo "✅ Production deployment verified successfully"
             else
-              echo "⚠️  Production version check failed or still updating"
-              echo "🔄 Deployment may still be in progress"
+              echo "⚠️  Production version verification failed"
+              echo "🔄 This may be normal - deployment could still be in progress"
             fi
           else
             echo "ℹ️  Azure credentials not configured - skipping production deployment trigger"

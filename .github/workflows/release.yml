@@ -172,6 +172,26 @@ jobs:
           exit 1
         fi
 
+    - name: Update WEB App Environment Variables
+      run: |
+        echo "Setting version environment variables for WEB app..."
+        # Check if this is an App Service or Container App deployment
+        if az webapp show --name ${{ env.WEB_CONTAINER_APP }} --resource-group ${{ env.AZURE_RESOURCE_GROUP }} 2>/dev/null; then
+          # App Service deployment
+          echo "Detected App Service - setting environment variables"
+          az webapp config appsettings set \
+            --name ${{ env.WEB_CONTAINER_APP }} \
+            --resource-group ${{ env.AZURE_RESOURCE_GROUP }} \
+            --settings \
+              GITHUB_SHA=${{ github.sha }} \
+              BUILD_SHA=${{ github.sha }} \
+              NEXT_PUBLIC_BUILD_SHA=${{ github.sha }}
+          echo "✅ App Service environment variables updated"
+        else
+          # Container App deployment
+          echo "Detected Container App - environment variables set via container image"
+        fi
+
     - name: Rollback on failure
       if: failure()
       run: |
