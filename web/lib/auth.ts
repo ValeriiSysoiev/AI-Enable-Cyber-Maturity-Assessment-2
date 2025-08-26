@@ -19,8 +19,21 @@ function getProviders() {
       tenantId: process.env.AZURE_AD_TENANT_ID!,
       authorization: {
         params: {
-          scope: "openid profile email User.Read",
+          scope: "openid profile email",
+          response_type: "code",
+          response_mode: "query",
         },
+      },
+      httpOptions: {
+        timeout: 10000,
+      },
+      profile(profile) {
+        return {
+          id: profile.sub || profile.oid,
+          name: profile.name,
+          email: profile.email || profile.preferred_username,
+          image: null,
+        };
       },
     }));
   }
