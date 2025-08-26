@@ -1,7 +1,7 @@
 import "./globals.css";
 import type { Metadata } from "next";
 import TopNav from "@/components/TopNav";
-import { AuthProvider } from "@/components/AuthProvider";
+import { Providers } from "@/components/Providers";
 import ErrorBoundary from "@/components/ErrorBoundary";
 
 export const metadata: Metadata = { 
@@ -25,10 +25,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="en">
       <body className="min-h-screen bg-gray-50 text-gray-900">
         <ErrorBoundary>
-          <AuthProvider>
+          <Providers>
             <TopNav />
             {children}
-          </AuthProvider>
+          </Providers>
         </ErrorBoundary>
       </body>
     </html>
