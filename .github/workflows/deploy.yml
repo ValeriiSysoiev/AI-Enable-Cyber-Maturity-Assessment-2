@@ -50,6 +50,15 @@ jobs:
           build-args: |
             GITHUB_SHA=${{ github.sha }}
             BUILD_SHA=${{ github.sha }}
+            AUTH_MODE=aad
+            AZURE_AD_CLIENT_ID=${{ secrets.AZURE_AD_CLIENT_ID }}
+            AZURE_AD_TENANT_ID=${{ secrets.AZURE_AD_TENANT_ID }}
+            AZURE_AD_CLIENT_SECRET=${{ secrets.AZURE_AD_CLIENT_SECRET }}
+            NEXTAUTH_URL=${{ secrets.NEXTAUTH_URL }}
+            NEXTAUTH_SECRET=${{ secrets.NEXTAUTH_SECRET }}
+            DEMO_E2E=0
+            PROXY_TARGET_API_BASE_URL=${{ secrets.PROXY_TARGET_API_BASE_URL }}
+            ADMIN_EMAILS=${{ secrets.ADMIN_EMAILS }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
