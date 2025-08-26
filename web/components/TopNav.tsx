@@ -68,7 +68,13 @@ export default function TopNav() {
   async function checkAdminStatus() {
     try {
       // Check if user can access admin endpoints with timeout
+      const headers: Record<string, string> = {};
+      if (auth.user?.email) {
+        headers['X-User-Email'] = auth.user.email;
+      }
+      
       const response = await fetch('/api/admin/auth-diagnostics', { 
+        headers,
         signal: AbortSignal.timeout(3000) // 3 second timeout
       });
       setIsAdmin(response.ok);

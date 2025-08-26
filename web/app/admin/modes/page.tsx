@@ -37,7 +37,12 @@ export default function AdminModesPage() {
 
   async function checkAdminStatus() {
     try {
-      const response = await fetch('/api/admin/auth-diagnostics');
+      const headers: Record<string, string> = {};
+      if (auth.user?.email) {
+        headers['X-User-Email'] = auth.user.email;
+      }
+      
+      const response = await fetch('/api/admin/auth-diagnostics', { headers });
       setIsAdmin(response.ok);
     } catch {
       setIsAdmin(false);
