@@ -6,8 +6,18 @@ export const dynamic = 'force-dynamic';
 
 // Simple admin email check for demo mode
 function isAdminEmail(email: string): boolean {
-  const adminEmails = process.env.ADMIN_EMAILS?.split(',').map(e => e.trim()) || [];
-  return adminEmails.includes(email);
+  const adminEmails = process.env.ADMIN_EMAILS?.split(',').map(e => e.trim().toLowerCase()) || [];
+  const normalizedEmail = email.toLowerCase().trim();
+  
+  // Debug logging
+  console.log('Admin email check:', {
+    email: email,
+    normalizedEmail: normalizedEmail,
+    adminEmails: adminEmails,
+    isAdmin: adminEmails.includes(normalizedEmail)
+  });
+  
+  return adminEmails.includes(normalizedEmail);
 }
 
 export async function GET(request: NextRequest) {
