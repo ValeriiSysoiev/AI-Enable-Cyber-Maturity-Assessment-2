@@ -17,6 +17,11 @@ function getProviders() {
       clientId: process.env.AZURE_AD_CLIENT_ID!,
       clientSecret: process.env.AZURE_AD_CLIENT_SECRET!,
       tenantId: process.env.AZURE_AD_TENANT_ID!,
+      authorization: {
+        params: {
+          scope: "openid profile email User.Read",
+        },
+      },
     }));
   }
   if (demoEnabled || providers.length === 0) {
@@ -66,10 +71,34 @@ export const authOptions: AuthOptions = {
         };
       }
       return session;
+    },
+    async signIn({ user, account, profile, email, credentials }) {
+      console.log('NextAuth signIn callback:', { user: user?.email, account: account?.provider });
+      return true;
+    },
+    async redirect({ url, baseUrl }) {
+      console.log('NextAuth redirect callback:', { url, baseUrl });
+      // Ensure we redirect to the correct base URL
+      if (url.startsWith("/")) return `${baseUrl}${url}`;
+      if (new URL(url).origin === baseUrl) return url;
+      return baseUrl;
     }
   },
   pages: {
     signIn: "/signin",
+    error: "/signin?error=true",
+  },
+  debug: process.env.NODE_ENV === "development",
+  logger: {
+    error(code, metadata) {
+      console.error('NextAuth error:', code, metadata);
+    },
+    warn(code) {
+      console.warn('NextAuth warning:', code);
+    },
+    debug(code, metadata) {
+      console.log('NextAuth debug:', code, metadata);
+    }
   }
 };
 
