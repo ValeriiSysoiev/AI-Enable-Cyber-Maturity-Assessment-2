@@ -42,14 +42,8 @@ ARG BUILD_SHA=""
 ENV GITHUB_SHA=$GITHUB_SHA
 ENV BUILD_SHA=$BUILD_SHA
 
-# Create environment variable template for runtime injection
-# This allows Azure App Service to inject environment variables at runtime
-RUN echo '#!/bin/sh' > /app/start.sh && \
-    echo 'echo "Starting application with runtime environment variables..."' >> /app/start.sh && \
-    echo 'echo "AUTH_MODE: $AUTH_MODE"' >> /app/start.sh && \
-    echo 'echo "AZURE_AD_CLIENT_ID: $(echo $AZURE_AD_CLIENT_ID | cut -c1-8)..."' >> /app/start.sh && \
-    echo 'exec node server.js' >> /app/start.sh && \
-    chmod +x /app/start.sh
+# Note: Azure App Service will inject environment variables at runtime
+# Next.js standalone mode will read them via next.config.js
 
 # Create non-root user for security
 RUN addgroup --system --gid 1001 nodejs
@@ -79,4 +73,4 @@ HEALTHCHECK --interval=30s --timeout=3s --start-period=15s --retries=3 \
 # Start the application using the generated server.js from standalone build
 # This uses Node.js directly without requiring Next.js CLI in production
 # The standalone build respects the PORT environment variable
-CMD ["/app/start.sh"]
+CMD ["node", "server.js"]
