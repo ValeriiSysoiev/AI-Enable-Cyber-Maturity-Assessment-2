@@ -28,11 +28,15 @@ async function getDemoUser(): Promise<MockUser | null> {
     return null;
   }
   
-  // For demo purposes, return mock user with the email
+  // Check if user is admin based on ADMIN_EMAILS environment variable
+  const adminEmails = process.env.ADMIN_EMAILS?.split(',').map(e => e.trim().toLowerCase()) || [];
+  const isAdmin = adminEmails.includes(userEmail.toLowerCase().trim());
+  
+  // Return user with proper role based on admin status
   return {
     email: userEmail,
-    roles: ['Member'],
-    name: 'Demo User'
+    roles: isAdmin ? ['Admin'] : ['Member'],
+    name: userEmail.split('@')[0]
   };
 }
 
