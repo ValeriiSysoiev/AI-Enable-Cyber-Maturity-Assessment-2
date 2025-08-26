@@ -29,16 +29,44 @@ export interface ScoreData {
 }
 
 export async function createAssessment(name: string, presetId: string): Promise<Assessment> {
+  // Get auth headers (includes X-User-Email)
+  const authHeaders = getAuthHeaders();
+  
   const res = await fetch(`${BASE}/assessments`, {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
+    headers: { 
+      "Content-Type": "application/json",
+      ...authHeaders
+    },
     body: JSON.stringify({ name, preset_id: presetId }),
     cache: 'no-store'
   });
   if (!res.ok) {
+    const errorText = await res.text();
+    console.error('Assessment creation failed:', errorText);
     throw new Error("Failed to create assessment");
   }
   return res.json();
+}
+
+// Helper function to get auth headers
+function getAuthHeaders(): Record<string, string> {
+  if (typeof window === 'undefined') return {};
+  
+  const headers: Record<string, string> = {};
+  
+  // Always try to get email from localStorage first (works for both modes)
+  const email = localStorage.getItem('email');
+  if (email) {
+    headers['X-User-Email'] = email;
+  }
+  
+  const engagementId = localStorage.getItem('engagementId');
+  if (engagementId) {
+    headers['X-Engagement-ID'] = engagementId;
+  }
+  
+  return headers;
 }
 
 export async function saveAnswer(assessmentId: string, payload: Answer): Promise<void> {
