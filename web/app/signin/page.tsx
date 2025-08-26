@@ -15,16 +15,25 @@ export default function SignIn() {
   useEffect(() => {
     // Only fetch auth mode in browser environment to prevent SSG build errors
     if (typeof window !== 'undefined') {
-      // Check auth mode
-      fetch('/api/auth/mode')
-        .then(res => res.json())
-        .then(data => {
-          setIsAAD(data.mode === 'aad' && data.enabled);
+      // Create a simple endpoint check to determine if AAD signin is available
+      fetch('/api/auth/signin/azure-ad', { method: 'HEAD' })
+        .then(response => {
+          // If the AAD signin endpoint exists (not 404), use AAD mode
+          setIsAAD(response.status !== 404);
           setIsLoading(false);
         })
         .catch(() => {
-          setIsAAD(false);
-          setIsLoading(false);
+          // Fallback: check auth mode endpoint
+          fetch('/api/auth/mode')
+            .then(res => res.json())
+            .then(data => {
+              setIsAAD(data.mode === 'aad' && data.enabled);
+              setIsLoading(false);
+            })
+            .catch(() => {
+              setIsAAD(false);
+              setIsLoading(false);
+            });
         });
     } else {
       // During build/SSG, default to demo mode to prevent errors
