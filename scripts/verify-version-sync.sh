@@ -34,7 +34,7 @@ for i in $(seq 1 $MAX_RETRIES); do
     
     current_sha=$(check_version)
     
-    if [ "$current_sha" = "$EXPECTED_SHA" ]; then
+    if [ "${current_sha:0:40}" = "${EXPECTED_SHA:0:40}" ]; then
         echo "✅ SUCCESS: Production version matches expected SHA"
         echo "   Expected: ${EXPECTED_SHA:0:8}"
         echo "   Actual:   ${current_sha:0:8}"
