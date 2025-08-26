@@ -4,6 +4,9 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { signIn } from "next-auth/react";
 
+// Force dynamic rendering to prevent static generation issues with API calls
+export const dynamic = 'force-dynamic';
+
 export default function SignIn() {
   const [email, setEmail] = useState("");
   const [isAAD, setIsAAD] = useState(false);
