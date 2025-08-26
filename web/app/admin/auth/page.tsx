@@ -1,13 +1,38 @@
 "use client";
+import { useState, useEffect } from "react";
 import { useRequireAuth } from "@/components/AuthProvider";
-import { isAdmin } from "@/lib/auth";
 import AuthDiagnostics from "@/components/AuthDiagnostics";
 
 export default function AdminAuthPage() {
+  const [isAdminUser, setIsAdminUser] = useState(false);
+  const [adminCheckLoading, setAdminCheckLoading] = useState(true);
+  
   // Require authentication and admin access
   const auth = useRequireAuth();
 
-  if (auth.isLoading) {
+  useEffect(() => {
+    if (auth.isAuthenticated && auth.user?.email) {
+      checkAdminStatus();
+    }
+  }, [auth.isAuthenticated, auth.user?.email]);
+
+  async function checkAdminStatus() {
+    try {
+      const headers: Record<string, string> = {};
+      if (auth.user?.email) {
+        headers['X-User-Email'] = auth.user.email;
+      }
+      
+      const response = await fetch('/api/admin/auth-diagnostics', { headers });
+      setIsAdminUser(response.ok);
+    } catch {
+      setIsAdminUser(false);
+    } finally {
+      setAdminCheckLoading(false);
+    }
+  }
+
+  if (auth.isLoading || adminCheckLoading) {
     return (
       <div className="p-6">
         <div className="text-center">Loading...</div>
@@ -15,7 +40,7 @@ export default function AdminAuthPage() {
     );
   }
 
-  if (!isAdmin()) {
+  if (!isAdminUser) {
     return (
       <div className="p-6">
         <div className="text-red-600">Access denied. Admin privileges required.</div>

@@ -181,7 +181,7 @@ export default function TopNav() {
                           <Link href="/admin/ops" className="block px-2 py-1 text-sm text-gray-700 hover:bg-gray-100 rounded">
                             Ops
                           </Link>
-                          <Link href="/admin/auth-diagnostics" className="block px-2 py-1 text-sm text-gray-700 hover:bg-gray-100 rounded">
+                          <Link href="/admin/auth" className="block px-2 py-1 text-sm text-gray-700 hover:bg-gray-100 rounded">
                             Auth Diagnostics
                           </Link>
                           <Link href="/admin/gdpr" className="block px-2 py-1 text-sm text-gray-700 hover:bg-gray-100 rounded">
