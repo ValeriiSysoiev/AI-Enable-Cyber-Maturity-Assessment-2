@@ -32,6 +32,8 @@ export async function createAssessment(name: string, presetId: string): Promise<
   // Get auth headers (includes X-User-Email)
   const authHeaders = getAuthHeaders();
   
+  console.log('Creating assessment with:', { name, presetId, authHeaders });
+  
   const res = await fetch(`${BASE}/assessments`, {
     method: "POST",
     headers: { 
@@ -41,12 +43,23 @@ export async function createAssessment(name: string, presetId: string): Promise<
     body: JSON.stringify({ name, preset_id: presetId }),
     cache: 'no-store'
   });
+  
+  console.log('Assessment creation response:', res.status, res.statusText);
+  
   if (!res.ok) {
     const errorText = await res.text();
-    console.error('Assessment creation failed:', errorText);
-    throw new Error("Failed to create assessment");
+    console.error('Assessment creation failed:', {
+      status: res.status,
+      statusText: res.statusText,
+      errorText,
+      headers: Object.fromEntries(res.headers.entries())
+    });
+    throw new Error(`Failed to create assessment: ${res.status} ${errorText}`);
   }
-  return res.json();
+  
+  const result = await res.json();
+  console.log('Assessment created successfully:', result);
+  return result;
 }
 
 // Helper function to get auth headers
