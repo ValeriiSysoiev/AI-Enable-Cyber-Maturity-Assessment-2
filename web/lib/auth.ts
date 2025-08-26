@@ -2,40 +2,44 @@ import { type AuthOptions } from "next-auth";
 import AzureADProvider from "next-auth/providers/azure-ad";
 import CredentialsProvider from "next-auth/providers/credentials";
 
-const aadEnabled = process.env.AUTH_MODE === "aad"
-  && !!process.env.AZURE_AD_CLIENT_ID
-  && !!process.env.AZURE_AD_TENANT_ID
-  && !!process.env.AZURE_AD_CLIENT_SECRET;
+// Dynamic provider configuration - evaluated at runtime
+function getProviders() {
+  const aadEnabled = process.env.AUTH_MODE === "aad"
+    && !!process.env.AZURE_AD_CLIENT_ID
+    && !!process.env.AZURE_AD_TENANT_ID
+    && !!process.env.AZURE_AD_CLIENT_SECRET;
 
-const demoEnabled = process.env.DEMO_E2E === "1";
+  const demoEnabled = process.env.DEMO_E2E === "1";
 
-const providers = [];
-if (aadEnabled) {
-  providers.push(AzureADProvider({
-    clientId: process.env.AZURE_AD_CLIENT_ID!,
-    clientSecret: process.env.AZURE_AD_CLIENT_SECRET!,
-    tenantId: process.env.AZURE_AD_TENANT_ID!,
-  }));
-}
-if (demoEnabled || providers.length === 0) {
-  // Always include demo provider as fallback to prevent 405 errors
-  providers.push(CredentialsProvider({
-    name: "Demo",
-    credentials: { email: { label: "Email", type: "text" } },
-    async authorize(creds) { 
-      return { 
-        id: "demo-user", 
-        email: creds?.email || "demo@example.com", 
-        name: "Demo User",
-        role: "admin", 
-        groups: ["admin"] 
-      }; 
-    }
-  }));
+  const providers = [];
+  if (aadEnabled) {
+    providers.push(AzureADProvider({
+      clientId: process.env.AZURE_AD_CLIENT_ID!,
+      clientSecret: process.env.AZURE_AD_CLIENT_SECRET!,
+      tenantId: process.env.AZURE_AD_TENANT_ID!,
+    }));
+  }
+  if (demoEnabled || providers.length === 0) {
+    // Always include demo provider as fallback to prevent 405 errors
+    providers.push(CredentialsProvider({
+      name: "Demo",
+      credentials: { email: { label: "Email", type: "text" } },
+      async authorize(creds) { 
+        return { 
+          id: "demo-user", 
+          email: creds?.email || "demo@example.com", 
+          name: "Demo User",
+          role: "admin", 
+          groups: ["admin"] 
+        }; 
+      }
+    }));
+  }
+  return providers;
 }
 
 export const authOptions: AuthOptions = {
-  providers,
+  providers: getProviders(),
   session: { strategy: "jwt", maxAge: 30 * 24 * 60 * 60 },
   callbacks: {
     async jwt({ token, account, profile }) {
