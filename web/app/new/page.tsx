@@ -4,11 +4,13 @@ import { useRouter } from "next/navigation";
 import { fetchPreset, authHeaders } from "@/lib/api";
 import { createAssessment } from "@/lib/assessments";
 import ApiErrorBoundary from "@/components/ApiErrorBoundary";
+import { useAuth } from "@/components/AuthProvider";
 
 type PresetOption = { id: string; name: string; version: string; source: string; counts: { pillars: number; capabilities: number; questions: number } };
 
 export default function NewAssessmentPage() {
   const router = useRouter();
+  const auth = useAuth();
   const [loading, setLoading] = useState(false);
   const [preset, setPreset] = useState<any>(null);
   const [error, setError] = useState<string | null>(null);
@@ -73,6 +75,11 @@ export default function NewAssessmentPage() {
     setCreating(true);
     setError(null);
     try {
+      // Ensure user email is available for the API call
+      if (auth.user?.email && typeof window !== 'undefined') {
+        localStorage.setItem('email', auth.user.email);
+      }
+      
       const assessment = await createAssessment("Demo Assessment", selectedPresetId);
       router.push(`/assessment/${assessment.id}`);
     } catch (err) {
