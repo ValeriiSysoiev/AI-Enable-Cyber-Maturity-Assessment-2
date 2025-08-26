@@ -24,15 +24,39 @@ export default function AdminGDPRPage() {
   const [error, setError] = useState<string>("");
   const [isSavingPolicy, setIsSavingPolicy] = useState(false);
   const [policyMessage, setPolicyMessage] = useState<string>("");
+  const [isAdminUser, setIsAdminUser] = useState(false);
+  const [adminCheckLoading, setAdminCheckLoading] = useState(true);
   
   // Require authentication and admin access
   const auth = useRequireAuth();
 
   useEffect(() => {
-    if (auth.isAuthenticated && isAdmin()) {
+    if (auth.isAuthenticated && auth.user?.email) {
+      checkAdminStatus();
+    }
+  }, [auth.isAuthenticated, auth.user?.email]);
+
+  useEffect(() => {
+    if (auth.isAuthenticated && isAdminUser) {
       loadAdminData();
     }
-  }, [auth.isAuthenticated]);
+  }, [auth.isAuthenticated, isAdminUser]);
+
+  async function checkAdminStatus() {
+    try {
+      const headers: Record<string, string> = {};
+      if (auth.user?.email) {
+        headers['X-User-Email'] = auth.user.email;
+      }
+      
+      const response = await fetch('/api/admin/auth-diagnostics', { headers });
+      setIsAdminUser(response.ok);
+    } catch {
+      setIsAdminUser(false);
+    } finally {
+      setAdminCheckLoading(false);
+    }
+  }
 
   const loadAdminData = async () => {
     setIsLoading(true);
@@ -91,7 +115,7 @@ export default function AdminGDPRPage() {
     }
   };
 
-  if (auth.isLoading) {
+  if (auth.isLoading || adminCheckLoading) {
     return (
       <div className="p-6">
         <div className="text-center">Loading...</div>
@@ -99,7 +123,7 @@ export default function AdminGDPRPage() {
     );
   }
 
-  if (!isAdmin()) {
+  if (!isAdminUser) {
     return (
       <div className="p-6">
         <div className="text-red-600">Access denied. Admin privileges required.</div>
