@@ -5,7 +5,6 @@ import logging
 from fastapi import Header, HTTPException, Depends, Request
 from typing import Dict, Optional, Set
 from domain.repository import Repository
-
 from config import config
 from services.aad_groups import create_aad_groups_service, UserRoles
 
@@ -250,7 +249,7 @@ def tenant_isolation_check(ctx: Dict[str, any]) -> bool:
     return ctx.get("tenant_validated", True)
 
 
-def require_member(repo: Repository, ctx: Dict[str, any], min_role: str = "member"):
+def require_member(repo=None, ctx: Dict[str, any] = None, min_role: str = "member"):
     """
     Ensure user has required role in the engagement.
     Uses enhanced context with AAD group information.
