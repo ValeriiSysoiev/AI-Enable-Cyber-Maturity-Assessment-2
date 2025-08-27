@@ -2,9 +2,11 @@ import os, json, re
 from pathlib import Path
 from typing import List, Dict, Any
 from fastapi import HTTPException
-from ..api.schemas import AssessmentPreset
-from .cache import get_cached, invalidate_cache_key, cache_manager
-from ..config import config
+from api.schemas import AssessmentPreset
+from services.cache import get_cached, invalidate_cache_key, cache_manager
+import sys
+sys.path.append("/app")
+from config import config
 
 BUNDLED: Dict[str, Path] = {}  # filled at startup with any bundled presets (e.g. cyber-for-ai.json)
 DATA_DIR = Path("data/presets")

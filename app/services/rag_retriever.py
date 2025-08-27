@@ -10,12 +10,14 @@ from typing import List, Optional, Dict, Any, Union
 from dataclasses import dataclass
 from enum import Enum
 
-from .azure_search_index import create_azure_search_index_manager, SearchResult as AzureSearchResult
-from .rag_service import RAGSearchResult, ProductionRAGService
-from ..repos.cosmos_embeddings_repository import create_cosmos_embeddings_repository, VectorSearchResult
-from ..domain.models import EmbeddingDocument
-from ..config import config
-from ..util.logging import get_correlated_logger
+from services.azure_search_index import create_azure_search_index_manager, SearchResult as AzureSearchResult
+from services.rag_service import RAGSearchResult, ProductionRAGService
+from repos.cosmos_embeddings_repository import create_cosmos_embeddings_repository, VectorSearchResult
+from domain.models import EmbeddingDocument
+import sys
+sys.path.append("/app")
+from config import config
+from util.logging import get_correlated_logger
 
 
 logger = logging.getLogger(__name__)
@@ -283,7 +285,7 @@ class RAGRetriever:
             if not query_vector:
                 # For Azure Search, we can use the built-in vectorizer
                 # or generate using the embeddings service
-                from .embeddings import create_embeddings_service
+                from services.embeddings import create_embeddings_service
                 embeddings_service = create_embeddings_service(self.correlation_id)
                 
                 query_chunks = embeddings_service.chunk_text(query, "search_query")

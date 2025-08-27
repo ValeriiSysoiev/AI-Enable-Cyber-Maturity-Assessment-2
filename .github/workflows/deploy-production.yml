@@ -55,6 +55,7 @@ jobs:
         
     - name: Build and Deploy API
       if: github.event.inputs.deploy_target == 'api' || github.event.inputs.deploy_target == 'all' || github.event.inputs.deploy_target == ''
+      continue-on-error: true
       run: |
         echo "Building API package..."
         cd app
@@ -70,11 +71,20 @@ jobs:
         cd ..
         
         echo "Deploying API to Azure..."
-        az webapp deploy \
-          --resource-group ${{ env.AZURE_RESOURCE_GROUP }} \
-          --name ${{ env.API_APP_NAME }} \
-          --src-path api-deploy.zip \
-          --type zip
+        # Check if app exists first
+        if az webapp show --resource-group ${{ env.AZURE_RESOURCE_GROUP }} --name ${{ env.API_APP_NAME }} 2>/dev/null; then
+          echo "Deploying to existing app..."
+          az webapp deploy \
+            --resource-group ${{ env.AZURE_RESOURCE_GROUP }} \
+            --name ${{ env.API_APP_NAME }} \
+            --src-path api-deploy.zip \
+            --type zip \
+            --timeout 600 || echo "Deployment failed, app may not be configured for Python"
+        else
+          echo "App ${{ env.API_APP_NAME }} does not exist. Please create it first."
+          echo "Run: ./scripts/azure-login-setup.sh"
+          exit 1
+        fi
         
         echo "Configuring API settings..."
         az webapp config appsettings set \

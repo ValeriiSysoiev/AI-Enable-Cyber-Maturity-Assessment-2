@@ -2,10 +2,12 @@
 Consumer for document ingestion messages.
 Handles messages related to document processing and embedding generation.
 """
+import sys
+sys.path.append("/app")
 from typing import Dict, Any
 
 from ...domain.models import ServiceBusMessage
-from .base_consumer import BaseConsumer
+from api.base_consumer import BaseConsumer
 
 
 class IngestConsumer(BaseConsumer):

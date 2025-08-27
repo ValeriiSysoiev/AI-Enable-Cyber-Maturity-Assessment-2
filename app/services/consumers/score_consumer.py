@@ -2,10 +2,12 @@
 Consumer for scoring calculation messages.
 Handles messages related to assessment scoring and analysis.
 """
+import sys
+sys.path.append("/app")
 from typing import Dict, Any
 
 from ...domain.models import ServiceBusMessage
-from .base_consumer import BaseConsumer
+from api.base_consumer import BaseConsumer
 
 
 class ScoreConsumer(BaseConsumer):

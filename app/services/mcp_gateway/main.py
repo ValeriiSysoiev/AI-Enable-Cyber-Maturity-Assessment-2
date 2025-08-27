@@ -2,17 +2,19 @@
 MCP Gateway main router.
 Provides REST API endpoints for MCP tools with comprehensive security and logging.
 """
+import sys
+sys.path.append("/app")
 from fastapi import APIRouter, HTTPException, Depends, Request
 from typing import Dict, Any
 from util.logging import get_correlated_logger
 from api.security import current_context, require_member
 from domain.repository import Repository
 
-from .config import MCPConfig, MCPOperationContext, get_mcp_config
+from api.config import MCPConfig, MCPOperationContext, get_mcp_config
 from .tools.filesystem import MCPFilesystemTool, FSReadRequest, FSWriteRequest, FSResponse
 from .tools.pdf_parser import MCPPDFParserTool, PDFParseRequest, PDFParseResponse
 from .tools.search import MCPSearchTool, SearchEmbedRequest, SearchQueryRequest, SearchEmbedResponse, SearchQueryResponse
-from .security import SecurityError
+from api.security import SecurityError
 
 
 # Create router

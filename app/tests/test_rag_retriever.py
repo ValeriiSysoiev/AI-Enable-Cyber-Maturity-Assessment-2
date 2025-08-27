@@ -7,11 +7,13 @@ import asyncio
 from unittest.mock import Mock, patch, AsyncMock
 from typing import List, Dict, Any
 
-from ..services.rag_retriever import RAGRetriever, SearchBackend, RetrievalResult, RetrievalMetrics
-from ..services.azure_search_index import AzureSearchIndexManager, SearchResult as AzureSearchResult, SearchDocument
-from ..services.rag_service import ProductionRAGService, RAGSearchResult
-from ..domain.models import EmbeddingDocument
-from ..config import config
+from services.rag_retriever import RAGRetriever, SearchBackend, RetrievalResult, RetrievalMetrics
+from services.azure_search_index import AzureSearchIndexManager, SearchResult as AzureSearchResult, SearchDocument
+from services.rag_service import ProductionRAGService, RAGSearchResult
+from domain.models import EmbeddingDocument
+import sys
+sys.path.append("/app")
+from config import config
 
 
 @pytest.fixture

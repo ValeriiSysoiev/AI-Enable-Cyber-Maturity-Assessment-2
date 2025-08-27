@@ -10,9 +10,11 @@ Provides caching for assessment-related data including:
 
 import logging
 from typing import Any, Dict, List, Optional
-from ..api.schemas.assessment import AssessmentPreset
-from .cache import get_cached, invalidate_cache_key, cache_manager
-from ..config import config
+from api.schemas.assessment import AssessmentPreset
+from services.cache import get_cached, invalidate_cache_key, cache_manager
+import sys
+sys.path.append("/app")
+from config import config
 
 logger = logging.getLogger(__name__)
 
@@ -192,7 +194,7 @@ class AssessmentCacheService:
     async def _load_assessment_schema_uncached(self, preset_id: str) -> Optional[Dict[str, Any]]:
         """Load assessment schema without caching"""
         # This would integrate with the presets service and domain models
-        from ..services.presets import _get_preset_uncached
+        from services.presets import _get_preset_uncached
         
         try:
             preset = _get_preset_uncached(preset_id)
@@ -245,7 +247,7 @@ class AssessmentCacheService:
     
     async def _load_question_set_uncached(self, preset_id: str) -> Optional[Dict[str, Any]]:
         """Load question set without caching"""
-        from ..services.presets import _get_preset_uncached
+        from services.presets import _get_preset_uncached
         
         try:
             preset = _get_preset_uncached(preset_id)
@@ -300,7 +302,7 @@ class AssessmentCacheService:
     
     async def _load_scoring_algorithm_uncached(self, preset_id: str) -> Optional[Dict[str, Any]]:
         """Load scoring algorithm without caching"""
-        from ..services.presets import _get_preset_uncached
+        from services.presets import _get_preset_uncached
         
         try:
             preset = _get_preset_uncached(preset_id)
@@ -382,7 +384,7 @@ class AssessmentCacheService:
     
     async def _load_assessment_template_uncached(self, preset_id: str) -> Optional[Dict[str, Any]]:
         """Load assessment template without caching"""
-        from ..services.presets import _get_preset_uncached
+        from services.presets import _get_preset_uncached
         
         try:
             preset = _get_preset_uncached(preset_id)
@@ -467,7 +469,7 @@ class AssessmentCacheService:
     
     async def _load_presets_list_uncached(self) -> List[Dict[str, Any]]:
         """Load list of available presets without caching"""
-        from ..services.presets import _list_presets_uncached
+        from services.presets import _list_presets_uncached
         
         try:
             presets = _list_presets_uncached()

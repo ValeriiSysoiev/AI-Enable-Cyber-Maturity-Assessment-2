@@ -25,7 +25,6 @@ from azure.search.documents.indexes.models import (
     HnswAlgorithmConfiguration,
     VectorSearchVectorizer,
     AzureOpenAIVectorizer,
-    AzureOpenAIParameters,
     SemanticConfiguration,
     SemanticField,
     SemanticPrioritizedFields,
@@ -35,8 +34,10 @@ from azure.search.documents.models import VectorizedQuery
 from azure.core.credentials import AzureKeyCredential
 from azure.identity import DefaultAzureCredential
 
-from ..domain.models import EmbeddingDocument
-from ..config import config
+from domain.models import EmbeddingDocument
+import sys
+sys.path.append("/app")
+from config import config
 
 
 logger = logging.getLogger(__name__)
@@ -208,11 +209,9 @@ class AzureSearchIndexManager:
                 vectorizers=[
                     AzureOpenAIVectorizer(
                         name="myOpenAI",
-                        azure_open_ai_parameters=AzureOpenAIParameters(
-                            resource_uri=config.azure_openai.endpoint,
-                            deployment_id=config.azure_openai.embedding_model,
-                            api_key=config.azure_openai.api_key if config.azure_openai.api_key else None
-                        )
+                        resource_uri=config.azure_openai.endpoint,
+                        deployment_id=config.azure_openai.embedding_model,
+                        api_key=config.azure_openai.api_key if config.azure_openai.api_key else None
                     )
                 ]
             )

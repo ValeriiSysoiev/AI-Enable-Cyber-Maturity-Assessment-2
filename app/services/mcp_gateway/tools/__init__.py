@@ -1,12 +1,14 @@
 """
 MCP Gateway tools package.
 """
-from .filesystem import MCPFilesystemTool
-from .pdf_parser import MCPPDFParserTool
-from .search import MCPSearchTool
-from .audio_transcribe import AudioTranscriptionTool
-from .pii_scrub import PIIScrubberTool
-from .pptx_render import PPTXRenderTool
+from api.filesystem import MCPFilesystemTool
+import sys
+sys.path.append("/app")
+from api.pdf_parser import MCPPDFParserTool
+from api.search import MCPSearchTool
+from api.audio_transcribe import AudioTranscriptionTool
+from api.pii_scrub import PIIScrubberTool
+from api.pptx_render import PPTXRenderTool
 
 __all__ = [
     "MCPFilesystemTool",

@@ -21,8 +21,10 @@ from typing import Any, Dict, List, Optional, Callable, Awaitable
 from contextlib import asynccontextmanager
 import statistics
 
-from ..config import config
-from .cache import get_cache_metrics
+import sys
+sys.path.append("/app")
+from config import config
+from services.cache import get_cache_metrics
 
 logger = logging.getLogger(__name__)
 

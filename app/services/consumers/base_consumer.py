@@ -2,6 +2,8 @@
 Base consumer class with retry logic and correlation ID propagation.
 Provides common functionality for all Service Bus message consumers.
 """
+import sys
+sys.path.append("/app")
 import asyncio
 import logging
 from abc import ABC, abstractmethod
@@ -10,7 +12,7 @@ from datetime import datetime, timezone
 
 from ...domain.models import ServiceBusMessage
 from ...util.logging import get_correlated_logger
-from ..service_bus import ServiceBusConsumer
+from service_bus import ServiceBusConsumer
 
 
 class BaseConsumer(ABC):

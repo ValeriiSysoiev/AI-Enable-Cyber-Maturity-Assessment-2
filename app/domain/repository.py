@@ -1,8 +1,10 @@
 from __future__ import annotations
+import sys
+sys.path.append("/app")
 import threading
 import logging
 from typing import Dict, List, Optional, Tuple
-from .models import Assessment, Question, Response, Finding, Recommendation, RunLog, Engagement, Membership, Document, Workshop, ConsentRecord, Minutes, ChatMessage, RunCard
+from domain.models import Assessment, Question, Response, Finding, Recommendation, RunLog, Engagement, Membership, Document, Workshop, ConsentRecord, Minutes, ChatMessage, RunCard
 
 logger = logging.getLogger(__name__)
 

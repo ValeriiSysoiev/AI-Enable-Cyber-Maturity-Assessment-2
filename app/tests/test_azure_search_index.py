@@ -7,14 +7,16 @@ import asyncio
 from unittest.mock import Mock, patch, AsyncMock
 from typing import List, Dict, Any
 
-from ..services.azure_search_index import (
+from services.azure_search_index import (
     AzureSearchIndexManager, 
     SearchDocument, 
     SearchResult,
     create_azure_search_index_manager
 )
-from ..domain.models import EmbeddingDocument
-from ..config import config
+from domain.models import EmbeddingDocument
+import sys
+sys.path.append("/app")
+from config import config
 
 
 @pytest.fixture

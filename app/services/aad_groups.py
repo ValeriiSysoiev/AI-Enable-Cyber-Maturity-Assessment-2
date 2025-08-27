@@ -4,6 +4,8 @@ Azure Active Directory Groups Service
 Provides integration with Microsoft Graph API for AAD group membership queries
 and role mapping. Includes caching and tenant isolation for security.
 """
+import sys
+sys.path.append("/app")
 import json
 import logging
 import time
@@ -15,7 +17,7 @@ import msal
 from cachetools import TTLCache
 
 from config import config
-from .cache import get_cached, invalidate_cache_key, cache_manager
+from services.cache import get_cached, invalidate_cache_key, cache_manager
 
 
 logger = logging.getLogger(__name__)
