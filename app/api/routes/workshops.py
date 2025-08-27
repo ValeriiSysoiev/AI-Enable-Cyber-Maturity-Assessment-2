@@ -1,5 +1,7 @@
 """Workshop API Routes"""
 
+import sys
+sys.path.append("/app")
 import logging
 from datetime import datetime, timezone
 from typing import Dict
@@ -10,8 +12,8 @@ from domain.models import Workshop, WorkshopAttendee, ConsentRecord
 from repos.cosmos_repository import CosmosRepository
 from services.audit import create_audit_service
 from util.logging import get_correlation_id
-from ..security import current_context, require_member
-from ..schemas.workshop import (
+from api.security import current_context, require_member
+from schemas.workshop import (
     WorkshopCreateRequest,
     WorkshopResponse,
     ConsentRequest,
@@ -343,7 +345,7 @@ async def list_workshops(
 
 def _workshop_to_response(workshop: Workshop) -> WorkshopResponse:
     """Convert domain model to response model"""
-    from ..schemas.workshop import AttendeeResponse, ConsentResponse
+    from schemas.workshop import AttendeeResponse, ConsentResponse
     
     attendee_responses = []
     for attendee in workshop.attendees:

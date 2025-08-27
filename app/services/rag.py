@@ -17,10 +17,12 @@ from azure.search.documents.models import VectorizedQuery, VectorFilterMode
 from azure.core.credentials import AzureKeyCredential
 from azure.identity import DefaultAzureCredential
 
-from .embeddings import EmbeddingResult, create_embeddings_service
-from ..domain.models import Document, EmbeddingDocument
-from ..repos.cosmos_embeddings_repository import create_cosmos_embeddings_repository, VectorSearchResult
-from ..config import config
+from services.embeddings import EmbeddingResult, create_embeddings_service
+from domain.models import Document, EmbeddingDocument
+from repos.cosmos_embeddings_repository import create_cosmos_embeddings_repository, VectorSearchResult
+import sys
+sys.path.append("/app")
+from config import config
 
 
 logger = logging.getLogger(__name__)

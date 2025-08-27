@@ -2,14 +2,16 @@
 PII Scrubbing MCP Tool
 Provides configurable PII redaction for transcripts and documents with audit logging.
 """
+import sys
+sys.path.append("/app")
 import re
 import logging
 from typing import Dict, Any, List, Optional, Tuple
 from datetime import datetime, timezone
 import json
 
-from ..security import SecurityPolicy
-from ..config import MCPConfig
+from api.security import SecurityPolicy
+from config import MCPConfig
 
 logger = logging.getLogger(__name__)
 

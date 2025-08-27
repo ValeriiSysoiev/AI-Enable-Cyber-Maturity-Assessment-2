@@ -2,13 +2,15 @@
 Security utilities for MCP Gateway operations.
 Provides path validation, content redaction, and sanitization.
 """
+import sys
+sys.path.append("/app")
 import re
 import fnmatch
 from pathlib import Path, PurePath
 from typing import Dict, Any, Optional, List, Set
 from util.logging import get_correlated_logger, log_security_event
 
-from .config import MCPConfig, MCPOperationContext
+from api.config import MCPConfig, MCPOperationContext
 
 
 class SecurityError(Exception):

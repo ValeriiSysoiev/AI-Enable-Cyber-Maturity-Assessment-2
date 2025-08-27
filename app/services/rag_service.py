@@ -11,12 +11,14 @@ from dataclasses import dataclass
 from datetime import datetime, timezone
 from enum import Enum
 
-from .embeddings import create_embeddings_service, EmbeddingResult
-from ..domain.models import Document, EmbeddingDocument
-from ..repos.cosmos_embeddings_repository import create_cosmos_embeddings_repository, VectorSearchResult
-from ..config import config
-from ..util.files import extract_text
-from ..util.logging import get_correlated_logger, log_operation, get_rag_metrics_logger, handle_rag_error, EmbeddingError, SearchError, IngestionError
+from services.embeddings import create_embeddings_service, EmbeddingResult
+from domain.models import Document, EmbeddingDocument
+from repos.cosmos_embeddings_repository import create_cosmos_embeddings_repository, VectorSearchResult
+import sys
+sys.path.append("/app")
+from config import config
+from util.files import extract_text
+from util.logging import get_correlated_logger, log_operation, get_rag_metrics_logger, handle_rag_error, EmbeddingError, SearchError, IngestionError
 
 
 logger = logging.getLogger(__name__)

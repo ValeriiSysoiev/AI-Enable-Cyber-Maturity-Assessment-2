@@ -2,6 +2,8 @@
 PPTX Rendering MCP Tool
 Generates executive roadmap presentations using python-pptx with citations.
 """
+import sys
+sys.path.append("/app")
 import os
 import tempfile
 import logging
@@ -20,8 +22,8 @@ try:
 except ImportError:
     PPTX_DEPS_AVAILABLE = False
 
-from ..security import SecurityPolicy
-from ..config import MCPConfig
+from api.security import SecurityPolicy
+from config import MCPConfig
 
 logger = logging.getLogger(__name__)
 

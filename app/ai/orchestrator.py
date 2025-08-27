@@ -1,10 +1,12 @@
 from __future__ import annotations
+import sys
+sys.path.append("/app")
 import re
 import logging
 from typing import List, Optional
 from pydantic import BaseModel
 from domain.models import Finding, Recommendation, RunLog
-from .llm import LLMClient
+from ai.llm import LLMClient
 
 # Set up logger
 logger = logging.getLogger(__name__)

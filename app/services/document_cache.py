@@ -11,8 +11,10 @@ Provides caching for document-related data including:
 import logging
 from typing import Any, Dict, List, Optional
 from datetime import datetime
-from .cache import get_cached, invalidate_cache_key, cache_manager
-from ..config import config
+from services.cache import get_cached, invalidate_cache_key, cache_manager
+import sys
+sys.path.append("/app")
+from config import config
 
 logger = logging.getLogger(__name__)
 
@@ -158,7 +160,7 @@ class DocumentCacheService:
             return
         
         # Use pattern invalidation to clear all cache entries for this engagement
-        from .cache import invalidate_cache_pattern
+        from services.cache import invalidate_cache_pattern
         
         patterns = [
             f"_{engagement_id}_",  # Matches doc_ENGAGEMENT_ID_DOCID
@@ -195,7 +197,7 @@ class DocumentCacheService:
         # Placeholder implementation
         try:
             # In a real system, this would query the repository
-            from ..domain.repository import InMemoryRepository
+            from domain.repository import InMemoryRepository
             
             # Placeholder metadata structure
             metadata = {

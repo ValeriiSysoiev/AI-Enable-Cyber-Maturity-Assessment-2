@@ -11,9 +11,11 @@ from datetime import datetime, timezone
 from collections import deque
 import uuid
 
-from ..domain.models import ServiceBusMessage, QueueConfig
-from ..config import config
-from ..util.logging import get_correlated_logger
+from domain.models import ServiceBusMessage, QueueConfig
+import sys
+sys.path.append("/app")
+from config import config
+from util.logging import get_correlated_logger
 
 T = TypeVar('T')
 

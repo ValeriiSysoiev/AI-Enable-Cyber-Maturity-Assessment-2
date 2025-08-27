@@ -10,11 +10,11 @@ from typing import Optional, List
 from fastapi import APIRouter, HTTPException, Depends, Query, Response
 from pydantic import BaseModel, Field
 
-from security.deps import get_current_user, require_role
+from api.security import current_context, require_member
 from domain.models import Evidence
 from security.secret_provider import get_secret
 from services.evidence_processing import EvidenceProcessor
-from repos.cosmos_repository import create_cosmos_repository
+# from repos.cosmos_repository import create_cosmos_repository
 
 logger = logging.getLogger(__name__)
 
@@ -117,8 +117,8 @@ async def _check_engagement_membership(user_email: str, engagement_id: str) -> b
 @router.post("/sas", response_model=SASResponse)
 async def generate_evidence_sas(
     request: SASRequest,
-    current_user: dict = Depends(get_current_user),
-    _: None = Depends(require_role(["Member", "LEM", "Admin"]))
+    context = Depends(current_context),
+    _: None = Depends(require_member)
 ):
     """
     Generate a short-lived SAS token for evidence upload.
@@ -126,8 +126,8 @@ async def generate_evidence_sas(
     Requires Member+ role and engagement membership.
     Returns write-only SAS with ≤5 min TTL.
     """
-    correlation_id = current_user.get("correlation_id")
-    user_email = current_user["email"]
+    correlation_id = context.get("correlation_id")
+    user_email = context["email"]
     
     logger.info(
         "Evidence SAS request",
@@ -238,16 +238,16 @@ async def generate_evidence_sas(
 @router.post("/complete")
 async def complete_evidence_upload(
     request: CompleteRequest,
-    current_user: dict = Depends(get_current_user),
-    _: None = Depends(require_role(["Member", "LEM", "Admin"]))
+    context = Depends(current_context),
+    _: None = Depends(require_member)
 ):
     """
     Finalize evidence upload and create Evidence record.
     
     Computes server-side checksum and PII detection.
     """
-    correlation_id = current_user.get("correlation_id")
-    user_email = current_user["email"]
+    correlation_id = context.get("correlation_id")
+    user_email = context["email"]
     
     logger.info(
         "Evidence complete request",
@@ -378,16 +378,16 @@ async def list_evidence(
     engagement_id: str = Query(..., description="Engagement ID"),
     page: int = Query(1, ge=1, description="Page number"),
     page_size: int = Query(50, ge=1, le=100, description="Items per page"),
-    current_user: dict = Depends(get_current_user),
-    _: None = Depends(require_role(["Member", "LEM", "Admin"]))
+    context = Depends(current_context),
+    _: None = Depends(require_member)
 ):
     """
     List evidence for an engagement with pagination.
     
     Enforces engagement membership isolation.
     """
-    correlation_id = current_user.get("correlation_id")
-    user_email = current_user["email"]
+    correlation_id = context.get("correlation_id")
+    user_email = context["email"]
     
     # Check engagement membership
     is_member = await _check_engagement_membership(user_email, engagement_id)
@@ -452,16 +452,16 @@ async def list_evidence(
 async def link_evidence(
     evidence_id: str,
     request: LinkRequest,
-    current_user: dict = Depends(get_current_user),
-    _: None = Depends(require_role(["Member", "LEM", "Admin"]))
+    context = Depends(current_context),
+    _: None = Depends(require_member)
 ):
     """
     Link evidence to an assessment item (many-to-many).
     
     Placeholder for assessment item linking.
     """
-    correlation_id = current_user.get("correlation_id")
-    user_email = current_user["email"]
+    correlation_id = context.get("correlation_id")
+    user_email = context["email"]
     
     try:
         # Initialize repository
@@ -542,16 +542,16 @@ async def link_evidence(
 async def unlink_evidence(
     evidence_id: str,
     link_id: str,
-    current_user: dict = Depends(get_current_user),
-    _: None = Depends(require_role(["Member", "LEM", "Admin"]))
+    context = Depends(current_context),
+    _: None = Depends(require_member)
 ):
     """
     Remove a link between evidence and an assessment item.
     
     link_id format: "{item_type}:{item_id}"
     """
-    correlation_id = current_user.get("correlation_id")
-    user_email = current_user["email"]
+    correlation_id = context.get("correlation_id")
+    user_email = context["email"]
     
     logger.info(
         "Evidence unlink request",

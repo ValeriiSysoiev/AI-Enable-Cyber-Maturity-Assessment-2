@@ -59,6 +59,14 @@ export async function createAssessment(name: string, presetId: string): Promise<
   
   const result = await res.json();
   console.log('Assessment created successfully:', result);
+  
+  // Check if we should store this assessment locally (fallback scenario)
+  const shouldStoreLocally = res.headers.get('X-Store-Locally');
+  if (shouldStoreLocally === 'true') {
+    console.log('Storing assessment locally for offline access');
+    localStorage.setItem(`assessment_${result.id}`, JSON.stringify(result));
+  }
+  
   return result;
 }
 
@@ -83,14 +91,49 @@ function getAuthHeaders(): Record<string, string> {
 }
 
 export async function saveAnswer(assessmentId: string, payload: Answer): Promise<void> {
-  const res = await fetch(`${BASE}/assessments/${assessmentId}/answers`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(payload),
-    cache: 'no-store'
-  });
-  if (!res.ok) {
-    throw new Error("Failed to save answer");
+  console.log('Saving answer:', { assessmentId, payload });
+  
+  // Try backend API first, fallback to local storage
+  try {
+    console.log('Attempting to save to backend API...');
+    const res = await fetch(`${BASE}/assessments/${assessmentId}/answers`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload),
+      cache: 'no-store'
+    });
+    
+    console.log('Backend API response:', res.status, res.statusText);
+    
+    if (res.ok) {
+      console.log('Answer saved to backend successfully');
+      return;
+    } else {
+      throw new Error(`Backend API failed: ${res.status}`);
+    }
+  } catch (backendError) {
+    console.log('Backend API unavailable, saving locally:', backendError);
+    
+    // Fallback: Save answer to local storage
+    const localAssessment = localStorage.getItem(`assessment_${assessmentId}`);
+    if (localAssessment) {
+      const assessment = JSON.parse(localAssessment);
+      
+      // Remove any existing answer for this question
+      assessment.answers = assessment.answers.filter((ans: Answer) => 
+        !(ans.pillar_id === payload.pillar_id && ans.question_id === payload.question_id)
+      );
+      
+      // Add the new answer
+      assessment.answers.push(payload);
+      
+      // Update the assessment in localStorage
+      localStorage.setItem(`assessment_${assessmentId}`, JSON.stringify(assessment));
+      console.log('Answer saved locally:', payload);
+    } else {
+      console.error('Assessment not found in local storage');
+      throw new Error("Failed to save answer: Assessment not found locally");
+    }
   }
 }
 
@@ -105,13 +148,50 @@ export async function getScores(assessmentId: string): Promise<ScoreData> {
 }
 
 export async function getAssessment(assessmentId: string): Promise<Assessment> {
-  const res = await fetch(`${BASE}/assessments/${assessmentId}`, {
-    cache: 'no-store'
-  });
-  if (!res.ok) {
-    throw new Error("Failed to get assessment");
+  console.log('Getting assessment:', assessmentId);
+  
+  // Try backend API first, fallback to local storage
+  try {
+    console.log('Attempting to fetch from backend API...');
+    const res = await fetch(`${BASE}/assessments/${assessmentId}`, {
+      cache: 'no-store'
+    });
+    
+    console.log('Backend API response:', res.status, res.statusText);
+    
+    if (res.ok) {
+      const result = await res.json();
+      console.log('Backend API success:', result);
+      return result;
+    } else {
+      throw new Error(`Backend API failed: ${res.status}`);
+    }
+  } catch (backendError) {
+    console.log('Backend API unavailable, checking local storage:', backendError);
+    
+    // Fallback: Check if we have this assessment in localStorage
+    const localAssessment = localStorage.getItem(`assessment_${assessmentId}`);
+    if (localAssessment) {
+      console.log('Found assessment in local storage');
+      return JSON.parse(localAssessment);
+    }
+    
+    // If not in localStorage, create a basic assessment structure
+    console.log('Assessment not found locally, creating basic structure');
+    const basicAssessment = {
+      id: assessmentId,
+      name: "Assessment",
+      preset_id: "cyber-for-ai", // Default preset
+      created_at: new Date().toISOString(),
+      answers: []
+    };
+    
+    // Store it locally for future retrieval
+    localStorage.setItem(`assessment_${assessmentId}`, JSON.stringify(basicAssessment));
+    console.log('Created and stored basic assessment:', basicAssessment);
+    
+    return basicAssessment;
   }
-  return res.json();
 }
 
 

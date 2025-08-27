@@ -7,6 +7,8 @@ Provides endpoints for managing workshop minutes:
 - Retrieve minutes by ID
 """
 
+import sys
+sys.path.append("/app")
 from fastapi import APIRouter, Depends, HTTPException, Request
 import logging
 import uuid
@@ -17,7 +19,7 @@ from pydantic import BaseModel, Field
 from domain.repository import Repository
 from domain.models import Minutes, MinutesSection
 from repos.cosmos_repository import CosmosRepository
-from ..security import current_context, require_member
+from api.security import current_context, require_member
 from services.minutes_agent import create_minutes_agent
 from config import config
 

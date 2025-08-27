@@ -2,6 +2,8 @@
 Audio Transcription MCP Tool
 Provides consent-aware audio transcription with MIME validation and size limits.
 """
+import sys
+sys.path.append("/app")
 import os
 import tempfile
 import logging
@@ -18,8 +20,8 @@ try:
 except ImportError:
     AUDIO_DEPS_AVAILABLE = False
 
-from ..security import SecurityPolicy
-from ..config import MCPConfig
+from api.security import SecurityPolicy
+from config import MCPConfig
 
 logger = logging.getLogger(__name__)
 

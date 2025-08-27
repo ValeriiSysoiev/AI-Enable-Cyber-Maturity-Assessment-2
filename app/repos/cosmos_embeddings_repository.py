@@ -15,9 +15,11 @@ from azure.cosmos import CosmosClient, PartitionKey
 from azure.cosmos.exceptions import CosmosResourceNotFoundError, CosmosHttpResponseError
 from azure.identity import DefaultAzureCredential
 
-from ..domain.models import EmbeddingDocument
-from ..config import config
-from ..security.secret_provider import get_secret
+from domain.models import EmbeddingDocument
+import sys
+sys.path.append("/app")
+from config import config
+from security.secret_provider import get_secret
 
 
 logger = logging.getLogger(__name__)

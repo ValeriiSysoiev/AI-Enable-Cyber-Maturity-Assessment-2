@@ -2,14 +2,16 @@
 MCP PDF Parser tool implementation.
 Provides secure PDF text extraction using PyMuPDF (fitz).
 """
+import sys
+sys.path.append("/app")
 import fitz  # PyMuPDF
 from pathlib import Path
 from typing import Dict, Any, Optional, List
 from pydantic import BaseModel, Field
 from util.logging import get_correlated_logger, log_operation
 
-from ..config import MCPConfig, MCPOperationContext
-from ..security import MCPSecurityValidator, redact_sensitive_content
+from config import MCPConfig, MCPOperationContext
+from api.security import MCPSecurityValidator, redact_sensitive_content
 
 
 class PDFParseRequest(BaseModel):

@@ -1,3 +1,5 @@
+import sys
+sys.path.append("/app")
 import json
 import os
 import tempfile
@@ -6,8 +8,8 @@ from datetime import datetime
 from pathlib import Path
 from typing import Dict, List, Optional
 import threading
-from .models import Assessment, Question, Response, Finding, Recommendation, RunLog, Engagement, Membership, Document
-from .repository import Repository
+from domain.models import Assessment, Question, Response, Finding, Recommendation, RunLog, Engagement, Membership, Document
+from api.repository import Repository
 
 logger = logging.getLogger(__name__)
 

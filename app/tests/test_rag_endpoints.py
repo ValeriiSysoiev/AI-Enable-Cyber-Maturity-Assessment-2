@@ -10,11 +10,13 @@ from typing import List, Dict, Any
 from fastapi.testclient import TestClient
 from fastapi import FastAPI
 
-from ..api.routes.orchestrations import router as orchestrations_router
-from ..api.routes.version import router as version_router
-from ..services.rag_service import ProductionRAGService, RAGMode, RAGSearchResult, RAGIngestionResult
-from ..domain.models import Document, EmbeddingDocument
-from ..config import config
+from api.routes.orchestrations import router as orchestrations_router
+from api.routes.version import router as version_router
+from services.rag_service import ProductionRAGService, RAGMode, RAGSearchResult, RAGIngestionResult
+from domain.models import Document, EmbeddingDocument
+import sys
+sys.path.append("/app")
+from config import config
 
 
 # Test fixtures
@@ -343,7 +345,7 @@ class TestVersionEndpoints:
     def test_rag_metrics_endpoint(self, mock_create_rag_service, client, mock_rag_service):
         """Test RAG metrics endpoint"""
         # Setup sample metrics
-        from ..services.rag_service import RAGMetrics
+        from services.rag_service import RAGMetrics
         sample_metrics = [
             RAGMetrics("search", 0.5, True, "eng1", 0, 5),
             RAGMetrics("search", 0.7, True, "eng1", 0, 3),

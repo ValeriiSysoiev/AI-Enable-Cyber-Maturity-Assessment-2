@@ -11,7 +11,9 @@ from datetime import datetime, timezone
 from functools import wraps
 from contextlib import contextmanager
 
-from ..config import config
+import sys
+sys.path.append("/app")
+from config import config
 
 
 # Configure JSON formatter for structured logging

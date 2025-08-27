@@ -10,8 +10,10 @@ Provides caching for framework metadata including:
 
 import logging
 from typing import Any, Dict, List, Optional
-from .cache import get_cached, invalidate_cache_key, cache_manager
-from ..config import config
+from services.cache import get_cached, invalidate_cache_key, cache_manager
+import sys
+sys.path.append("/app")
+from config import config
 
 logger = logging.getLogger(__name__)
 
