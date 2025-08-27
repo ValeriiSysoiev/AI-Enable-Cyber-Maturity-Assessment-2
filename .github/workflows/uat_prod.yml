@@ -127,12 +127,15 @@ jobs:
         echo "health_duration=$HEALTH_DURATION" >> $GITHUB_OUTPUT
 
     - name: Install Playwright Dependencies
-      timeout-minutes: 10
+      timeout-minutes: 15
       working-directory: ./web
       run: |
         echo "🎭 Setting up Playwright for production E2E tests..."
-        npm ci
-        npx playwright install --with-deps
+        # Use cache-friendly installation
+        npm ci --prefer-offline --no-audit
+        # Install only chromium for faster setup
+        npx playwright install chromium
+        npx playwright install-deps chromium
 
     - name: Production E2E Critical Path Tests
       id: e2e_critical
