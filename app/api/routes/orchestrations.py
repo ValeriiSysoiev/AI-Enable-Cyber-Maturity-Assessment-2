@@ -1,18 +1,20 @@
+import sys
+sys.path.append("/app")
 from fastapi import APIRouter, Depends, HTTPException, Request
 from pydantic import BaseModel
-from typing import List, Dict, Optional
+from typing import List, Dict, Optional, Any
 import logging
 import uuid
 from domain.models import Finding, Recommendation
 from domain.repository import Repository
 from ai.orchestrator import Orchestrator
-from ..security import current_context, require_member
+from api.security import current_context, require_member
 from util.files import extract_text
 from services.rag_service import create_rag_service
 from services.rag_retriever import create_rag_retriever
 from config import config
 
-router = APIRouter(prefix="/orchestrations", tags=["orchestrations"])
+router = APIRouter(prefix="/api/orchestrations", tags=["orchestrations"])
 logger = logging.getLogger(__name__)
 
 def get_repo(request: Request) -> Repository:

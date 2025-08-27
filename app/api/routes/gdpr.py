@@ -35,7 +35,7 @@ from util.logging import get_correlation_id
 
 logger = logging.getLogger(__name__)
 
-router = APIRouter(prefix="/gdpr", tags=["GDPR Data Governance"])
+router = APIRouter(prefix="/api/gdpr", tags=["GDPR Data Governance"])
 
 
 # Dependency injection

@@ -1,10 +1,12 @@
+import sys
+sys.path.append("/app")
 from fastapi import APIRouter, Depends, HTTPException, Request
 from typing import List, Dict
 from domain.models import Assessment
 from domain.repository import Repository
-from ..security import current_context, require_member
+from api.security import current_context, require_member
 
-router = APIRouter(prefix="/domain-assessments", tags=["domain-assessments"])
+router = APIRouter(prefix="/api/domain-assessments", tags=["domain-assessments"])
 
 def get_repo(request: Request) -> Repository:
     # wired in main.py app.state.repo
