@@ -1,0 +1,216 @@
+name: Deploy to Production
+
+on:
+  workflow_dispatch:
+    inputs:
+      deploy_target:
+        description: 'Deploy target'
+        required: true
+        default: 'all'
+        type: choice
+        options:
+          - all
+          - api
+          - web
+  push:
+    branches:
+      - main
+    paths:
+      - 'app/**'
+      - 'web/**'
+      - '.github/workflows/deploy-production.yml'
+
+env:
+  AZURE_RESOURCE_GROUP: rg-cybermat-prd
+  API_APP_NAME: api-cybermat-prd
+  WEB_APP_NAME: web-cybermat-prd
+  
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    environment: production
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20'
+        cache: 'npm'
+        cache-dependency-path: web/package-lock.json
+        
+    - name: Setup Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.11'
+        cache: 'pip'
+        cache-dependency-path: app/requirements.txt
+        
+    - name: Azure Login
+      uses: azure/login@v2
+      with:
+        creds: ${{ secrets.AZURE_CREDENTIALS }}
+        
+    - name: Build and Deploy API
+      if: github.event.inputs.deploy_target == 'api' || github.event.inputs.deploy_target == 'all' || github.event.inputs.deploy_target == ''
+      run: |
+        echo "Building API package..."
+        cd app
+        
+        # Create deployment package
+        zip -r ../api-deploy.zip . \
+          -x "*.pyc" \
+          -x "__pycache__/*" \
+          -x ".pytest_cache/*" \
+          -x "tests/*" \
+          -x "*.log"
+        
+        cd ..
+        
+        echo "Deploying API to Azure..."
+        az webapp deploy \
+          --resource-group ${{ env.AZURE_RESOURCE_GROUP }} \
+          --name ${{ env.API_APP_NAME }} \
+          --src-path api-deploy.zip \
+          --type zip
+        
+        echo "Configuring API settings..."
+        az webapp config appsettings set \
+          --resource-group ${{ env.AZURE_RESOURCE_GROUP }} \
+          --name ${{ env.API_APP_NAME }} \
+          --settings \
+          AUTH_MODE=aad \
+          AZURE_AD_TENANT_ID="${{ secrets.AZURE_AD_TENANT_ID }}" \
+          AZURE_AD_CLIENT_ID="${{ secrets.AZURE_AD_CLIENT_ID }}" \
+          AZURE_AD_CLIENT_SECRET="${{ secrets.AZURE_AD_CLIENT_SECRET }}" \
+          ADMIN_EMAILS="${{ secrets.ADMIN_EMAILS }}" \
+          DATA_BACKEND=cosmos \
+          COSMOS_DB_ENDPOINT="${{ secrets.COSMOS_DB_ENDPOINT }}" \
+          COSMOS_DB_KEY="${{ secrets.COSMOS_DB_KEY }}" \
+          AZURE_STORAGE_CONNECTION_STRING="${{ secrets.AZURE_STORAGE_CONNECTION_STRING }}" \
+          AZURE_SERVICE_BUS_CONNECTION_STRING="${{ secrets.AZURE_SERVICE_BUS_CONNECTION_STRING }}" \
+          AZURE_OPENAI_ENDPOINT="${{ secrets.AZURE_OPENAI_ENDPOINT }}" \
+          AZURE_OPENAI_API_KEY="${{ secrets.AZURE_OPENAI_API_KEY }}" \
+          AZURE_SEARCH_ENDPOINT="${{ secrets.AZURE_SEARCH_ENDPOINT }}" \
+          AZURE_SEARCH_KEY="${{ secrets.AZURE_SEARCH_KEY }}" \
+          ENVIRONMENT=production \
+          LOG_LEVEL=info \
+          ENABLE_S4_FEATURES=true \
+          BUILD_SHA="${{ github.sha }}"
+        
+        echo "Restarting API..."
+        az webapp restart --resource-group ${{ env.AZURE_RESOURCE_GROUP }} --name ${{ env.API_APP_NAME }}
+        
+    - name: Build and Deploy Web
+      if: github.event.inputs.deploy_target == 'web' || github.event.inputs.deploy_target == 'all' || github.event.inputs.deploy_target == ''
+      run: |
+        echo "Building Web application..."
+        cd web
+        
+        # Install dependencies
+        npm ci --production
+        
+        # Build with production settings
+        NEXT_PUBLIC_API_URL=https://${{ env.API_APP_NAME }}.azurewebsites.net \
+        AUTH_MODE=aad \
+        AZURE_AD_CLIENT_ID="${{ secrets.AZURE_AD_CLIENT_ID }}" \
+        AZURE_AD_TENANT_ID="${{ secrets.AZURE_AD_TENANT_ID }}" \
+        NEXTAUTH_URL=https://${{ env.WEB_APP_NAME }}.azurewebsites.net \
+        NEXTAUTH_SECRET="${{ secrets.NEXTAUTH_SECRET }}" \
+        npm run build
+        
+        # Create deployment package
+        zip -r ../web-deploy.zip \
+          .next \
+          public \
+          package.json \
+          package-lock.json \
+          next.config.js \
+          -x "node_modules/*"
+        
+        cd ..
+        
+        echo "Deploying Web to Azure..."
+        az webapp deploy \
+          --resource-group ${{ env.AZURE_RESOURCE_GROUP }} \
+          --name ${{ env.WEB_APP_NAME }} \
+          --src-path web-deploy.zip \
+          --type zip
+        
+        echo "Configuring Web settings..."
+        az webapp config appsettings set \
+          --resource-group ${{ env.AZURE_RESOURCE_GROUP }} \
+          --name ${{ env.WEB_APP_NAME }} \
+          --settings \
+          AUTH_MODE=aad \
+          AZURE_AD_CLIENT_ID="${{ secrets.AZURE_AD_CLIENT_ID }}" \
+          AZURE_AD_TENANT_ID="${{ secrets.AZURE_AD_TENANT_ID }}" \
+          AZURE_AD_CLIENT_SECRET="${{ secrets.AZURE_AD_CLIENT_SECRET }}" \
+          NEXTAUTH_URL=https://${{ env.WEB_APP_NAME }}.azurewebsites.net \
+          NEXTAUTH_SECRET="${{ secrets.NEXTAUTH_SECRET }}" \
+          PROXY_TARGET_API_BASE_URL=https://${{ env.API_APP_NAME }}.azurewebsites.net \
+          ADMIN_EMAILS="${{ secrets.ADMIN_EMAILS }}" \
+          NODE_ENV=production \
+          BUILD_SHA="${{ github.sha }}"
+        
+        # Set startup command
+        az webapp config set \
+          --resource-group ${{ env.AZURE_RESOURCE_GROUP }} \
+          --name ${{ env.WEB_APP_NAME }} \
+          --startup-file "npm run start"
+        
+        echo "Restarting Web..."
+        az webapp restart --resource-group ${{ env.AZURE_RESOURCE_GROUP }} --name ${{ env.WEB_APP_NAME }}
+        
+    - name: Wait for deployment to stabilize
+      run: sleep 30
+      
+    - name: Verify Deployment
+      run: |
+        echo "Verifying deployment..."
+        
+        # Check API health
+        API_URL=https://${{ env.API_APP_NAME }}.azurewebsites.net
+        echo "Checking API at $API_URL..."
+        
+        API_STATUS=$(curl -s -o /dev/null -w "%{http_code}" $API_URL/api/health || echo "000")
+        if [ "$API_STATUS" = "200" ]; then
+          echo "✅ API is healthy"
+        else
+          echo "❌ API health check failed (HTTP $API_STATUS)"
+          exit 1
+        fi
+        
+        # Check Web
+        WEB_URL=https://${{ env.WEB_APP_NAME }}.azurewebsites.net
+        echo "Checking Web at $WEB_URL..."
+        
+        WEB_STATUS=$(curl -s -o /dev/null -w "%{http_code}" $WEB_URL || echo "000")
+        if [ "$WEB_STATUS" = "200" ] || [ "$WEB_STATUS" = "307" ]; then
+          echo "✅ Web application is responding"
+        else
+          echo "❌ Web application check failed (HTTP $WEB_STATUS)"
+          exit 1
+        fi
+        
+        # Check version
+        VERSION=$(curl -s $API_URL/api/version | jq -r '.git_sha' 2>/dev/null || echo "unknown")
+        echo "Deployed version: $VERSION"
+        
+        if [ "$VERSION" = "${{ github.sha }}" ]; then
+          echo "✅ Correct version deployed"
+        else
+          echo "⚠️ Version mismatch (expected ${{ github.sha }}, got $VERSION)"
+        fi
+        
+    - name: Run Production UAT
+      if: success()
+      run: |
+        echo "Triggering UAT validation..."
+        gh workflow run "Production UAT Validation" \
+          --ref ${{ github.ref }} \
+          -f deployment_tag=${{ github.sha }}
+      env:
+        GH_TOKEN: ${{ github.token }}
