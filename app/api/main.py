@@ -8,24 +8,26 @@ import os
 import logging
 from typing import List, Dict
 from datetime import datetime, timezone
-from .assist import router as assist_router
-from .storage import router as storage_router
-from .db import create_db_and_tables, get_session
-from .models import Assessment, Answer
-from .schemas import AssessmentCreate, AssessmentResponse, AnswerUpsert, ScoreResponse, PillarScore
-from .scoring import compute_scores
-from .routes import assessments as assessments_router, orchestrations as orchestrations_router, engagements as engagements_router, documents, summary, presets as presets_router, version as version_router, admin_auth as admin_auth_router, gdpr as gdpr_router, admin_settings as admin_settings_router, evidence as evidence_router, csf as csf_router, workshops as workshops_router, minutes as minutes_router, roadmap_prioritization as roadmap_prioritization_router
+from api.assist import router as assist_router
+from api.storage import router as storage_router
+from api.db import create_db_and_tables, get_session
+from api.models import Assessment, Answer
+from api.schemas import AssessmentCreate, AssessmentResponse, AnswerUpsert, ScoreResponse, PillarScore
+from api.scoring import compute_scores
+from api.routes import assessments as assessments_router, orchestrations as orchestrations_router, engagements as engagements_router, documents, summary, presets as presets_router, version as version_router, admin_auth as admin_auth_router, gdpr as gdpr_router, admin_settings as admin_settings_router, evidence as evidence_router, csf as csf_router, workshops as workshops_router, minutes as minutes_router, roadmap_prioritization as roadmap_prioritization_router
 from services.mcp_gateway.main import router as mcp_gateway_router
 from domain.repository import InMemoryRepository
 from domain.file_repo import FileRepository
 from ai.llm import LLMClient
 from ai.orchestrator import Orchestrator
+import sys
+sys.path.append('/app')
 from config import config
 
 # Import performance monitoring components
 from .middleware.performance import PerformanceTrackingMiddleware, CorrelationIDMiddleware
-from ..services.performance import start_performance_monitoring, stop_performance_monitoring
-from ..services.cache import cache_manager
+from services.performance import start_performance_monitoring, stop_performance_monitoring
+from services.cache import cache_manager
 
 app = FastAPI(title="AI Maturity Tool API", version="0.1.0")
 
@@ -196,14 +198,17 @@ async def on_startup():
     preset_service.ensure_dirs()
     # register bundled presets if present
     try:
+        # Use absolute paths that work both locally and in Docker
+        base_path = Path("/app") if Path("/app").exists() else Path(".")
         bundled = {
-            "cyber-for-ai": Path("app/config/presets/cyber-for-ai.json"),
-            "cscm-v3": Path("app/config/presets/preset_cscm_v3.json"),
+            "cyber-for-ai": base_path / "config/presets/cyber-for-ai.json",
+            "cscm-v3": base_path / "config/presets/preset_cscm_v3.json",
             # add others here if you have them
         }
         preset_service.BUNDLED.update({k: v for k, v in bundled.items() if v.exists()})
-    except Exception:
-        pass
+        logger.info(f"Loaded bundled presets: {list(preset_service.BUNDLED.keys())}")
+    except Exception as e:
+        logger.error(f"Failed to load bundled presets: {e}")
     
     # Initialize MCP Gateway configuration
     try:
@@ -272,8 +277,8 @@ async def get_feature_flags():
 @app.get("/api/performance/metrics")
 async def get_performance_metrics(time_window_minutes: int = 60):
     """Get performance metrics for monitoring and debugging"""
-    from ..services.performance import get_performance_statistics, get_recent_alerts
-    from ..services.cache import get_cache_metrics
+    from services.performance import get_performance_statistics, get_recent_alerts
+    from services.cache import get_cache_metrics
     
     try:
         # Get performance statistics
