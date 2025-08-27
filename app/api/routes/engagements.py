@@ -1,11 +1,13 @@
+import sys
+sys.path.append("/app")
 from fastapi import APIRouter, Depends, HTTPException, Request
 from typing import List, Dict
 from domain.models import Engagement, Membership
 from domain.repository import Repository
-from ..security import current_context, is_admin, require_member
-from ..schemas import EngagementCreate, AddMemberRequest
+from api.security import current_context, is_admin, require_member
+from schemas import EngagementCreate, AddMemberRequest
 
-router = APIRouter(prefix="/engagements", tags=["engagements"])
+router = APIRouter(prefix="/api/engagements", tags=["engagements"])
 
 
 def get_repo(request: Request) -> Repository:

@@ -1,13 +1,15 @@
+import sys
+sys.path.append("/app")
 from fastapi import APIRouter, Depends, UploadFile, File, Request, HTTPException
 from fastapi.responses import JSONResponse
 from typing import Any, Dict
 import json
 
-from ..security import current_context, require_admin
+from api.security import current_context, require_admin
 from services import presets as svc
-from ..schemas import AssessmentPreset
+from api.schemas import AssessmentPreset
 
-router = APIRouter(prefix="/presets", tags=["presets"])
+router = APIRouter(prefix="/api/presets", tags=["presets"])
 
 @router.get("/")
 async def list_presets():

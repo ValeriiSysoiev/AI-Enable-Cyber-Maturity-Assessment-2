@@ -15,7 +15,7 @@ from config import config
 from api.security import current_context
 from domain.admin_repository import create_admin_repository
 
-router = APIRouter(prefix="/admin", tags=["admin-settings"])
+router = APIRouter(prefix="/api/admin", tags=["admin-settings"])
 logger = logging.getLogger(__name__)
 
 

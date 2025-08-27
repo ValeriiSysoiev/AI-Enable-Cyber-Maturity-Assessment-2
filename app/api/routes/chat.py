@@ -4,6 +4,8 @@ Chat API Endpoints
 Provides orchestrator shell interface for chat messages and command execution.
 """
 
+import sys
+sys.path.append("/app")
 from fastapi import APIRouter, Depends, HTTPException, Request, Query
 from typing import List, Dict, Optional
 from pydantic import BaseModel, Field
@@ -13,9 +15,9 @@ from domain.models import ChatMessage, RunCard
 from domain.repository import Repository
 from services.chat_commands import create_chat_command_parser
 from services.audit import audit_log_async
-from ..security import current_context, require_member
+from api.security import current_context, require_member
 
-router = APIRouter(prefix="/chat", tags=["chat"])
+router = APIRouter(prefix="/api/chat", tags=["chat"])
 
 
 # Request/Response Models

@@ -1,3 +1,5 @@
+import sys
+sys.path.append("/app")
 from fastapi import APIRouter, Depends, HTTPException, UploadFile, File, Request, BackgroundTasks
 from fastapi.responses import FileResponse
 import os, uuid, shutil, logging
@@ -7,7 +9,7 @@ from typing import Optional, Dict, Any, List
 
 from domain.repository import Repository
 from domain.models import Document
-from ..security import current_context, require_member, is_admin
+from api.security import current_context, require_member, is_admin
 from util.files import safe_join, extract_text
 from services.rag import create_rag_service, IngestionStatus, SearchResult
 from config import config
@@ -22,7 +24,7 @@ class DocumentPublic(BaseModel):
     uploaded_by: str
     uploaded_at: datetime
 
-router = APIRouter(prefix="/engagements/{engagement_id}/docs", tags=["documents"])
+router = APIRouter(prefix="/api/engagements/{engagement_id}/docs", tags=["documents"])
 
 def get_repo(request: Request) -> Repository:
     return request.app.state.repo
