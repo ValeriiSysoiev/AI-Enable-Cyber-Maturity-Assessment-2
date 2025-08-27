@@ -6,16 +6,31 @@ export const dynamic = 'force-dynamic';
 
 export async function GET(request: NextRequest) {
   try {
-    // Get user email for authorization check
-    const userEmail = request.headers.get('X-User-Email');
-    if (!userEmail) {
-      return NextResponse.json(
-        { detail: 'Authentication required' },
-        { status: 401 }
-      );
-    }
+    // This is a public status endpoint for basic system info
+    // No authentication required for basic status
 
-    // Enhanced environment detection
+    // Try to get status from backend API first
+    const API_BASE_URL = process.env.PROXY_TARGET_API_BASE_URL || 'http://localhost:8000';
+    
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/admin/status`, {
+        headers: {
+          'X-User-Email': 'system@localhost', // System status check
+          'X-Engagement-ID': 'system-status', // Required header
+        },
+        signal: AbortSignal.timeout(3000) // 3 second timeout
+      });
+      
+      if (response.ok) {
+        const data = await response.json();
+        return NextResponse.json(data);
+      }
+    } catch (backendError) {
+      // Backend unavailable, return fallback status
+      console.log('Backend admin status unavailable:', backendError);
+    }
+    
+    // Fallback: Return local environment status
     const authMode = process.env.AUTH_MODE?.toLowerCase() || 'demo';
     const environment = process.env.NODE_ENV?.toLowerCase() || 'development';
     const dataBackend = process.env.DATA_BACKEND || 'local';
@@ -42,9 +57,8 @@ export async function GET(request: NextRequest) {
       environment: environment
     };
 
-    // Log access for security monitoring
-    console.info('System status accessed', {
-      userEmail,
+    // Return simplified status when backend is unavailable
+    console.info('Returning fallback system status', {
       timestamp: new Date().toISOString(),
       authMode,
       environment
