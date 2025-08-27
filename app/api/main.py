@@ -20,8 +20,6 @@ from domain.repository import InMemoryRepository
 from domain.file_repo import FileRepository
 from ai.llm import LLMClient
 from ai.orchestrator import Orchestrator
-import sys
-sys.path.append('/app')
 from config import config
 
 # Import performance monitoring components

@@ -30,7 +30,7 @@ export async function POST(request: NextRequest) {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'X-User-Email': userEmail || 'va.sysoiev@audit3a.com'
+          'X-User-Email': userEmail || ''
         },
         body: JSON.stringify(engagementData)
       });
@@ -44,22 +44,13 @@ export async function POST(request: NextRequest) {
         throw new Error(`Backend API failed: ${response.status}`);
       }
     } catch (backendError) {
-      console.log('Backend API unavailable, creating locally:', backendError);
+      console.error('Backend API unavailable:', backendError);
       
-      // Fallback: Create engagement locally
-      engagement = {
-        id: `engagement-${Date.now()}`,
-        name: engagementData.name || "New Assessment",
-        description: engagementData.description || "",
-        preset_id: engagementData.preset_id,
-        status: "draft",
-        created_at: new Date().toISOString(),
-        updated_at: new Date().toISOString(),
-        member_count: 1,
-        user_role: "Admin"
-      };
-      
-      console.log('Created engagement locally as fallback:', engagement);
+      // Fail securely when backend is unavailable
+      return NextResponse.json(
+        { error: 'Backend service temporarily unavailable. Please try again later.' },
+        { status: 503 }
+      );
     }
     console.log('Engagement created:', engagement);
     
@@ -73,7 +64,13 @@ export async function POST(request: NextRequest) {
     };
     
     console.log('Returning assessment:', assessment);
-    return NextResponse.json(assessment, { status: 201 });
+    
+    // Store assessment in response headers so frontend can cache it locally
+    const response = NextResponse.json(assessment, { status: 201 });
+    response.headers.set('X-Store-Locally', 'true');
+    response.headers.set('X-Assessment-Data', JSON.stringify(assessment));
+    
+    return response;
     
   } catch (error) {
     console.error('Assessment creation error:', error);
@@ -90,7 +87,7 @@ export async function GET(request: NextRequest) {
     // Forward to engagements API
     const response = await fetch(`${request.nextUrl.origin}/api/engagements`, {
       headers: {
-        'X-User-Email': request.headers.get('X-User-Email') || 'va.sysoiev@audit3a.com'
+        'X-User-Email': request.headers.get('X-User-Email') || ''
       }
     });
     
