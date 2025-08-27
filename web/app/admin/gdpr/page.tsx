@@ -1,20 +1,20 @@
 "use client";
 import { useState, useEffect } from "react";
-import { useRequireAuth } from "@/components/AuthProvider";
-import { isAdmin } from "@/lib/auth";
+import { useRequireAuth } from "../../components/AuthProvider";
+import { isAdmin } from "../../lib/auth";
 import { 
   getAdminDashboard, 
   getTTLPolicy, 
   updateTTLPolicy,
   formatFileSize,
   getJobStatusColor 
-} from "@/lib/gdpr";
-import AuditLogViewer from "@/components/gdpr/AuditLogViewer";
+} from "../../lib/gdpr";
+import AuditLogViewer from "../../components/gdpr/AuditLogViewer";
 import type { 
   GDPRAdminDashboard, 
   GDPRTTLPolicy,
   GDPRError 
-} from "@/types/gdpr";
+} from "../../types/gdpr";
 
 export default function AdminGDPRPage() {
   const [activeTab, setActiveTab] = useState<'dashboard' | 'ttl-policy' | 'audit-logs' | 'jobs'>('dashboard');
