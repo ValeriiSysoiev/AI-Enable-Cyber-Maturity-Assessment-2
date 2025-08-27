@@ -1,7 +1,7 @@
 "use client";
 import { useState, useEffect } from "react";
-import { useRequireAuth } from "../../components/AuthProvider";
-import AuthDiagnostics from "../../components/AuthDiagnostics";
+import { useRequireAuth } from "@/components/AuthProvider";
+import AuthDiagnostics from "@/components/AuthDiagnostics";
 
 export default function AdminAuthPage() {
   const [isAdminUser, setIsAdminUser] = useState(false);
