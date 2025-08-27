@@ -1,6 +1,6 @@
 "use client";
 import { useState, useEffect } from "react";
-import { API_BASE, authHeaders } from "@/lib/api";
+import { API_BASE, authHeaders } from "../../lib/api";
 
 type PresetRow = { id:string; name:string; version:string; source:string; counts:{pillars:number;capabilities:number;questions:number}};
 
