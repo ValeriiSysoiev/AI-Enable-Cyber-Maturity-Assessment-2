@@ -358,6 +358,12 @@ def get_rag_metrics_logger(correlation_id: str) -> RAGMetricsLogger:
     return RAGMetricsLogger(correlation_id)
 
 
+def get_correlation_id() -> str:
+    """Get or generate a correlation ID for request tracking"""
+    # This is a simple implementation - in a real system this might come from context
+    return str(uuid.uuid4())
+
+
 # Error handling utilities
 class RAGError(Exception):
     """Base exception for RAG operations"""

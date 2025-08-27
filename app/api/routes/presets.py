@@ -2,7 +2,7 @@ import sys
 sys.path.append("/app")
 from fastapi import APIRouter, Depends, UploadFile, File, Request, HTTPException
 from fastapi.responses import JSONResponse
-from typing import Any, Dict
+from typing import Any, Dict, Optional
 import json
 
 from api.security import current_context, require_admin
@@ -20,7 +20,7 @@ async def get_preset(preset_id: str):
     return await svc.get_preset(preset_id)
 
 @router.post("/upload")
-async def upload_preset(request: Request, file: UploadFile | None = File(default=None)):
+async def upload_preset(request: Request, file: Optional[UploadFile] = File(default=None)):
     ctx = await current_context(request)
     require_admin(None, ctx)
 

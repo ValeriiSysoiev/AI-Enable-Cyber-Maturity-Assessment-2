@@ -7,7 +7,7 @@ sys.path.append("/app")
 import re
 import fnmatch
 from pathlib import Path, PurePath
-from typing import Dict, Any, Optional, List, Set
+from typing import Dict, Any, Optional, List, Set, Union
 from util.logging import get_correlated_logger, log_security_event
 
 from api.config import MCPConfig, MCPOperationContext
@@ -33,7 +33,7 @@ class FileSizeError(SecurityError):
     pass
 
 
-def sanitize_path(path: str | Path, sandbox: Path) -> Path:
+def sanitize_path(path: Union[str, Path], sandbox: Path) -> Path:
     """
     Sanitize and validate a path within the given sandbox.
     
@@ -199,7 +199,7 @@ class MCPSecurityValidator:
     
     def validate_file_operation(
         self,
-        file_path: str | Path,
+        file_path: Union[str, Path],
         operation: str,
         tool_config: Any,
         content_size_bytes: Optional[int] = None

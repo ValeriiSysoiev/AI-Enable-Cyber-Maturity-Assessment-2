@@ -14,7 +14,7 @@ from api.db import create_db_and_tables, get_session
 from api.models import Assessment, Answer
 from api.schemas import AssessmentCreate, AssessmentResponse, AnswerUpsert, ScoreResponse, PillarScore
 from api.scoring import compute_scores
-from api.routes import assessments as assessments_router, orchestrations as orchestrations_router, engagements as engagements_router, documents, summary, presets as presets_router, version as version_router, admin_auth as admin_auth_router, gdpr as gdpr_router, admin_settings as admin_settings_router, evidence as evidence_router, csf as csf_router, workshops as workshops_router, minutes as minutes_router, roadmap_prioritization as roadmap_prioritization_router
+from api.routes import assessments as assessments_router, orchestrations as orchestrations_router, engagements as engagements_router, documents, summary, presets as presets_router, version as version_router, admin_auth as admin_auth_router, gdpr as gdpr_router, admin_settings as admin_settings_router, evidence as evidence_router, csf as csf_router, workshops as workshops_router, minutes as minutes_router, roadmap_prioritization as roadmap_prioritization_router, chat as chat_router
 from services.mcp_gateway.main import router as mcp_gateway_router
 from domain.repository import InMemoryRepository
 from domain.file_repo import FileRepository
@@ -361,9 +361,10 @@ if feature_flags.minutes_enabled:
     app.include_router(minutes_router.router)
     logger.info("Minutes Publishing feature enabled")
 
-# Note: chat_router would be included here if it exists
-# if feature_flags.chat_enabled and chat_router exists:
-#     app.include_router(chat_router.router)
+# Include chat router if enabled
+if feature_flags.chat_enabled:
+    app.include_router(chat_router.router)
+    logger.info("Chat feature enabled")
 
 def load_preset(preset_id: str) -> dict:
     # Use new preset service for consistency

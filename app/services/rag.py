@@ -11,11 +11,25 @@ from typing import List, Dict, Any, Optional, Tuple
 from dataclasses import dataclass, asdict
 from datetime import datetime, timezone
 
-from azure.search.documents import SearchClient
-from azure.search.documents.indexes import SearchIndexClient
-from azure.search.documents.models import VectorizedQuery, VectorFilterMode
-from azure.core.credentials import AzureKeyCredential
-from azure.identity import DefaultAzureCredential
+logger = logging.getLogger(__name__)
+
+try:
+    from azure.search.documents import SearchClient
+    from azure.search.documents.indexes import SearchIndexClient
+    from azure.search.documents.models import VectorizedQuery, VectorFilterMode
+    from azure.core.credentials import AzureKeyCredential
+    from azure.identity import DefaultAzureCredential
+    AZURE_SEARCH_AVAILABLE = True
+except ImportError as e:
+    AZURE_SEARCH_AVAILABLE = False
+    logger.warning(f"Azure Search SDK not available: {e}")
+    # Create dummy classes to avoid import errors
+    class SearchClient: pass
+    class SearchIndexClient: pass
+    class VectorizedQuery: pass
+    class VectorFilterMode: pass
+    class AzureKeyCredential: pass
+    class DefaultAzureCredential: pass
 
 from services.embeddings import EmbeddingResult, create_embeddings_service
 from domain.models import Document, EmbeddingDocument
@@ -23,9 +37,6 @@ from repos.cosmos_embeddings_repository import create_cosmos_embeddings_reposito
 import sys
 sys.path.append("/app")
 from config import config
-
-
-logger = logging.getLogger(__name__)
 
 
 @dataclass
