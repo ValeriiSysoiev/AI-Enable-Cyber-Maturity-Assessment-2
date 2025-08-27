@@ -5,7 +5,7 @@ from typing import List, Dict
 from domain.models import Engagement, Membership
 from domain.repository import Repository
 from api.security import current_context, is_admin, require_member
-from schemas import EngagementCreate, AddMemberRequest
+from api.schemas import EngagementCreate, AddMemberRequest
 
 router = APIRouter(prefix="/api/engagements", tags=["engagements"])
 

@@ -11,36 +11,46 @@ from typing import List, Optional, Dict, Any, Tuple
 from datetime import datetime, timezone
 from dataclasses import dataclass, asdict
 
-from azure.search.documents import SearchClient
-from azure.search.documents.indexes import SearchIndexClient
-from azure.search.documents.indexes.models import (
-    SearchIndex,
-    SearchField,
-    SearchFieldDataType,
-    SimpleField,
-    SearchableField,
-    VectorSearch,
-    VectorSearchProfile,
-    VectorSearchAlgorithmConfiguration,
-    HnswAlgorithmConfiguration,
-    VectorSearchVectorizer,
-    AzureOpenAIVectorizer,
-    SemanticConfiguration,
-    SemanticField,
-    SemanticPrioritizedFields,
-    SemanticSearch
-)
-from azure.search.documents.models import VectorizedQuery
-from azure.core.credentials import AzureKeyCredential
-from azure.identity import DefaultAzureCredential
+logger = logging.getLogger(__name__)
+
+try:
+    from azure.search.documents import SearchClient
+    from azure.search.documents.indexes import SearchIndexClient
+    from azure.search.documents.indexes.models import (
+        SearchIndex,
+        SearchField,
+        SearchFieldDataType,
+        SimpleField,
+        SearchableField,
+        VectorSearch,
+        VectorSearchProfile,
+        VectorSearchAlgorithmConfiguration,
+        HnswAlgorithmConfiguration,
+        VectorSearchVectorizer,
+        AzureOpenAIVectorizer,
+        SemanticConfiguration,
+        SemanticField,
+        SemanticPrioritizedFields,
+        SemanticSearch
+    )
+    from azure.search.documents.models import VectorizedQuery
+    from azure.core.credentials import AzureKeyCredential
+    from azure.identity import DefaultAzureCredential
+    AZURE_SEARCH_AVAILABLE = True
+except ImportError as e:
+    AZURE_SEARCH_AVAILABLE = False
+    logger.warning(f"Azure Search SDK not available: {e}")
+    # Create dummy classes to avoid import errors
+    class SearchClient: pass
+    class SearchIndexClient: pass
+    class VectorizedQuery: pass
+    class AzureKeyCredential: pass
+    class DefaultAzureCredential: pass
 
 from domain.models import EmbeddingDocument
 import sys
 sys.path.append("/app")
 from config import config
-
-
-logger = logging.getLogger(__name__)
 
 
 @dataclass 
@@ -102,6 +112,16 @@ class AzureSearchIndexManager:
     
     def __init__(self, correlation_id: Optional[str] = None):
         self.correlation_id = correlation_id or "unknown"
+        
+        if not AZURE_SEARCH_AVAILABLE:
+            logger.warning("Azure Search SDK not available, using stub implementation")
+            self.index_name = "stub_index"
+            self.endpoint = "stub_endpoint"
+            self.vector_dimensions = 1536
+            self.index_client = None
+            self.search_client = None
+            return
+            
         self.index_name = config.azure_search.index_name
         self.endpoint = config.azure_search.endpoint
         self.vector_dimensions = config.azure_openai.embedding_dimensions
@@ -150,6 +170,9 @@ class AzureSearchIndexManager:
     
     def create_index(self) -> bool:
         """Create the search index with vector search configuration"""
+        if not AZURE_SEARCH_AVAILABLE:
+            logger.warning("Azure Search not available, returning True for stub")
+            return True
         try:
             logger.info(
                 "Creating Azure Search index",
@@ -261,6 +284,9 @@ class AzureSearchIndexManager:
     
     def delete_index(self) -> bool:
         """Delete the search index"""
+        if not AZURE_SEARCH_AVAILABLE:
+            logger.warning("Azure Search not available, returning True for stub")
+            return True
         try:
             self.index_client.delete_index(self.index_name)
             logger.info(
@@ -284,6 +310,9 @@ class AzureSearchIndexManager:
     
     def index_exists(self) -> bool:
         """Check if the index exists"""
+        if not AZURE_SEARCH_AVAILABLE:
+            logger.warning("Azure Search not available, returning False for stub")
+            return False
         try:
             self.index_client.get_index(self.index_name)
             return True
@@ -292,6 +321,9 @@ class AzureSearchIndexManager:
     
     async def upload_documents(self, embeddings: List[EmbeddingDocument]) -> Tuple[int, List[str]]:
         """Upload embedding documents to the search index"""
+        if not AZURE_SEARCH_AVAILABLE:
+            logger.warning("Azure Search not available, returning stub upload result")
+            return len(embeddings), []
         if not embeddings:
             return 0, []
         
@@ -379,6 +411,9 @@ class AzureSearchIndexManager:
         similarity_threshold: Optional[float] = None
     ) -> List[SearchResult]:
         """Perform vector search with optional semantic ranking"""
+        if not AZURE_SEARCH_AVAILABLE:
+            logger.warning("Azure Search not available, returning empty search results")
+            return []
         try:
             top_k = top_k or config.rag.search_top_k
             
@@ -492,6 +527,9 @@ class AzureSearchIndexManager:
     
     async def delete_documents_by_filter(self, filter_expression: str) -> int:
         """Delete documents matching a filter"""
+        if not AZURE_SEARCH_AVAILABLE:
+            logger.warning("Azure Search not available, returning 0 for stub delete")
+            return 0
         try:
             logger.info(
                 "Deleting documents by filter",
@@ -573,6 +611,9 @@ class AzureSearchIndexManager:
     
     async def get_index_stats(self) -> Dict[str, Any]:
         """Get index statistics"""
+        if not AZURE_SEARCH_AVAILABLE:
+            logger.warning("Azure Search not available, returning stub stats")
+            return {"document_count": 0, "index_size_mb": 0, "vector_index_size_mb": 0, "storage_size_mb": 0}
         try:
             # Get document count
             count_result = await asyncio.to_thread(

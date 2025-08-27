@@ -6,7 +6,7 @@ import re
 import uuid
 import logging
 from datetime import datetime, timedelta
-from typing import Optional, List
+from typing import Optional, List, Dict, Any
 from fastapi import APIRouter, HTTPException, Depends, Query, Response
 from pydantic import BaseModel, Field
 
@@ -68,7 +68,7 @@ class LinkRequest(BaseModel):
     item_type: str = Field(..., description="Type of item (e.g., 'assessment')")
     item_id: str = Field(..., description="ID of the item")
 
-async def _get_storage_config(correlation_id: str = None) -> dict:
+async def _get_storage_config(correlation_id: Optional[str] = None) -> Dict[str, Any]:
     """Get storage configuration from secret provider"""
     account = await get_secret("azure-storage-account", correlation_id)
     key = await get_secret("azure-storage-key", correlation_id)
