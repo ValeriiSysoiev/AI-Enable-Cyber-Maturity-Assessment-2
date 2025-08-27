@@ -1,9 +1,9 @@
 "use client";
 import { useState, useEffect } from "react";
-import { API_BASE, authHeaders } from "@/lib/api";
-import EvidenceAdminPanel from "@/components/EvidenceAdminPanel";
-import { useRequireAuth } from "@/components/AuthProvider";
-import { isAdmin } from "@/lib/auth";
+import { API_BASE, authHeaders } from "../../lib/api";
+import EvidenceAdminPanel from "../../components/EvidenceAdminPanel";
+import { useRequireAuth } from "../../components/AuthProvider";
+import { isAdmin } from "../../lib/auth";
 
 type PresetRow = { 
   id: string; 
