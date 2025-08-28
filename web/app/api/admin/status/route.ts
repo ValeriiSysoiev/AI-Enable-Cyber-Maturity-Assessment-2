@@ -41,7 +41,7 @@ export async function GET(request: NextRequest) {
     // Get version from package.json if available
     let version = '1.0.0';
     try {
-      const packageJson = require('/Users/svvval/Documents/AI-Enable-Cyber-Maturity-Assessment-2/web/package.json');
+      const packageJson = require('../../../../package.json');
       version = packageJson.version || '1.0.0';
     } catch {
       // Fallback to default version
