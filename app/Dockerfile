@@ -19,10 +19,8 @@ RUN apt-get update && apt-get install -y \
     && rm -rf /var/lib/apt/lists/*
 
 # Copy Python deps and install
-# Use minimal requirements for production to reduce size and startup time
-COPY requirements-minimal.txt requirements.txt ./
-RUN pip install --no-cache-dir -r requirements-minimal.txt || \
-    pip install --no-cache-dir -r requirements.txt
+COPY requirements.txt ./
+RUN pip install --no-cache-dir -r requirements.txt
 
 # Copy application code
 COPY api/ ./api/
