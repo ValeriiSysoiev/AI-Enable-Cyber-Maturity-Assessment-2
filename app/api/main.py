@@ -273,6 +273,64 @@ async def on_startup():
         )
     except Exception as e:
         logger.error(f"Failed to initialize MCP Gateway: {e}")
+    
+    # Log comprehensive route information for debugging
+    try:
+        routes = []
+        route_methods = {}
+        for route in app.routes:
+            if hasattr(route, 'path'):
+                routes.append(route.path)
+                if hasattr(route, 'methods'):
+                    route_methods[route.path] = list(route.methods)
+        
+        # Log route statistics
+        total_routes = len(routes)
+        api_routes = [r for r in routes if r.startswith('/api/')]
+        business_routes = [r for r in api_routes if r not in ['/', '/health', '/version']]
+        
+        logger.info(
+            "API Route Loading Summary",
+            extra={
+                "total_routes": total_routes,
+                "api_routes_count": len(api_routes),
+                "business_routes_count": len(business_routes),
+                "basic_routes": ['/', '/health', '/version'],
+                "critical_endpoints_loaded": bool([r for r in routes if any(x in r for x in ['/features', '/engagements', '/assessments'])]),
+                "startup_status": "SUCCESS" if total_routes > 10 else "LIMITED_ROUTES"
+            }
+        )
+        
+        # Log failed routers if any
+        if hasattr(app.state, 'failed_routers') or 'failed_routers' in locals():
+            failed_count = len(failed_routers) if 'failed_routers' in locals() else 0
+            if failed_count > 0:
+                logger.warning(
+                    f"Router Loading Issues: {failed_count} routers failed to load",
+                    extra={
+                        "failed_routers": failed_routers if 'failed_routers' in locals() else [],
+                        "total_failed": failed_count
+                    }
+                )
+        
+        # Log sample of loaded routes for verification
+        if total_routes > 0:
+            logger.info(
+                "Sample Loaded Routes",
+                extra={
+                    "first_10_routes": sorted(routes)[:10],
+                    "business_sample": sorted(business_routes)[:5],
+                    "diagnostic_available": "/api/diagnostic" in routes,
+                    "router_status_available": "/api/router-status" in routes
+                }
+            )
+        else:
+            logger.error("CRITICAL: No routes loaded! This indicates a serious application issue.")
+            
+    except Exception as e:
+        logger.error(f"Failed to log route information: {e}")
+    
+    logger.info("=== API STARTUP COMPLETE ===")
 
 
 @app.on_event("shutdown")
