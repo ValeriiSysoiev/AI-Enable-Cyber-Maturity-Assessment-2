@@ -110,7 +110,7 @@ flowchart TB
 ## Environments & Deployment
 
 ### **Production Environment** 
-- **Web**: [web-cybermat-prd.azurewebsites.net](https://web-cybermat-prd.azurewebsites.net) (App Service)
+- **Web**: [web-cybermat-prd-aca.icystone-69c102b0.westeurope.azurecontainerapps.io](https://web-cybermat-prd-aca.icystone-69c102b0.westeurope.azurecontainerapps.io) (Container Apps)
 - **API**: [api-cybermat-prd-aca.icystone-69c102b0.westeurope.azurecontainerapps.io](https://api-cybermat-prd-aca.icystone-69c102b0.westeurope.azurecontainerapps.io) (Container Apps)
 - **Features**: S4 features OFF, production-hardened configuration
 
@@ -643,7 +643,7 @@ Go to **Settings → Secrets and variables → Actions → Variables** and confi
 
 **App Service Option:**
 - `GHCR_ENABLED=1`
-- `STAGING_URL=https://your-staging-app.azurewebsites.net`
+- `STAGING_URL=https://your-staging-app.azurecontainerapps.io`
 
 **Container Apps Option:**
 - `GHCR_ENABLED=1`

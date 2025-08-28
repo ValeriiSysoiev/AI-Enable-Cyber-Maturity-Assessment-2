@@ -38,10 +38,10 @@ COPY util/ ./util/
 COPY __init__.py .
 COPY test_api.py .
 
-# Copy all startup scripts
-COPY simple_start.py start_prod.py gunicorn_config.py ./
+# Copy startup script
+COPY simple_start.py ./
 
 EXPOSE 8000
 
-# Use production startup script for Azure App Service
-CMD ["python", "start_prod.py"]
+# Use simple startup script for Container Apps
+CMD ["python", "simple_start.py"]

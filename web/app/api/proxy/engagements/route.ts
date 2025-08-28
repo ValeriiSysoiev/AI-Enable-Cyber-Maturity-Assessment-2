@@ -4,8 +4,6 @@ import { rateLimiters, withRateLimit } from '../../../../lib/rate-limiter';
 // SSRF Protection: Allowed backend URLs
 const ALLOWED_BACKEND_URLS = [
   'https://api-cybermat-prd-aca.icystone-69c102b0.westeurope.azurecontainerapps.io',
-  'https://api-cybermat-dev.azurewebsites.net', 
-  'https://api-cybermat-staging.azurewebsites.net',
   'http://localhost:8000'
 ];
 
