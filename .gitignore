@@ -60,3 +60,5 @@ webapp-logs.zip
 # Debug artifacts
 web/app/api/debug/
 web/app/api/test-env/
+to_claude*
+to_cursor*
