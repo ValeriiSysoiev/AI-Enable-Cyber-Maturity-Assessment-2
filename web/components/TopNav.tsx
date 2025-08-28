@@ -105,7 +105,12 @@ export default function TopNav() {
       if (auth.mode.mode === 'aad') {
         // Use NextAuth signOut function for proper AAD logout
         console.log('Using NextAuth signOut');
-        await signOut({ callbackUrl: '/signin' });
+        await signOut({ 
+          callbackUrl: '/signin',
+          redirect: false 
+        });
+        // Manually redirect after signout
+        window.location.href = '/signin';
       } else {
         console.log('Using demo signOut');
         localStorage.removeItem('email');
