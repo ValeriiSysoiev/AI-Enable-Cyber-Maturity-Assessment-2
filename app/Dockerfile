@@ -34,7 +34,6 @@ COPY security/ ./security/
 COPY storage/ ./storage/
 COPY util/ ./util/
 COPY __init__.py .
-COPY test_api.py .
 
 # Copy startup script
 COPY simple_start.py ./
