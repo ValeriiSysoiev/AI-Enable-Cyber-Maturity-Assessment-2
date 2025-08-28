@@ -19,8 +19,10 @@ RUN apt-get update && apt-get install -y \
     && rm -rf /var/lib/apt/lists/*
 
 # Copy Python deps and install
-COPY requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt
+# Use minimal requirements for production to reduce size and startup time
+COPY requirements-minimal.txt requirements.txt ./
+RUN pip install --no-cache-dir -r requirements-minimal.txt || \
+    pip install --no-cache-dir -r requirements.txt
 
 # Copy application code
 COPY api/ ./api/
@@ -36,7 +38,10 @@ COPY util/ ./util/
 COPY __init__.py .
 COPY test_api.py .
 
-COPY simple_start.py .
+# Copy all startup scripts
+COPY simple_start.py start_prod.py gunicorn_config.py ./
 
 EXPOSE 8000
-CMD ["python", "simple_start.py"]
+
+# Use production startup script for Azure App Service
+CMD ["python", "start_prod.py"]
