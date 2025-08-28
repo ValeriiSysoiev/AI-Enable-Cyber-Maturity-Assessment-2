@@ -6,9 +6,7 @@ const API_BASE_URL = process.env.PROXY_TARGET_API_BASE_URL || 'http://localhost:
 // SSRF Protection: Allowed base URLs for proxy requests
 const ALLOWED_BASE_URLS = [
   'http://localhost:8000',
-  'https://api-cybermat-prd-aca.icystone-69c102b0.westeurope.azurecontainerapps.io',
-  'https://api-cybermat-dev.azurewebsites.net',
-  'https://api-cybermat-staging.azurewebsites.net'
+  'https://api-cybermat-prd-aca.icystone-69c102b0.westeurope.azurecontainerapps.io'
 ];
 
 // SSRF Protection: Block dangerous protocols and private IPs
