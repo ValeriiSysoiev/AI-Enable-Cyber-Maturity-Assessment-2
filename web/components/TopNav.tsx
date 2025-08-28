@@ -3,7 +3,6 @@ import dynamic from "next/dynamic";
 import { usePathname } from "next/navigation";
 import { useEffect, useState, useRef } from "react";
 import Link from "next/link";
-import { signOut } from "next-auth/react";
 import { useAuth } from "./AuthProvider";
 
 // Dynamic import to avoid SSR issues with localStorage
@@ -103,10 +102,10 @@ export default function TopNav() {
     try {
       console.log('Sign out clicked, auth mode:', auth.mode.mode);
       if (auth.mode.mode === 'aad') {
-        // Use NextAuth signOut function for proper AAD logout
-        console.log('Using NextAuth signOut');
-        // Let NextAuth handle the redirect
-        await signOut({ callbackUrl: '/signin' });
+        // For AAD mode, use a direct navigation to NextAuth signout endpoint
+        // This avoids React hook issues with the signOut function
+        console.log('Using NextAuth signOut via redirect');
+        window.location.href = '/api/auth/signout?callbackUrl=' + encodeURIComponent('/signin');
       } else {
         console.log('Using demo signOut');
         localStorage.removeItem('email');
