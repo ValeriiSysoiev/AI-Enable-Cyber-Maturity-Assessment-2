@@ -248,8 +248,10 @@ async def on_startup():
     else:
         logger.warning(
             "Service Bus configuration not found - using in-memory queue fallback",
-            namespace_configured=bool(config.service_bus.namespace),
-            connection_string_configured=bool(config.service_bus.connection_string)
+            extra={
+                "namespace_configured": bool(config.service_bus.namespace),
+                "connection_string_configured": bool(config.service_bus.connection_string)
+            }
         )
     
     # Initialize preset service
