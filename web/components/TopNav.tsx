@@ -105,16 +105,14 @@ export default function TopNav() {
       if (auth.mode.mode === 'aad') {
         // Use NextAuth signOut function for proper AAD logout
         console.log('Using NextAuth signOut');
-        await signOut({ 
-          callbackUrl: '/signin',
-          redirect: false 
-        });
-        // Manually redirect after signout
-        window.location.href = '/signin';
+        // Let NextAuth handle the redirect
+        await signOut({ callbackUrl: '/signin' });
       } else {
         console.log('Using demo signOut');
         localStorage.removeItem('email');
         localStorage.removeItem('engagementId');
+        // For demo mode, also clear the cookie
+        await fetch('/api/demo/signout', { method: 'POST' });
         window.location.href = '/signin';
       }
     } catch (error) {
