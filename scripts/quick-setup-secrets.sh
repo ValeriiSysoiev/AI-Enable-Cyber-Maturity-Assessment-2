@@ -28,7 +28,7 @@ set_github_secret() {
 }
 
 # Get existing values from environment or use defaults
-API_BASE_URL="${API_BASE_URL:-https://api-cybermat-prd.azurewebsites.net}"
+API_BASE_URL="${API_BASE_URL:-https://api-cybermat-prd-aca.icystone-69c102b0.westeurope.azurecontainerapps.io}"
 WEB_BASE_URL="${WEB_BASE_URL:-https://web-cybermat-prd.azurewebsites.net}"
 ADMIN_EMAILS="${ADMIN_EMAILS:-admin@example.com}"
 

@@ -118,7 +118,7 @@ jobs:
           --build-arg DEMO_E2E=${{ secrets.DEMO_E2E || '0' }} \
           --build-arg NEXTAUTH_URL=${{ secrets.NEXTAUTH_URL || 'https://web-cybermat-prd.azurewebsites.net' }} \
           --build-arg NEXTAUTH_SECRET=${{ secrets.NEXTAUTH_SECRET }} \
-          --build-arg PROXY_TARGET_API_BASE_URL=${{ secrets.PROXY_TARGET_API_BASE_URL || 'https://api-cybermat-prd.azurewebsites.net' }} \
+          --build-arg PROXY_TARGET_API_BASE_URL=${{ secrets.PROXY_TARGET_API_BASE_URL || 'https://api-cybermat-prd-aca.icystone-69c102b0.westeurope.azurecontainerapps.io' }} \
           -t ${{ env.AZURE_CONTAINER_REGISTRY }}.azurecr.io/web:${{ github.sha }} ./web
         docker push ${{ env.AZURE_CONTAINER_REGISTRY }}.azurecr.io/web:${{ github.sha }}
 

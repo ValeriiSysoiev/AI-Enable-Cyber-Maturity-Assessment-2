@@ -27,7 +27,7 @@ const fallbackEngagements = [
 export async function GET(request: Request) {
   try {
     // Try to proxy to backend first
-    const backendUrl = process.env.PROXY_TARGET_API_BASE_URL || "https://api-cybermat-prd.azurewebsites.net";
+    const backendUrl = process.env.PROXY_TARGET_API_BASE_URL || "https://api-cybermat-prd-aca.icystone-69c102b0.westeurope.azurecontainerapps.io";
     
     try {
       const response = await fetch(`${backendUrl}/engagements`, {
