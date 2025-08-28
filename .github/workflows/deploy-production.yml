@@ -110,6 +110,12 @@ jobs:
           ENABLE_S4_FEATURES=true \
           BUILD_SHA="${{ github.sha }}"
         
+        echo "Configuring API startup command..."
+        az webapp config set \
+          --resource-group ${{ env.AZURE_RESOURCE_GROUP }} \
+          --name ${{ env.API_APP_NAME }} \
+          --startup-file "python start_prod.py"
+        
         echo "Restarting API..."
         az webapp restart --resource-group ${{ env.AZURE_RESOURCE_GROUP }} --name ${{ env.API_APP_NAME }}
         
