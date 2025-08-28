@@ -22,19 +22,34 @@ from ai.llm import LLMClient
 from ai.orchestrator import Orchestrator
 from config import config
 
-# Import performance monitoring components
+# Import middleware components
 from .middleware.performance import PerformanceTrackingMiddleware, CorrelationIDMiddleware
+from .middleware.security_headers import SecurityHeadersMiddleware
+from .middleware.rate_limiting import RateLimitingMiddleware
 from services.performance import start_performance_monitoring, stop_performance_monitoring
 from services.cache import cache_manager
 
 app = FastAPI(title="AI Maturity Tool API", version="0.1.0")
 
-# --- Performance and monitoring middleware (order matters) ---
-# 1. Correlation ID middleware (runs first to ensure correlation IDs are available)
-app.add_middleware(CorrelationIDMiddleware)
+# --- Middleware stack (order matters - first added runs last) ---
+# 1. Security headers middleware (runs last, adds headers to all responses)
+app.add_middleware(SecurityHeadersMiddleware)
 
-# 2. Performance tracking middleware (runs after correlation ID is set)
+# 2. Rate limiting middleware (disabled by default, can be enabled via env var)
+rate_limiting_enabled = os.getenv('RATE_LIMITING_ENABLED', '0') == '1'
+if rate_limiting_enabled:
+    requests_per_minute = int(os.getenv('RATE_LIMIT_PER_MINUTE', '60'))
+    burst_per_second = int(os.getenv('RATE_LIMIT_BURST_PER_SECOND', '10'))
+    app.add_middleware(RateLimitingMiddleware, 
+                      default_requests_per_minute=requests_per_minute,
+                      burst_requests_per_second=burst_per_second,
+                      enabled=True)
+
+# 3. Performance tracking middleware 
 app.add_middleware(PerformanceTrackingMiddleware)
+
+# 4. Correlation ID middleware (runs first to ensure correlation IDs are available)
+app.add_middleware(CorrelationIDMiddleware)
 
 # --- CORS configuration (env-driven) ---
 app.add_middleware(
@@ -598,6 +613,43 @@ async def api_health_redirect():
     """Health endpoint redirect for API prefix compatibility"""
     from .routes.version import health_check
     return await health_check()
+
+@app.get("/api/diagnostic")
+async def diagnostic_endpoint():
+    """Comprehensive diagnostic endpoint for production debugging"""
+    import sys
+    import os
+    from datetime import datetime, timezone
+    
+    # Count loaded routes
+    routes = []
+    business_routes = []
+    for route in app.routes:
+        if hasattr(route, 'path'):
+            routes.append(route.path)
+            if '/api/' in route.path and route.path not in ['/', '/health', '/version']:
+                business_routes.append(route.path)
+    
+    return {
+        "status": "API diagnostic information",
+        "timestamp": datetime.now(timezone.utc).isoformat(),
+        "environment": {
+            "python_version": sys.version,
+            "working_directory": os.getcwd(),
+            "pythonpath_set": os.environ.get('PYTHONPATH', 'NOT_SET'),
+            "ci_mode": os.environ.get('CI_MODE', '0') == '1',
+            "ml_disabled": os.environ.get('DISABLE_ML', '0') == '1'
+        },
+        "routes": {
+            "total_routes": len(routes),
+            "business_routes_count": len(business_routes),
+            "sample_routes": routes[:10],
+            "sample_business_routes": business_routes[:10]
+        },
+        "failed_routers": failed_routers if 'failed_routers' in globals() else [],
+        "fastapi_loaded": True,
+        "diagnosis": "If you see this, FastAPI basic functionality is working"
+    }
 
 
 @app.post("/assessments", response_model=AssessmentResponse)
