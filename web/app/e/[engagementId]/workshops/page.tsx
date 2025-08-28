@@ -26,7 +26,7 @@ function NewWorkshopModal({ isOpen, onClose, onSuccess, engagementId }: NewWorks
     setError("");
 
     try {
-      const { createWorkshop } = await import("@/lib/workshops");
+      const { createWorkshop } = await import("../../../../lib/workshops");
       await createWorkshop(engagementId, formData);
       onSuccess();
       onClose();
