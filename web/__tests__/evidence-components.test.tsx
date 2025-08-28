@@ -19,7 +19,7 @@ jest.mock('next/navigation', () => ({
 }));
 
 // Mock evidence API functions
-jest.mock('@/lib/evidence', () => ({
+jest.mock('../lib/evidence', () => ({
   generateEvidenceSAS: jest.fn(),
   uploadFileToAzure: jest.fn(),
   completeEvidenceUpload: jest.fn(),
@@ -71,7 +71,7 @@ describe('EvidenceUploader', () => {
   });
 
   it('displays validation errors for oversized files', async () => {
-    const { formatFileSize } = require('@/lib/evidence');
+    const { formatFileSize } = require('../lib/evidence');
     formatFileSize.mockReturnValue('30 MB');
     
     render(<EvidenceUploader />);
@@ -92,7 +92,7 @@ describe('EvidenceUploader', () => {
     render(<EvidenceUploader onUploadComplete={onUploadComplete} />);
     
     // Mock successful upload flow
-    const { generateEvidenceSAS, uploadFileToAzure, completeEvidenceUpload, computeFileChecksum } = require('@/lib/evidence');
+    const { generateEvidenceSAS, uploadFileToAzure, completeEvidenceUpload, computeFileChecksum } = require('../lib/evidence');
     
     generateEvidenceSAS.mockResolvedValue({
       upload_url: 'https://storage.blob.core.windows.net/test',
@@ -122,7 +122,7 @@ describe('EvidenceTable', () => {
   });
 
   it('renders loading state initially', () => {
-    const { listEvidence } = require('@/lib/evidence');
+    const { listEvidence } = require('../lib/evidence');
     listEvidence.mockImplementation(() => new Promise(() => {})); // Never resolves
     
     render(<EvidenceTable />);
@@ -131,7 +131,7 @@ describe('EvidenceTable', () => {
   });
 
   it('renders empty state when no evidence', async () => {
-    const { listEvidence } = require('@/lib/evidence');
+    const { listEvidence } = require('../lib/evidence');
     listEvidence.mockResolvedValue({
       data: [],
       total: 0,
@@ -151,7 +151,7 @@ describe('EvidenceTable', () => {
   });
 
   it('renders evidence list when data is available', async () => {
-    const { listEvidence } = require('@/lib/evidence');
+    const { listEvidence } = require('../lib/evidence');
     listEvidence.mockResolvedValue({
       data: [mockEvidence],
       total: 1,
@@ -173,7 +173,7 @@ describe('EvidenceTable', () => {
   });
 
   it('handles pagination controls', async () => {
-    const { listEvidence } = require('@/lib/evidence');
+    const { listEvidence } = require('../lib/evidence');
     listEvidence.mockResolvedValue({
       data: [mockEvidence],
       total: 100,
@@ -200,7 +200,7 @@ describe('EvidenceTable', () => {
   });
 
   it('calls onEvidenceSelect when row is clicked', async () => {
-    const { listEvidence } = require('@/lib/evidence');
+    const { listEvidence } = require('../lib/evidence');
     const onEvidenceSelect = jest.fn();
     
     listEvidence.mockResolvedValue({
@@ -272,7 +272,7 @@ describe('EvidencePreview', () => {
   });
 
   it('handles link creation', async () => {
-    const { linkEvidence } = require('@/lib/evidence');
+    const { linkEvidence } = require('../lib/evidence');
     const onLinked = jest.fn();
     
     linkEvidence.mockResolvedValue({
