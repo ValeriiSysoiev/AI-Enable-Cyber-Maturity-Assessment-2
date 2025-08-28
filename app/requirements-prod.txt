@@ -1,0 +1,64 @@
+# Core FastAPI dependencies
+fastapi==0.109.0
+uvicorn[standard]==0.25.0
+python-multipart==0.0.6
+pydantic==2.5.3
+pydantic_core==2.14.6
+
+# Database
+sqlmodel==0.0.14
+alembic==1.13.1
+
+# Azure dependencies
+azure-identity==1.15.0
+azure-storage-blob==12.19.0
+azure-cosmos==4.5.1
+azure-servicebus==7.11.4
+azure-search-documents==11.4.0
+azure-keyvault-secrets==4.7.0
+
+# Azure OpenAI
+openai==1.6.1
+
+# Authentication
+msal==1.26.0
+PyJWT==2.8.0
+cryptography==41.0.7
+
+# Data processing
+pandas==2.1.4
+numpy==1.26.2
+openpyxl==3.1.2
+
+# PDF and document processing
+pypdf==3.17.4
+python-docx==1.1.0
+python-pptx==0.6.23
+pdfplumber==0.10.3
+camelot-py[cv]==0.11.0
+opencv-python==4.8.1.78
+ghostscript==0.7
+
+# Audio processing
+openai-whisper==20231117
+
+# AI and NLP
+tiktoken==0.5.2
+langchain==0.1.0
+langchain-community==0.0.10
+langchain-openai==0.0.5
+
+# Utilities
+python-dotenv==1.0.0
+httpx==0.25.2
+aiofiles==23.2.1
+nest-asyncio==1.5.8
+tenacity==8.2.3
+ujson==5.9.0
+
+# MCP Server
+mcp==1.1.2
+
+# Additional utilities
+bleach==6.1.0
+email-validator==2.1.0.post1
