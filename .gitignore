@@ -62,3 +62,7 @@ web/app/api/debug/
 web/app/api/test-env/
 to_claude*
 to_cursor*
+
+# IDE named pipes (Claude and Cursor)
+claude_input
+cursor_input
