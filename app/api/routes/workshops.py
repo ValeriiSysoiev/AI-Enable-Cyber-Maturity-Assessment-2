@@ -13,7 +13,7 @@ from repos.cosmos_repository import CosmosRepository
 from services.audit import create_audit_service
 from util.logging import get_correlation_id
 from api.security import current_context, require_member
-from schemas.workshop import (
+from api.schemas.workshop import (
     WorkshopCreateRequest,
     WorkshopResponse,
     ConsentRequest,

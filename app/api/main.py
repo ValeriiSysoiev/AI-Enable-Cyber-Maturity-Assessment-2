@@ -15,7 +15,7 @@ from api.models import Assessment, Answer
 from api.schemas import AssessmentCreate, AssessmentResponse, AnswerUpsert, ScoreResponse, PillarScore
 from api.scoring import compute_scores
 from api.routes import assessments as assessments_router, orchestrations as orchestrations_router, engagements as engagements_router, documents, summary, presets as presets_router, version as version_router, admin_auth as admin_auth_router, gdpr as gdpr_router, admin_settings as admin_settings_router, evidence as evidence_router, csf as csf_router, workshops as workshops_router, minutes as minutes_router, roadmap_prioritization as roadmap_prioritization_router, chat as chat_router
-from services.mcp_gateway.main import router as mcp_gateway_router
+# from services.mcp_gateway.main import router as mcp_gateway_router  # Broken imports
 from domain.repository import InMemoryRepository
 from domain.file_repo import FileRepository
 from ai.llm import LLMClient
@@ -477,11 +477,12 @@ except Exception as e:
     failed_routers.append(("roadmap_prioritization_router", str(e)))
 
 # MCP Gateway router
-try:
-    app.include_router(mcp_gateway_router)
-except Exception as e:
-    logger.error(f"Failed to include mcp_gateway_router: {e}")
-    failed_routers.append(("mcp_gateway_router", str(e)))
+# MCP gateway router disabled - broken imports
+# try:
+#     app.include_router(mcp_gateway_router)
+# except Exception as e:
+#     logger.error(f"Failed to include mcp_gateway_router: {e}")
+#     failed_routers.append(("mcp_gateway_router", str(e)))
 
 # Add diagnostic info about failed routers
 @app.get("/api/router-status")

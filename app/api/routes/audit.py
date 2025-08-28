@@ -13,14 +13,14 @@ from fastapi.responses import FileResponse, StreamingResponse
 from pydantic import BaseModel, Field, validator
 import aiofiles
 
-from app.services.audit_logger import (
+from services.audit_logger import (
     AuditLogger, 
     AuditEventType, 
     AuditSeverity,
     get_audit_logger
 )
-from app.core.security import get_current_user, require_permissions
-from app.core.logging import get_correlation_id
+from core.security import get_current_user, require_permissions
+from core.logging import get_correlation_id
 
 
 router = APIRouter(prefix="/audit", tags=["audit"])

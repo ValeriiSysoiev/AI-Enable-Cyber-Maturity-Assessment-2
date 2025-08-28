@@ -10,13 +10,13 @@ from typing import List, Optional
 from fastapi import APIRouter, HTTPException, Depends, Request
 from pydantic import BaseModel
 
-from app.domain.models import CSFFunction, CSFCategory, CSFSubcategory
-from app.services.csf_taxonomy import get_csf_service
-from app.util.logging import get_logger
+from domain.models import CSFFunction, CSFCategory, CSFSubcategory
+from services.csf_taxonomy import get_csf_service
+import logging
 
 
 router = APIRouter(prefix="/api/v1/csf", tags=["csf"])
-logger = get_logger(__name__)
+logger = logging.getLogger(__name__)
 
 
 class CSFTaxonomyResponse(BaseModel):

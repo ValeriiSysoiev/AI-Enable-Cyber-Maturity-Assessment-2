@@ -4,13 +4,13 @@ from typing import Optional
 from fastapi import APIRouter, HTTPException, Header, Depends
 from datetime import datetime
 
-from app.api.schemas.roadmap import (
+from api.schemas.roadmap import (
     PrioritizationRequest, PrioritizationResponse,
     WeightsConfigRequest, WeightsConfigResponse,
     ScoringWeights, ScoringAlgorithmInfo
 )
-from app.services.roadmap_prioritization import roadmap_prioritization_service
-from app.core.logging import get_correlation_id
+from services.roadmap_prioritization import roadmap_prioritization_service
+from core.logging import get_correlation_id
 
 logger = logging.getLogger(__name__)
 router = APIRouter(prefix="/api/roadmap/prioritization", tags=["roadmap-prioritization"])

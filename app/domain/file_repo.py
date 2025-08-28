@@ -9,7 +9,7 @@ from pathlib import Path
 from typing import Dict, List, Optional
 import threading
 from domain.models import Assessment, Question, Response, Finding, Recommendation, RunLog, Engagement, Membership, Document
-from api.repository import Repository
+from domain.repository import Repository
 
 logger = logging.getLogger(__name__)
 

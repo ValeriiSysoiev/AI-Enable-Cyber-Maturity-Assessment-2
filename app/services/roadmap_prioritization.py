@@ -3,7 +3,7 @@ import logging
 from typing import List, Dict, Optional, Tuple
 from datetime import datetime
 import json
-from app.api.schemas.roadmap import (
+from api.schemas.roadmap import (
     ScoringWeights, InitiativeScoring, CompositeScore, 
     InitiativePrioritization, PrioritizationRequest, PrioritizationResponse
 )

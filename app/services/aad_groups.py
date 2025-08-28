@@ -9,7 +9,7 @@ sys.path.append("/app")
 import json
 import logging
 import time
-from typing import Dict, List, Optional, Set, Tuple
+from typing import Any, Dict, List, Optional, Set, Tuple
 from datetime import datetime, timedelta
 from dataclasses import dataclass
 
@@ -468,7 +468,7 @@ class AADGroupsService:
             self._legacy_cache.clear()
             logger.info("Cleared all AAD groups cache", extra={"correlation_id": self.correlation_id})
 
-    def get_cache_stats(self) -> Dict[str, any]:
+    def get_cache_stats(self) -> Dict[str, Any]:
         """Get cache statistics"""
         stats = {
             "legacy_cache": {
@@ -500,7 +500,7 @@ class AADGroupsService:
             and bool(self._group_roles_map)
         )
 
-    def get_status(self) -> Dict[str, any]:
+    def get_status(self) -> Dict[str, Any]:
         """Get comprehensive service status for monitoring"""
         return {
             "enabled": config.aad_groups.enabled,
