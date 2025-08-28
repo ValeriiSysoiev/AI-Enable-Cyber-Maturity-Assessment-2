@@ -57,7 +57,7 @@ export default function AuditLogViewer({
       
       if (isAdminView) {
         // Import the global admin function when needed
-        const { getGlobalAuditLogs } = await import("@/lib/gdpr");
+        const { getGlobalAuditLogs } = await import("../../lib/gdpr");
         response = await getGlobalAuditLogs(
           currentPage, 
           pageSize, 

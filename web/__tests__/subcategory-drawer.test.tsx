@@ -13,7 +13,7 @@ jest.mock('next/navigation', () => ({
 }));
 
 // Mock evidence API
-jest.mock('@/lib/evidence', () => ({
+jest.mock('../lib/evidence', () => ({
   listEvidence: jest.fn(),
 }));
 
@@ -177,7 +177,7 @@ describe('SubcategoryDrawer', () => {
   });
 
   it('loads evidence on mount', async () => {
-    const { listEvidence } = require('@/lib/evidence');
+    const { listEvidence } = require('../lib/evidence');
     listEvidence.mockResolvedValue({
       data: mockEvidence,
       total: 1,
@@ -207,7 +207,7 @@ describe('SubcategoryDrawer', () => {
   });
 
   it('displays error state for evidence loading', async () => {
-    const { listEvidence } = require('@/lib/evidence');
+    const { listEvidence } = require('../lib/evidence');
     listEvidence.mockRejectedValue(new Error('Network error'));
 
     render(
@@ -230,7 +230,7 @@ describe('SubcategoryDrawer', () => {
   });
 
   it('displays empty state when no evidence', async () => {
-    const { listEvidence } = require('@/lib/evidence');
+    const { listEvidence } = require('../lib/evidence');
     listEvidence.mockResolvedValue({
       data: [],
       total: 0,
