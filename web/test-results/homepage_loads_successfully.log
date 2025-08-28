@@ -1,33 +1,37 @@
-[2025-08-18T15:21:34.921Z] [INFO] Starting homepage load test
-[2025-08-18T15:21:34.922Z] [INFO] Starting step: Navigate to homepage
-[2025-08-18T15:21:34.931Z] [ERROR] Step failed: Navigate to homepage
+[2025-08-28T23:26:59.691Z] [INFO] Starting homepage load test
+[2025-08-28T23:26:59.691Z] [INFO] Starting step: Navigate to homepage
+[2025-08-28T23:26:59.699Z] [ERROR] Step failed: Navigate to homepage
 {
   "duration": 8,
   "error": "page.goto: Protocol error (Page.navigate): Cannot navigate to invalid URL\nCall log:\n\u001b[2m  - navigating to \"/\", waiting until \"load\"\u001b[22m\n"
 }
-[2025-08-18T15:21:34.931Z] [ERROR] Capturing error context
+[2025-08-28T23:26:59.699Z] [ERROR] Capturing error context
 {
   "error": "page.goto: Protocol error (Page.navigate): Cannot navigate to invalid URL\nCall log:\n\u001b[2m  - navigating to \"/\", waiting until \"load\"\u001b[22m\n",
-  "stack": "page.goto: Protocol error (Page.navigate): Cannot navigate to invalid URL\nCall log:\n\u001b[2m  - navigating to \"/\", waiting until \"load\"\u001b[22m\n\n    at PerformanceMonitor.measurePageLoad (/Users/valsysoiev/AI-Enable-Cyber-Maturity-Assessment-2/web/e2e/test-utils.ts:214:21)\n    at action (/Users/valsysoiev/AI-Enable-Cyber-Maturity-Assessment-2/web/e2e/tests/smoke.spec.ts:20:44)\n    at TestStepTracker.executeStep (/Users/valsysoiev/AI-Enable-Cyber-Maturity-Assessment-2/web/e2e/test-utils.ts:86:28)\n    at /Users/valsysoiev/AI-Enable-Cyber-Maturity-Assessment-2/web/e2e/tests/smoke.spec.ts:19:25"
+  "stack": "page.goto: Protocol error (Page.navigate): Cannot navigate to invalid URL\nCall log:\n\u001b[2m  - navigating to \"/\", waiting until \"load\"\u001b[22m\n\n    at PerformanceMonitor.measurePageLoad (/Users/svvval/Documents/AI-Enable-Cyber-Maturity-Assessment-2/web/e2e/test-utils.ts:215:21)\n    at action (/Users/svvval/Documents/AI-Enable-Cyber-Maturity-Assessment-2/web/e2e/tests/smoke.spec.ts:20:44)\n    at TestStepTracker.executeStep (/Users/svvval/Documents/AI-Enable-Cyber-Maturity-Assessment-2/web/e2e/test-utils.ts:87:28)\n    at /Users/svvval/Documents/AI-Enable-Cyber-Maturity-Assessment-2/web/e2e/tests/smoke.spec.ts:19:25"
 }
-[2025-08-18T15:21:34.989Z] [INFO] Error screenshot captured
+[2025-08-28T23:26:59.755Z] [INFO] Error screenshot captured
 {
-  "path": "error-screenshot-1755530494931.png"
+  "message": "Screenshot saved",
+  "sanitizedPath": "error-screenshot-1756423619699.png",
+  "timestamp": "2025-08-28T23:26:59.755Z"
 }
-[2025-08-18T15:21:34.990Z] [INFO] Error HTML captured
+[2025-08-28T23:26:59.757Z] [INFO] Error HTML captured
 {
-  "path": "error-html-1755530494990.html"
+  "message": "HTML content saved",
+  "sanitizedPath": "error-html-1756423619756.html",
+  "timestamp": "2025-08-28T23:26:59.757Z"
 }
-[2025-08-18T15:21:34.992Z] [INFO] Console logs at error
+[2025-08-28T23:26:59.758Z] [INFO] Console logs at error
 {
   "logs": "No logs available"
 }
-[2025-08-18T15:21:34.992Z] [INFO] Page state at error
+[2025-08-28T23:26:59.759Z] [INFO] Page state at error
 {
   "url": "about:blank",
   "title": ""
 }
-[2025-08-18T15:21:34.992Z] [ERROR] Homepage test failed
+[2025-08-28T23:26:59.759Z] [ERROR] Homepage test failed
 {
   "error": "page.goto: Protocol error (Page.navigate): Cannot navigate to invalid URL\nCall log:\n\u001b[2m  - navigating to \"/\", waiting until \"load\"\u001b[22m\n"
 }

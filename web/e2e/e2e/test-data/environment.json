@@ -1,6 +1,6 @@
 {
-  "timestamp": "2025-08-25T17:54:03.479Z",
-  "baseURL": "https://web-cybermat-prd-aca.icystone-69c102b0.westeurope.azurecontainerapps.io",
+  "timestamp": "2025-08-28T23:06:12.671Z",
+  "baseURL": "http://localhost:3000",
   "environment": "test",
   "features": {
     "aad": false,
