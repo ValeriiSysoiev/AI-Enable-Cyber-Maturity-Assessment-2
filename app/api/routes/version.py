@@ -405,3 +405,162 @@ async def rag_status(request: Request):
             "error": f"Failed to get RAG status: {str(e)}",
             "timestamp": datetime.now(timezone.utc).isoformat()
         }
+
+
+@router.get("/admin/status")
+async def admin_status(request: Request):
+    """
+    Admin status endpoint for system monitoring and health checks.
+    
+    Provides comprehensive system status including:
+    - Application health and uptime
+    - Service status (RAG, database, cache)
+    - Configuration summary
+    - Recent performance metrics
+    """
+    try:
+        correlation_id = request.headers.get("X-Correlation-ID", "admin-status-check")
+        current_time = datetime.now(timezone.utc)
+        
+        # Basic system info
+        git_info = get_git_info()
+        build_info = get_build_info()
+        system_info = get_system_info()
+        uptime_seconds = (current_time - _startup_time).total_seconds()
+        
+        # Service status checks
+        service_status = {
+            "database": "unknown",
+            "rag_service": "unknown", 
+            "cache": "unknown",
+            "file_system": "unknown"
+        }
+        
+        # Check database
+        try:
+            # Simple database check - try to import and test connection
+            from api.db import engine
+            from sqlmodel import text
+            with engine.begin() as conn:
+                conn.execute(text("SELECT 1"))
+            service_status["database"] = "healthy"
+        except Exception as e:
+            service_status["database"] = f"unhealthy: {str(e)[:100]}"
+        
+        # Check RAG service
+        try:
+            if config.is_rag_enabled():
+                rag_service = create_rag_service(correlation_id)
+                if rag_service.is_operational():
+                    service_status["rag_service"] = "healthy"
+                else:
+                    service_status["rag_service"] = "configured but not operational"
+            else:
+                service_status["rag_service"] = "disabled"
+        except Exception as e:
+            service_status["rag_service"] = f"unhealthy: {str(e)[:100]}"
+        
+        # Check cache
+        try:
+            if config.cache.enabled:
+                from services.cache import cache_manager
+                cache_metrics = cache_manager.get_metrics() if hasattr(cache_manager, 'get_metrics') else {}
+                service_status["cache"] = "healthy"
+            else:
+                service_status["cache"] = "disabled"
+        except Exception as e:
+            service_status["cache"] = f"unhealthy: {str(e)[:100]}"
+        
+        # Check file system
+        try:
+            import os
+            os.makedirs("data/temp", exist_ok=True)
+            test_file = "data/temp/health_check.txt"
+            with open(test_file, "w") as f:
+                f.write("health check")
+            os.remove(test_file)
+            service_status["file_system"] = "healthy"
+        except Exception as e:
+            service_status["file_system"] = f"unhealthy: {str(e)[:100]}"
+        
+        # Configuration summary (no sensitive data)
+        config_summary = {
+            "rag_enabled": config.rag.enabled,
+            "rag_mode": config.rag.mode,
+            "cache_enabled": config.cache.enabled,
+            "aad_enabled": config.aad_groups.enabled,
+            "environment": build_info["environment"],
+            "log_level": config.logging.level
+        }
+        
+        # Environment flags
+        environment_flags = {
+            "ci_mode": os.getenv('CI_MODE', '0') == '1',
+            "ml_disabled": os.getenv('DISABLE_ML', '0') == '1',
+            "graceful_startup": os.getenv('GRACEFUL_STARTUP', '0') == '1'
+        }
+        
+        # Overall health determination
+        unhealthy_services = [k for k, v in service_status.items() 
+                            if isinstance(v, str) and v.startswith("unhealthy")]
+        overall_health = "healthy" if not unhealthy_services else "degraded"
+        
+        response = {
+            "status": overall_health,
+            "timestamp": current_time.isoformat(),
+            "uptime_seconds": round(uptime_seconds, 2),
+            
+            # Application info
+            "application": {
+                "name": "AI-Enabled Cyber Maturity Assessment",
+                "version": build_info["version"],
+                "git_sha": git_info["sha"],
+                "git_branch": git_info["branch"],
+                "build_time": build_info["time"],
+                "build_environment": build_info["environment"]
+            },
+            
+            # System info
+            "system": {
+                "python_version": system_info["python_version"],
+                "platform": system_info["platform"],
+                "working_directory": os.getcwd()
+            },
+            
+            # Service status
+            "services": service_status,
+            
+            # Configuration
+            "configuration": config_summary,
+            
+            # Environment
+            "environment_flags": environment_flags,
+            
+            # Issues (if any)
+            "issues": unhealthy_services if unhealthy_services else []
+        }
+        
+        logger.info(
+            "Admin status endpoint accessed",
+            extra={
+                "correlation_id": correlation_id,
+                "overall_health": overall_health,
+                "unhealthy_services": len(unhealthy_services),
+                "uptime_seconds": uptime_seconds
+            }
+        )
+        
+        return response
+        
+    except Exception as e:
+        logger.error(
+            "Failed to generate admin status response",
+            extra={"error": str(e)}
+        )
+        
+        # Return minimal error response
+        return {
+            "status": "error",
+            "error": f"Admin status check failed: {str(e)}",
+            "timestamp": datetime.now(timezone.utc).isoformat()
+        }

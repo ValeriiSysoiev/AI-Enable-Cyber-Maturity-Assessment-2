@@ -58,56 +58,102 @@ async def on_startup():
     # Check and log CI/ML mode configuration
     ci_mode = os.getenv('CI_MODE', '0') == '1'
     ml_disabled = os.getenv('DISABLE_ML', '0') == '1'
+    graceful_mode = os.getenv('GRACEFUL_STARTUP', '0') == '1'
     
-    if ci_mode or ml_disabled:
+    if ci_mode or ml_disabled or graceful_mode:
         logger.info(
-            "Application starting in CI/lightweight mode",
+            "Application starting in lightweight mode",
             extra={
                 "ci_mode": ci_mode,
                 "ml_disabled": ml_disabled,
+                "graceful_mode": graceful_mode,
                 "heavy_deps_skipped": True,
                 "performance_mode": "optimized"
             }
         )
     
-    create_db_and_tables()
-    # Wire up new domain dependencies
-    app.state.repo = FileRepository()
-    app.state.orchestrator = Orchestrator(LLMClient())
+    # Initialize database with error handling
+    try:
+        create_db_and_tables()
+        logger.info("Database initialized successfully")
+    except Exception as e:
+        logger.error(f"Database initialization failed: {e}")
+        if not graceful_mode:
+            raise
+        logger.warning("Continuing in graceful mode without database")
     
-    # Initialize performance monitoring and caching
-    logger.info("Starting performance monitoring and cache services...")
+    # Wire up domain dependencies with error handling
+    try:
+        app.state.repo = FileRepository()
+        logger.info("File repository initialized")
+    except Exception as e:
+        logger.error(f"File repository initialization failed: {e}")
+        if not graceful_mode:
+            raise
+        # Create a minimal mock repository
+        from domain.repository import InMemoryRepository
+        app.state.repo = InMemoryRepository()
+        logger.warning("Using in-memory repository fallback")
     
-    # Start cache cleanup tasks
-    if config.cache.enabled:
-        await cache_manager.start_all_cleanup()
-        logger.info(
-            "Cache services started",
-            extra={
-                "cache_enabled": config.cache.enabled,
-                "presets_ttl": config.cache.presets_ttl_seconds,
-                "framework_ttl": config.cache.framework_ttl_seconds,
-                "user_roles_ttl": config.cache.user_roles_ttl_seconds
-            }
-        )
+    try:
+        app.state.orchestrator = Orchestrator(LLMClient())
+        logger.info("Orchestrator initialized")
+    except Exception as e:
+        logger.error(f"Orchestrator initialization failed: {e}")
+        if not graceful_mode:
+            raise
+        # Create a minimal mock orchestrator
+        app.state.orchestrator = None
+        logger.warning("Orchestrator disabled due to initialization failure")
+    
+    # Initialize performance monitoring and caching with error handling
+    if not graceful_mode:
+        logger.info("Starting performance monitoring and cache services...")
+        
+        # Start cache cleanup tasks
+        try:
+            if config.cache.enabled:
+                await cache_manager.start_all_cleanup()
+                logger.info(
+                    "Cache services started",
+                    extra={
+                        "cache_enabled": config.cache.enabled,
+                        "presets_ttl": config.cache.presets_ttl_seconds,
+                        "framework_ttl": config.cache.framework_ttl_seconds,
+                        "user_roles_ttl": config.cache.user_roles_ttl_seconds
+                    }
+                )
+            else:
+                logger.info("Cache services disabled")
+        except Exception as e:
+            logger.error(f"Cache initialization failed: {e}")
+            if not graceful_mode:
+                raise
+            logger.warning("Cache services disabled due to initialization failure")
+        
+        # Start performance monitoring
+        try:
+            if config.performance.enable_request_timing or config.performance.enable_query_timing:
+                await start_performance_monitoring()
+                logger.info(
+                    "Performance monitoring started",
+                    extra={
+                        "request_timing": config.performance.enable_request_timing,
+                        "query_timing": config.performance.enable_query_timing,
+                        "slow_request_threshold_ms": config.performance.slow_request_threshold_ms,
+                        "slow_query_threshold_ms": config.performance.slow_query_threshold_ms,
+                        "alerts_enabled": config.performance.enable_performance_alerts
+                    }
+                )
+            else:
+                logger.info("Performance monitoring disabled")
+        except Exception as e:
+            logger.error(f"Performance monitoring initialization failed: {e}")
+            if not graceful_mode:
+                raise
+            logger.warning("Performance monitoring disabled due to initialization failure")
     else:
-        logger.info("Cache services disabled")
-    
-    # Start performance monitoring
-    if config.performance.enable_request_timing or config.performance.enable_query_timing:
-        await start_performance_monitoring()
-        logger.info(
-            "Performance monitoring started",
-            extra={
-                "request_timing": config.performance.enable_request_timing,
-                "query_timing": config.performance.enable_query_timing,
-                "slow_request_threshold_ms": config.performance.slow_request_threshold_ms,
-                "slow_query_threshold_ms": config.performance.slow_query_threshold_ms,
-                "alerts_enabled": config.performance.enable_performance_alerts
-            }
-        )
-    else:
-        logger.info("Performance monitoring disabled")
+        logger.info("Performance monitoring and cache services skipped in graceful mode")
     
     # Validate RAG configuration if enabled
     if config.rag.enabled:
