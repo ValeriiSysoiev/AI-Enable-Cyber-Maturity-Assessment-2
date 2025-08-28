@@ -6,7 +6,7 @@ import {
   ChatHistoryResponse, 
   RunCardHistoryResponse,
   CommandSuggestion 
-} from '@/types/chat';
+} from '../types/chat';
 
 /**
  * Send a chat message and potentially create a RunCard if command is detected

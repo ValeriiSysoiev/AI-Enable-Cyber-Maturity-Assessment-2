@@ -1,10 +1,10 @@
 "use client";
 import { useState } from "react";
 import { useParams } from "next/navigation";
-import { analyzeWithEvidence, getCitations } from "@/lib/evidence";
+import { analyzeWithEvidence, getCitations } from "../lib/evidence";
 import RAGToggle, { useRAGAvailability } from "./RAGToggle";
 import CitationsList from "./CitationsList";
-import type { Citation, RAGAnalysisResponse } from "@/types/evidence";
+import type { Citation, RAGAnalysisResponse } from "../types/evidence";
 
 interface AnalysisWithEvidenceProps {
   initialContent?: string;

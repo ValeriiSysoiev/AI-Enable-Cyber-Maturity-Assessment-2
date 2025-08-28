@@ -2,8 +2,8 @@
 import { useState, useEffect } from "react";
 import { useParams } from "next/navigation";
 import Link from "next/link";
-import { listWorkshops, getConsentStatus, hasAllConsent } from "@/lib/workshops";
-import type { Workshop } from "@/types/workshops";
+import { listWorkshops, getConsentStatus, hasAllConsent } from "../../../../lib/workshops";
+import type { Workshop } from "../../../../types/workshops";
 
 interface NewWorkshopModalProps {
   isOpen: boolean;

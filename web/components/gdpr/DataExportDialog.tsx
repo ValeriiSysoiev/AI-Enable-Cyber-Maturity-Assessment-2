@@ -7,13 +7,13 @@ import {
   formatFileSize, 
   getJobStatusColor,
   GDPRJobPoller 
-} from "@/lib/gdpr";
+} from "../../lib/gdpr";
 import type { 
   GDPRDialogProps, 
   GDPRExportFormData, 
   GDPRDataExportResponse,
   GDPRError 
-} from "@/types/gdpr";
+} from "../../types/gdpr";
 
 interface DataExportDialogProps extends GDPRDialogProps {
   onDownloadComplete?: (response: GDPRDataExportResponse) => void;

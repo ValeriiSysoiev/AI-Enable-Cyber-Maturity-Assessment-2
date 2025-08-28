@@ -1,7 +1,7 @@
 "use client";
 import React, { useState, useEffect, useRef, useCallback } from "react";
-import type { Citation } from "@/types/csf";
-import type { Evidence } from "@/types/evidence";
+import type { Citation } from "../types/csf";
+import type { Evidence } from "../types/evidence";
 
 interface DocumentViewerProps {
   evidence: Evidence | null;

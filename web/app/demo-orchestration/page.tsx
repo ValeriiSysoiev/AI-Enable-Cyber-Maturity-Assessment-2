@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { createAssessment, runAnalyze, runRecommend } from "@/lib/orchestration";
+import { createAssessment, runAnalyze, runRecommend } from "../../lib/orchestration";
 
 export default function DemoOrchestration() {
   const [aid, setAid] = useState<string>("");

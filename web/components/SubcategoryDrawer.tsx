@@ -1,9 +1,9 @@
 "use client";
 import React, { useState, useEffect, useRef, useCallback, useMemo } from "react";
 import { FixedSizeList as List } from "react-window";
-import type { CSFSubcategory, Citation } from "@/types/csf";
-import type { Evidence } from "@/types/evidence";
-import { listEvidence } from "@/lib/evidence";
+import type { CSFSubcategory, Citation } from "../types/csf";
+import type { Evidence } from "../types/evidence";
+import { listEvidence } from "../lib/evidence";
 import { useParams } from "next/navigation";
 
 interface SubcategoryDrawerProps {

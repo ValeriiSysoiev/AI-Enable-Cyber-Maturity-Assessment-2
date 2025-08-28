@@ -1,7 +1,7 @@
 "use client";
 import { useState } from "react";
-import { downloadUrl } from "@/lib/docs";
-import type { Citation } from "@/types/evidence";
+import { downloadUrl } from "../lib/docs";
+import type { Citation } from "../types/evidence";
 
 interface CitationsListProps {
   citations: Citation[];

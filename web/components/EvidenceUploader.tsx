@@ -8,8 +8,8 @@ import {
   computeFileChecksum,
   formatFileSize,
   getFileIcon
-} from "@/lib/evidence";
-import type { Evidence, UploadState } from "@/types/evidence";
+} from "../lib/evidence";
+import type { Evidence, UploadState } from "../types/evidence";
 
 interface EvidenceUploaderProps {
   onUploadComplete?: (evidence: Evidence) => void;

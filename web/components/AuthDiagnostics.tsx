@@ -1,7 +1,7 @@
 "use client";
 import { useState, useEffect } from "react";
-import { AuthDiagnostics as AuthDiagnosticsType } from "@/types/auth";
-import { apiFetch } from "@/lib/api";
+import { AuthDiagnostics as AuthDiagnosticsType } from "../types/auth";
+import { apiFetch } from "../lib/api";
 
 interface AuthDiagnosticsProps {
   className?: string;

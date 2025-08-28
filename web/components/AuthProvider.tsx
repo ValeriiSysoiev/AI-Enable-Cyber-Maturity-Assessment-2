@@ -1,7 +1,7 @@
 "use client";
 import { createContext, useContext, useEffect, useState, ReactNode } from "react";
 import { useRouter } from "next/navigation";
-import type { AuthContext, AADUser, AuthMode } from "@/types/evidence";
+import type { AuthContext, AADUser, AuthMode } from "../types/evidence";
 
 const AuthContext = createContext<AuthContext | null>(null);
 

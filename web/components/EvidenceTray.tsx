@@ -1,7 +1,7 @@
 "use client";
 import React, { useState, useCallback, useMemo } from "react";
-import type { Evidence } from "@/types/evidence";
-import type { Citation } from "@/types/csf";
+import type { Evidence } from "../types/evidence";
+import type { Citation } from "../types/csf";
 
 interface EvidenceTrayProps {
   evidence: Evidence[];

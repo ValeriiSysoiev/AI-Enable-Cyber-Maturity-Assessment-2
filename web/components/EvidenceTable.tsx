@@ -7,8 +7,8 @@ import {
   unlinkEvidence,
   formatFileSize,
   getFileIcon
-} from "@/lib/evidence";
-import type { Evidence, EvidenceListResponse } from "@/types/evidence";
+} from "../lib/evidence";
+import type { Evidence, EvidenceListResponse } from "../types/evidence";
 
 interface EvidenceTableProps {
   onEvidenceSelect?: (evidence: Evidence) => void;

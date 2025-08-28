@@ -3,9 +3,9 @@
  */
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { jest } from '@jest/globals';
-import DocumentViewer from '@/components/DocumentViewer';
-import type { Citation } from '@/types/csf';
-import type { Evidence } from '@/types/evidence';
+import DocumentViewer from '../components/DocumentViewer';
+import type { Citation } from '../types/csf';
+import type { Evidence } from '../types/evidence';
 
 const mockEvidence: Evidence = {
   id: 'evidence-1',

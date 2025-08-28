@@ -1,4 +1,4 @@
-import { apiFetch } from "@/lib/api";
+import { apiFetch } from "./api";
 import type {
   IngestionStatus,
   EvidenceSearchRequest,
@@ -21,7 +21,7 @@ import type {
   LinkResponse,
   UnlinkResponse,
   EvidenceListResponse
-} from "@/types/evidence";
+} from "../types/evidence";
 
 // Evidence search endpoints
 export async function searchEvidence(request: EvidenceSearchRequest): Promise<EvidenceSearchResponse> {

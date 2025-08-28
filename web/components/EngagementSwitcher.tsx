@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useRouter, usePathname } from "next/navigation";
-import { getEmail, getEngagementId, setEngagementId } from "@/lib/auth";
+import { getEmail, getEngagementId, setEngagementId } from "../lib/auth";
 
 interface Engagement {
   id: string;

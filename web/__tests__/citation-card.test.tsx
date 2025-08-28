@@ -3,9 +3,9 @@
  */
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { jest } from '@jest/globals';
-import CitationCard from '@/components/CitationCard';
-import type { Citation } from '@/types/csf';
-import type { Evidence } from '@/types/evidence';
+import CitationCard from '../components/CitationCard';
+import type { Citation } from '../types/csf';
+import type { Evidence } from '../types/evidence';
 
 const mockCitation: Citation = {
   document_id: 'doc-1',

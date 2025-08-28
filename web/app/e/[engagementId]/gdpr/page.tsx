@@ -1,12 +1,12 @@
 "use client";
 import { useState } from "react";
 import { useParams } from "next/navigation";
-import { useRequireAuth } from "@/components/AuthProvider";
-import { isAdmin } from "@/lib/auth";
-import GDPRDashboard from "@/components/gdpr/GDPRDashboard";
-import DataExportDialog from "@/components/gdpr/DataExportDialog";
-import DataPurgeDialog from "@/components/gdpr/DataPurgeDialog";
-import AuditLogViewer from "@/components/gdpr/AuditLogViewer";
+import { useRequireAuth } from "../../../../components/AuthProvider";
+import { isAdmin } from "../../../../lib/auth";
+import GDPRDashboard from "../../../../components/gdpr/GDPRDashboard";
+import DataExportDialog from "../../../../components/gdpr/DataExportDialog";
+import DataPurgeDialog from "../../../../components/gdpr/DataPurgeDialog";
+import AuditLogViewer from "../../../../components/gdpr/AuditLogViewer";
 
 export default function GDPRPage() {
   const { engagementId } = useParams<{ engagementId: string }>();

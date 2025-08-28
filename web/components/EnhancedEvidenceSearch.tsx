@@ -1,11 +1,11 @@
 "use client";
 import { useState, useRef, useEffect, useCallback } from "react";
 import { useParams } from "next/navigation";
-import { searchEvidence } from "@/lib/evidence";
-import { downloadUrl } from "@/lib/docs";
+import { searchEvidence } from "../lib/evidence";
+import { downloadUrl } from "../lib/docs";
 import RAGToggle, { useRAGAvailability } from "./RAGToggle";
 import CitationsList from "./CitationsList";
-import type { SearchResult, EvidenceSearchResponse, RAGSearchResponse } from "@/types/evidence";
+import type { SearchResult, EvidenceSearchResponse, RAGSearchResponse } from "../types/evidence";
 
 interface EnhancedEvidenceSearchProps {
   className?: string;

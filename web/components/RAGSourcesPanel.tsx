@@ -5,8 +5,8 @@ import EnhancedEvidenceSearch from "./EnhancedEvidenceSearch";
 import CitationsList from "./CitationsList";
 import RAGStatusPanel from "./RAGStatusPanel";
 import { useRAGAvailability } from "./RAGToggle";
-import type { SearchResult } from "@/types/evidence";
-import type { Citation } from "@/types/evidence";
+import type { SearchResult } from "../types/evidence";
+import type { Citation } from "../types/evidence";
 
 interface RAGSourcesPanelProps {
   className?: string;

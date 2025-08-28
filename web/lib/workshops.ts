@@ -5,7 +5,7 @@ import type {
   CreateWorkshopFormData,
   ConsentRequestData,
   StartWorkshopResponse,
-} from "@/types/workshops";
+} from "../types/workshops";
 
 /**
  * Create a new workshop

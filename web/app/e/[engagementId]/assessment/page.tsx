@@ -1,11 +1,11 @@
 "use client";
 import { useEffect, useState, useMemo } from "react";
 import { useParams } from "next/navigation";
-import { getFunctions } from "@/lib/csf";
-import { useRequireAuth } from "@/components/AuthProvider";
-import SubcategoryDrawer from "@/components/SubcategoryDrawer";
-import type { CSFFunction, CSFSubcategory, CSFAssessmentItem } from "@/types/csf";
-import type { Evidence } from "@/types/evidence";
+import { getFunctions } from "../../../../lib/csf";
+import { useRequireAuth } from "../../../../components/AuthProvider";
+import SubcategoryDrawer from "../../../../components/SubcategoryDrawer";
+import type { CSFFunction, CSFSubcategory, CSFAssessmentItem } from "../../../../types/csf";
+import type { Evidence } from "../../../../types/evidence";
 
 // CSF Grid Component
 function CSFGrid({ 

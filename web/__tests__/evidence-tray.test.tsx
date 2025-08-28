@@ -3,9 +3,9 @@
  */
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { jest } from '@jest/globals';
-import EvidenceTray from '@/components/EvidenceTray';
-import type { Evidence } from '@/types/evidence';
-import type { Citation } from '@/types/csf';
+import EvidenceTray from '../components/EvidenceTray';
+import type { Evidence } from '../types/evidence';
+import type { Citation } from '../types/csf';
 
 const mockEvidence: Evidence[] = [
   {

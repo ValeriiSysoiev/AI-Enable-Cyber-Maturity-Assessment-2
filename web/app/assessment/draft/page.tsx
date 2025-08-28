@@ -1,7 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
-import { fetchPreset } from "@/lib/api";
-import QuestionCard from "@/components/QuestionCard";
+import { fetchPreset } from "../../../lib/api";
+import QuestionCard from "../../../components/QuestionCard";
 
 export default function DraftAssessment() {
   const [preset, setPreset] = useState<any>(null);

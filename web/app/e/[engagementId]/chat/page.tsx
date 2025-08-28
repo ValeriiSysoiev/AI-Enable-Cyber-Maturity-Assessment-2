@@ -2,12 +2,12 @@
 
 import { useEffect, useState, useRef } from 'react';
 import { useParams } from 'next/navigation';
-import { ChatMessage, RunCard } from '@/types/chat';
-import { sendMessage, getChatMessages, RunCardPoller } from '@/lib/chat';
-import { useRequireAuth } from '@/components/AuthProvider';
-import MessageBubble from '@/components/MessageBubble';
-import RunCardComponent from '@/components/RunCardComponent';
-import CommandInput from '@/components/CommandInput';
+import { ChatMessage, RunCard } from '../../../../types/chat';
+import { sendMessage, getChatMessages, RunCardPoller } from '../../../../lib/chat';
+import { useRequireAuth } from '../../../../components/AuthProvider';
+import MessageBubble from '../../../../components/MessageBubble';
+import RunCardComponent from '../../../../components/RunCardComponent';
+import CommandInput from '../../../../components/CommandInput';
 
 export default function ChatPage() {
   const { engagementId } = useParams<{ engagementId: string }>();

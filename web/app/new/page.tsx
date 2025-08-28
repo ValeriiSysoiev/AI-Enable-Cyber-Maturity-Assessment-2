@@ -1,10 +1,10 @@
 "use client";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { fetchPreset, authHeaders } from "@/lib/api";
-import { createAssessment } from "@/lib/assessments";
-import ApiErrorBoundary from "@/components/ApiErrorBoundary";
-import { useAuth } from "@/components/AuthProvider";
+import { fetchPreset, authHeaders } from "../../lib/api";
+import { createAssessment } from "../../lib/assessments";
+import ApiErrorBoundary from "../../components/ApiErrorBoundary";
+import { useAuth } from "../../components/AuthProvider";
 
 type PresetOption = { id: string; name: string; version: string; source: string; counts: { pillars: number; capabilities: number; questions: number } };
 
