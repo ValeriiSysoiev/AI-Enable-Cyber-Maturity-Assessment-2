@@ -56,6 +56,17 @@ jobs:
         docker push ${{ env.ACR_NAME }}.azurecr.io/api-cybermat:${{ github.sha }}
         docker push ${{ env.ACR_NAME }}.azurecr.io/api-cybermat:latest
         
+        # Configure ACR credentials for Container App
+        echo "Configuring ACR credentials..."
+        ACR_PASSWORD=$(az acr credential show --name ${{ env.ACR_NAME }} --query passwords[0].value -o tsv)
+        
+        az containerapp registry set \
+          --name ${{ env.API_CONTAINER_APP }} \
+          --resource-group ${{ env.AZURE_RESOURCE_GROUP }} \
+          --server ${{ env.ACR_NAME }}.azurecr.io \
+          --username ${{ env.ACR_NAME }} \
+          --password $ACR_PASSWORD
+        
         # Update Container App
         echo "Updating Container App with new image..."
         az containerapp update \
