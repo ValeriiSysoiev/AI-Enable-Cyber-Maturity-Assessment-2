@@ -374,23 +374,123 @@ async def get_performance_metrics(time_window_minutes: int = 60):
 
 
 
-app.include_router(assist_router)
-app.include_router(storage_router)
-app.include_router(assessments_router.router)
-app.include_router(orchestrations_router.router)
-app.include_router(engagements_router.router)
-app.include_router(documents.router)
-app.include_router(summary.router)
-app.include_router(presets_router.router)
-app.include_router(version_router.router)
-app.include_router(admin_auth_router.router)
-app.include_router(gdpr_router.router)
-app.include_router(admin_settings_router.router)
-app.include_router(evidence_router.router)
-app.include_router(roadmap_prioritization_router.router)
+# Add diagnostic endpoint to verify API is working
+@app.get("/api/diagnostic")
+async def diagnostic_endpoint():
+    """Diagnostic endpoint to verify API functionality"""
+    import sys
+    return {
+        "status": "API is running",
+        "python_version": sys.version,
+        "fastapi_loaded": True,
+        "diagnostic": "If you see this, FastAPI is working but routes may not be loading"
+    }
+
+# Include routers with error handling
+import logging
+logger = logging.getLogger(__name__)
+
+failed_routers = []
+
+try:
+    app.include_router(assist_router)
+except Exception as e:
+    logger.error(f"Failed to include assist_router: {e}")
+    failed_routers.append(("assist_router", str(e)))
+
+try:
+    app.include_router(storage_router)
+except Exception as e:
+    logger.error(f"Failed to include storage_router: {e}")
+    failed_routers.append(("storage_router", str(e)))
+
+try:
+    app.include_router(assessments_router.router)
+except Exception as e:
+    logger.error(f"Failed to include assessments_router: {e}")
+    failed_routers.append(("assessments_router", str(e)))
+
+try:
+    app.include_router(orchestrations_router.router)
+except Exception as e:
+    logger.error(f"Failed to include orchestrations_router: {e}")
+    failed_routers.append(("orchestrations_router", str(e)))
+
+try:
+    app.include_router(engagements_router.router)
+except Exception as e:
+    logger.error(f"Failed to include engagements_router: {e}")
+    failed_routers.append(("engagements_router", str(e)))
+
+try:
+    app.include_router(documents.router)
+except Exception as e:
+    logger.error(f"Failed to include documents router: {e}")
+    failed_routers.append(("documents", str(e)))
+
+try:
+    app.include_router(summary.router)
+except Exception as e:
+    logger.error(f"Failed to include summary router: {e}")
+    failed_routers.append(("summary", str(e)))
+
+try:
+    app.include_router(presets_router.router)
+except Exception as e:
+    logger.error(f"Failed to include presets_router: {e}")
+    failed_routers.append(("presets_router", str(e)))
+
+try:
+    app.include_router(version_router.router)
+except Exception as e:
+    logger.error(f"Failed to include version_router: {e}")
+    failed_routers.append(("version_router", str(e)))
+
+try:
+    app.include_router(admin_auth_router.router)
+except Exception as e:
+    logger.error(f"Failed to include admin_auth_router: {e}")
+    failed_routers.append(("admin_auth_router", str(e)))
+
+try:
+    app.include_router(gdpr_router.router)
+except Exception as e:
+    logger.error(f"Failed to include gdpr_router: {e}")
+    failed_routers.append(("gdpr_router", str(e)))
+
+try:
+    app.include_router(admin_settings_router.router)
+except Exception as e:
+    logger.error(f"Failed to include admin_settings_router: {e}")
+    failed_routers.append(("admin_settings_router", str(e)))
+
+try:
+    app.include_router(evidence_router.router)
+except Exception as e:
+    logger.error(f"Failed to include evidence_router: {e}")
+    failed_routers.append(("evidence_router", str(e)))
+
+try:
+    app.include_router(roadmap_prioritization_router.router)
+except Exception as e:
+    logger.error(f"Failed to include roadmap_prioritization_router: {e}")
+    failed_routers.append(("roadmap_prioritization_router", str(e)))
 
 # MCP Gateway router
-app.include_router(mcp_gateway_router)
+try:
+    app.include_router(mcp_gateway_router)
+except Exception as e:
+    logger.error(f"Failed to include mcp_gateway_router: {e}")
+    failed_routers.append(("mcp_gateway_router", str(e)))
+
+# Add diagnostic info about failed routers
+@app.get("/api/router-status")
+async def router_status():
+    """Check which routers failed to load"""
+    return {
+        "failed_routers": failed_routers,
+        "failed_count": len(failed_routers)
+    }
 
 # S4 Feature routers - conditionally included based on feature flags
 from config import feature_flags
