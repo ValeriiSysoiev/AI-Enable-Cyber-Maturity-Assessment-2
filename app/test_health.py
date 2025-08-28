@@ -1,32 +1,44 @@
 #!/usr/bin/env python3
 """
-Minimal test server to verify Azure App Service can run Python
+Simple health check test for the API
 """
-from http.server import HTTPServer, BaseHTTPRequestHandler
+import asyncio
+import sys
 import os
-import json
+from pathlib import Path
 
-class HealthHandler(BaseHTTPRequestHandler):
-    def do_GET(self):
-        if self.path == '/api/health':
-            self.send_response(200)
-            self.send_header('Content-Type', 'application/json')
-            self.end_headers()
-            response = {
-                'status': 'healthy',
-                'timestamp': '2025-08-28T00:00:00Z'
-            }
-            self.wfile.write(json.dumps(response).encode())
+# Add the app directory to path
+sys.path.insert(0, str(Path(__file__).parent))
+
+async def test_health():
+    """Test the health endpoint"""
+    try:
+        # Set minimal environment
+        os.environ.setdefault('CI_MODE', '1')  # Lightweight mode
+        os.environ.setdefault('DISABLE_ML', '1')  # Disable ML features
+        os.environ.setdefault('LOG_LEVEL', 'INFO')
+        
+        print("Testing health endpoint...")
+        
+        # Import after setting environment
+        from api.routes.version import health_check
+        
+        # Call health check
+        result = await health_check()
+        
+        print(f"Health check result: {result}")
+        
+        if result.get("status") == "healthy":
+            print("✅ Health check passed")
+            return True
         else:
-            self.send_response(404)
-            self.end_headers()
-    
-    def log_message(self, format, *args):
-        # Suppress logs for cleaner output
-        pass
+            print(f"❌ Health check failed: {result}")
+            return False
+            
+    except Exception as e:
+        print(f"❌ Health check error: {e}")
+        return False
 
-if __name__ == '__main__':
-    port = int(os.environ.get('PORT', '8000'))
-    server = HTTPServer(('0.0.0.0', port), HealthHandler)
-    print(f"Test server running on port {port}")
-    server.serve_forever()
+if __name__ == "__main__":
+    success = asyncio.run(test_health())
+    sys.exit(0 if success else 1)
