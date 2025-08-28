@@ -4,12 +4,23 @@ import CredentialsProvider from "next-auth/providers/credentials";
 
 // Dynamic provider configuration - evaluated at runtime
 function getProviders() {
+  // Debug environment variables
+  console.log("Auth config debug:", {
+    AUTH_MODE: process.env.AUTH_MODE,
+    AZURE_AD_CLIENT_ID: !!process.env.AZURE_AD_CLIENT_ID ? "SET" : "MISSING",
+    AZURE_AD_TENANT_ID: !!process.env.AZURE_AD_TENANT_ID ? "SET" : "MISSING", 
+    AZURE_AD_CLIENT_SECRET: !!process.env.AZURE_AD_CLIENT_SECRET ? "SET" : "MISSING",
+    DEMO_E2E: process.env.DEMO_E2E,
+  });
+
   const aadEnabled = process.env.AUTH_MODE === "aad"
     && !!process.env.AZURE_AD_CLIENT_ID
     && !!process.env.AZURE_AD_TENANT_ID
     && !!process.env.AZURE_AD_CLIENT_SECRET;
 
   const demoEnabled = process.env.DEMO_E2E === "1";
+  
+  console.log("Provider config:", { aadEnabled, demoEnabled });
 
   const providers = [];
   if (aadEnabled) {
