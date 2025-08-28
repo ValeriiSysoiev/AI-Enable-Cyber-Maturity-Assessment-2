@@ -16,8 +16,9 @@ NC='\033[0m' # No Color
 # Production configuration values
 RESOURCE_GROUP="rg-cybermat-prd"
 WEB_APP_NAME="web-cybermat-prd"
-API_APP_NAME="api-cybermat-prd"
+API_CONTAINER_APP_NAME="api-cybermat-prd-aca"
 PROD_URL="https://web-cybermat-prd.azurewebsites.net"
+API_URL="https://api-cybermat-prd-aca.icystone-69c102b0.westeurope.azurecontainerapps.io"
 
 # Logging functions
 log_info() { echo -e "${BLUE}ℹ${NC} $1"; }
@@ -104,7 +105,7 @@ configure_web_container_app() {
         "NEXT_PUBLIC_ADMIN_E2E=0"
         "DEMO_E2E=0"
         "NEXT_PUBLIC_API_BASE_URL=/api/proxy"
-        "PROXY_TARGET_API_BASE_URL=https://${API_APP_NAME}.azurewebsites.net"
+        "PROXY_TARGET_API_BASE_URL=${API_URL}"
         "NEXTAUTH_URL=${PROD_URL}"
     )
     
@@ -140,9 +141,9 @@ configure_web_container_app() {
 
 # Configure API Container App (minimal changes needed)
 configure_api_container_app() {
-    log_info "=== Configuring API Container App: $API_APP_NAME ==="
+    log_info "=== Configuring API Container App: $API_CONTAINER_APP_NAME ==="
     
-    if ! verify_container_app "$API_APP_NAME" "API"; then
+    if ! verify_container_app "$API_CONTAINER_APP_NAME" "API"; then
         log_warning "Skipping API Container App configuration - service not found"
         return 0
     fi
@@ -172,10 +173,10 @@ restart_container_apps() {
     fi
     
     # Restart API Container App
-    if verify_container_app "$API_APP_NAME" "API" >/dev/null 2>&1; then
-        log_info "Restarting API Container App: $API_APP_NAME"
+    if verify_container_app "$API_CONTAINER_APP_NAME" "API" >/dev/null 2>&1; then
+        log_info "Restarting API Container App: $API_CONTAINER_APP_NAME"
         if az containerapp revision restart \
-            --name "$API_APP_NAME" \
+            --name "$API_CONTAINER_APP_NAME" \
             --resource-group "$RESOURCE_GROUP" \
             --output none 2>/dev/null; then
             log_success "API Container App restart initiated"
@@ -206,10 +207,9 @@ check_warmup_logs() {
     fi
     
     # Check API app health
-    local api_url="https://${API_APP_NAME}.azurewebsites.net"
-    log_info "Checking API App health: $api_url/health"
+    log_info "Checking API App health: ${API_URL}/health"
     
-    if curl -sf "$api_url/health" >/dev/null 2>&1; then
+    if curl -sf "${API_URL}/health" >/dev/null 2>&1; then
         log_success "API App is responding to health checks"
     else
         log_warning "API App health check failed - this may be normal during warmup"
@@ -217,7 +217,7 @@ check_warmup_logs() {
     
     log_info "Container App logs can be viewed with:"
     echo "  Web logs: az containerapp logs show --name $WEB_APP_NAME --resource-group $RESOURCE_GROUP"
-    echo "  API logs: az containerapp logs show --name $API_APP_NAME --resource-group $RESOURCE_GROUP"
+    echo "  API logs: az containerapp logs show --name $API_CONTAINER_APP_NAME --resource-group $RESOURCE_GROUP"
 }
 
 # Generate configuration summary
@@ -234,13 +234,13 @@ generate_summary() {
     echo "  - NEXT_PUBLIC_ADMIN_E2E: 0 (disabled)"
     echo "  - DEMO_E2E: 0 (disabled)"
     echo "  - NEXT_PUBLIC_API_BASE_URL: /api/proxy"
-    echo "  - PROXY_TARGET_API_BASE_URL: https://${API_APP_NAME}.azurewebsites.net"
+    echo "  - PROXY_TARGET_API_BASE_URL: ${API_URL}"
     echo "  - NEXTAUTH_URL: $PROD_URL"
     echo "  - NEXTAUTH_SECRET: Configured from Key Vault"
     echo "  - Status: Restarted"
     
     echo
-    echo "API Container App: $API_APP_NAME"
+    echo "API Container App: $API_CONTAINER_APP_NAME"
     echo "  - Configuration: Managed by Terraform"
     echo "  - Target Port: 8000"
     echo "  - Status: Restarted"
@@ -249,7 +249,7 @@ generate_summary() {
     echo "Production URLs:"
     echo "==============="
     echo "Web App: https://${WEB_APP_NAME}.azurewebsites.net"
-    echo "API App: https://${API_APP_NAME}.azurewebsites.net"
+    echo "API App: ${API_URL}"
     echo "Production URL: $PROD_URL"
     
     echo
@@ -269,7 +269,7 @@ main() {
     echo "=== Container Apps Production Configuration ==="
     echo "Resource Group: $RESOURCE_GROUP"
     echo "Web App: $WEB_APP_NAME"
-    echo "API App: $API_APP_NAME"
+    echo "API App: $API_CONTAINER_APP_NAME"
     echo "Production URL: $PROD_URL"
     echo
     

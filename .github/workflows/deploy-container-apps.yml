@@ -20,7 +20,8 @@ env:
   AZURE_RESOURCE_GROUP: rg-cybermat-prd
   API_CONTAINER_APP: api-cybermat-prd-aca
   API_CONTAINER_APP_URL: https://api-cybermat-prd-aca.icystone-69c102b0.westeurope.azurecontainerapps.io
-  WEB_APP_NAME: web-cybermat-prd
+  WEB_CONTAINER_APP: web-cybermat-prd-aca
+  WEB_CONTAINER_APP_URL: https://web-cybermat-prd-aca.icystone-69c102b0.westeurope.azurecontainerapps.io
   ACR_NAME: webcybermatprdacr
   NODE_VERSION: '20'
 
@@ -48,18 +49,15 @@ jobs:
         docker tag ${{ env.ACR_NAME }}.azurecr.io/api-cybermat:${{ github.sha }} ${{ env.ACR_NAME }}.azurecr.io/api-cybermat:latest
         
         # Login to ACR
-        echo "Logging in to Azure Container Registry..."
         az acr login --name ${{ env.ACR_NAME }}
         
-        # Push image
-        echo "Pushing Docker image..."
+        # Push images
         docker push ${{ env.ACR_NAME }}.azurecr.io/api-cybermat:${{ github.sha }}
         docker push ${{ env.ACR_NAME }}.azurecr.io/api-cybermat:latest
         
         # Configure ACR credentials for Container App
-        echo "Configuring ACR credentials..."
+        echo "Configuring ACR credentials for Container App..."
         ACR_PASSWORD=$(az acr credential show --name ${{ env.ACR_NAME }} --query passwords[0].value -o tsv)
-        
         az containerapp registry set \
           --name ${{ env.API_CONTAINER_APP }} \
           --resource-group ${{ env.AZURE_RESOURCE_GROUP }} \
@@ -117,76 +115,69 @@ jobs:
         echo "❌ API health check failed after $max_attempts attempts"
         exit 1
         
-    - name: Setup Node.js
-      if: github.event.inputs.deploy_target == 'web' || github.event.inputs.deploy_target == 'all' || github.event.inputs.deploy_target == ''
-      uses: actions/setup-node@v4
-      with:
-        node-version: ${{ env.NODE_VERSION }}
-        
-    - name: Build and Deploy Web
+    - name: Build and Deploy Web to Container Apps
       if: github.event.inputs.deploy_target == 'web' || github.event.inputs.deploy_target == 'all' || github.event.inputs.deploy_target == ''
       run: |
-        echo "Building Web application..."
+        echo "Building Web Docker image..."
         cd web
         
-        # Clean up any temporary build directories
-        rm -rf temp-deploy web-deploy production-deploy.zip || true
+        # Build Docker image with production settings
+        docker build --platform linux/amd64 \
+          -t ${{ env.ACR_NAME }}.azurecr.io/web-cybermat-prd:${{ github.sha }} \
+          -t ${{ env.ACR_NAME }}.azurecr.io/web-cybermat-prd:latest \
+          --build-arg PROXY_TARGET_API_BASE_URL=${{ env.API_CONTAINER_APP_URL }} \
+          --build-arg NEXTAUTH_URL=${{ env.WEB_CONTAINER_APP_URL }} \
+          --build-arg NODE_ENV=production \
+          --build-arg AUTH_MODE=aad .
         
-        # Install all dependencies
-        npm ci
+        # Login to ACR and push
+        az acr login --name ${{ env.ACR_NAME }}
+        docker push ${{ env.ACR_NAME }}.azurecr.io/web-cybermat-prd:${{ github.sha }}
+        docker push ${{ env.ACR_NAME }}.azurecr.io/web-cybermat-prd:latest
         
-        # Build with production settings pointing to Container Apps API
-        NEXT_PUBLIC_API_URL=${{ env.API_CONTAINER_APP_URL }} \
-        AUTH_MODE=aad \
-        AZURE_AD_CLIENT_ID="${{ secrets.AZURE_AD_CLIENT_ID }}" \
-        AZURE_AD_TENANT_ID="${{ secrets.AZURE_AD_TENANT_ID }}" \
-        NEXTAUTH_URL=https://${{ env.WEB_APP_NAME }}.azurewebsites.net \
-        NEXTAUTH_SECRET="${{ secrets.NEXTAUTH_SECRET }}" \
-        npm run build
-        
-        # Create deployment package including server.js
-        zip -r ../web-deploy.zip \
-          .next \
-          public \
-          package.json \
-          package-lock.json \
-          next.config.js \
-          server.js \
-          node_modules \
-          -x "*.log" \
-          -x ".git/*" \
-          -x ".next/cache/*"
-        
-        cd ..
-        
-        echo "Deploying Web to Azure App Service..."
-        az webapp deploy \
+        # Configure ACR credentials for Web Container App
+        echo "Configuring ACR credentials for Web Container App..."
+        ACR_PASSWORD=$(az acr credential show --name ${{ env.ACR_NAME }} --query passwords[0].value -o tsv)
+        az containerapp registry set \
+          --name ${{ env.WEB_CONTAINER_APP }} \
           --resource-group ${{ env.AZURE_RESOURCE_GROUP }} \
-          --name ${{ env.WEB_APP_NAME }} \
-          --src-path web-deploy.zip \
-          --type zip \
-          --timeout 600
+          --server ${{ env.ACR_NAME }}.azurecr.io \
+          --username ${{ env.ACR_NAME }} \
+          --password $ACR_PASSWORD
         
-        echo "Configuring Web startup command..."
-        az webapp config set \
+        echo "Updating Web Container App..."
+        az containerapp update \
+          --name ${{ env.WEB_CONTAINER_APP }} \
           --resource-group ${{ env.AZURE_RESOURCE_GROUP }} \
-          --name ${{ env.WEB_APP_NAME }} \
-          --startup-file "node server.js"
+          --image ${{ env.ACR_NAME }}.azurecr.io/web-cybermat-prd:${{ github.sha }} \
+          --set-env-vars \
+            NODE_ENV=production \
+            PROXY_TARGET_API_BASE_URL=${{ env.API_CONTAINER_APP_URL }} \
+            API_BASE_URL=${{ env.API_CONTAINER_APP_URL }} \
+            NEXTAUTH_URL=${{ env.WEB_CONTAINER_APP_URL }} \
+            AUTH_TRUST_HOST=true \
+            AUTH_MODE=aad \
+            NEXT_PUBLIC_API_BASE_URL=/api/proxy \
+            AZURE_AD_CLIENT_ID="${{ secrets.AZURE_AD_CLIENT_ID }}" \
+            AZURE_AD_TENANT_ID="${{ secrets.AZURE_AD_TENANT_ID }}" \
+            AZURE_AD_CLIENT_SECRET="${{ secrets.AZURE_AD_CLIENT_SECRET }}" \
+            NEXTAUTH_SECRET="${{ secrets.NEXTAUTH_SECRET }}" \
+            ADMIN_EMAILS="${{ secrets.ADMIN_EMAILS }}" \
+            BUILD_SHA="${{ github.sha }}"
         
-        echo "Restarting Web app..."
-        az webapp restart --resource-group ${{ env.AZURE_RESOURCE_GROUP }} --name ${{ env.WEB_APP_NAME }}
+        echo "Web Container App deployment completed!"
         
     - name: Test Web Application
-      if: github.event.inputs.deploy_target == 'web' || github.event.inputs.deploy_target == 'all' || github.event.inputs.deploy_target == ''
       run: |
         echo "Testing Web application..."
+        WEB_URL=${{ env.WEB_CONTAINER_APP_URL }}
         max_attempts=30
         attempt=0
         
         while [ $attempt -lt $max_attempts ]; do
-          response=$(curl -s -o /dev/null -w "%{http_code}" https://${{ env.WEB_APP_NAME }}.azurewebsites.net || echo "000")
+          response=$(curl -s -o /dev/null -w "%{http_code}" $WEB_URL || echo "000")
           
-          if [ "$response" = "200" ] || [ "$response" = "302" ]; then
+          if [ "$response" = "200" ] || [ "$response" = "307" ]; then
             echo "✓ Web application is responding (HTTP $response)"
             exit 0
           else
@@ -196,5 +187,5 @@ jobs:
           fi
         done
         
-        echo "❌ Web health check failed after $max_attempts attempts"
+        echo "❌ Web application check failed after $max_attempts attempts"
         exit 1

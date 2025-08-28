@@ -1,0 +1,46 @@
+# Web Container App Environment Variables
+# Generated: 2025-08-28
+# Container App: web-cybermat-prd-aca
+
+env:
+  # Node Environment
+  - name: NODE_ENV
+    value: production
+  
+  # API Configuration
+  - name: PROXY_TARGET_API_BASE_URL
+    value: https://api-cybermat-prd-aca.icystone-69c102b0.westeurope.azurecontainerapps.io
+  - name: API_BASE_URL
+    value: https://api-cybermat-prd-aca.icystone-69c102b0.westeurope.azurecontainerapps.io
+  
+  # NextAuth Configuration  
+  - name: NEXTAUTH_URL
+    value: https://web-cybermat-prd-aca.icystone-69c102b0.westeurope.azurecontainerapps.io
+  - name: AUTH_TRUST_HOST
+    value: "true"
+  
+  # Authentication Mode
+  - name: AUTH_MODE
+    value: aad
+  
+  # Public API URL for client-side
+  - name: NEXT_PUBLIC_API_BASE_URL
+    value: /api/proxy
+  
+  # Feature Flags
+  - name: DEMO_E2E
+    value: "0"
+  - name: NEXT_PUBLIC_ADMIN_E2E
+    value: "0"
+  
+  # Build Information
+  - name: ENVIRONMENT
+    value: production
+  
+# Secrets (to be configured from Key Vault)
+secrets:
+  - AZURE_AD_CLIENT_ID
+  - AZURE_AD_TENANT_ID  
+  - AZURE_AD_CLIENT_SECRET
+  - NEXTAUTH_SECRET
+  - ADMIN_EMAILS

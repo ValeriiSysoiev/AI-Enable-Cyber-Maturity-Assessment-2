@@ -1,6 +1,6 @@
 {
   "timestamp": "2025-08-25T17:54:03.479Z",
-  "baseURL": "https://web-cybermat-prd.azurewebsites.net",
+  "baseURL": "https://web-cybermat-prd-aca.icystone-69c102b0.westeurope.azurecontainerapps.io",
   "environment": "test",
   "features": {
     "aad": false,
