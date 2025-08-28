@@ -11,7 +11,7 @@ This guide provides instructions for configuring Azure Container Apps for produc
 - **NEXT_PUBLIC_ADMIN_E2E**: `0` (disable admin demo features)
 - **DEMO_E2E**: `0` (disable demo authentication)
 - **NEXT_PUBLIC_API_BASE_URL**: `/api/proxy` (use proxy routing)
-- **PROXY_TARGET_API_BASE_URL**: `https://api-cybermat-prd.azurewebsites.net`
+- **PROXY_TARGET_API_BASE_URL**: `https://api-cybermat-prd-aca.icystone-69c102b0.westeurope.azurecontainerapps.io`
 - **NODE_ENV**: `production`
 - **NEXTAUTH_SECRET**: Retrieved from Key Vault
 
@@ -99,7 +99,7 @@ This will:
 
 ### Health Checks
 - Web app: `https://web-cybermat-prd.azurewebsites.net/api/health`
-- API app: `https://api-cybermat-prd.azurewebsites.net/health`
+- API app: `https://api-cybermat-prd-aca.icystone-69c102b0.westeurope.azurecontainerapps.io/health`
 
 ### Log Monitoring
 ```bash

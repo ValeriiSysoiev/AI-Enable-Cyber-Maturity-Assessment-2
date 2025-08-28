@@ -3,7 +3,7 @@ import { rateLimiters, withRateLimit } from '../../../../lib/rate-limiter';
 
 // SSRF Protection: Allowed backend URLs
 const ALLOWED_BACKEND_URLS = [
-  'https://api-cybermat-prd.azurewebsites.net',
+  'https://api-cybermat-prd-aca.icystone-69c102b0.westeurope.azurecontainerapps.io',
   'https://api-cybermat-dev.azurewebsites.net', 
   'https://api-cybermat-staging.azurewebsites.net',
   'http://localhost:8000'
@@ -18,7 +18,7 @@ const rateLimitedHandler = withRateLimit(rateLimiters.proxy);
 export const GET = rateLimitedHandler(async (request: NextRequest) => {
   try {
     // Try backend first, fallback to local API
-    const backendUrl = process.env.PROXY_TARGET_API_BASE_URL || "https://api-cybermat-prd.azurewebsites.net";
+    const backendUrl = process.env.PROXY_TARGET_API_BASE_URL || "https://api-cybermat-prd-aca.icystone-69c102b0.westeurope.azurecontainerapps.io";
     
     // SSRF Protection: Validate backend URL
     if (!validateBackendUrl(backendUrl)) {

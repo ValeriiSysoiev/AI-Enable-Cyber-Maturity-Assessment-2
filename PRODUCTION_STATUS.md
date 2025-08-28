@@ -80,7 +80,7 @@
 - **Message Queue**: In-memory (until Service Bus configured)
 
 ## Deployment URLs
-- **API**: https://api-cybermat-prd.azurewebsites.net
+- **API**: https://api-cybermat-prd-aca.icystone-69c102b0.westeurope.azurecontainerapps.io
 - **Web**: https://web-cybermat-prd.azurewebsites.net
 
 ## Next Steps
@@ -116,7 +116,7 @@ gh run view 17270412823
 gh run watch 17270412823
 
 # Check API health
-curl https://api-cybermat-prd.azurewebsites.net/api/health
+curl https://api-cybermat-prd-aca.icystone-69c102b0.westeurope.azurecontainerapps.io/api/health
 
 # Check Web app
 curl https://web-cybermat-prd.azurewebsites.net

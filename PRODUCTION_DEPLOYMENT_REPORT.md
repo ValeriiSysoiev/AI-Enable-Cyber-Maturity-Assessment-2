@@ -45,7 +45,7 @@ This session focused on fixing all production issues affecting backend stability
 ## Current Status
 
 ### Applications Health
-- **API:** https://api-cybermat-prd.azurewebsites.net - Status: 503 (Starting/Configuration Issues)
+- **API:** https://api-cybermat-prd-aca.icystone-69c102b0.westeurope.azurecontainerapps.io - Status: Working
 - **Web:** https://web-cybermat-prd.azurewebsites.net - Status: 503 (Starting/Configuration Issues)
 
 ### Deployment Pipeline

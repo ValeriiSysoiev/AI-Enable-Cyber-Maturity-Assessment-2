@@ -132,15 +132,15 @@ python start_production.py
 
 ## Production URL
 After deployment, test the production endpoints:
-- https://api-cybermat-prd.azurewebsites.net/api/health
-- https://api-cybermat-prd.azurewebsites.net/api/version
-- https://api-cybermat-prd.azurewebsites.net/api/admin/status
+- https://api-cybermat-prd-aca.icystone-69c102b0.westeurope.azurecontainerapps.io/api/health
+- https://api-cybermat-prd-aca.icystone-69c102b0.westeurope.azurecontainerapps.io/api/version
+- https://api-cybermat-prd-aca.icystone-69c102b0.westeurope.azurecontainerapps.io/api/admin/status
 
 ## Monitoring
 
 Use the admin status endpoint for monitoring:
 ```bash
-curl https://api-cybermat-prd.azurewebsites.net/api/admin/status
+curl https://api-cybermat-prd-aca.icystone-69c102b0.westeurope.azurecontainerapps.io/api/admin/status
 ```
 
 This provides:

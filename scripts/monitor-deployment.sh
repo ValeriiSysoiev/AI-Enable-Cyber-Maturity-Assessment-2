@@ -122,7 +122,7 @@ while true; do
         echo "Next steps:"
         echo "1. Run health check: ./scripts/health-check-prod.sh"
         echo "2. View application: https://web-cybermat-prd.azurewebsites.net"
-        echo "3. Check API: https://api-cybermat-prd.azurewebsites.net/api/health"
+        echo "3. Check API: https://api-cybermat-prd-aca.icystone-69c102b0.westeurope.azurecontainerapps.io/api/health"
         exit 0
     elif [ $STATUS_CODE -eq 1 ]; then
         # Failed

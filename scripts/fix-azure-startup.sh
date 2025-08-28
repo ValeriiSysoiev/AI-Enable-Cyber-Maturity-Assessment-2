@@ -55,7 +55,7 @@ sleep 30
 
 # Check health
 echo "Checking API health..."
-API_STATUS=$(curl -s -o /dev/null -w "%{http_code}" https://api-cybermat-prd.azurewebsites.net/api/health || echo "000")
+API_STATUS=$(curl -s -o /dev/null -w "%{http_code}" https://api-cybermat-prd-aca.icystone-69c102b0.westeurope.azurecontainerapps.io/api/health || echo "000")
 if [ "$API_STATUS" = "200" ]; then
   echo "✅ API is healthy (HTTP $API_STATUS)"
 else

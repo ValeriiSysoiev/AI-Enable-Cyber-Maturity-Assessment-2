@@ -12,7 +12,7 @@ BLUE='\033[0;34m'
 NC='\033[0m' # No Color
 
 # Configuration
-API_BASE_URL="${API_BASE_URL:-https://api-cybermat-prd.azurewebsites.net}"
+API_BASE_URL="${API_BASE_URL:-https://api-cybermat-prd-aca.icystone-69c102b0.westeurope.azurecontainerapps.io}"
 WEB_BASE_URL="${WEB_BASE_URL:-https://web-cybermat-prd.azurewebsites.net}"
 TIMEOUT=10
 FAILURES=0
