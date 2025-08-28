@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { signIn } from "next-auth/react";
+import { signIn, useSession } from "next-auth/react";
 
 // Force dynamic rendering to prevent static generation issues with API calls
 export const dynamic = 'force-dynamic';
@@ -12,6 +12,14 @@ export default function SignIn() {
   const [isAAD, setIsAAD] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const router = useRouter();
+  const { data: session, status } = useSession();
+
+  // Redirect if already authenticated
+  useEffect(() => {
+    if (status === "authenticated" && session?.user) {
+      router.push("/engagements");
+    }
+  }, [status, session, router]);
 
   useEffect(() => {
     // Only fetch auth mode in browser environment to prevent SSG build errors
