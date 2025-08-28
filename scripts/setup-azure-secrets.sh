@@ -62,7 +62,7 @@ echo ""
 # Collect configuration
 echo -e "${GREEN}Step 2: Resource Configuration${NC}"
 prompt_with_default "Enter Resource Group name" "rg-cybermat-prd" RESOURCE_GROUP
-prompt_with_default "Enter API App Service name" "api-cybermat-prd" API_APP_NAME
+prompt_with_default "Enter API Container App name" "api-cybermat-prd-aca" API_CONTAINER_APP_NAME
 prompt_with_default "Enter Web App Service name" "web-cybermat-prd" WEB_APP_NAME
 prompt_with_default "Enter Cosmos DB account name" "cosmos-cybermat-prd" COSMOS_ACCOUNT
 prompt_with_default "Enter Storage Account name" "stcybermatprd" STORAGE_ACCOUNT
@@ -244,8 +244,8 @@ set_github_secret "AZURE_OPENAI_ENDPOINT" "$OPENAI_ENDPOINT"
 set_github_secret "AZURE_OPENAI_API_KEY" "$OPENAI_KEY"
 set_github_secret "AZURE_SEARCH_ENDPOINT" "$SEARCH_ENDPOINT"
 set_github_secret "AZURE_SEARCH_KEY" "$SEARCH_KEY"
-set_github_secret "PROXY_TARGET_API_BASE_URL" "https://$API_APP_NAME.azurewebsites.net"
-set_github_secret "API_BASE_URL" "https://$API_APP_NAME.azurewebsites.net"
+set_github_secret "PROXY_TARGET_API_BASE_URL" "https://$API_CONTAINER_APP_NAME.icystone-69c102b0.westeurope.azurecontainerapps.io"
+set_github_secret "API_BASE_URL" "https://$API_CONTAINER_APP_NAME.icystone-69c102b0.westeurope.azurecontainerapps.io"
 set_github_secret "WEB_BASE_URL" "https://$WEB_APP_NAME.azurewebsites.net"
 
 echo ""
@@ -260,8 +260,8 @@ AZURE_SUBSCRIPTION_ID=$SUBSCRIPTION_ID
 AZURE_TENANT_ID=$TENANT_ID
 
 # API Configuration
-API_BASE_URL=https://$API_APP_NAME.azurewebsites.net
-PROXY_TARGET_API_BASE_URL=https://$API_APP_NAME.azurewebsites.net
+API_BASE_URL=https://$API_CONTAINER_APP_NAME.icystone-69c102b0.westeurope.azurecontainerapps.io
+PROXY_TARGET_API_BASE_URL=https://$API_CONTAINER_APP_NAME.icystone-69c102b0.westeurope.azurecontainerapps.io
 WEB_BASE_URL=https://$WEB_APP_NAME.azurewebsites.net
 
 # Authentication (AAD)

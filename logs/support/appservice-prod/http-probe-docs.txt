@@ -1,8 +1,0 @@
-  % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
-                                 Dload  Upload   Total   Spent    Left  Speed
-  0     0    0     0    0     0      0      0 --:--:-- --:--:-- --:--:--     0  0     0    0     0    0     0      0      0 --:--:-- --:--:-- --:--:--     0  0     0    0     0    0     0      0      0 --:--:--  0:00:01 --:--:--     0  0     0    0     0    0     0      0      0 --:--:--  0:00:01 --:--:--     0
-HTTP/2 503 
-date: Tue, 19 Aug 2025 04:41:51 GMT
-set-cookie: ARRAffinity=7d84ad198c6f807fbfa2076d1e286d2bb239ec2b3ab1f48a5008aac89bd50ca3;Path=/;HttpOnly;Secure;Domain=api-cybermat-prd.azurewebsites.net
-set-cookie: ARRAffinitySameSite=7d84ad198c6f807fbfa2076d1e286d2bb239ec2b3ab1f48a5008aac89bd50ca3;Path=/;HttpOnly;SameSite=None;Secure;Domain=api-cybermat-prd.azurewebsites.net
-
