@@ -121,14 +121,20 @@ jobs:
         echo "Building Web Docker image..."
         cd web
         
-        # Build Docker image with production settings
+        # Build Docker image with production settings and all required build args
         docker build --platform linux/amd64 \
           -t ${{ env.ACR_NAME }}.azurecr.io/web-cybermat-prd:${{ github.sha }} \
           -t ${{ env.ACR_NAME }}.azurecr.io/web-cybermat-prd:latest \
           --build-arg PROXY_TARGET_API_BASE_URL=${{ env.API_CONTAINER_APP_URL }} \
           --build-arg NEXTAUTH_URL=${{ env.WEB_CONTAINER_APP_URL }} \
+          --build-arg NEXTAUTH_SECRET="${{ secrets.NEXTAUTH_SECRET }}" \
           --build-arg NODE_ENV=production \
-          --build-arg AUTH_MODE=aad .
+          --build-arg AUTH_MODE=aad \
+          --build-arg AZURE_AD_CLIENT_ID="${{ secrets.AZURE_AD_CLIENT_ID }}" \
+          --build-arg AZURE_AD_TENANT_ID="${{ secrets.AZURE_AD_TENANT_ID }}" \
+          --build-arg AZURE_AD_CLIENT_SECRET="${{ secrets.AZURE_AD_CLIENT_SECRET }}" \
+          --build-arg DEMO_E2E=0 \
+          --build-arg BUILD_SHA="${{ github.sha }}" .
         
         # Login to ACR and push
         az acr login --name ${{ env.ACR_NAME }}
