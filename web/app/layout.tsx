@@ -1,8 +1,8 @@
 import "./globals.css";
 import type { Metadata } from "next";
-import TopNav from "@/components/TopNav";
-import { Providers } from "@/components/Providers";
-import ErrorBoundary from "@/components/ErrorBoundary";
+import TopNav from "../components/TopNav";
+import { Providers } from "../components/Providers";
+import ErrorBoundary from "../components/ErrorBoundary";
 
 export const metadata: Metadata = { 
   title: "AI Maturity Tool", 

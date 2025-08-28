@@ -2,8 +2,8 @@
 import { useState, useEffect } from "react";
 import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
-import { listWorkshops, giveConsent, startWorkshop, hasAllConsent } from "@/lib/workshops";
-import type { Workshop, WorkshopAttendee } from "@/types/workshops";
+import { listWorkshops, giveConsent, startWorkshop, hasAllConsent } from "../../../../../lib/workshops";
+import type { Workshop, WorkshopAttendee } from "../../../../../types/workshops";
 
 function ConsentStatus({ attendee, currentUserEmail }: { 
   attendee: WorkshopAttendee; 

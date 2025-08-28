@@ -1,7 +1,7 @@
 "use client";
 import { useState, useCallback } from "react";
-import { linkEvidence, formatFileSize, getFileIcon } from "@/lib/evidence";
-import type { Evidence } from "@/types/evidence";
+import { linkEvidence, formatFileSize, getFileIcon } from "../lib/evidence";
+import type { Evidence } from "../types/evidence";
 
 interface EvidencePreviewProps {
   evidence: Evidence | null;

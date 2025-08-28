@@ -1,9 +1,9 @@
 "use client";
 import { useState } from "react";
-import { bulkReindex } from "@/lib/evidence";
-import { isAdmin } from "@/lib/auth";
+import { bulkReindex } from "../lib/evidence";
+import { isAdmin } from "../lib/auth";
 import RAGStatusPanel from "./RAGStatusPanel";
-import type { BulkReindexResponse } from "@/types/evidence";
+import type { BulkReindexResponse } from "../types/evidence";
 
 interface EvidenceAdminPanelProps {
   className?: string;

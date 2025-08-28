@@ -1,4 +1,4 @@
-import { API_BASE, authHeaders } from "@/lib/api";
+import { API_BASE, authHeaders } from "./api";
 
 export type CountSummary = {
   assessments: number; documents: number; findings: number; recommendations: number; runlogs: number;

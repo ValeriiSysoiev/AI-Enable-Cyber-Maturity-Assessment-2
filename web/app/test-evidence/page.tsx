@@ -1,9 +1,9 @@
 "use client";
 import { useState } from "react";
-import DocumentsPanel from "@/components/DocumentsPanel";
-import EvidenceSearch from "@/components/EvidenceSearch";
-import AnalysisWithEvidence from "@/components/AnalysisWithEvidence";
-import EvidenceAdminPanel from "@/components/EvidenceAdminPanel";
+import DocumentsPanel from "../../components/DocumentsPanel";
+import EvidenceSearch from "../../components/EvidenceSearch";
+import AnalysisWithEvidence from "../../components/AnalysisWithEvidence";
+import EvidenceAdminPanel from "../../components/EvidenceAdminPanel";
 
 export default function TestEvidencePage() {
   const [activeComponent, setActiveComponent] = useState<'documents' | 'search' | 'analysis' | 'admin'>('documents');

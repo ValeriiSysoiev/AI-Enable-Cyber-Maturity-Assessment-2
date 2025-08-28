@@ -2,11 +2,11 @@
 
 import { useState, useEffect } from "react";
 import { useParams, useRouter } from "next/navigation";
-import { createAssessment, runAnalyze, runRecommend } from "@/lib/orchestration";
-import { requireEmail, setEngagementId } from "@/lib/auth";
-import EngagementSwitcher from "@/components/EngagementSwitcher";
-import { listDocs, uploadDocs, deleteDoc, downloadUrl, analyzeDoc, type Doc } from "@/lib/docs";
-import { authHeaders } from "@/lib/api";
+import { createAssessment, runAnalyze, runRecommend } from "../../../../lib/orchestration";
+import { requireEmail, setEngagementId } from "../../../../lib/auth";
+import EngagementSwitcher from "../../../../components/EngagementSwitcher";
+import { listDocs, uploadDocs, deleteDoc, downloadUrl, analyzeDoc, type Doc } from "../../../../lib/docs";
+import { authHeaders } from "../../../../lib/api";
 
 interface Finding {
   id: string;

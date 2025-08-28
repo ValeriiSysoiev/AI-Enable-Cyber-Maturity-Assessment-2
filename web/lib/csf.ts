@@ -11,7 +11,7 @@ import type {
   CSFFunction, 
   CSFCategory, 
   CSFSubcategory 
-} from '@/types/csf';
+} from '../types/csf';
 
 // Memoization cache
 const csfCache = new Map<string, any>();

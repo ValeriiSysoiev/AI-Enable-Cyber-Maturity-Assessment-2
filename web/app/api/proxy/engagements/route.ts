@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { rateLimiters, withRateLimit } from '@/lib/rate-limiter';
+import { rateLimiters, withRateLimit } from '../../../../lib/rate-limiter';
 
 // SSRF Protection: Allowed backend URLs
 const ALLOWED_BACKEND_URLS = [

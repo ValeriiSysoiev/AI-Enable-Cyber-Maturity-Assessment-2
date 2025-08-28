@@ -10,7 +10,7 @@ import type {
   GDPRAdminDashboard,
   GDPRTTLPolicy,
   GDPRError,
-} from "@/types/gdpr";
+} from "../types/gdpr";
 
 // GDPR Data Export Operations
 export async function requestDataExport(request: GDPRDataExportRequest): Promise<GDPRDataExportResponse> {

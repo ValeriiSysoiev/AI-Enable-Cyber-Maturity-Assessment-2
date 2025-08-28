@@ -1,4 +1,4 @@
-import { API_BASE, authHeaders } from "@/lib/api";
+import { API_BASE, authHeaders } from "./api";
 
 export type Doc = {
   id: string;

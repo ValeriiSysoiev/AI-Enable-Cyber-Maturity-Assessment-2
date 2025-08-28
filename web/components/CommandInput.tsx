@@ -1,8 +1,8 @@
 'use client';
 
 import { useState, useRef, useEffect } from 'react';
-import { CommandSuggestion } from '@/types/chat';
-import { getCommandSuggestions, parseCommand } from '@/lib/chat';
+import { CommandSuggestion } from '../types/chat';
+import { getCommandSuggestions, parseCommand } from '../lib/chat';
 
 interface CommandInputProps {
   onSend: (message: string) => void;

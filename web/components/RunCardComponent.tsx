@@ -1,4 +1,4 @@
-import { RunCard } from '@/types/chat';
+import { RunCard } from '../types/chat';
 
 interface RunCardComponentProps {
   runCard: RunCard;

@@ -6,13 +6,13 @@ import {
   formatFileSize, 
   getJobStatusColor,
   getActionDisplayName 
-} from "@/lib/gdpr";
+} from "../../lib/gdpr";
 import type { 
   GDPRComponentProps, 
   GDPRComplianceStatus, 
   GDPRJobStatus,
   GDPRError 
-} from "@/types/gdpr";
+} from "../../types/gdpr";
 
 interface GDPRDashboardProps extends GDPRComponentProps {
   onExportClick?: () => void;

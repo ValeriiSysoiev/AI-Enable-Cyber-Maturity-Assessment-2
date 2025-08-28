@@ -6,10 +6,10 @@ import {
   ingestDocument, 
   bulkReindex,
   getIngestionStatuses 
-} from "@/lib/evidence";
-import { uploadDocs, deleteDoc, downloadUrl } from "@/lib/docs";
-import { isAdmin } from "@/lib/auth";
-import type { DocumentWithIngestion, IngestionStatus } from "@/types/evidence";
+} from "../lib/evidence";
+import { uploadDocs, deleteDoc, downloadUrl } from "../lib/docs";
+import { isAdmin } from "../lib/auth";
+import type { DocumentWithIngestion, IngestionStatus } from "../types/evidence";
 
 export default function DocumentsPanel() {
   const { engagementId } = useParams<{ engagementId: string }>();

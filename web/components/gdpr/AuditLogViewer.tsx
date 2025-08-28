@@ -3,13 +3,13 @@ import { useState, useEffect } from "react";
 import { 
   getAuditLogs, 
   getActionDisplayName 
-} from "@/lib/gdpr";
+} from "../../lib/gdpr";
 import type { 
   GDPRComponentProps, 
   GDPRAuditLogEntry, 
   GDPRAuditLogResponse,
   GDPRError 
-} from "@/types/gdpr";
+} from "../../types/gdpr";
 
 interface AuditLogViewerProps extends GDPRComponentProps {
   isAdminView?: boolean;

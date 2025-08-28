@@ -1,10 +1,10 @@
 "use client";
 import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
-import { fetchPreset } from "@/lib/api";
-import { getAssessment, saveAnswer, getScores, Answer, ScoreData } from "@/lib/assessments";
-import ScoreRadar from "@/components/ScoreRadar";
-import EvidenceUploader from "@/components/EvidenceUploader";
+import { fetchPreset } from "../../../lib/api";
+import { getAssessment, saveAnswer, getScores, Answer, ScoreData } from "../../../lib/assessments";
+import ScoreRadar from "../../../components/ScoreRadar";
+import EvidenceUploader from "../../../components/EvidenceUploader";
 
 interface QuestionWithAnswer {
   question: any;

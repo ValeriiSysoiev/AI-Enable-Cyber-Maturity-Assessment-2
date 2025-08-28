@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { rateLimiters, withRateLimit } from '@/lib/rate-limiter';
+import { rateLimiters, withRateLimit } from '../../../../lib/rate-limiter';
 
 const API_BASE_URL = process.env.PROXY_TARGET_API_BASE_URL || 'http://localhost:8000';
 

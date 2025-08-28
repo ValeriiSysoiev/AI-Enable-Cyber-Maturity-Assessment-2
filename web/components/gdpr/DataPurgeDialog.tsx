@@ -7,13 +7,13 @@ import {
   validateConfirmationText,
   getJobStatusColor,
   GDPRJobPoller 
-} from "@/lib/gdpr";
+} from "../../lib/gdpr";
 import type { 
   GDPRDialogProps, 
   GDPRPurgeFormData, 
   GDPRDataPurgeResponse,
   GDPRError 
-} from "@/types/gdpr";
+} from "../../types/gdpr";
 
 interface DataPurgeDialogProps extends GDPRDialogProps {
   onPurgeComplete?: (response: GDPRDataPurgeResponse) => void;

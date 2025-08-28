@@ -3,10 +3,10 @@
  */
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { jest } from '@jest/globals';
-import EvidenceUploader from '@/components/EvidenceUploader';
-import EvidenceTable from '@/components/EvidenceTable';
-import EvidencePreview from '@/components/EvidencePreview';
-import type { Evidence } from '@/types/evidence';
+import EvidenceUploader from '../components/EvidenceUploader';
+import EvidenceTable from '../components/EvidenceTable';
+import EvidencePreview from '../components/EvidencePreview';
+import type { Evidence } from '../types/evidence';
 
 // Mock Next.js router
 jest.mock('next/navigation', () => ({

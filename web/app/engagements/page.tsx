@@ -6,7 +6,7 @@ import { redirect } from 'next/navigation';
 import { headers } from 'next/headers';
 import Link from 'next/link';
 import { Suspense } from 'react';
-import ApiErrorBoundary from '@/components/ApiErrorBoundary';
+import ApiErrorBoundary from '../../components/ApiErrorBoundary';
 
 // Mock session data for demo mode
 interface MockUser {

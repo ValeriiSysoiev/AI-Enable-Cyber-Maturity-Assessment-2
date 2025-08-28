@@ -1,8 +1,8 @@
 "use client";
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { useAuth } from "@/components/AuthProvider";
-import { usePerformanceTracker } from "@/lib/performance";
+import { useAuth } from "../components/AuthProvider";
+import { usePerformanceTracker } from "../lib/performance";
 
 export default function HomePage() {
   const router = useRouter();

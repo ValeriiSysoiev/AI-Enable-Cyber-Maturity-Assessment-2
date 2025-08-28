@@ -2,8 +2,8 @@
 import React, { useState, useCallback } from "react";
 import CitationCard from "./CitationCard";
 import DocumentViewer from "./DocumentViewer";
-import type { Citation } from "@/types/csf";
-import type { Evidence } from "@/types/evidence";
+import type { Citation } from "../types/csf";
+import type { Evidence } from "../types/evidence";
 
 interface EnhancedCitationsListProps {
   citations: Citation[];

@@ -3,9 +3,9 @@
  */
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { jest } from '@jest/globals';
-import SubcategoryDrawer from '@/components/SubcategoryDrawer';
-import type { CSFSubcategory } from '@/types/csf';
-import type { Evidence } from '@/types/evidence';
+import SubcategoryDrawer from '../components/SubcategoryDrawer';
+import type { CSFSubcategory } from '../types/csf';
+import type { Evidence } from '../types/evidence';
 
 // Mock Next.js router
 jest.mock('next/navigation', () => ({

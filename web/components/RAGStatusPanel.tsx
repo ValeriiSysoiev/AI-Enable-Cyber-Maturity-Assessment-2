@@ -1,7 +1,7 @@
 "use client";
 import { useState, useEffect } from "react";
-import { isAdmin } from "@/lib/auth";
-import type { RAGConfiguration, IngestionStatus } from "@/types/evidence";
+import { isAdmin } from "../lib/auth";
+import type { RAGConfiguration, IngestionStatus } from "../types/evidence";
 
 interface RAGStatusPanelProps {
   className?: string;

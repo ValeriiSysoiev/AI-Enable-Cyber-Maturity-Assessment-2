@@ -1,6 +1,6 @@
 "use client";
 import { useState, useEffect } from "react";
-import type { RAGConfiguration } from "@/types/evidence";
+import type { RAGConfiguration } from "../types/evidence";
 
 interface RAGToggleProps {
   enabled: boolean;

@@ -1,11 +1,11 @@
 "use client";
 import { useState, useCallback } from "react";
 import { useParams } from "next/navigation";
-import EvidenceUploader from "@/components/EvidenceUploader";
-import EvidenceTable from "@/components/EvidenceTable";
-import EvidencePreview from "@/components/EvidencePreview";
-import { useRequireAuth } from "@/components/AuthProvider";
-import type { Evidence } from "@/types/evidence";
+import EvidenceUploader from "../../../../components/EvidenceUploader";
+import EvidenceTable from "../../../../components/EvidenceTable";
+import EvidencePreview from "../../../../components/EvidencePreview";
+import { useRequireAuth } from "../../../../components/AuthProvider";
+import type { Evidence } from "../../../../types/evidence";
 
 export default function EvidenceManagementPage() {
   const { engagementId } = useParams<{ engagementId: string }>();

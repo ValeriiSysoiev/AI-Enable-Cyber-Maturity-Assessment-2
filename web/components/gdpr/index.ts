@@ -23,7 +23,7 @@ export type {
   GDPRError,
   GDPRExportFormData,
   GDPRPurgeFormData
-} from '@/types/gdpr';
+} from '../../types/gdpr';
 
 // Re-export GDPR API functions for convenience
 export {
@@ -46,4 +46,4 @@ export {
   getJobStatusColor,
   getActionDisplayName,
   GDPRJobPoller
-} from '@/lib/gdpr';
+} from '../../lib/gdpr';

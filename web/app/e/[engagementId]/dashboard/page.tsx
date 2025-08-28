@@ -2,12 +2,12 @@
 import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
-import { getSummary, reportMdUrl, type EngagementSummary } from "@/lib/summary";
-import DocumentsPanel from "@/components/DocumentsPanel";
-import EvidenceSearch from "@/components/EvidenceSearch";
-import AnalysisWithEvidence from "@/components/AnalysisWithEvidence";
-import { useRequireAuth } from "@/components/AuthProvider";
-import { isAdmin } from "@/lib/auth";
+import { getSummary, reportMdUrl, type EngagementSummary } from "../../../../lib/summary";
+import DocumentsPanel from "../../../../components/DocumentsPanel";
+import EvidenceSearch from "../../../../components/EvidenceSearch";
+import AnalysisWithEvidence from "../../../../components/AnalysisWithEvidence";
+import { useRequireAuth } from "../../../../components/AuthProvider";
+import { isAdmin } from "../../../../lib/auth";
 
 export default function DashboardPage() {
   const { engagementId } = useParams<{ engagementId: string }>();

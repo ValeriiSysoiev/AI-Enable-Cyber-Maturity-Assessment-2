@@ -1,9 +1,9 @@
 "use client";
 import { useState } from "react";
 import { useParams } from "next/navigation";
-import { searchEvidence } from "@/lib/evidence";
-import { downloadUrl } from "@/lib/docs";
-import type { SearchResult, EvidenceSearchResponse } from "@/types/evidence";
+import { searchEvidence } from "../lib/evidence";
+import { downloadUrl } from "../lib/docs";
+import type { SearchResult, EvidenceSearchResponse } from "../types/evidence";
 
 interface EvidenceSearchProps {
   className?: string;
