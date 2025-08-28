@@ -10,7 +10,12 @@ from api.schemas.roadmap import (
     ScoringWeights, ScoringAlgorithmInfo
 )
 from services.roadmap_prioritization import roadmap_prioritization_service
-from core.logging import get_correlation_id
+# from core.logging import get_correlation_id  # Temporarily disabled - import path issue
+import uuid
+
+def get_correlation_id() -> str:
+    """Generate a correlation ID - temporary workaround"""
+    return str(uuid.uuid4())
 
 logger = logging.getLogger(__name__)
 router = APIRouter(prefix="/api/roadmap/prioritization", tags=["roadmap-prioritization"])
