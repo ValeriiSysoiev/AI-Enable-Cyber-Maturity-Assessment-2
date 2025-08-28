@@ -7,6 +7,8 @@ import { headers } from 'next/headers';
 import Link from 'next/link';
 import { Suspense } from 'react';
 import ApiErrorBoundary from '../../components/ApiErrorBoundary';
+import { getServerSession } from 'next-auth';
+import { authOptions } from '../../lib/auth';
 
 // Mock session data for demo mode
 interface MockUser {
@@ -253,9 +255,25 @@ async function EngagementsList({ userEmail, correlationId }: { userEmail: string
   );
 }
 
+// Combined authentication check - supports both NextAuth and demo mode
+async function getAuthenticatedUser(): Promise<MockUser | null> {
+  // First try NextAuth session
+  const session = await getServerSession(authOptions);
+  if (session?.user?.email) {
+    return {
+      email: session.user.email,
+      name: session.user.name || session.user.email,
+      roles: (session as any).user?.roles || ['Member']
+    };
+  }
+  
+  // Fall back to demo authentication
+  return getDemoUser();
+}
+
 export default async function EngagementsPage() {
-  // SSR Guard: Check authentication
-  const user = await getDemoUser();
+  // SSR Guard: Check authentication (supports both NextAuth and demo)
+  const user = await getAuthenticatedUser();
   const correlationId = crypto.randomUUID();
   
   // Redirect to sign-in if not authenticated
