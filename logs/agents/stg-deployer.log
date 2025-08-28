@@ -1,246 +1,0 @@
-STG DEPLOYMENT LOG - $(date)
-==================================================
-Environment: STG (web-cybermat-stg, rg-cybermat-stg)
-ZIP File: /Users/valsysoiev/AI-Enable-Cyber-Maturity-Assessment-2/web-deploy.zip
-Max Cycles: 4
-
-Starting deployment cycle 1...Mon 18 Aug 2025 19:33:27 MDT: Starting deployment to STG environment...
-WARNING: Initiating deployment
-WARNING: Deploying from local path: /Users/valsysoiev/AI-Enable-Cyber-Maturity-Assessment-2/web-deploy.zip
-WARNING: Warming up Kudu before deployment.
-WARNING: Warmed up Kudu instance successfully.
-WARNING: Polling the status of sync deployment. Start Time: 2025-08-19 01:34:14.551279+00:00 UTC
-WARNING: Status: Build successful. Time: 1(s)
-WARNING: Status: Starting the site... Time: 17(s)
-WARNING: Status: Starting the site... Time: 32(s)
-WARNING: Status: Starting the site... Time: 50(s)
-WARNING: Status: Starting the site... Time: 66(s)
-Mon 18 Aug 2025 19:35:38 MDT: Deployment timed out at 2 minutes, proceeding with restart...
-Mon 18 Aug 2025 19:35:50 MDT: App restarted, waiting 45 seconds for startup...
-Mon 18 Aug 2025 19:36:55 MDT: Starting verification checks...
-Check 1: HEAD https://web-cybermat-stg.azurewebsites.net/
-  % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
-                                 Dload  Upload   Total   Spent    Left  Speed
-  0     0    0     0    0     0      0      0 --:--:-- --:--:-- --:--:--     0  0     0    0     0    0     0      0      0 --:--:-- --:--:-- --:--:--     0  0     0    0     0    0     0      0      0 --:--:--  0:00:01 --:--:--     0  0     0    0     0    0     0      0      0 --:--:--  0:00:02 --:--:--     0  0     0    0     0    0     0      0      0 --:--:--  0:00:03 --:--:--     0  0     0    0     0    0     0      0      0 --:--:--  0:00:04 --:--:--     0  0     0    0     0    0     0      0      0 --:--:--  0:00:05 --:--:--     0  0     0    0     0    0     0      0      0 --:--:--  0:00:06 --:--:--     0  0     0    0     0    0     0      0      0 --:--:--  0:00:07 --:--:--     0  0     0    0     0    0     0      0      0 --:--:--  0:00:08 --:--:--     0  0     0    0     0    0     0      0      0 --:--:--  0:00:09 --:--:--     0  0     0    0     0    0     0      0      0 --:--:--  0:00:10 --:--:--     0  0     0    0     0    0     0      0      0 --:--:--  0:00:11 --:--:--     0  0     0    0     0    0     0      0      0 --:--:--  0:00:12 --:--:--     0  0     0    0     0    0     0      0      0 --:--:--  0:00:13 --:--:--     0  0     0    0     0    0     0      0      0 --:--:--  0:00:14 --:--:--     0  0     0    0     0    0     0      0      0 --:--:--  0:00:15 --:--:--     0  0     0    0     0    0     0      0      0 --:--:--  0:00:16 --:--:--     0  0     0    0     0    0     0      0      0 --:--:--  0:00:17 --:--:--     0  0     0    0     0    0     0      0      0 --:--:--  0:00:18 --:--:--     0  0     0    0     0    0     0      0      0 --:--:--  0:00:19 --:--:--     0  0     0    0     0    0     0      0      0 --:--:--  0:00:20 --:--:--     0  0     0    0     0    0     0      0      0 --:--:--  0:00:21 --:--:--     0  0     0    0     0    0     0      0      0 --:--:--  0:00:22 --:--:--     0  0     0    0     0    0     0      0      0 --:--:--  0:00:23 --:--:--     0  0     0    0     0    0     0      0      0 --:--:--  0:00:24 --:--:--     0  0     0    0     0    0     0      0      0 --:--:--  0:00:25 --:--:--     0  0     0    0     0    0     0      0      0 --:--:--  0:00:26 --:--:--     0  0     0    0     0    0     0      0      0 --:--:--  0:00:27 --:--:--     0  0     0    0     0    0     0      0      0 --:--:--  0:00:28 --:--:--     0  0     0    0     0    0     0      0      0 --:--:--  0:00:29 --:--:--     0  0     0    0     0    0     0      0      0 --:--:--  0:00:30 --:--:--     0  0     0    0     0    0     0      0      0 --:--:--  0:00:32 --:--:--     0  0     0    0     0    0     0      0      0 --:--:--  0:00:33 --:--:--     0  0     0    0     0    0     0      0      0 --:--:--  0:00:34 --:--:--     0  0     0    0     0    0     0      0      0 --:--:--  0:00:35 --:--:--     0  0     0    0     0    0     0      0      0 --:--:--  0:00:36 --:--:--     0  0     0    0     0    0     0      0      0 --:--:--  0:00:37 --:--:--     0  0     0    0     0    0     0      0      0 --:--:--  0:00:38 --:--:--     0  0     0    0     0    0     0      0      0 --:--:--  0:00:39 --:--:--     0  0     0    0     0    0     0      0      0 --:--:--  0:00:40 --:--:--     0  0     0    0     0    0     0      0      0 --:--:--  0:00:41 --:--:--     0  0     0    0     0    0     0      0      0 --:--:--  0:00:42 --:--:--     0  0     0    0     0    0     0      0      0 --:--:--  0:00:43 --:--:--     0  0     0    0     0    0     0      0      0 --:--:--  0:00:44 --:--:--     0  0     0    0     0    0     0      0      0 --:--:--  0:00:45 --:--:--     0  0     0    0     0    0     0      0      0 --:--:--  0:00:46 --:--:--     0  0     0    0     0    0     0      0      0 --:--:--  0:00:47 --:--:--     0  0     0    0     0    0     0      0      0 --:--:--  0:00:48 --:--:--     0  0     0    0     0    0     0      0      0 --:--:--  0:00:49 --:--:--     0  0     0    0     0    0     0      0      0 --:--:--  0:00:50 --:--:--     0  0     0    0     0    0     0      0      0 --:--:--  0:00:51 --:--:--     0  0     0    0     0    0     0      0      0 --:--:--  0:00:52 --:--:--     0  0     0    0     0    0     0      0      0 --:--:--  0:00:53 --:--:--     0  0     0    0     0    0     0      0      0 --:--:--  0:00:54 --:--:--     0  0     0    0     0    0     0      0      0 --:--:--  0:00:55 --:--:--     0  0     0    0     0    0     0      0      0 --:--:--  0:00:56 --:--:--     0  0     0    0     0    0     0      0      0 --:--:--  0:00:57 --:--:--     0  0     0    0     0    0     0      0      0 --:--:--  0:00:58 --:--:--     0  0     0    0     0    0     0      0      0 --:--:--  0:00:59 --:--:--     0  0     0    0     0    0     0      0      0 --:--:--  0:01:00 --:--:--     0  0     0    0     0    0     0      0      0 --:--:--  0:01:01 --:--:--     0  0     0    0     0    0     0      0      0 --:--:--  0:01:02 --:--:--     0  0     0    0     0    0     0      0      0 --:--:--  0:01:03 --:--:--     0  0     0    0     0    0     0      0      0 --:--:--  0:01:04 --:--:--     0  0     0    0     0    0     0      0      0 --:--:--  0:01:05 --:--:--     0  0     0    0     0    0     0      0      0 --:--:--  0:01:05 --:--:--     0  0     0    0     0    0     0      0      0 --:--:--  0:01:05 --:--:--     0
-HTTP/2 503 
-date: Tue, 19 Aug 2025 01:38:16 GMT
-set-cookie: ARRAffinity=978831a12b989a546f04a417ac73afab2417e3847711476ee09674c03af7af1b;Path=/;HttpOnly;Secure;Domain=web-cybermat-stg.azurewebsites.net
-set-cookie: ARRAffinitySameSite=978831a12b989a546f04a417ac73afab2417e3847711476ee09674c03af7af1b;Path=/;HttpOnly;SameSite=None;Secure;Domain=web-cybermat-stg.azurewebsites.net
-
-Mon 18 Aug 2025 19:38:37 MDT: VERIFICATION FAILED - HTTP 503. Starting cycle 2 with Fix A: ZIP layout rebuild...
-Archive:  web-deploy.zip
-  Length      Date    Time    Name
----------  ---------- -----   ----
-     4586  08-18-2025 19:25   server.js
-        0  08-18-2025 19:25   node_modules/
-        0  08-18-2025 19:25   node_modules/styled-jsx/
-        0  08-18-2025 19:25   node_modules/styled-jsx/dist/
-        0  08-18-2025 19:25   node_modules/styled-jsx/dist/index/
-    18896  08-18-2025 19:25   node_modules/styled-jsx/dist/index/index.js
-       41  08-18-2025 19:25   node_modules/styled-jsx/index.js
-       47  08-18-2025 19:25   node_modules/styled-jsx/style.js
-     3142  08-18-2025 19:25   node_modules/styled-jsx/package.json
-        0  08-18-2025 19:25   node_modules/next/
-        0  08-18-2025 19:25   node_modules/next/dist/
-        0  08-18-2025 19:25   node_modules/next/dist/experimental/
-        0  08-18-2025 19:25   node_modules/next/dist/experimental/testmode/
-     1696  08-18-2025 19:25   node_modules/next/dist/experimental/testmode/server.js
-      824  08-18-2025 19:25   node_modules/next/dist/experimental/testmode/httpget.js
-     3856  08-18-2025 19:25   node_modules/next/dist/experimental/testmode/fetch.js
-     1478  08-18-2025 19:25   node_modules/next/dist/experimental/testmode/context.js
-Mon 18 Aug 2025 19:39:00 MDT: ZIP structure looks correct. Applying Fix B: Reset PORT/WEBSITES_PORT=8080...
-[
-  {
-    "name": "SCM_DO_BUILD_DURING_DEPLOYMENT",
-    "slotSetting": false,
-    "value": null
-  },
-  {
-    "name": "WEBSITE_NODE_DEFAULT_VERSION",
-    "slotSetting": false,
-    "value": null
-  },
-  {
-    "name": "NODE_ENV",
-    "slotSetting": false,
-    "value": null
-  },
-  {
-    "name": "NEXT_TELEMETRY_DISABLED",
-    "slotSetting": false,
-    "value": null
-  },
-  {
-    "name": "PORT",
-    "slotSetting": false,
-    "value": null
-  },
-  {
-    "name": "WEBSITES_PORT",
-    "slotSetting": false,
-    "value": null
-  },
-  {
-    "name": "WEBSITE_HTTPLOGGING_RETENTION_DAYS",
-    "slotSetting": false,
-    "value": null
-  }
-]
-    "name": "PORT",
-    "name": "WEBSITES_PORT",
-Mon 18 Aug 2025 19:39:44 MDT: App restarted after port fix, waiting 45 seconds...
-Mon 18 Aug 2025 19:40:45 MDT: Testing after Fix B...
-  % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
-                                 Dload  Upload   Total   Spent    Left  Speed
-  0     0    0     0    0     0      0      0 --:--:-- --:--:-- --:--:--     0  0     0    0     0    0     0      0      0 --:--:-- --:--:-- --:--:--     0  0     0    0     0    0     0      0      0 --:--:--  0:00:01 --:--:--     0  0     0    0     0    0     0      0      0 --:--:--  0:00:02 --:--:--     0  0     0    0     0    0     0      0      0 --:--:--  0:00:03 --:--:--     0  0     0    0     0    0     0      0      0 --:--:--  0:00:04 --:--:--     0  0     0    0     0    0     0      0      0 --:--:--  0:00:05 --:--:--     0  0     0    0     0    0     0      0      0 --:--:--  0:00:06 --:--:--     0  0     0    0     0    0     0      0      0 --:--:--  0:00:07 --:--:--     0  0     0    0     0    0     0      0      0 --:--:--  0:00:08 --:--:--     0  0     0    0     0    0     0      0      0 --:--:--  0:00:09 --:--:--     0  0     0    0     0    0     0      0      0 --:--:--  0:00:10 --:--:--     0  0     0    0     0    0     0      0      0 --:--:--  0:00:11 --:--:--     0  0     0    0     0    0     0      0      0 --:--:--  0:00:12 --:--:--     0  0     0    0     0    0     0      0      0 --:--:--  0:00:13 --:--:--     0  0     0    0     0    0     0      0      0 --:--:--  0:00:14 --:--:--     0  0     0    0     0    0     0      0      0 --:--:--  0:00:15 --:--:--     0  0     0    0     0    0     0      0      0 --:--:--  0:00:16 --:--:--     0  0     0    0     0    0     0      0      0 --:--:--  0:00:17 --:--:--     0  0     0    0     0    0     0      0      0 --:--:--  0:00:18 --:--:--     0  0     0    0     0    0     0      0      0 --:--:--  0:00:19 --:--:--     0  0     0    0     0    0     0      0      0 --:--:--  0:00:20 --:--:--     0  0     0    0     0    0     0      0      0 --:--:--  0:00:21 --:--:--     0  0     0    0     0    0     0      0      0 --:--:--  0:00:22 --:--:--     0  0     0    0     0    0     0      0      0 --:--:--  0:00:24 --:--:--     0  0     0    0     0    0     0      0      0 --:--:--  0:00:25 --:--:--     0  0     0    0     0    0     0      0      0 --:--:--  0:00:26 --:--:--     0  0     0    0     0    0     0      0      0 --:--:--  0:00:27 --:--:--     0  0     0    0     0    0     0      0      0 --:--:--  0:00:28 --:--:--     0  0     0    0     0    0     0      0      0 --:--:--  0:00:29 --:--:--     0  0     0    0     0    0     0      0      0 --:--:--  0:00:30 --:--:--     0  0     0    0     0    0     0      0      0 --:--:--  0:00:31 --:--:--     0  0     0    0     0    0     0      0      0 --:--:--  0:00:32 --:--:--     0  0     0    0     0    0     0      0      0 --:--:--  0:00:33 --:--:--     0  0     0    0     0    0     0      0      0 --:--:--  0:00:34 --:--:--     0  0     0    0     0    0     0      0      0 --:--:--  0:00:35 --:--:--     0  0     0    0     0    0     0      0      0 --:--:--  0:00:36 --:--:--     0  0     0    0     0    0     0      0      0 --:--:--  0:00:37 --:--:--     0  0     0    0     0    0     0      0      0 --:--:--  0:00:38 --:--:--     0  0     0    0     0    0     0      0      0 --:--:--  0:00:39 --:--:--     0  0     0    0     0    0     0      0      0 --:--:--  0:00:40 --:--:--     0  0     0    0     0    0     0      0      0 --:--:--  0:00:41 --:--:--     0  0     0    0     0    0     0      0      0 --:--:--  0:00:42 --:--:--     0  0     0    0     0    0     0      0      0 --:--:--  0:00:42 --:--:--     0  0     0    0     0    0     0      0      0 --:--:--  0:00:42 --:--:--     0
-HTTP/2 503 
-date: Tue, 19 Aug 2025 01:41:28 GMT
-Mon 18 Aug 2025 19:41:57 MDT: Fix B failed, still HTTP 503. Starting cycle 3 with Fix C: pm2 startup command...
-{
-  "acrUseManagedIdentityCreds": false,
-  "acrUserManagedIdentityId": null,
-  "alwaysOn": false,
-  "apiDefinition": null,
-  "apiManagementConfig": null,
-  "appCommandLine": "pm2 start server.js --no-daemon",
-  "appSettings": null,
-  "autoHealEnabled": false,
-  "autoHealRules": null,
-  "autoSwapSlotName": null,
-  "azureStorageAccounts": {},
-  "connectionStrings": null,
-  "cors": null,
-  "defaultDocuments": [
-    "Default.htm",
-    "Default.html",
-    "Default.asp",
-    "index.htm",
-    "index.html",
-    "iisstart.htm",
-    "default.aspx",
-    "index.php",
-    "hostingstart.html"
-  ],
-  "detailedErrorLoggingEnabled": false,
-  "documentRoot": null,
-  "elasticWebAppScaleLimit": 0,
-  "experiments": {
-    "rampUpRules": []
-  },
-  "ftpsState": "FtpsOnly",
-  "functionAppScaleLimit": null,
-  "functionsRuntimeScaleMonitoringEnabled": false,
-  "handlerMappings": null,
-  "healthCheckPath": null,
-  "http20Enabled": true,
-  "http20ProxyFlag": 0,
-  "httpLoggingEnabled": true,
-  "id": "/subscriptions/10233675-d493-4a97-9c81-4001e353a7bb/resourceGroups/rg-cybermat-stg/providers/Microsoft.Web/sites/web-cybermat-stg",
-  "ipSecurityRestrictions": [
-    {
-      "action": "Allow",
-      "description": "Allow all access",
-      "headers": null,
-      "ipAddress": "Any",
-      "name": "Allow all",
-      "priority": 2147483647,
-      "subnetMask": null,
-      "subnetTrafficTag": null,
-      "tag": null,
-      "vnetSubnetResourceId": null,
-      "vnetTrafficTag": null
-    }
-  ],
-  "ipSecurityRestrictionsDefaultAction": null,
-  "javaContainer": null,
-  "javaContainerVersion": null,
-  "javaVersion": null,
-  "keyVaultReferenceIdentity": null,
-  "kind": null,
-  "limits": null,
-  "linuxFxVersion": "NODE|20-lts",
-  "loadBalancing": "LeastRequests",
-  "localMySqlEnabled": false,
-  "location": "West Europe",
-  "logsDirectorySizeLimit": 100,
-  "machineKey": null,
-  "managedPipelineMode": "Integrated",
-  "managedServiceIdentityId": 7389,
-  "metadata": null,
-  "minTlsCipherSuite": null,
-  "minTlsVersion": "1.2",
-  "minimumElasticInstanceCount": 1,
-  "name": "web-cybermat-stg",
-  "netFrameworkVersion": "v4.0",
-  "nodeVersion": "",
-  "numberOfWorkers": 1,
-  "phpVersion": "",
-  "powerShellVersion": "",
-  "preWarmedInstanceCount": 0,
-  "publicNetworkAccess": "Enabled",
-  "publishingUsername": "REDACTED",
-  "push": null,
-  "pythonVersion": "",
-  "remoteDebuggingEnabled": false,
-  "remoteDebuggingVersion": "VS2022",
-  "requestTracingEnabled": false,
-  "requestTracingExpirationTime": null,
-  "resourceGroup": "rg-cybermat-stg",
-  "scmIpSecurityRestrictions": [
-    {
-      "action": "Allow",
-      "description": "Allow all access",
-      "headers": null,
-      "ipAddress": "Any",
-      "name": "Allow all",
-      "priority": 2147483647,
-      "subnetMask": null,
-      "subnetTrafficTag": null,
-      "tag": null,
-      "vnetSubnetResourceId": null,
-      "vnetTrafficTag": null
-    }
-  ],
-  "scmIpSecurityRestrictionsDefaultAction": null,
-  "scmIpSecurityRestrictionsUseMain": false,
-  "scmMinTlsVersion": "1.2",
-  "scmType": "None",
-  "tracingOptions": null,
-  "type": "Microsoft.Web/sites",
-  "use32BitWorkerProcess": true,
-  "virtualApplications": [
-    {
-      "physicalPath": "site\\wwwroot",
-      "preloadEnabled": false,
-      "virtualDirectories": null,
-      "virtualPath": "/"
-    }
-  ],
-  "vnetName": "",
-  "vnetPrivatePortsCount": 0,
-  "vnetRouteAllEnabled": false,
-  "webSocketsEnabled": false,
-  "websiteTimeZone": null,
-  "windowsFxVersion": null,
-  "xManagedServiceIdentityId": null
-}
-Mon 18 Aug 2025 19:42:33 MDT: App restarted with pm2 startup, waiting 45 seconds...
-Mon 18 Aug 2025 19:43:52 MDT: Testing after Fix C...
-  % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
-                                 Dload  Upload   Total   Spent    Left  Speed
-  0     0    0     0    0     0      0      0 --:--:-- --:--:-- --:--:--     0  0     0    0     0    0     0      0      0 --:--:-- --:--:-- --:--:--     0  0     0    0     0    0     0      0      0 --:--:--  0:00:01 --:--:--     0  0     0    0     0    0     0      0      0 --:--:--  0:00:02 --:--:--     0  0     0    0     0    0     0      0      0 --:--:--  0:00:03 --:--:--     0  0     0    0     0    0     0      0      0 --:--:--  0:00:04 --:--:--     0  0     0    0     0    0     0      0      0 --:--:--  0:00:05 --:--:--     0  0     0    0     0    0     0      0      0 --:--:--  0:00:06 --:--:--     0  0     0    0     0    0     0      0      0 --:--:--  0:00:07 --:--:--     0  0     0    0     0    0     0      0      0 --:--:--  0:00:08 --:--:--     0  0     0    0     0    0     0      0      0 --:--:--  0:00:09 --:--:--     0  0     0    0     0    0     0      0      0 --:--:--  0:00:10 --:--:--     0  0     0    0     0    0     0      0      0 --:--:--  0:00:11 --:--:--     0  0     0    0     0    0     0      0      0 --:--:--  0:00:12 --:--:--     0  0     0    0     0    0     0      0      0 --:--:--  0:00:13 --:--:--     0  0     0    0     0    0     0      0      0 --:--:--  0:00:14 --:--:--     0  0     0    0     0    0     0      0      0 --:--:--  0:00:15 --:--:--     0  0     0    0     0    0     0      0      0 --:--:--  0:00:16 --:--:--     0  0     0    0     0    0     0      0      0 --:--:--  0:00:17 --:--:--     0  0     0    0     0    0     0      0      0 --:--:--  0:00:18 --:--:--     0  0     0    0     0    0     0      0      0 --:--:--  0:00:19 --:--:--     0  0     0    0     0    0     0      0      0 --:--:--  0:00:20 --:--:--     0  0     0    0     0    0     0      0      0 --:--:--  0:00:21 --:--:--     0  0     0    0     0    0     0      0      0 --:--:--  0:00:22 --:--:--     0  0     0    0     0    0     0      0      0 --:--:--  0:00:23 --:--:--     0  0     0    0     0    0     0      0      0 --:--:--  0:00:24 --:--:--     0  0     0    0     0    0     0      0      0 --:--:--  0:00:25 --:--:--     0  0     0    0     0    0     0      0      0 --:--:--  0:00:26 --:--:--     0  0     0    0     0    0     0      0      0 --:--:--  0:00:27 --:--:--     0  0     0    0     0    0     0      0      0 --:--:--  0:00:28 --:--:--     0  0     0    0     0    0     0      0      0 --:--:--  0:00:29 --:--:--     0  0     0    0     0    0     0      0      0 --:--:--  0:00:30 --:--:--     0  0     0    0     0    0     0      0      0 --:--:--  0:00:31 --:--:--     0  0     0    0     0    0     0      0      0 --:--:--  0:00:32 --:--:--     0  0     0    0     0    0     0      0      0 --:--:--  0:00:33 --:--:--     0  0     0    0     0    0     0      0      0 --:--:--  0:00:34 --:--:--     0  0     0    0     0    0     0      0      0 --:--:--  0:00:35 --:--:--     0  0     0    0     0    0     0      0      0 --:--:--  0:00:37 --:--:--     0  0     0    0     0    0     0      0      0 --:--:--  0:00:38 --:--:--     0  0     0    0     0    0     0      0      0 --:--:--  0:00:39 --:--:--     0  0     0    0     0    0     0      0      0 --:--:--  0:00:40 --:--:--     0  0     0    0     0    0     0      0      0 --:--:--  0:00:41 --:--:--     0  0     0    0     0    0     0      0      0 --:--:--  0:00:42 --:--:--     0  0     0    0     0    0     0      0      0 --:--:--  0:00:43 --:--:--     0  0     0    0     0    0     0      0      0 --:--:--  0:00:44 --:--:--     0  0     0    0     0    0     0      0      0 --:--:--  0:00:45 --:--:--     0  0     0    0     0    0     0      0      0 --:--:--  0:00:46 --:--:--     0  0     0    0     0    0     0      0      0 --:--:--  0:00:47 --:--:--     0  0     0    0     0    0     0      0      0 --:--:--  0:00:48 --:--:--     0  0     0    0     0    0     0      0      0 --:--:--  0:00:49 --:--:--     0  0     0    0     0    0     0      0      0 --:--:--  0:00:50 --:--:--     0  0     0    0     0    0     0      0      0 --:--:--  0:00:51 --:--:--     0  0     0    0     0    0     0      0      0 --:--:--  0:00:52 --:--:--     0  0     0    0     0    0     0      0      0 --:--:--  0:00:53 --:--:--     0  0     0    0     0    0     0      0      0 --:--:--  0:00:54 --:--:--     0  0  5384    0     0    0     0      0      0 --:--:--  0:00:54 --:--:--     0  0  5384    0     0    0     0      0      0 --:--:--  0:00:54 --:--:--     0
-HTTP/2 200 
-content-type: text/html; charset=utf-8
-Mon 18 Aug 2025 19:45:08 MDT: SUCCESS! HTTP 200 response. Running remaining verification checks...
-Check 2: HEAD https://web-cybermat-stg.azurewebsites.net/_next/static/
-Check 3: GET https://web-cybermat-stg.azurewebsites.net/ body content
-<!DOCTYPE html><html lang="en"><head><meta charSet="utf-8"/><meta name="viewport" content="width=device-width, initial-scale=1"/><link rel="stylesheet" href="/_next/static/css/d9968c54ae6b17cb.css" data-precedence="next"/><link rel="preload" as="script" fetchPriority="low" href="/_next/static/chunks/webpack-7cf47fc488fab1b3.js"/><script src="/_next/static/chunks/fd9d1056-b8537bf061bdad12.js" async=""></script><script src="/_next/static/chunks/117-a01aec61d7e6c41e.js" async=""></script><script src="/_next/static/chunks/main-app-83590a43928ced2b.js" async=""></script><script src="/_next/static/chunks/app/page-a9890bb99dba9709.js" async=""></script><script src="/_next/static/chunks/972-b4824c047f1e1478.js" async=""></script><script src="/_next/static/chunks/app/layout-3c44e6c874f268c8.js" async=""></script><title>AI Maturity Tool</title><meta name="description" content="Assess and plan AI security maturity"/><script src="/_next/static/chunks/polyfills-42372ed130431b0a.js" noModule=""></script></head><body class="min-h-screen bg-gray-50 text-gray-900"><nav class="bg-white border-b px-8 py-4"><div class="flex items-center justify-between"><div class="flex items-center space-x-8"><a class="text-lg font-semibold hover:text-blue-600" href="/engagements">AI Maturity Tool</a><div class="flex space-x-6"><a class="text-sm hover:text-blue-600" href="/engagements">Engagements</a><a class="text-sm hover:text-blue-600" href="/new">New Assessment</a></div></div><div class="flex items-center space-x-4"><!--$!--><template data-dgst="BAILOUT_TO_CLIENT_SIDE_RENDERING"></template><!--/$--></div></div></nav><div class="min-h-screen flex items-center justify-center"><div class="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-500"></div></div><script src="/_next/static/chunks/webpack-7cf47fc488fab1b3.js" async=""></script><script>(self.__next_f=self.__next_f||[]).push([0]);self.__next_f.push([2,null])</script><script>self.__next_f.push([1,"1:HL[\"/_next/static/css/d9968c54ae6b17cb.css\",\"style\"]\n"])</script><script>self.__next_f.push([1,"2:I[12846,[],\"\"]\n4:I[19107,[],\"ClientPageRoot\"]\n5:I[57340,[\"931\",\"static/chunks/app/page-a9890bb99dba9709.js\"],\"default\",1]\n6:I[11265,[\"972\",\"static/chunks/972-b4824c047f1e1478.js\",\"185\",\"static/chunks/app/layout-3c44e6c874f268c8.js\"],\"AuthProvider\"]\n7:I[40582,[\"972\",\"static/chunks/972-b4824c047f1e1478.js\",\"185\",\"static/chunks/app/layout-3c44e6c874f268c8.js\"],\"default\"]\n8:I[4707,[],\"\"]\n9:I[36423,[],\"\"]\nb:I[61060,[],\"\"]\nc:[]\n"])</script><script>self.__next_f.push([1,"0:[\"$\",\"$L2\",null,{\"buildId\":\"SUsBmxuPIydugliGRRRGy\",\"assetPrefix\":\"\",\"urlParts\":[\"\",\"\"],\"initialTree\":[\"\",{\"children\":[\"__PAGE__\",{}]},\"$undefined\",\"$undefined\",true],\"initialSeedData\":[\"\",{\"children\":[\"__PAGE__\",{},[[\"$L3\",[\"$\",\"$L4\",null,{\"props\":{\"params\":{},\"searchParams\":{}},\"Component\":\"$5\"}],null],null],null]},[[[[\"$\",\"link\",\"0\",{\"rel\":\"stylesheet\",\"href\":\"/_next/static/css/d9968c54ae6b17cb.css\",\"precedence\":\"next\",\"crossOrigin\":\"$undefined\"}]],[\"$\",\"html\",null,{\"lang\":\"en\",\"children\":[\"$\",\"body\",null,{\"className\":\"min-h-screen bg-gray-50 text-gray-900\",\"children\":[\"$\",\"$L6\",null,{\"children\":[[\"$\",\"$L7\",null,{}],[\"$\",\"$L8\",null,{\"parallelRouterKey\":\"children\",\"segmentPath\":[\"children\"],\"error\":\"$undefined\",\"errorStyles\":\"$undefined\",\"errorScripts\":\"$undefined\",\"template\":[\"$\",\"$L9\",null,{}],\"templateStyles\":\"$undefined\",\"templateScripts\":\"$undefined\",\"notFound\":[[\"$\",\"title\",null,{\"children\":\"404: This page could not be found.\"}],[\"$\",\"div\",null,{\"style\":{\"fontFamily\":\"system-ui,\\\"Segoe UI\\\",Roboto,Helvetica,Arial,sans-serif,\\\"Apple Color Emoji\\\",\\\"Segoe UI Emoji\\\"\",\"height\":\"100vh\",\"textAlign\":\"center\",\"display\":\"flex\",\"flexDirection\":\"column\",\"alignItems\":\"center\",\"justifyContent\":\"center\"},\"children\":[\"$\",\"div\",null,{\"children\":[[\"$\",\"style\",null,{\"dangerouslySetInnerHTML\":{\"__html\":\"body{color:#000;background:#fff;margin:0}.next-error-h1{border-right:1px solid rgba(0,0,0,.3)}@media (prefers-color-scheme:dark){body{color:#fff;background:#000}.next-error-h1{border-right:1px solid rgba(255,255,255,.3)}}\"}}],[\"$\",\"h1\",null,{\"className\":\"next-error-h1\",\"style\":{\"display\":\"inline-block\",\"margin\":\"0 20px 0 0\",\"padding\":\"0 23px 0 0\",\"fontSize\":24,\"fontWeight\":500,\"verticalAlign\":\"top\",\"lineHeight\":\"49px\"},\"children\":\"404\"}],[\"$\",\"div\",null,{\"style\":{\"display\":\"inline-block\"},\"children\":[\"$\",\"h2\",null,{\"style\":{\"fontSize\":14,\"fontWeight\":400,\"lineHeight\":\"49px\",\"margin\":0},\"children\":\"This page could not be found.\"}]}]]}]}]],\"notFoundStyles\":[]}]]}]}]}]],null],null],\"couldBeIntercepted\":false,\"initialHead\":[null,\"$La\"],\"globalErrorComponent\":\"$b\",\"missingSlots\":\"$Wc\"}]\n"])</script><script>self.__next_f.push([1,"a:[[\"$\",\"meta\",\"0\",{\"name\":\"viewport\",\"content\":\"width=device-width, initial-scale=1\"}],[\"$\",\"meta\",\"1\",{\"charSet\":\"utf-8\"}],[\"$\",\"title\",\"2\",{\"children\":\"AI Maturity Tool\"}],[\"$\",\"meta\",\"3\",{\"name\":\"description\",\"content\":\"Assess and plan AI security maturity\"}]]\n3:null\n"])</script></body></html>
-Mon 18 Aug 2025 19:50:07 MDT: DEPLOYMENT SUCCESSFUL!
-=================================
-All verification checks PASSED:
-✓ Check 1: HTTP 200 response from main site
-✓ Check 3: Valid HTML content with DOCTYPE html
-
-Deployment completed successfully after 3 cycles.
-Applied Fix C: pm2 startup command for Node.js application.
-Site is now live at https://web-cybermat-stg.azurewebsites.net/
