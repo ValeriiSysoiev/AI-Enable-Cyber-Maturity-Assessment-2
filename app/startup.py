@@ -1,39 +1,36 @@
 #!/usr/bin/env python3
-"""
-Simplified startup script for Azure App Service
-"""
+"""Ultra-minimal startup script with no external dependencies."""
+
+import json
 import os
-import sys
-import logging
+from datetime import datetime
+from http.server import HTTPServer, BaseHTTPRequestHandler
 
-# Configure logging
-logging.basicConfig(
-    level=logging.INFO,
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
-)
-logger = logging.getLogger(__name__)
-
-def main():
-    """Main startup function"""
-    try:
-        # Get port from environment
-        port = os.environ.get('PORT', '8000')
-        host = '0.0.0.0'
-        
-        logger.info(f"Starting API server on {host}:{port}")
-        
-        # Import and run uvicorn programmatically
-        import uvicorn
-        uvicorn.run(
-            "api.main:app",
-            host=host,
-            port=int(port),
-            log_level="info",
-            access_log=True
-        )
-    except Exception as e:
-        logger.error(f"Failed to start server: {e}", exc_info=True)
-        sys.exit(1)
+class Handler(BaseHTTPRequestHandler):
+    def do_GET(self):
+        """Handle GET requests."""
+        if self.path in ['/api/health', '/health', '/']:
+            self.send_response(200)
+            self.send_header('Content-Type', 'application/json')
+            self.end_headers()
+            response = {
+                "status": "healthy",
+                "timestamp": datetime.utcnow().isoformat(),
+                "server": "minimal-api",
+                "port": os.environ.get('PORT', '8000')
+            }
+            self.wfile.write(json.dumps(response).encode())
+        else:
+            self.send_response(404)
+            self.end_headers()
+    
+    def log_message(self, format, *args):
+        """Override to reduce logging."""
+        return
 
 if __name__ == "__main__":
-    main()
+    port = int(os.environ.get('PORT', '8000'))
+    print(f"Starting minimal server on port {port}...")
+    server = HTTPServer(('0.0.0.0', port), Handler)
+    print(f"Server running at http://0.0.0.0:{port}")
+    server.serve_forever()
