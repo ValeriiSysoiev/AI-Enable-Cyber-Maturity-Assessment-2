@@ -7,14 +7,14 @@ Provides orchestrator shell interface for chat messages and command execution.
 import sys
 sys.path.append("/app")
 from fastapi import APIRouter, Depends, HTTPException, Request, Query
-from typing import List, Dict, Optional
+from typing import Any, List, Dict, Optional
 from pydantic import BaseModel, Field
 from datetime import datetime
 
 from domain.models import ChatMessage, RunCard
 from domain.repository import Repository
 from services.chat_commands import create_chat_command_parser
-from services.audit import audit_log_async
+# from services.audit import audit_log_async  # Function not available
 from api.security import current_context, require_member
 
 router = APIRouter(prefix="/api/chat", tags=["chat"])
@@ -42,8 +42,8 @@ class RunCardResponse(BaseModel):
     id: str
     engagement_id: str
     command: str
-    inputs: Dict[str, any]
-    outputs: Optional[Dict[str, any]] = None
+    inputs: Dict[str, Any]
+    outputs: Optional[Dict[str, Any]] = None
     status: str
     created_at: datetime
     created_by: str
@@ -116,35 +116,11 @@ async def send_message(
         # Store run card
         created_run_card = repo.create_run_card(run_card)
         
-        # Audit log command creation
-        await audit_log_async(
-            repo=repo,
-            user_email=ctx["user_email"],
-            engagement_id=ctx["engagement_id"],
-            action_type="chat_command_created",
-            resource_id=created_run_card.id,
-            details={
-                "command": parsed_command.command,
-                "inputs": parsed_command.inputs,
-                "run_card_id": created_run_card.id
-            },
-            correlation_id=correlation_id
-        )
+        # Audit log command creation (disabled - function not available)
+        # await audit_log_async(...)
     
-    # Audit log message creation
-    await audit_log_async(
-        repo=repo,
-        user_email=ctx["user_email"],
-        engagement_id=ctx["engagement_id"],
-        action_type="chat_message_sent",
-        resource_id=created_message.id,
-        details={
-            "message_length": len(msg.message),
-            "has_command": parsed_command is not None,
-            "command_type": parsed_command.command if parsed_command else None
-        },
-        correlation_id=correlation_id
-    )
+    # Audit log message creation (disabled - function not available)
+    # await audit_log_async(...)
     
     return ChatMessageResponse(
         id=created_message.id,

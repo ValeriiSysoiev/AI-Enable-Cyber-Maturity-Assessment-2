@@ -3,13 +3,13 @@ import logging
 from typing import Optional
 from fastapi import APIRouter, HTTPException, Header, Depends
 
-from app.api.schemas.roadmap_costs import (
+from api.schemas.roadmap_costs import (
     CostCalculationRequest, CostCalculationResponse,
     TSizeUpdateRequest, TSizeConfigResponse,
     CostConfigurationInfo, Region, Scenario
 )
-from app.services.roadmap_cost_calculation import roadmap_cost_service
-from app.core.logging import get_correlation_id
+from services.roadmap_cost_calculation import roadmap_cost_service
+from core.logging import get_correlation_id
 
 logger = logging.getLogger(__name__)
 router = APIRouter(prefix="/api/roadmap/costs", tags=["roadmap-costs"])

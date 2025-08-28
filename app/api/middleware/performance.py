@@ -16,11 +16,11 @@ from fastapi import Request, Response
 from starlette.middleware.base import BaseHTTPMiddleware
 from starlette.responses import Response as StarletteResponse
 
-from ...config import config
-from ...services.performance import performance_monitor, RequestMetrics
-from ...util.logging import get_logger
+from config import config
+from services.performance import performance_monitor, RequestMetrics
+import logging
 
-logger = get_logger(__name__)
+logger = logging.getLogger(__name__)
 
 
 class PerformanceTrackingMiddleware(BaseHTTPMiddleware):

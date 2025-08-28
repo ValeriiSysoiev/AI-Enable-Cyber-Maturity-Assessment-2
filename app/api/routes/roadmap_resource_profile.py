@@ -5,15 +5,15 @@ from fastapi import APIRouter, HTTPException, Header, Depends, Response
 from fastapi.responses import StreamingResponse
 import io
 
-from app.api.schemas.resource_profile import (
+from api.schemas.resource_profile import (
     ResourcePlanningRequest, ResourcePlanningResponse,
     CSVExportRequest, CSVExportResponse,
     GanttChartRequest, GanttChartResponse,
     WaveOverlayRequest, WaveOverlayResponse,
     ResourceConfigurationInfo
 )
-from app.services.roadmap_resource_profile import roadmap_resource_service
-from app.core.logging import get_correlation_id
+from services.roadmap_resource_profile import roadmap_resource_service
+from core.logging import get_correlation_id
 
 logger = logging.getLogger(__name__)
 router = APIRouter(prefix="/api/roadmap/resources", tags=["roadmap-resources"])

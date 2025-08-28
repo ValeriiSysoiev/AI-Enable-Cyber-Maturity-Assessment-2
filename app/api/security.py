@@ -3,7 +3,7 @@ import re
 import email.utils
 import logging
 from fastapi import Header, HTTPException, Depends, Request
-from typing import Dict, Optional, Set
+from typing import Any, Dict, Optional, Set
 from domain.repository import Repository
 from config import config
 from services.aad_groups import create_aad_groups_service, UserRoles
@@ -28,7 +28,7 @@ def is_admin(user_email: str) -> bool:
     return canonical_email in admins
 
 
-async def is_admin_with_demo_fallback(user_email: str) -> bool:
+async def is_admin_with_demo_fallback(user_email: str, repository: Optional[Repository] = None) -> bool:
     """
     Check if user is an admin, including demo admin fallback
     
@@ -45,9 +45,13 @@ async def is_admin_with_demo_fallback(user_email: str) -> bool:
     if auth_mode == "demo":
         try:
             from domain.admin_repository import create_admin_repository
-            from api.main import app
             
-            repository = getattr(app.state, 'repo', None)
+            # Use provided repository or create a minimal one
+            if repository is None:
+                # Create a minimal repository for demo mode
+                from domain.file_repo import FileRepository
+                repository = FileRepository()
+            
             admin_repo = create_admin_repository(
                 data_backend=os.getenv("DATA_BACKEND", "local"),
                 repository=repository
@@ -66,7 +70,7 @@ async def current_context(
     x_user_email: str = Header(..., alias="X-User-Email"),
     x_engagement_id: str = Header(..., alias="X-Engagement-ID"),
     x_tenant_id: Optional[str] = Header(None, alias="X-Tenant-ID")
-) -> Dict[str, any]:
+) -> Dict[str, Any]:
     """
     Extract current user and engagement context from headers.
     Includes AAD group information when AAD groups mode is enabled.
@@ -178,7 +182,7 @@ async def current_context(
     return context
 
 
-def get_user_groups(ctx: Dict[str, any]) -> Set[str]:
+def get_user_groups(ctx: Dict[str, Any]) -> Set[str]:
     """
     Get user's AAD group IDs from context
     
@@ -194,7 +198,7 @@ def get_user_groups(ctx: Dict[str, any]) -> Set[str]:
     return {group["group_id"] for group in ctx.get("aad_groups", [])}
 
 
-def get_user_roles(ctx: Dict[str, any]) -> Set[str]:
+def get_user_roles(ctx: Dict[str, Any]) -> Set[str]:
     """
     Get user's effective roles from AAD groups
     
@@ -210,7 +214,7 @@ def get_user_roles(ctx: Dict[str, any]) -> Set[str]:
     return set(ctx.get("aad_roles", []))
 
 
-def is_admin_enhanced(ctx: Dict[str, any]) -> bool:
+def is_admin_enhanced(ctx: Dict[str, Any]) -> bool:
     """
     Check if user is admin using both email-based and AAD group-based methods
     
@@ -233,7 +237,7 @@ def is_admin_enhanced(ctx: Dict[str, any]) -> bool:
     return False
 
 
-def tenant_isolation_check(ctx: Dict[str, any]) -> bool:
+def tenant_isolation_check(ctx: Dict[str, Any]) -> bool:
     """
     Verify tenant isolation requirements are met
     
@@ -249,7 +253,7 @@ def tenant_isolation_check(ctx: Dict[str, any]) -> bool:
     return ctx.get("tenant_validated", True)
 
 
-def require_member(repo=None, ctx: Dict[str, any] = None, min_role: str = "member"):
+def require_member(repo=None, ctx: Dict[str, Any] = None, min_role: str = "member"):
     """
     Ensure user has required role in the engagement.
     Uses enhanced context with AAD group information.
@@ -273,7 +277,7 @@ def require_member(repo=None, ctx: Dict[str, any] = None, min_role: str = "membe
         raise HTTPException(403, "Lead role required")
 
 
-def require_admin(repo: Repository, ctx: Dict[str, any]):
+def require_admin(repo: Repository, ctx: Dict[str, Any]):
     """
     Ensure user is an admin using enhanced authentication methods.
     Checks both email-based and AAD group-based admin status.
@@ -286,7 +290,7 @@ def require_admin(repo: Repository, ctx: Dict[str, any]):
         raise HTTPException(403, "Admin access required")
 
 
-def require_role(ctx: Dict[str, any], required_roles: Set[str]):
+def require_role(ctx: Dict[str, Any], required_roles: Set[str]):
     """
     Ensure user has one of the required AAD roles
     

@@ -23,7 +23,7 @@ from azure.identity import DefaultAzureCredential
 from domain.models import (
     Assessment, Question, Response, Finding, Recommendation, RunLog,
     Engagement, Membership, Document, EmbeddingDocument, Workshop,
-    WorkshopAttendee, ConsentRecord, Minutes
+    WorkshopAttendee, ConsentRecord, Minutes, Evidence
 )
 from domain.repository import Repository
 from api.schemas.gdpr import BackgroundJob, AuditLogEntry, TTLPolicy

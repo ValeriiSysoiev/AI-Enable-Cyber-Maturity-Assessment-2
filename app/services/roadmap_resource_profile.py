@@ -6,7 +6,7 @@ from typing import Dict, List, Optional, Tuple
 from datetime import datetime, date, timedelta
 from collections import defaultdict
 
-from app.api.schemas.resource_profile import (
+from api.schemas.resource_profile import (
     SkillLevel, RoleType, WavePhase, SkillRequirement, RoleProfile,
     WaveResourceAllocation, InitiativeResourceProfile, ResourcePlanningRequest,
     ResourcePlanningResponse, CSVExportRequest, CSVExportResponse,

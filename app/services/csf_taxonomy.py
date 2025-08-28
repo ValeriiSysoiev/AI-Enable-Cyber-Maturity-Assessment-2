@@ -10,10 +10,10 @@ from functools import lru_cache
 from typing import List, Optional, Dict
 from pathlib import Path
 
-from app.domain.models import CSFFunction, CSFCategory, CSFSubcategory
-from app.util.logging import get_logger
+from domain.models import CSFFunction, CSFCategory, CSFSubcategory
+import logging
 
-logger = get_logger(__name__)
+logger = logging.getLogger(__name__)
 
 class CSFTaxonomyService:
     """Service for loading and accessing CSF 2.0 taxonomy data"""
