@@ -100,6 +100,8 @@ jobs:
     - name: Build application
       run: |
         cd web
+        # Clean up any temporary build directories that could cause issues
+        rm -rf temp-deploy web-deploy production-deploy.zip web-prod-deploy-latest.zip || true
         npm run build
 
     - name: Start application (if needed)

@@ -145,6 +145,9 @@ jobs:
         echo "🏗️  Testing Web build..."
         cd web
         
+        # Clean up any temporary build directories that could cause issues
+        rm -rf temp-deploy web-deploy production-deploy.zip web-prod-deploy-latest.zip || true
+        
         # Test build process
         npm run build || {
           echo "⚠️  Web build failed, but this might be due to missing environment variables"
