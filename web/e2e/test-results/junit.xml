@@ -1,65 +1,63 @@
-<testsuites id="" name="" tests="27" failures="1" skipped="23" errors="0" time="6.1061570000000005">
-<testsuite name="smoke.spec.ts" timestamp="2025-08-28T23:06:12.697Z" hostname="chromium" tests="9" failures="1" skipped="5" time="21.461" errors="0">
-<testcase name="Smoke Tests › homepage loads successfully" classname="smoke.spec.ts" time="3.052">
+<testsuites id="" name="" tests="27" failures="6" skipped="3" errors="0" time="24.07797">
+<testsuite name="smoke.spec.ts" timestamp="2025-08-29T00:52:20.864Z" hostname="chromium" tests="9" failures="2" skipped="1" time="27.72" errors="0">
+<testcase name="Smoke Tests › homepage loads successfully" classname="smoke.spec.ts" time="1.615">
 <properties>
 <property name="info" value="Starting homepage load test">
 </property>
 <property name="info" value="Starting step: Navigate to homepage">
 </property>
-<property name="info" value="Page load time for / - {&quot;loadTime&quot;:2192}">
+<property name="info" value="Page load time for / - {&quot;loadTime&quot;:1416}">
 </property>
-<property name="info" value="Step completed: Navigate to homepage - {&quot;duration&quot;:2206}">
+<property name="info" value="Step completed: Navigate to homepage - {&quot;duration&quot;:1431}">
 </property>
 <property name="info" value="Starting step: Verify main navigation elements">
 </property>
-<property name="info" value="Step completed: Verify main navigation elements - {&quot;duration&quot;:5}">
+<property name="info" value="Step completed: Verify main navigation elements - {&quot;duration&quot;:6}">
 </property>
-<property name="info" value="Homepage test completed successfully - {&quot;total&quot;:2,&quot;passed&quot;:2,&quot;failed&quot;:0,&quot;totalDuration&quot;:2211,&quot;steps&quot;:[{&quot;name&quot;:&quot;Navigate to homepage&quot;,&quot;status&quot;:&quot;passed&quot;,&quot;duration&quot;:2206},{&quot;name&quot;:&quot;Verify main navigation elements&quot;,&quot;status&quot;:&quot;passed&quot;,&quot;duration&quot;:5}]}">
+<property name="info" value="Homepage test completed successfully - {&quot;total&quot;:2,&quot;passed&quot;:2,&quot;failed&quot;:0,&quot;totalDuration&quot;:1437,&quot;steps&quot;:[{&quot;name&quot;:&quot;Navigate to homepage&quot;,&quot;status&quot;:&quot;passed&quot;,&quot;duration&quot;:1431},{&quot;name&quot;:&quot;Verify main navigation elements&quot;,&quot;status&quot;:&quot;passed&quot;,&quot;duration&quot;:6}]}">
 </property>
 </properties>
 <system-out>
-<![CDATA[[2025-08-28T23:06:14.514Z] [INFO] Starting homepage load test
-[2025-08-28T23:06:14.524Z] [INFO] Starting step: Navigate to homepage
-[2025-08-28T23:06:16.716Z] [INFO] Page load time for /
+<![CDATA[[2025-08-29T00:52:21.528Z] [INFO] Starting homepage load test
+[2025-08-29T00:52:21.534Z] [INFO] Starting step: Navigate to homepage
+[2025-08-29T00:52:22.959Z] [INFO] Page load time for /
 {
-  "loadTime": 2192
+  "loadTime": 1416
 }
-[2025-08-28T23:06:16.730Z] [INFO] Step completed: Navigate to homepage
+[2025-08-29T00:52:22.974Z] [INFO] Step completed: Navigate to homepage
 {
-  "duration": 2206
+  "duration": 1431
 }
-[2025-08-28T23:06:16.730Z] [INFO] Starting step: Verify main navigation elements
-[2025-08-28T23:06:16.736Z] [INFO] Step completed: Verify main navigation elements
+[2025-08-29T00:52:22.974Z] [INFO] Starting step: Verify main navigation elements
+[2025-08-29T00:52:22.980Z] [INFO] Step completed: Verify main navigation elements
 {
-  "duration": 5
+  "duration": 6
 }
-[2025-08-28T23:06:16.737Z] [INFO] Homepage test completed successfully
+[2025-08-29T00:52:22.981Z] [INFO] Homepage test completed successfully
 {
   "total": 2,
   "passed": 2,
   "failed": 0,
-  "totalDuration": 2211,
+  "totalDuration": 1437,
   "steps": [
     {
       "name": "Navigate to homepage",
       "status": "passed",
-      "duration": 2206
+      "duration": 1431
     },
     {
       "name": "Verify main navigation elements",
       "status": "passed",
-      "duration": 5
+      "duration": 6
     }
   ]
 }
 ]]>
 </system-out>
 </testcase>
-<testcase name="Smoke Tests › authentication page is accessible" classname="smoke.spec.ts" time="4.433">
-<skipped>
-</skipped>
+<testcase name="Smoke Tests › authentication page is accessible" classname="smoke.spec.ts" time="3.618">
 </testcase>
-<testcase name="Smoke Tests › API health endpoint responds" classname="smoke.spec.ts" time="0.012">
+<testcase name="Smoke Tests › API health endpoint responds" classname="smoke.spec.ts" time="0.01">
 <properties>
 <property name="skip" value="API_BASE_URL not configured">
 </property>
@@ -67,21 +65,21 @@
 <skipped>
 </skipped>
 </testcase>
-<testcase name="Smoke Tests › static assets load correctly" classname="smoke.spec.ts" time="3.022">
+<testcase name="Smoke Tests › static assets load correctly" classname="smoke.spec.ts" time="1.588">
 </testcase>
-<testcase name="Smoke Tests › CSF grid page loads without errors" classname="smoke.spec.ts" time="4.024">
+<testcase name="Smoke Tests › CSF grid page loads without errors" classname="smoke.spec.ts" time="2.383">
 <properties>
 <property name="info" value="Testing CSF grid page basic functionality">
 </property>
 <property name="info" value="Starting step: Navigate to CSF assessment page">
 </property>
-<property name="error" value="Step failed: Navigate to CSF assessment page - {&quot;duration&quot;:3152,&quot;error&quot;:&quot;\u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoContain\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m) // indexOf\u001b[22m\n\nExpected substring: \u001b[32m\&quot;/assessment\&quot;\u001b[39m\nReceived string:    \u001b[31m\&quot;http://localhost:3000/signin\&quot;\u001b[39m&quot;}">
+<property name="error" value="Step failed: Navigate to CSF assessment page - {&quot;duration&quot;:2120,&quot;error&quot;:&quot;\u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoContain\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m) // indexOf\u001b[22m\n\nExpected substring: \u001b[32m\&quot;/assessment\&quot;\u001b[39m\nReceived string:    \u001b[31m\&quot;http://localhost:3000/signin\&quot;\u001b[39m&quot;}">
 </property>
 <property name="error" value="Capturing error context - {&quot;error&quot;:&quot;\u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoContain\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m) // indexOf\u001b[22m\n\nExpected substring: \u001b[32m\&quot;/assessment\&quot;\u001b[39m\nReceived string:    \u001b[31m\&quot;http://localhost:3000/signin\&quot;\u001b[39m&quot;,&quot;stack&quot;:&quot;Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoContain\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m) // indexOf\u001b[22m\n\nExpected substring: \u001b[32m\&quot;/assessment\&quot;\u001b[39m\nReceived string:    \u001b[31m\&quot;http://localhost:3000/signin\&quot;\u001b[39m\n    at /Users/svvval/Documents/AI-Enable-Cyber-Maturity-Assessment-2/web/e2e/tests/smoke.spec.ts:121:28\n    at TestStepTracker.executeStep (/Users/svvval/Documents/AI-Enable-Cyber-Maturity-Assessment-2/web/e2e/test-utils.ts:87:22)\n    at /Users/svvval/Documents/AI-Enable-Cyber-Maturity-Assessment-2/web/e2e/tests/smoke.spec.ts:107:7&quot;}">
 </property>
-<property name="info" value="Error screenshot captured - {&quot;message&quot;:&quot;Screenshot saved&quot;,&quot;sanitizedPath&quot;:&quot;error-screenshot-1756422377698.png&quot;,&quot;timestamp&quot;:&quot;2025-08-28T23:06:17.865Z&quot;}">
+<property name="info" value="Error screenshot captured - {&quot;message&quot;:&quot;Screenshot saved&quot;,&quot;sanitizedPath&quot;:&quot;error-screenshot-1756428743654.png&quot;,&quot;timestamp&quot;:&quot;2025-08-29T00:52:23.703Z&quot;}">
 </property>
-<property name="info" value="Error HTML captured - {&quot;message&quot;:&quot;HTML content saved&quot;,&quot;sanitizedPath&quot;:&quot;error-html-1756422377868.html&quot;,&quot;timestamp&quot;:&quot;2025-08-28T23:06:17.868Z&quot;}">
+<property name="info" value="Error HTML captured - {&quot;message&quot;:&quot;HTML content saved&quot;,&quot;sanitizedPath&quot;:&quot;error-html-1756428743704.html&quot;,&quot;timestamp&quot;:&quot;2025-08-29T00:52:23.705Z&quot;}">
 </property>
 <property name="info" value="Console logs at error - {&quot;logs&quot;:&quot;No logs available&quot;}">
 </property>
@@ -121,40 +119,40 @@
 ]]>
 </failure>
 <system-out>
-<![CDATA[[2025-08-28T23:06:14.532Z] [INFO] Testing CSF grid page basic functionality
-[2025-08-28T23:06:14.539Z] [INFO] Starting step: Navigate to CSF assessment page
-[2025-08-28T23:06:17.692Z] [ERROR] Step failed: Navigate to CSF assessment page
+<![CDATA[[2025-08-29T00:52:21.524Z] [INFO] Testing CSF grid page basic functionality
+[2025-08-29T00:52:21.531Z] [INFO] Starting step: Navigate to CSF assessment page
+[2025-08-29T00:52:23.654Z] [ERROR] Step failed: Navigate to CSF assessment page
 {
-  "duration": 3152,
+  "duration": 2120,
   "error": "\u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoContain\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m) // indexOf\u001b[22m\n\nExpected substring: \u001b[32m\"/assessment\"\u001b[39m\nReceived string:    \u001b[31m\"http://localhost:3000/signin\"\u001b[39m"
 }
-[2025-08-28T23:06:17.697Z] [ERROR] Capturing error context
+[2025-08-29T00:52:23.654Z] [ERROR] Capturing error context
 {
   "error": "\u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoContain\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m) // indexOf\u001b[22m\n\nExpected substring: \u001b[32m\"/assessment\"\u001b[39m\nReceived string:    \u001b[31m\"http://localhost:3000/signin\"\u001b[39m",
   "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoContain\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m) // indexOf\u001b[22m\n\nExpected substring: \u001b[32m\"/assessment\"\u001b[39m\nReceived string:    \u001b[31m\"http://localhost:3000/signin\"\u001b[39m\n    at /Users/svvval/Documents/AI-Enable-Cyber-Maturity-Assessment-2/web/e2e/tests/smoke.spec.ts:121:28\n    at TestStepTracker.executeStep (/Users/svvval/Documents/AI-Enable-Cyber-Maturity-Assessment-2/web/e2e/test-utils.ts:87:22)\n    at /Users/svvval/Documents/AI-Enable-Cyber-Maturity-Assessment-2/web/e2e/tests/smoke.spec.ts:107:7"
 }
-[2025-08-28T23:06:17.865Z] [INFO] Error screenshot captured
+[2025-08-29T00:52:23.703Z] [INFO] Error screenshot captured
 {
   "message": "Screenshot saved",
-  "sanitizedPath": "error-screenshot-1756422377698.png",
-  "timestamp": "2025-08-28T23:06:17.865Z"
+  "sanitizedPath": "error-screenshot-1756428743654.png",
+  "timestamp": "2025-08-29T00:52:23.703Z"
 }
-[2025-08-28T23:06:17.868Z] [INFO] Error HTML captured
+[2025-08-29T00:52:23.705Z] [INFO] Error HTML captured
 {
   "message": "HTML content saved",
-  "sanitizedPath": "error-html-1756422377868.html",
-  "timestamp": "2025-08-28T23:06:17.868Z"
+  "sanitizedPath": "error-html-1756428743704.html",
+  "timestamp": "2025-08-29T00:52:23.705Z"
 }
-[2025-08-28T23:06:17.872Z] [INFO] Console logs at error
+[2025-08-29T00:52:23.707Z] [INFO] Console logs at error
 {
   "logs": "No logs available"
 }
-[2025-08-28T23:06:17.873Z] [INFO] Page state at error
+[2025-08-29T00:52:23.709Z] [INFO] Page state at error
 {
   "url": "http://localhost:3000/signin",
   "title": "AI Maturity Tool"
 }
-[2025-08-28T23:06:17.873Z] [ERROR] CSF grid smoke test failed
+[2025-08-29T00:52:23.709Z] [ERROR] CSF grid smoke test failed
 {
   "error": "\u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoContain\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m) // indexOf\u001b[22m\n\nExpected substring: \u001b[32m\"/assessment\"\u001b[39m\nReceived string:    \u001b[31m\"http://localhost:3000/signin\"\u001b[39m"
 }
@@ -167,95 +165,504 @@
 ]]>
 </system-out>
 </testcase>
-<testcase name="Smoke Tests › responsive design works" classname="smoke.spec.ts" time="4.459">
-<skipped>
-</skipped>
+<testcase name="Smoke Tests › responsive design works" classname="smoke.spec.ts" time="11.174">
+<failure message="smoke.spec.ts:146:7 responsive design works" type="FAILURE">
+<![CDATA[  [chromium] › smoke.spec.ts:146:7 › Smoke Tests › responsive design works › Test desktop viewport ─
+
+    Error: Timed out 10000ms waiting for expect(locator).toBeVisible()
+
+    Locator: locator('main, [role="main"], .main-content')
+    Expected: visible
+    Received: <element(s) not found>
+    Call log:
+      - Expect "toBeVisible" with timeout 10000ms
+      - waiting for locator('main, [role="main"], .main-content')
+
+
+      150 |       
+      151 |       // Main content should be visible
+    > 152 |       await expect(page.locator('main, [role="main"], .main-content')).toBeVisible();
+          |                                                                        ^
+      153 |     });
+      154 |     
+      155 |     await test.step('Test mobile viewport', async () => {
+        at /Users/svvval/Documents/AI-Enable-Cyber-Maturity-Assessment-2/web/e2e/tests/smoke.spec.ts:152:72
+        at /Users/svvval/Documents/AI-Enable-Cyber-Maturity-Assessment-2/web/e2e/tests/smoke.spec.ts:147:5
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    ../test-results/smoke-Smoke-Tests-responsive-design-works-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    ../test-results/smoke-Smoke-Tests-responsive-design-works-chromium/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: ../test-results/smoke-Smoke-Tests-responsive-design-works-chromium/error-context.md
+]]>
+</failure>
+<system-out>
+<![CDATA[
+[[ATTACHMENT|smoke-Smoke-Tests-responsive-design-works-chromium/test-failed-1.png]]
+
+[[ATTACHMENT|smoke-Smoke-Tests-responsive-design-works-chromium/video.webm]]
+
+[[ATTACHMENT|smoke-Smoke-Tests-responsive-design-works-chromium/error-context.md]]
+]]>
+</system-out>
 </testcase>
-<testcase name="Smoke Tests › error pages handle gracefully" classname="smoke.spec.ts" time="0.895">
+<testcase name="Smoke Tests › error pages handle gracefully" classname="smoke.spec.ts" time="0.507">
 </testcase>
-<testcase name="Performance Tests › page load time is acceptable" classname="smoke.spec.ts" time="1.197">
-<skipped>
-</skipped>
+<testcase name="Performance Tests › page load time is acceptable" classname="smoke.spec.ts" time="1.005">
+<system-out>
+<![CDATA[Page load time: 943ms
+]]>
+</system-out>
 </testcase>
-<testcase name="Performance Tests › no console errors on main pages" classname="smoke.spec.ts" time="0.367">
-<skipped>
-</skipped>
+<testcase name="Performance Tests › no console errors on main pages" classname="smoke.spec.ts" time="5.82">
 </testcase>
 </testsuite>
-<testsuite name="smoke.spec.ts" timestamp="2025-08-28T23:06:12.697Z" hostname="Mobile Chrome" tests="9" failures="0" skipped="9" time="0" errors="0">
-<testcase name="Smoke Tests › homepage loads successfully" classname="smoke.spec.ts" time="0">
+<testsuite name="smoke.spec.ts" timestamp="2025-08-29T00:52:20.864Z" hostname="Mobile Chrome" tests="9" failures="2" skipped="1" time="23.433" errors="0">
+<testcase name="Smoke Tests › homepage loads successfully" classname="smoke.spec.ts" time="1.031">
+<properties>
+<property name="info" value="Starting homepage load test">
+</property>
+<property name="info" value="Starting step: Navigate to homepage">
+</property>
+<property name="info" value="Page load time for / - {&quot;loadTime&quot;:911}">
+</property>
+<property name="info" value="Step completed: Navigate to homepage - {&quot;duration&quot;:922}">
+</property>
+<property name="info" value="Starting step: Verify main navigation elements">
+</property>
+<property name="info" value="Step completed: Verify main navigation elements - {&quot;duration&quot;:4}">
+</property>
+<property name="info" value="Homepage test completed successfully - {&quot;total&quot;:2,&quot;passed&quot;:2,&quot;failed&quot;:0,&quot;totalDuration&quot;:926,&quot;steps&quot;:[{&quot;name&quot;:&quot;Navigate to homepage&quot;,&quot;status&quot;:&quot;passed&quot;,&quot;duration&quot;:922},{&quot;name&quot;:&quot;Verify main navigation elements&quot;,&quot;status&quot;:&quot;passed&quot;,&quot;duration&quot;:4}]}">
+</property>
+</properties>
+<system-out>
+<![CDATA[[2025-08-29T00:52:24.152Z] [INFO] Starting homepage load test
+[2025-08-29T00:52:24.153Z] [INFO] Starting step: Navigate to homepage
+[2025-08-29T00:52:25.064Z] [INFO] Page load time for /
+{
+  "loadTime": 911
+}
+[2025-08-29T00:52:25.075Z] [INFO] Step completed: Navigate to homepage
+{
+  "duration": 922
+}
+[2025-08-29T00:52:25.075Z] [INFO] Starting step: Verify main navigation elements
+[2025-08-29T00:52:25.080Z] [INFO] Step completed: Verify main navigation elements
+{
+  "duration": 4
+}
+[2025-08-29T00:52:25.080Z] [INFO] Homepage test completed successfully
+{
+  "total": 2,
+  "passed": 2,
+  "failed": 0,
+  "totalDuration": 926,
+  "steps": [
+    {
+      "name": "Navigate to homepage",
+      "status": "passed",
+      "duration": 922
+    },
+    {
+      "name": "Verify main navigation elements",
+      "status": "passed",
+      "duration": 4
+    }
+  ]
+}
+]]>
+</system-out>
+</testcase>
+<testcase name="Smoke Tests › authentication page is accessible" classname="smoke.spec.ts" time="2.936">
+</testcase>
+<testcase name="Smoke Tests › API health endpoint responds" classname="smoke.spec.ts" time="0.009">
+<properties>
+<property name="skip" value="API_BASE_URL not configured">
+</property>
+</properties>
 <skipped>
 </skipped>
 </testcase>
-<testcase name="Smoke Tests › authentication page is accessible" classname="smoke.spec.ts" time="0">
-<skipped>
-</skipped>
+<testcase name="Smoke Tests › static assets load correctly" classname="smoke.spec.ts" time="0.889">
 </testcase>
-<testcase name="Smoke Tests › API health endpoint responds" classname="smoke.spec.ts" time="0">
-<skipped>
-</skipped>
+<testcase name="Smoke Tests › CSF grid page loads without errors" classname="smoke.spec.ts" time="1.02">
+<properties>
+<property name="info" value="Testing CSF grid page basic functionality">
+</property>
+<property name="info" value="Starting step: Navigate to CSF assessment page">
+</property>
+<property name="error" value="Step failed: Navigate to CSF assessment page - {&quot;duration&quot;:814,&quot;error&quot;:&quot;\u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoContain\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m) // indexOf\u001b[22m\n\nExpected substring: \u001b[32m\&quot;/assessment\&quot;\u001b[39m\nReceived string:    \u001b[31m\&quot;http://localhost:3000/signin\&quot;\u001b[39m&quot;}">
+</property>
+<property name="error" value="Capturing error context - {&quot;error&quot;:&quot;\u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoContain\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m) // indexOf\u001b[22m\n\nExpected substring: \u001b[32m\&quot;/assessment\&quot;\u001b[39m\nReceived string:    \u001b[31m\&quot;http://localhost:3000/signin\&quot;\u001b[39m&quot;,&quot;stack&quot;:&quot;Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoContain\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m) // indexOf\u001b[22m\n\nExpected substring: \u001b[32m\&quot;/assessment\&quot;\u001b[39m\nReceived string:    \u001b[31m\&quot;http://localhost:3000/signin\&quot;\u001b[39m\n    at /Users/svvval/Documents/AI-Enable-Cyber-Maturity-Assessment-2/web/e2e/tests/smoke.spec.ts:121:28\n    at TestStepTracker.executeStep (/Users/svvval/Documents/AI-Enable-Cyber-Maturity-Assessment-2/web/e2e/test-utils.ts:87:22)\n    at /Users/svvval/Documents/AI-Enable-Cyber-Maturity-Assessment-2/web/e2e/tests/smoke.spec.ts:107:7&quot;}">
+</property>
+<property name="info" value="Error screenshot captured - {&quot;message&quot;:&quot;Screenshot saved&quot;,&quot;sanitizedPath&quot;:&quot;error-screenshot-1756428746306.png&quot;,&quot;timestamp&quot;:&quot;2025-08-29T00:52:26.368Z&quot;}">
+</property>
+<property name="info" value="Error HTML captured - {&quot;message&quot;:&quot;HTML content saved&quot;,&quot;sanitizedPath&quot;:&quot;error-html-1756428746369.html&quot;,&quot;timestamp&quot;:&quot;2025-08-29T00:52:26.370Z&quot;}">
+</property>
+<property name="info" value="Console logs at error - {&quot;logs&quot;:&quot;No logs available&quot;}">
+</property>
+<property name="info" value="Page state at error - {&quot;url&quot;:&quot;http://localhost:3000/signin&quot;,&quot;title&quot;:&quot;AI Maturity Tool&quot;}">
+</property>
+<property name="error" value="CSF grid smoke test failed - {&quot;error&quot;:&quot;\u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoContain\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m) // indexOf\u001b[22m\n\nExpected substring: \u001b[32m\&quot;/assessment\&quot;\u001b[39m\nReceived string:    \u001b[31m\&quot;http://localhost:3000/signin\&quot;\u001b[39m&quot;}">
+</property>
+</properties>
+<failure message="smoke.spec.ts:100:7 CSF grid page loads without errors" type="FAILURE">
+<![CDATA[  [Mobile Chrome] › smoke.spec.ts:100:7 › Smoke Tests › CSF grid page loads without errors ─────────
+
+    Error: expect(received).toContain(expected) // indexOf
+
+    Expected substring: "/assessment"
+    Received string:    "http://localhost:3000/signin"
+
+      119 |         
+      120 |         // Should not result in 404 or server error
+    > 121 |         expect(page.url()).toContain('/assessment');
+          |                            ^
+      122 |       });
+      123 |       
+      124 |       await stepTracker.executeStep('Verify CSF grid renders', async () => {
+        at /Users/svvval/Documents/AI-Enable-Cyber-Maturity-Assessment-2/web/e2e/tests/smoke.spec.ts:121:28
+        at TestStepTracker.executeStep (/Users/svvval/Documents/AI-Enable-Cyber-Maturity-Assessment-2/web/e2e/test-utils.ts:87:22)
+        at /Users/svvval/Documents/AI-Enable-Cyber-Maturity-Assessment-2/web/e2e/tests/smoke.spec.ts:107:7
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    ../test-results/smoke-Smoke-Tests-CSF-grid-page-loads-without-errors-Mobile-Chrome/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    ../test-results/smoke-Smoke-Tests-CSF-grid-page-loads-without-errors-Mobile-Chrome/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: ../test-results/smoke-Smoke-Tests-CSF-grid-page-loads-without-errors-Mobile-Chrome/error-context.md
+]]>
+</failure>
+<system-out>
+<![CDATA[[2025-08-29T00:52:25.491Z] [INFO] Testing CSF grid page basic functionality
+[2025-08-29T00:52:25.491Z] [INFO] Starting step: Navigate to CSF assessment page
+[2025-08-29T00:52:26.305Z] [ERROR] Step failed: Navigate to CSF assessment page
+{
+  "duration": 814,
+  "error": "\u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoContain\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m) // indexOf\u001b[22m\n\nExpected substring: \u001b[32m\"/assessment\"\u001b[39m\nReceived string:    \u001b[31m\"http://localhost:3000/signin\"\u001b[39m"
+}
+[2025-08-29T00:52:26.305Z] [ERROR] Capturing error context
+{
+  "error": "\u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoContain\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m) // indexOf\u001b[22m\n\nExpected substring: \u001b[32m\"/assessment\"\u001b[39m\nReceived string:    \u001b[31m\"http://localhost:3000/signin\"\u001b[39m",
+  "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoContain\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m) // indexOf\u001b[22m\n\nExpected substring: \u001b[32m\"/assessment\"\u001b[39m\nReceived string:    \u001b[31m\"http://localhost:3000/signin\"\u001b[39m\n    at /Users/svvval/Documents/AI-Enable-Cyber-Maturity-Assessment-2/web/e2e/tests/smoke.spec.ts:121:28\n    at TestStepTracker.executeStep (/Users/svvval/Documents/AI-Enable-Cyber-Maturity-Assessment-2/web/e2e/test-utils.ts:87:22)\n    at /Users/svvval/Documents/AI-Enable-Cyber-Maturity-Assessment-2/web/e2e/tests/smoke.spec.ts:107:7"
+}
+[2025-08-29T00:52:26.368Z] [INFO] Error screenshot captured
+{
+  "message": "Screenshot saved",
+  "sanitizedPath": "error-screenshot-1756428746306.png",
+  "timestamp": "2025-08-29T00:52:26.368Z"
+}
+[2025-08-29T00:52:26.370Z] [INFO] Error HTML captured
+{
+  "message": "HTML content saved",
+  "sanitizedPath": "error-html-1756428746369.html",
+  "timestamp": "2025-08-29T00:52:26.370Z"
+}
+[2025-08-29T00:52:26.371Z] [INFO] Console logs at error
+{
+  "logs": "No logs available"
+}
+[2025-08-29T00:52:26.372Z] [INFO] Page state at error
+{
+  "url": "http://localhost:3000/signin",
+  "title": "AI Maturity Tool"
+}
+[2025-08-29T00:52:26.372Z] [ERROR] CSF grid smoke test failed
+{
+  "error": "\u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoContain\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m) // indexOf\u001b[22m\n\nExpected substring: \u001b[32m\"/assessment\"\u001b[39m\nReceived string:    \u001b[31m\"http://localhost:3000/signin\"\u001b[39m"
+}
+
+[[ATTACHMENT|smoke-Smoke-Tests-CSF-grid-page-loads-without-errors-Mobile-Chrome/test-failed-1.png]]
+
+[[ATTACHMENT|smoke-Smoke-Tests-CSF-grid-page-loads-without-errors-Mobile-Chrome/video.webm]]
+
+[[ATTACHMENT|smoke-Smoke-Tests-CSF-grid-page-loads-without-errors-Mobile-Chrome/error-context.md]]
+]]>
+</system-out>
 </testcase>
-<testcase name="Smoke Tests › static assets load correctly" classname="smoke.spec.ts" time="0">
-<skipped>
-</skipped>
+<testcase name="Smoke Tests › responsive design works" classname="smoke.spec.ts" time="10.449">
+<failure message="smoke.spec.ts:146:7 responsive design works" type="FAILURE">
+<![CDATA[  [Mobile Chrome] › smoke.spec.ts:146:7 › Smoke Tests › responsive design works › Test desktop viewport 
+
+    Error: Timed out 10000ms waiting for expect(locator).toBeVisible()
+
+    Locator: locator('main, [role="main"], .main-content')
+    Expected: visible
+    Received: <element(s) not found>
+    Call log:
+      - Expect "toBeVisible" with timeout 10000ms
+      - waiting for locator('main, [role="main"], .main-content')
+
+
+      150 |       
+      151 |       // Main content should be visible
+    > 152 |       await expect(page.locator('main, [role="main"], .main-content')).toBeVisible();
+          |                                                                        ^
+      153 |     });
+      154 |     
+      155 |     await test.step('Test mobile viewport', async () => {
+        at /Users/svvval/Documents/AI-Enable-Cyber-Maturity-Assessment-2/web/e2e/tests/smoke.spec.ts:152:72
+        at /Users/svvval/Documents/AI-Enable-Cyber-Maturity-Assessment-2/web/e2e/tests/smoke.spec.ts:147:5
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    ../test-results/smoke-Smoke-Tests-responsive-design-works-Mobile-Chrome/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    ../test-results/smoke-Smoke-Tests-responsive-design-works-Mobile-Chrome/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: ../test-results/smoke-Smoke-Tests-responsive-design-works-Mobile-Chrome/error-context.md
+]]>
+</failure>
+<system-out>
+<![CDATA[
+[[ATTACHMENT|smoke-Smoke-Tests-responsive-design-works-Mobile-Chrome/test-failed-1.png]]
+
+[[ATTACHMENT|smoke-Smoke-Tests-responsive-design-works-Mobile-Chrome/video.webm]]
+
+[[ATTACHMENT|smoke-Smoke-Tests-responsive-design-works-Mobile-Chrome/error-context.md]]
+]]>
+</system-out>
 </testcase>
-<testcase name="Smoke Tests › CSF grid page loads without errors" classname="smoke.spec.ts" time="0">
-<skipped>
-</skipped>
+<testcase name="Smoke Tests › error pages handle gracefully" classname="smoke.spec.ts" time="0.322">
 </testcase>
-<testcase name="Smoke Tests › responsive design works" classname="smoke.spec.ts" time="0">
-<skipped>
-</skipped>
+<testcase name="Performance Tests › page load time is acceptable" classname="smoke.spec.ts" time="1.251">
+<system-out>
+<![CDATA[Page load time: 1141ms
+]]>
+</system-out>
 </testcase>
-<testcase name="Smoke Tests › error pages handle gracefully" classname="smoke.spec.ts" time="0">
-<skipped>
-</skipped>
-</testcase>
-<testcase name="Performance Tests › page load time is acceptable" classname="smoke.spec.ts" time="0">
-<skipped>
-</skipped>
-</testcase>
-<testcase name="Performance Tests › no console errors on main pages" classname="smoke.spec.ts" time="0">
-<skipped>
-</skipped>
+<testcase name="Performance Tests › no console errors on main pages" classname="smoke.spec.ts" time="5.526">
 </testcase>
 </testsuite>
-<testsuite name="smoke.spec.ts" timestamp="2025-08-28T23:06:12.697Z" hostname="firefox" tests="9" failures="0" skipped="9" time="0" errors="0">
-<testcase name="Smoke Tests › homepage loads successfully" classname="smoke.spec.ts" time="0">
+<testsuite name="smoke.spec.ts" timestamp="2025-08-29T00:52:20.864Z" hostname="firefox" tests="9" failures="2" skipped="1" time="25.743" errors="0">
+<testcase name="Smoke Tests › homepage loads successfully" classname="smoke.spec.ts" time="1.47">
+<properties>
+<property name="info" value="Starting homepage load test">
+</property>
+<property name="info" value="Starting step: Navigate to homepage">
+</property>
+<property name="info" value="Page load time for / - {&quot;loadTime&quot;:889}">
+</property>
+<property name="info" value="Step completed: Navigate to homepage - {&quot;duration&quot;:907}">
+</property>
+<property name="info" value="Starting step: Verify main navigation elements">
+</property>
+<property name="info" value="Step completed: Verify main navigation elements - {&quot;duration&quot;:6}">
+</property>
+<property name="info" value="Homepage test completed successfully - {&quot;total&quot;:2,&quot;passed&quot;:2,&quot;failed&quot;:0,&quot;totalDuration&quot;:913,&quot;steps&quot;:[{&quot;name&quot;:&quot;Navigate to homepage&quot;,&quot;status&quot;:&quot;passed&quot;,&quot;duration&quot;:907},{&quot;name&quot;:&quot;Verify main navigation elements&quot;,&quot;status&quot;:&quot;passed&quot;,&quot;duration&quot;:6}]}">
+</property>
+</properties>
+<system-out>
+<![CDATA[[2025-08-29T00:52:29.697Z] [INFO] Starting homepage load test
+[2025-08-29T00:52:29.698Z] [INFO] Starting step: Navigate to homepage
+[2025-08-29T00:52:30.587Z] [INFO] Page load time for /
+{
+  "loadTime": 889
+}
+[2025-08-29T00:52:30.605Z] [INFO] Step completed: Navigate to homepage
+{
+  "duration": 907
+}
+[2025-08-29T00:52:30.605Z] [INFO] Starting step: Verify main navigation elements
+[2025-08-29T00:52:30.611Z] [INFO] Step completed: Verify main navigation elements
+{
+  "duration": 6
+}
+[2025-08-29T00:52:30.612Z] [INFO] Homepage test completed successfully
+{
+  "total": 2,
+  "passed": 2,
+  "failed": 0,
+  "totalDuration": 913,
+  "steps": [
+    {
+      "name": "Navigate to homepage",
+      "status": "passed",
+      "duration": 907
+    },
+    {
+      "name": "Verify main navigation elements",
+      "status": "passed",
+      "duration": 6
+    }
+  ]
+}
+]]>
+</system-out>
+</testcase>
+<testcase name="Smoke Tests › authentication page is accessible" classname="smoke.spec.ts" time="3.264">
+</testcase>
+<testcase name="Smoke Tests › API health endpoint responds" classname="smoke.spec.ts" time="0.002">
+<properties>
+<property name="skip" value="API_BASE_URL not configured">
+</property>
+</properties>
 <skipped>
 </skipped>
 </testcase>
-<testcase name="Smoke Tests › authentication page is accessible" classname="smoke.spec.ts" time="0">
-<skipped>
-</skipped>
+<testcase name="Smoke Tests › static assets load correctly" classname="smoke.spec.ts" time="0.92">
 </testcase>
-<testcase name="Smoke Tests › API health endpoint responds" classname="smoke.spec.ts" time="0">
-<skipped>
-</skipped>
+<testcase name="Smoke Tests › CSF grid page loads without errors" classname="smoke.spec.ts" time="0.949">
+<properties>
+<property name="info" value="Testing CSF grid page basic functionality">
+</property>
+<property name="info" value="Starting step: Navigate to CSF assessment page">
+</property>
+<property name="error" value="Step failed: Navigate to CSF assessment page - {&quot;duration&quot;:781,&quot;error&quot;:&quot;\u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoContain\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m) // indexOf\u001b[22m\n\nExpected substring: \u001b[32m\&quot;/assessment\&quot;\u001b[39m\nReceived string:    \u001b[31m\&quot;http://localhost:3000/signin\&quot;\u001b[39m&quot;}">
+</property>
+<property name="error" value="Capturing error context - {&quot;error&quot;:&quot;\u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoContain\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m) // indexOf\u001b[22m\n\nExpected substring: \u001b[32m\&quot;/assessment\&quot;\u001b[39m\nReceived string:    \u001b[31m\&quot;http://localhost:3000/signin\&quot;\u001b[39m&quot;,&quot;stack&quot;:&quot;Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoContain\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m) // indexOf\u001b[22m\n\nExpected substring: \u001b[32m\&quot;/assessment\&quot;\u001b[39m\nReceived string:    \u001b[31m\&quot;http://localhost:3000/signin\&quot;\u001b[39m\n    at /Users/svvval/Documents/AI-Enable-Cyber-Maturity-Assessment-2/web/e2e/tests/smoke.spec.ts:121:28\n    at TestStepTracker.executeStep (/Users/svvval/Documents/AI-Enable-Cyber-Maturity-Assessment-2/web/e2e/test-utils.ts:87:22)\n    at /Users/svvval/Documents/AI-Enable-Cyber-Maturity-Assessment-2/web/e2e/tests/smoke.spec.ts:107:7&quot;}">
+</property>
+<property name="info" value="Error screenshot captured - {&quot;message&quot;:&quot;Screenshot saved&quot;,&quot;sanitizedPath&quot;:&quot;error-screenshot-1756428752477.png&quot;,&quot;timestamp&quot;:&quot;2025-08-29T00:52:32.507Z&quot;}">
+</property>
+<property name="info" value="Error HTML captured - {&quot;message&quot;:&quot;HTML content saved&quot;,&quot;sanitizedPath&quot;:&quot;error-html-1756428752508.html&quot;,&quot;timestamp&quot;:&quot;2025-08-29T00:52:32.509Z&quot;}">
+</property>
+<property name="info" value="Console logs at error - {&quot;logs&quot;:&quot;No logs available&quot;}">
+</property>
+<property name="info" value="Page state at error - {&quot;url&quot;:&quot;http://localhost:3000/signin&quot;,&quot;title&quot;:&quot;AI Maturity Tool&quot;}">
+</property>
+<property name="error" value="CSF grid smoke test failed - {&quot;error&quot;:&quot;\u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoContain\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m) // indexOf\u001b[22m\n\nExpected substring: \u001b[32m\&quot;/assessment\&quot;\u001b[39m\nReceived string:    \u001b[31m\&quot;http://localhost:3000/signin\&quot;\u001b[39m&quot;}">
+</property>
+</properties>
+<failure message="smoke.spec.ts:100:7 CSF grid page loads without errors" type="FAILURE">
+<![CDATA[  [firefox] › smoke.spec.ts:100:7 › Smoke Tests › CSF grid page loads without errors ───────────────
+
+    Error: expect(received).toContain(expected) // indexOf
+
+    Expected substring: "/assessment"
+    Received string:    "http://localhost:3000/signin"
+
+      119 |         
+      120 |         // Should not result in 404 or server error
+    > 121 |         expect(page.url()).toContain('/assessment');
+          |                            ^
+      122 |       });
+      123 |       
+      124 |       await stepTracker.executeStep('Verify CSF grid renders', async () => {
+        at /Users/svvval/Documents/AI-Enable-Cyber-Maturity-Assessment-2/web/e2e/tests/smoke.spec.ts:121:28
+        at TestStepTracker.executeStep (/Users/svvval/Documents/AI-Enable-Cyber-Maturity-Assessment-2/web/e2e/test-utils.ts:87:22)
+        at /Users/svvval/Documents/AI-Enable-Cyber-Maturity-Assessment-2/web/e2e/tests/smoke.spec.ts:107:7
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    ../test-results/smoke-Smoke-Tests-CSF-grid-page-loads-without-errors-firefox/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    ../test-results/smoke-Smoke-Tests-CSF-grid-page-loads-without-errors-firefox/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: ../test-results/smoke-Smoke-Tests-CSF-grid-page-loads-without-errors-firefox/error-context.md
+]]>
+</failure>
+<system-out>
+<![CDATA[[2025-08-29T00:52:31.695Z] [INFO] Testing CSF grid page basic functionality
+[2025-08-29T00:52:31.695Z] [INFO] Starting step: Navigate to CSF assessment page
+[2025-08-29T00:52:32.476Z] [ERROR] Step failed: Navigate to CSF assessment page
+{
+  "duration": 781,
+  "error": "\u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoContain\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m) // indexOf\u001b[22m\n\nExpected substring: \u001b[32m\"/assessment\"\u001b[39m\nReceived string:    \u001b[31m\"http://localhost:3000/signin\"\u001b[39m"
+}
+[2025-08-29T00:52:32.477Z] [ERROR] Capturing error context
+{
+  "error": "\u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoContain\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m) // indexOf\u001b[22m\n\nExpected substring: \u001b[32m\"/assessment\"\u001b[39m\nReceived string:    \u001b[31m\"http://localhost:3000/signin\"\u001b[39m",
+  "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoContain\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m) // indexOf\u001b[22m\n\nExpected substring: \u001b[32m\"/assessment\"\u001b[39m\nReceived string:    \u001b[31m\"http://localhost:3000/signin\"\u001b[39m\n    at /Users/svvval/Documents/AI-Enable-Cyber-Maturity-Assessment-2/web/e2e/tests/smoke.spec.ts:121:28\n    at TestStepTracker.executeStep (/Users/svvval/Documents/AI-Enable-Cyber-Maturity-Assessment-2/web/e2e/test-utils.ts:87:22)\n    at /Users/svvval/Documents/AI-Enable-Cyber-Maturity-Assessment-2/web/e2e/tests/smoke.spec.ts:107:7"
+}
+[2025-08-29T00:52:32.507Z] [INFO] Error screenshot captured
+{
+  "message": "Screenshot saved",
+  "sanitizedPath": "error-screenshot-1756428752477.png",
+  "timestamp": "2025-08-29T00:52:32.507Z"
+}
+[2025-08-29T00:52:32.509Z] [INFO] Error HTML captured
+{
+  "message": "HTML content saved",
+  "sanitizedPath": "error-html-1756428752508.html",
+  "timestamp": "2025-08-29T00:52:32.509Z"
+}
+[2025-08-29T00:52:32.510Z] [INFO] Console logs at error
+{
+  "logs": "No logs available"
+}
+[2025-08-29T00:52:32.511Z] [INFO] Page state at error
+{
+  "url": "http://localhost:3000/signin",
+  "title": "AI Maturity Tool"
+}
+[2025-08-29T00:52:32.511Z] [ERROR] CSF grid smoke test failed
+{
+  "error": "\u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoContain\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m) // indexOf\u001b[22m\n\nExpected substring: \u001b[32m\"/assessment\"\u001b[39m\nReceived string:    \u001b[31m\"http://localhost:3000/signin\"\u001b[39m"
+}
+
+[[ATTACHMENT|smoke-Smoke-Tests-CSF-grid-page-loads-without-errors-firefox/test-failed-1.png]]
+
+[[ATTACHMENT|smoke-Smoke-Tests-CSF-grid-page-loads-without-errors-firefox/video.webm]]
+
+[[ATTACHMENT|smoke-Smoke-Tests-CSF-grid-page-loads-without-errors-firefox/error-context.md]]
+]]>
+</system-out>
 </testcase>
-<testcase name="Smoke Tests › static assets load correctly" classname="smoke.spec.ts" time="0">
-<skipped>
-</skipped>
+<testcase name="Smoke Tests › responsive design works" classname="smoke.spec.ts" time="11.026">
+<failure message="smoke.spec.ts:146:7 responsive design works" type="FAILURE">
+<![CDATA[  [firefox] › smoke.spec.ts:146:7 › Smoke Tests › responsive design works › Test desktop viewport ──
+
+    Error: Timed out 10000ms waiting for expect(locator).toBeVisible()
+
+    Locator: locator('main, [role="main"], .main-content')
+    Expected: visible
+    Received: <element(s) not found>
+    Call log:
+      - Expect "toBeVisible" with timeout 10000ms
+      - waiting for locator('main, [role="main"], .main-content')
+
+
+      150 |       
+      151 |       // Main content should be visible
+    > 152 |       await expect(page.locator('main, [role="main"], .main-content')).toBeVisible();
+          |                                                                        ^
+      153 |     });
+      154 |     
+      155 |     await test.step('Test mobile viewport', async () => {
+        at /Users/svvval/Documents/AI-Enable-Cyber-Maturity-Assessment-2/web/e2e/tests/smoke.spec.ts:152:72
+        at /Users/svvval/Documents/AI-Enable-Cyber-Maturity-Assessment-2/web/e2e/tests/smoke.spec.ts:147:5
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    ../test-results/smoke-Smoke-Tests-responsive-design-works-firefox/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    ../test-results/smoke-Smoke-Tests-responsive-design-works-firefox/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: ../test-results/smoke-Smoke-Tests-responsive-design-works-firefox/error-context.md
+]]>
+</failure>
+<system-out>
+<![CDATA[
+[[ATTACHMENT|smoke-Smoke-Tests-responsive-design-works-firefox/test-failed-1.png]]
+
+[[ATTACHMENT|smoke-Smoke-Tests-responsive-design-works-firefox/video.webm]]
+
+[[ATTACHMENT|smoke-Smoke-Tests-responsive-design-works-firefox/error-context.md]]
+]]>
+</system-out>
 </testcase>
-<testcase name="Smoke Tests › CSF grid page loads without errors" classname="smoke.spec.ts" time="0">
-<skipped>
-</skipped>
+<testcase name="Smoke Tests › error pages handle gracefully" classname="smoke.spec.ts" time="1.041">
 </testcase>
-<testcase name="Smoke Tests › responsive design works" classname="smoke.spec.ts" time="0">
-<skipped>
-</skipped>
+<testcase name="Performance Tests › page load time is acceptable" classname="smoke.spec.ts" time="1.424">
+<system-out>
+<![CDATA[Page load time: 824ms
+]]>
+</system-out>
 </testcase>
-<testcase name="Smoke Tests › error pages handle gracefully" classname="smoke.spec.ts" time="0">
-<skipped>
-</skipped>
-</testcase>
-<testcase name="Performance Tests › page load time is acceptable" classname="smoke.spec.ts" time="0">
-<skipped>
-</skipped>
-</testcase>
-<testcase name="Performance Tests › no console errors on main pages" classname="smoke.spec.ts" time="0">
-<skipped>
-</skipped>
+<testcase name="Performance Tests › no console errors on main pages" classname="smoke.spec.ts" time="5.647">
 </testcase>
 </testsuite>
 </testsuites>

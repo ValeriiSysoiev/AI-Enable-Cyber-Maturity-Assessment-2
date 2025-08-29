@@ -102,9 +102,9 @@ export default function TopNav() {
     try {
       console.log('Sign out clicked, auth mode:', auth.mode.mode);
       if (auth.mode.mode === 'aad') {
-        // Redirect to our custom signout page that will handle the signout
-        console.log('Using custom signOut page');
-        window.location.href = '/signout';
+        // Use the NextAuth signout endpoint (which we've overridden)
+        console.log('Using NextAuth signOut endpoint');
+        window.location.href = '/api/auth/signout?callbackUrl=' + encodeURIComponent('/signin');
       } else {
         console.log('Using demo signOut');
         localStorage.removeItem('email');
