@@ -285,3 +285,61 @@ class RunCard(BaseModel):
     created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
     created_by: str  # User email
     citations: Optional[List[str]] = None  # Document references
+
+
+class DocumentMetadata(BaseModel):
+    """Document metadata for caching service"""
+    id: str
+    engagement_id: str
+    filename: str
+    original_filename: str
+    content_type: str
+    size_bytes: int
+    upload_date: str  # ISO datetime string
+    uploaded_by: str
+    status: Literal["processing", "processed", "error"] = "processing"
+    checksum: str
+    storage_path: str
+    processing_complete: bool = False
+    text_extracted: bool = False
+    embeddings_generated: bool = False
+    security_scan_complete: bool = False
+    security_scan_status: Literal["pending", "clean", "flagged"] = "pending"
+
+
+class DocumentPermissions(BaseModel):
+    """Document access permissions"""
+    doc_id: str
+    engagement_id: str
+    access_level: Literal["public", "confidential", "restricted"] = "confidential"
+    allowed_roles: List[str] = Field(default_factory=list)
+    allowed_users: List[str] = Field(default_factory=list)
+    read_only: bool = False
+    expires_at: Optional[datetime] = None
+    created_by: str
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+
+
+class DocumentProcessingStatus(BaseModel):
+    """Document processing status"""
+    doc_id: str
+    engagement_id: str
+    stage: Literal["upload", "text_extraction", "embedding", "indexing", "complete"] = "upload"
+    progress_percent: float = 0.0
+    started_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    completed_at: Optional[datetime] = None
+    error_message: Optional[str] = None
+    retry_count: int = 0
+    max_retries: int = 3
+
+
+class DocumentSearchIndex(BaseModel):
+    """Document search index metadata"""
+    engagement_id: str
+    index_name: str
+    document_count: int = 0
+    total_size_bytes: int = 0
+    last_updated: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    search_enabled: bool = True
+    embedding_model: str = ""
+    chunk_count: int = 0

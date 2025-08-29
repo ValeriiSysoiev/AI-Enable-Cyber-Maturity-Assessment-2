@@ -25,8 +25,8 @@ export default function DashboardPage() {
       try {
         const s = await getSummary(engagementId);
         setSum(s);
-      } catch (e: any) {
-        setErr(e.message ?? "Failed to load");
+      } catch (e: unknown) {
+        setErr(e instanceof Error ? e.message : "Failed to load");
       }
     })();
   }, [engagementId]);

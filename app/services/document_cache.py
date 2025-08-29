@@ -9,12 +9,18 @@ Provides caching for document-related data including:
 """
 
 import logging
-from typing import Any, Dict, List, Optional
+from typing import List, Optional
 from datetime import datetime
 from services.cache import get_cached, invalidate_cache_key, cache_manager
 import sys
 sys.path.append("/app")
 from config import config
+from domain.models import (
+    DocumentMetadata,
+    DocumentPermissions, 
+    DocumentProcessingStatus,
+    DocumentSearchIndex
+)
 
 logger = logging.getLogger(__name__)
 
@@ -32,7 +38,7 @@ class DocumentCacheService:
             "cleanup_interval_seconds": config.cache.cleanup_interval_seconds
         }
     
-    async def get_document_metadata(self, engagement_id: str, doc_id: str) -> Optional[Dict[str, Any]]:
+    async def get_document_metadata(self, engagement_id: str, doc_id: str) -> Optional[DocumentMetadata]:
         """Get cached document metadata"""
         if not config.cache.enabled:
             return await self._load_document_metadata_uncached(engagement_id, doc_id)
@@ -48,7 +54,7 @@ class DocumentCacheService:
             **self.cache_config
         )
     
-    async def list_engagement_documents(self, engagement_id: str) -> List[Dict[str, Any]]:
+    async def list_engagement_documents(self, engagement_id: str) -> List[DocumentMetadata]:
         """Get cached list of documents for an engagement"""
         if not config.cache.enabled:
             return await self._load_engagement_documents_uncached(engagement_id)
@@ -64,7 +70,7 @@ class DocumentCacheService:
             **self.cache_config
         )
     
-    async def get_document_permissions(self, engagement_id: str, doc_id: str) -> Optional[Dict[str, Any]]:
+    async def get_document_permissions(self, engagement_id: str, doc_id: str) -> Optional[DocumentPermissions]:
         """Get cached document permissions"""
         if not config.cache.enabled:
             return await self._load_document_permissions_uncached(engagement_id, doc_id)
@@ -80,7 +86,7 @@ class DocumentCacheService:
             **self.cache_config
         )
     
-    async def get_document_processing_status(self, engagement_id: str, doc_id: str) -> Optional[Dict[str, Any]]:
+    async def get_document_processing_status(self, engagement_id: str, doc_id: str) -> Optional[DocumentProcessingStatus]:
         """Get cached document processing status"""
         if not config.cache.enabled:
             return await self._load_processing_status_uncached(engagement_id, doc_id)
@@ -96,7 +102,7 @@ class DocumentCacheService:
             **self.cache_config
         )
     
-    async def get_document_search_index(self, engagement_id: str) -> Optional[Dict[str, Any]]:
+    async def get_document_search_index(self, engagement_id: str) -> Optional[DocumentSearchIndex]:
         """Get cached document search index for an engagement"""
         if not config.cache.enabled:
             return await self._load_search_index_uncached(engagement_id)
@@ -191,7 +197,7 @@ class DocumentCacheService:
         
         logger.info("Invalidated all document cache entries")
     
-    async def _load_document_metadata_uncached(self, engagement_id: str, doc_id: str) -> Optional[Dict[str, Any]]:
+    async def _load_document_metadata_uncached(self, engagement_id: str, doc_id: str) -> Optional[DocumentMetadata]:
         """Load document metadata without caching"""
         # This would integrate with the repository layer and storage services
         # Placeholder implementation
@@ -200,31 +206,31 @@ class DocumentCacheService:
             from domain.repository import InMemoryRepository
             
             # Placeholder metadata structure
-            metadata = {
-                "id": doc_id,
-                "engagement_id": engagement_id,
-                "filename": f"document_{doc_id}.pdf",
-                "original_filename": f"uploaded_document.pdf",
-                "content_type": "application/pdf",
-                "size_bytes": 1024000,  # 1MB placeholder
-                "upload_date": datetime.utcnow().isoformat(),
-                "uploaded_by": "system@example.com",
-                "status": "processed",
-                "checksum": f"sha256_{doc_id}",
-                "storage_path": f"data/engagements/{engagement_id}/documents/{doc_id}",
-                "processing_complete": True,
-                "text_extracted": True,
-                "embeddings_generated": False,
-                "security_scan_complete": True,
-                "security_scan_status": "clean"
-            }
+            metadata = DocumentMetadata(
+                id=doc_id,
+                engagement_id=engagement_id,
+                filename=f"document_{doc_id}.pdf",
+                original_filename=f"uploaded_document.pdf",
+                content_type="application/pdf",
+                size_bytes=1024000,  # 1MB placeholder
+                upload_date=datetime.utcnow().isoformat(),
+                uploaded_by="system@example.com",
+                status="processed",
+                checksum=f"sha256_{doc_id}",
+                storage_path=f"data/engagements/{engagement_id}/documents/{doc_id}",
+                processing_complete=True,
+                text_extracted=True,
+                embeddings_generated=False,
+                security_scan_complete=True,
+                security_scan_status="clean"
+            )
             
             logger.debug(
                 f"Loaded document metadata for {doc_id}",
                 extra={
                     "engagement_id": engagement_id,
                     "doc_id": doc_id,
-                    "size_mb": round(metadata["size_bytes"] / (1024 * 1024), 2)
+                    "size_mb": round(metadata.size_bytes / (1024 * 1024), 2)
                 }
             )
             
@@ -241,36 +247,63 @@ class DocumentCacheService:
             )
             return None
     
-    async def _load_engagement_documents_uncached(self, engagement_id: str) -> List[Dict[str, Any]]:
+    async def _load_engagement_documents_uncached(self, engagement_id: str) -> List[DocumentMetadata]:
         """Load engagement documents without caching"""
         try:
             # In a real system, this would query the repository
             # Placeholder implementation
             documents = [
-                {
-                    "id": f"doc_001",
-                    "filename": "security_policy.pdf",
-                    "upload_date": "2024-01-01T10:00:00Z",
-                    "size_bytes": 512000,
-                    "status": "processed",
-                    "uploaded_by": "admin@example.com"
-                },
-                {
-                    "id": f"doc_002",
-                    "filename": "network_diagram.png",
-                    "upload_date": "2024-01-02T14:30:00Z",
-                    "size_bytes": 256000,
-                    "status": "processed",
-                    "uploaded_by": "engineer@example.com"
-                },
-                {
-                    "id": f"doc_003",
-                    "filename": "incident_response_plan.docx",
-                    "upload_date": "2024-01-03T09:15:00Z",
-                    "size_bytes": 128000,
-                    "status": "processing",
-                    "uploaded_by": "security@example.com"
-                }
+                DocumentMetadata(
+                    id="doc_001",
+                    engagement_id=engagement_id,
+                    filename="security_policy.pdf",
+                    original_filename="security_policy.pdf",
+                    content_type="application/pdf",
+                    size_bytes=512000,
+                    upload_date="2024-01-01T10:00:00Z",
+                    uploaded_by="admin@example.com",
+                    status="processed",
+                    checksum="sha256_001",
+                    storage_path=f"data/engagements/{engagement_id}/documents/doc_001",
+                    processing_complete=True,
+                    text_extracted=True,
+                    security_scan_complete=True,
+                    security_scan_status="clean"
+                ),
+                DocumentMetadata(
+                    id="doc_002",
+                    engagement_id=engagement_id,
+                    filename="network_diagram.png",
+                    original_filename="network_diagram.png",
+                    content_type="image/png",
+                    size_bytes=256000,
+                    upload_date="2024-01-02T14:30:00Z",
+                    uploaded_by="engineer@example.com",
+                    status="processed",
+                    checksum="sha256_002",
+                    storage_path=f"data/engagements/{engagement_id}/documents/doc_002",
+                    processing_complete=True,
+                    text_extracted=False,  # Images don't extract text
+                    security_scan_complete=True,
+                    security_scan_status="clean"
+                ),
+                DocumentMetadata(
+                    id="doc_003",
+                    engagement_id=engagement_id,
+                    filename="incident_response_plan.docx",
+                    original_filename="incident_response_plan.docx",
+                    content_type="application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+                    size_bytes=128000,
+                    upload_date="2024-01-03T09:15:00Z",
+                    uploaded_by="security@example.com",
+                    status="processing",
+                    checksum="sha256_003",
+                    storage_path=f"data/engagements/{engagement_id}/documents/doc_003",
+                    processing_complete=False,  # Still processing
+                    text_extracted=False,
+                    security_scan_complete=False,
+                    security_scan_status="pending"
+                )
             ]
             
             logger.debug(
@@ -290,113 +323,74 @@ class DocumentCacheService:
             )
             return []
     
-    async def _load_document_permissions_uncached(self, engagement_id: str, doc_id: str) -> Optional[Dict[str, Any]]:
+    async def _load_document_permissions_uncached(self, engagement_id: str, doc_id: str) -> Optional[DocumentPermissions]:
         """Load document permissions without caching"""
         # Placeholder implementation
-        permissions = {
-            "doc_id": doc_id,
-            "engagement_id": engagement_id,
-            "owner": "admin@example.com",
-            "permissions": {
-                "read": ["admin@example.com", "user@example.com"],
-                "write": ["admin@example.com"],
-                "delete": ["admin@example.com"]
-            },
-            "public_access": False,
-            "sharing_policy": "engagement_members_only",
-            "expires_at": None,
-            "created_at": datetime.utcnow().isoformat(),
-            "updated_at": datetime.utcnow().isoformat()
-        }
+        permissions = DocumentPermissions(
+            doc_id=doc_id,
+            engagement_id=engagement_id,
+            access_level="confidential",
+            allowed_roles=["admin", "lead"],
+            allowed_users=["admin@example.com", "user@example.com"],
+            read_only=False,
+            expires_at=None,
+            created_by="admin@example.com"
+        )
         
         logger.debug(
             f"Loaded document permissions for {doc_id}",
             extra={
                 "engagement_id": engagement_id,
                 "doc_id": doc_id,
-                "sharing_policy": permissions["sharing_policy"]
+                "access_level": permissions.access_level
             }
         )
         
         return permissions
     
-    async def _load_processing_status_uncached(self, engagement_id: str, doc_id: str) -> Optional[Dict[str, Any]]:
+    async def _load_processing_status_uncached(self, engagement_id: str, doc_id: str) -> Optional[DocumentProcessingStatus]:
         """Load document processing status without caching"""
         # Placeholder implementation
-        status = {
-            "doc_id": doc_id,
-            "engagement_id": engagement_id,
-            "overall_status": "completed",
-            "stages": {
-                "upload": {
-                    "status": "completed",
-                    "completed_at": "2024-01-01T10:00:00Z",
-                    "details": "File uploaded successfully"
-                },
-                "virus_scan": {
-                    "status": "completed",
-                    "completed_at": "2024-01-01T10:01:00Z",
-                    "details": "No threats detected"
-                },
-                "text_extraction": {
-                    "status": "completed",
-                    "completed_at": "2024-01-01T10:02:00Z",
-                    "details": "Text extracted successfully"
-                },
-                "embedding_generation": {
-                    "status": "pending",
-                    "started_at": None,
-                    "details": "Waiting for processing"
-                }
-            },
-            "error_message": None,
-            "retry_count": 0,
-            "last_updated": datetime.utcnow().isoformat()
-        }
+        status = DocumentProcessingStatus(
+            doc_id=doc_id,
+            engagement_id=engagement_id,
+            stage="complete",
+            progress_percent=100.0,
+            completed_at=datetime.utcnow(),
+            error_message=None,
+            retry_count=0
+        )
         
         logger.debug(
             f"Loaded processing status for {doc_id}",
             extra={
                 "engagement_id": engagement_id,
                 "doc_id": doc_id,
-                "overall_status": status["overall_status"]
+                "stage": status.stage,
+                "progress_percent": status.progress_percent
             }
         )
         
         return status
     
-    async def _load_search_index_uncached(self, engagement_id: str) -> Optional[Dict[str, Any]]:
+    async def _load_search_index_uncached(self, engagement_id: str) -> Optional[DocumentSearchIndex]:
         """Load document search index without caching"""
         # Placeholder implementation
-        search_index = {
-            "engagement_id": engagement_id,
-            "index_version": "1.0",
-            "documents": [
-                {
-                    "doc_id": "doc_001",
-                    "filename": "security_policy.pdf",
-                    "keywords": ["security", "policy", "compliance", "iso27001"],
-                    "content_preview": "This document outlines the security policy...",
-                    "indexed_at": "2024-01-01T10:05:00Z"
-                },
-                {
-                    "doc_id": "doc_002",
-                    "filename": "network_diagram.png",
-                    "keywords": ["network", "infrastructure", "topology"],
-                    "content_preview": "Network diagram showing...",
-                    "indexed_at": "2024-01-02T14:35:00Z"
-                }
-            ],
-            "total_documents": 2,
-            "last_updated": datetime.utcnow().isoformat(),
-            "index_size_bytes": 4096
-        }
+        search_index = DocumentSearchIndex(
+            engagement_id=engagement_id,
+            index_name=f"search_index_{engagement_id}",
+            document_count=2,
+            total_size_bytes=4096,
+            search_enabled=True,
+            embedding_model="text-embedding-3-large",
+            chunk_count=150
+        )
         
         logger.debug(
             f"Loaded search index for engagement {engagement_id}",
             extra={
                 "engagement_id": engagement_id,
-                "indexed_documents": search_index["total_documents"]
+                "indexed_documents": search_index.document_count
             }
         )
         
@@ -430,22 +424,22 @@ document_cache_service = DocumentCacheService()
 
 
 # Convenience functions
-async def get_document_metadata(engagement_id: str, doc_id: str) -> Optional[Dict[str, Any]]:
+async def get_document_metadata(engagement_id: str, doc_id: str) -> Optional[DocumentMetadata]:
     """Get document metadata with caching"""
     return await document_cache_service.get_document_metadata(engagement_id, doc_id)
 
 
-async def list_engagement_documents(engagement_id: str) -> List[Dict[str, Any]]:
+async def list_engagement_documents(engagement_id: str) -> List[DocumentMetadata]:
     """List engagement documents with caching"""
     return await document_cache_service.list_engagement_documents(engagement_id)
 
 
-async def get_document_permissions(engagement_id: str, doc_id: str) -> Optional[Dict[str, Any]]:
+async def get_document_permissions(engagement_id: str, doc_id: str) -> Optional[DocumentPermissions]:
     """Get document permissions with caching"""
     return await document_cache_service.get_document_permissions(engagement_id, doc_id)
 
 
-async def get_document_processing_status(engagement_id: str, doc_id: str) -> Optional[Dict[str, Any]]:
+async def get_document_processing_status(engagement_id: str, doc_id: str) -> Optional[DocumentProcessingStatus]:
     """Get document processing status with caching"""
     return await document_cache_service.get_document_processing_status(engagement_id, doc_id)
 

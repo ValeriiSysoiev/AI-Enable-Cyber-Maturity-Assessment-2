@@ -2,21 +2,18 @@
 import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import { fetchPreset } from "../../../lib/api";
-import { getAssessment, saveAnswer, getScores, Answer, ScoreData } from "../../../lib/assessments";
+import { getAssessment, saveAnswer, getScores, Answer, ScoreData, Assessment } from "../../../lib/assessments";
 import ScoreRadar from "../../../components/ScoreRadar";
 import EvidenceUploader from "../../../components/EvidenceUploader";
 
-interface QuestionWithAnswer {
-  question: any;
-  answer?: Answer;
-}
+import { AssessmentPreset, QuestionWithAnswer } from "../../../types/presets";
 
 export default function AssessmentPage() {
   const params = useParams();
   const assessmentId = params.id as string;
   
-  const [preset, setPreset] = useState<any>(null);
-  const [assessment, setAssessment] = useState<any>(null);
+  const [preset, setPreset] = useState<AssessmentPreset | null>(null);
+  const [assessment, setAssessment] = useState<Assessment | null>(null);
   const [pillarId, setPillarId] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -98,8 +95,11 @@ export default function AssessmentPage() {
   if (error) return <main className="p-8"><div className="p-4 bg-red-50 text-red-700 rounded">Error: {error}</div></main>;
   if (!preset || !assessment) return <main className="p-8">No data loaded</main>;
 
-  const currentQuestions = pillarId ? preset.questions[pillarId] : [];
-  const answersByKey = assessment.answers.reduce((acc: any, ans: Answer) => {
+  // Get questions for the current pillar
+  const currentQuestions = pillarId 
+    ? preset.pillars.find(p => p.id === pillarId)?.capabilities.flatMap(c => c.questions) || []
+    : [];
+  const answersByKey = assessment.answers.reduce((acc: Record<string, Answer>, ans: Answer) => {
     acc[`${ans.pillar_id}-${ans.question_id}`] = ans;
     return acc;
   }, {});

@@ -6,10 +6,10 @@ S4 implementation provides deterministic stub functionality.
 """
 
 import logging
-from typing import Dict, Any, Optional
+from typing import Optional
 from datetime import datetime
 
-from domain.models import MinutesSection, Minutes
+from domain.models import MinutesSection, Minutes, Workshop
 
 logger = logging.getLogger(__name__)
 
@@ -20,13 +20,13 @@ class MinutesAgent:
     def __init__(self, correlation_id: Optional[str] = None):
         self.correlation_id = correlation_id or "minutes-agent"
     
-    async def generate_draft_minutes(self, workshop: Dict[str, Any]) -> MinutesSection:
+    async def generate_draft_minutes(self, workshop: Workshop) -> MinutesSection:
         """
         Generate draft minutes from workshop data.
         S4 stub implementation with deterministic outputs.
         
         Args:
-            workshop: Workshop data containing participants, discussions, etc.
+            workshop: Workshop instance containing attendees, title, etc.
             
         Returns:
             MinutesSection with structured content
@@ -35,8 +35,8 @@ class MinutesAgent:
             "Generating draft minutes",
             extra={
                 "correlation_id": self.correlation_id,
-                "workshop_id": workshop.get("id", "unknown"),
-                "workshop_type": workshop.get("type", "unknown")
+                "workshop_id": workshop.id,
+                "workshop_title": workshop.title
             }
         )
         
@@ -58,7 +58,7 @@ class MinutesAgent:
                 "Successfully generated draft minutes",
                 extra={
                     "correlation_id": self.correlation_id,
-                    "workshop_id": workshop.get("id", "unknown"),
+                    "workshop_id": workshop.id,
                     "attendee_count": len(attendees),
                     "decision_count": len(decisions),
                     "action_count": len(actions),
@@ -73,22 +73,19 @@ class MinutesAgent:
                 "Failed to generate draft minutes",
                 extra={
                     "correlation_id": self.correlation_id,
-                    "workshop_id": workshop.get("id", "unknown"),
+                    "workshop_id": workshop.id,
                     "error": str(e)
                 }
             )
             raise
     
-    def _extract_attendees(self, workshop: Dict[str, Any]) -> list[str]:
+    def _extract_attendees(self, workshop: Workshop) -> list[str]:
         """Extract attendees from workshop data (S4 stub implementation)"""
-        # Stub: Look for attendees in workshop data or generate defaults
-        if "attendees" in workshop:
-            return workshop["attendees"]
+        # Extract attendee emails from workshop attendees
+        if workshop.attendees:
+            return [attendee.email for attendee in workshop.attendees]
         
-        if "participants" in workshop:
-            return workshop["participants"]
-        
-        # Default stub attendees
+        # Default stub attendees if no attendees registered
         return [
             "Workshop Facilitator",
             "Technical Lead",
@@ -96,12 +93,12 @@ class MinutesAgent:
             "Stakeholder Representative"
         ]
     
-    def _generate_decisions(self, workshop: Dict[str, Any]) -> list[str]:
+    def _generate_decisions(self, workshop: Workshop) -> list[str]:
         """Generate decisions from workshop data (S4 stub implementation)"""
-        workshop_type = workshop.get("type", "general")
+        workshop_title = workshop.title.lower()
         
-        # Stub decisions based on workshop type
-        if workshop_type.lower() in ["security", "assessment"]:
+        # Stub decisions based on workshop title content
+        if any(keyword in workshop_title for keyword in ["security", "assessment", "audit"]):
             return [
                 "Approved implementation of multi-factor authentication",
                 "Decided to conduct quarterly security training",
@@ -114,7 +111,7 @@ class MinutesAgent:
             "Agreed on weekly status meetings"
         ]
     
-    def _generate_actions(self, workshop: Dict[str, Any]) -> list[str]:
+    def _generate_actions(self, workshop: Workshop) -> list[str]:
         """Generate action items from workshop data (S4 stub implementation)"""
         return [
             "Technical Lead to create detailed implementation plan by end of week",
@@ -123,7 +120,7 @@ class MinutesAgent:
             "Workshop Facilitator to schedule follow-up meeting in 2 weeks"
         ]
     
-    def _generate_questions(self, workshop: Dict[str, Any]) -> list[str]:
+    def _generate_questions(self, workshop: Workshop) -> list[str]:
         """Generate open questions from workshop data (S4 stub implementation)"""
         return [
             "What is the expected timeline for budget approval?",
