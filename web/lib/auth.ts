@@ -1,11 +1,14 @@
 import { type AuthOptions } from "next-auth";
 import AzureADProvider from "next-auth/providers/azure-ad";
 import CredentialsProvider from "next-auth/providers/credentials";
+import { createLogger } from "./logger";
+
+const logger = createLogger('auth');
 
 // Dynamic provider configuration - evaluated at runtime
 function getProviders() {
-  // Debug environment variables
-  console.log("Auth config debug:", {
+  // Debug environment variables (only in development)
+  logger.debug("Auth configuration check", {
     AUTH_MODE: process.env.AUTH_MODE,
     AZURE_AD_CLIENT_ID: !!process.env.AZURE_AD_CLIENT_ID ? "SET" : "MISSING",
     AZURE_AD_TENANT_ID: !!process.env.AZURE_AD_TENANT_ID ? "SET" : "MISSING", 
@@ -20,7 +23,7 @@ function getProviders() {
 
   const demoEnabled = process.env.DEMO_E2E === "1";
   
-  console.log("Provider config:", { aadEnabled, demoEnabled });
+  logger.debug("Provider configuration", { aadEnabled, demoEnabled });
 
   const providers = [];
   if (aadEnabled) {

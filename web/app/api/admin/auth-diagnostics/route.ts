@@ -1,4 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { createLogger } from '@/lib/logger';
+
+const logger = createLogger('admin-auth');
 
 // Force dynamic rendering for this route
 export const runtime = 'nodejs';
@@ -10,17 +13,16 @@ function isAdminEmail(email: string): boolean {
   
   // Explicit admin check for production user
   if (normalizedEmail === 'va.sysoiev@audit3a.com') {
-    console.log('Admin access granted for production user:', email);
+    logger.debug('Admin access granted for production user');
     return true;
   }
   
   const adminEmails = process.env.ADMIN_EMAILS?.split(',').map(e => e.trim().toLowerCase()) || [];
   
-  // Debug logging
-  console.log('Admin email check:', {
-    email: email,
+  // Debug logging (only in development)
+  logger.debug('Admin email check', {
     normalizedEmail: normalizedEmail,
-    adminEmails: adminEmails,
+    adminEmailCount: adminEmails.length,
     isAdmin: adminEmails.includes(normalizedEmail)
   });
   
@@ -61,7 +63,7 @@ export async function GET(request: NextRequest) {
           isAdmin = data.emails.includes(userEmail);
         }
       } catch (error) {
-        console.warn('Failed to check demo admin status:', error);
+        logger.warn('Failed to check demo admin status', { error: error.message });
         // Fallback to checking ADMIN_EMAILS
         isAdmin = isAdminEmail(userEmail);
       }
@@ -72,12 +74,12 @@ export async function GET(request: NextRequest) {
 
     // Explicit production admin override
     if (userEmail.toLowerCase().trim() === 'va.sysoiev@audit3a.com') {
-      console.log('Production admin override activated for:', userEmail);
+      logger.debug('Production admin override activated');
       isAdmin = true;
     }
 
     if (!isAdmin) {
-      console.log('Admin access denied for:', userEmail, 'isAdmin:', isAdmin);
+      logger.debug('Admin access denied');
       return NextResponse.json(
         { detail: 'Admin access required' },
         { status: 403 }
@@ -85,8 +87,7 @@ export async function GET(request: NextRequest) {
     }
 
     // Log admin access for security audit
-    console.info('Admin access granted', {
-      userEmail,
+    logger.info('Admin access granted', {
       authMode,
       timestamp: new Date().toISOString()
     });

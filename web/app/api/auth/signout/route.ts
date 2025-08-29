@@ -2,6 +2,9 @@ import { NextRequest, NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
+import { createLogger } from '@/lib/logger';
+
+const logger = createLogger('auth-signout');
 
 // Custom signout handler that ensures proper Azure AD logout
 export async function GET(request: NextRequest) {
@@ -77,7 +80,7 @@ export async function GET(request: NextRequest) {
 }
 
 export async function POST(request: NextRequest) {
-  console.log('Processing signout...');
+  logger.debug('Processing signout initiated');
   
   // Get the form data
   const formData = await request.formData();
@@ -122,7 +125,7 @@ export async function POST(request: NextRequest) {
       process.env.AZURE_AD_TENANT_ID && 
       process.env.AZURE_AD_CLIENT_ID) {
     
-    console.log('Performing Azure AD federated logout');
+    logger.debug('Performing Azure AD federated logout');
     
     // Build the Azure AD logout URL
     const tenantId = process.env.AZURE_AD_TENANT_ID;
@@ -136,12 +139,16 @@ export async function POST(request: NextRequest) {
     logoutUrl.searchParams.set('client_id', clientId);
     logoutUrl.searchParams.set('post_logout_redirect_uri', postLogoutRedirectUri);
     
-    console.log('Redirecting to Azure AD logout:', logoutUrl.toString());
+    logger.debug('Redirecting to Azure AD logout', { 
+      tenantId,
+      clientId,
+      postLogoutRedirectUri 
+    });
     
     // First clear local session, then redirect to Azure AD logout
     return NextResponse.redirect(logoutUrl);
   }
   
-  console.log('Signout complete, redirecting to /signin');
+  logger.info('Signout complete, redirecting to /signin');
   return response;
 }
