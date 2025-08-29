@@ -7,6 +7,7 @@ from typing import Any, Dict, Optional, Set
 from domain.repository import Repository
 from config import config
 from services.aad_groups import create_aad_groups_service, UserRoles
+from api.validators import validate_email, validate_engagement_id, validate_tenant_id
 
 logger = logging.getLogger(__name__)
 
@@ -14,15 +15,10 @@ logger = logging.getLogger(__name__)
 def is_admin(user_email: str) -> bool:
     """Check if user is an admin based on ADMIN_EMAILS env var"""
     # Validate email format first
-    if not user_email or not isinstance(user_email, str):
+    try:
+        canonical_email = validate_email(user_email, "user_email")
+    except HTTPException:
         return False
-    
-    # Parse and normalize email
-    parsed = email.utils.parseaddr(user_email.strip())
-    if not parsed[1] or '@' not in parsed[1]:
-        return False
-    
-    canonical_email = parsed[1].strip().lower()
     
     admins = [e.strip().lower() for e in os.getenv("ADMIN_EMAILS", "").split(",") if e.strip()]
     return canonical_email in admins
@@ -75,30 +71,26 @@ async def current_context(
     Extract current user and engagement context from headers.
     Includes AAD group information when AAD groups mode is enabled.
     """
-    # Validate and sanitize email
+    # Validate and sanitize email using improved validator
     if not x_user_email or not x_user_email.strip():
         raise HTTPException(422, "X-User-Email header is required")
     
-    parsed = email.utils.parseaddr(x_user_email.strip())
-    if not parsed[1] or '@' not in parsed[1]:
-        raise HTTPException(422, "X-User-Email header must be a valid email address")
+    canonical_email = validate_email(x_user_email, "X-User-Email")
     
-    canonical_email = parsed[1].strip().lower()
-    
-    # Validate and sanitize engagement ID
+    # Validate and sanitize engagement ID using improved validator
     if not x_engagement_id or not x_engagement_id.strip():
         raise HTTPException(422, "X-Engagement-ID header is required")
     
-    engagement_id_normalized = x_engagement_id.strip()
-    # Basic validation - alphanumeric, hyphens, underscores allowed
-    if not re.match(r'^[a-zA-Z0-9_-]+$', engagement_id_normalized):
-        raise HTTPException(422, "X-Engagement-ID header must contain only alphanumeric characters, hyphens, and underscores")
+    engagement_id_normalized = validate_engagement_id(x_engagement_id)
+    
+    # Validate tenant ID if provided
+    tenant_id_normalized = validate_tenant_id(x_tenant_id) if x_tenant_id else None
     
     # Base context (always present)
     context = {
         "user_email": canonical_email,
         "engagement_id": engagement_id_normalized,
-        "tenant_id": x_tenant_id,
+        "tenant_id": tenant_id_normalized,
         "aad_groups_enabled": config.is_aad_groups_enabled()
     }
     
