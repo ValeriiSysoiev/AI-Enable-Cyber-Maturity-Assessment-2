@@ -71,7 +71,11 @@ function getProviders() {
 export const authOptions: AuthOptions = {
   secret: process.env.NEXTAUTH_SECRET || process.env.AUTH_SECRET,
   providers: getProviders(),
-  session: { strategy: "jwt", maxAge: 30 * 24 * 60 * 60 },
+  session: { 
+    strategy: "jwt", 
+    maxAge: 8 * 60 * 60, // 8 hours for production security
+    updateAge: 60 * 60  // Update session every hour
+  },
   callbacks: {
     async jwt({ token, account, profile }) {
       // Surface AAD groups/roles when available
