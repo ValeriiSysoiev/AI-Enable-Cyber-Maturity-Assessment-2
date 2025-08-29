@@ -1,8 +1,14 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
+import { addSecurityHeaders, validateOrigin } from './lib/security-headers';
 
 export function middleware(request: NextRequest) {
   const url = request.nextUrl.clone();
+  
+  // Validate origin for CSRF protection
+  if (!validateOrigin(request)) {
+    return new NextResponse('Forbidden', { status: 403 });
+  }
   
   // Intercept NextAuth signout callback to handle Azure AD logout
   if (url.pathname === '/api/auth/callback/azure-ad' && url.searchParams.has('error')) {
@@ -21,16 +27,22 @@ export function middleware(request: NextRequest) {
   
   // Ensure authenticated pages clear any stale auth when no valid session
   if (url.pathname.startsWith('/engagements') || url.pathname.startsWith('/e/')) {
-    const response = NextResponse.next();
+    let response = NextResponse.next();
     
     // Add header to prevent caching authenticated pages
     response.headers.set('Cache-Control', 'no-store, must-revalidate');
     response.headers.set('Pragma', 'no-cache');
     
+    // Add security headers
+    response = addSecurityHeaders(response);
+    
     return response;
   }
   
-  return NextResponse.next();
+  // Add security headers to all responses
+  let response = NextResponse.next();
+  response = addSecurityHeaders(response);
+  return response;
 }
 
 export const config = {
