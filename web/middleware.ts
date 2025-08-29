@@ -19,6 +19,17 @@ export function middleware(request: NextRequest) {
     return NextResponse.redirect(url);
   }
   
+  // Ensure authenticated pages clear any stale auth when no valid session
+  if (url.pathname.startsWith('/engagements') || url.pathname.startsWith('/e/')) {
+    const response = NextResponse.next();
+    
+    // Add header to prevent caching authenticated pages
+    response.headers.set('Cache-Control', 'no-store, must-revalidate');
+    response.headers.set('Pragma', 'no-cache');
+    
+    return response;
+  }
+  
   return NextResponse.next();
 }
 
@@ -26,5 +37,7 @@ export const config = {
   matcher: [
     '/api/auth/callback/:path*',
     '/singin',
+    '/engagements',
+    '/e/:path*'
   ]
 };
