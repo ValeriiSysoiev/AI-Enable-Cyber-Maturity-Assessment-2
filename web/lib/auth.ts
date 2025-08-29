@@ -110,9 +110,14 @@ export const authOptions: AuthOptions = {
       return baseUrl;
     }
   },
+  events: {
+    async signOut(message) {
+      console.log('NextAuth signOut event triggered');
+      // Clear server-side session completely
+    }
+  },
   pages: {
     signIn: "/signin",
-    signOut: "/signout",
     error: "/signin?error=true",
   },
   debug: process.env.NODE_ENV === "development",

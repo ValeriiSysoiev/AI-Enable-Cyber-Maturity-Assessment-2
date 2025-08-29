@@ -4,6 +4,7 @@ import { usePathname } from "next/navigation";
 import { useEffect, useState, useRef } from "react";
 import Link from "next/link";
 import { useAuth } from "./AuthProvider";
+import { signOut } from "next-auth/react";
 
 // Dynamic import to avoid SSR issues with localStorage
 const EngagementSwitcher = dynamic(() => import("./EngagementSwitcher"), {
@@ -102,9 +103,15 @@ export default function TopNav() {
     try {
       console.log('Sign out clicked, auth mode:', auth.mode.mode);
       if (auth.mode.mode === 'aad') {
-        // Use the NextAuth signout endpoint (which we've overridden)
-        console.log('Using NextAuth signOut endpoint');
-        window.location.href = '/api/auth/signout?callbackUrl=' + encodeURIComponent('/signin');
+        // For Azure AD, redirect directly to our Azure signout endpoint
+        console.log('Using Azure AD federated signout');
+        
+        // Clear local storage first
+        localStorage.removeItem('email');
+        localStorage.removeItem('engagementId');
+        
+        // Redirect to Azure AD signout endpoint
+        window.location.href = '/api/auth/azure-signout';
       } else {
         console.log('Using demo signOut');
         localStorage.removeItem('email');
