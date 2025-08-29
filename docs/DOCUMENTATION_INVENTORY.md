@@ -86,6 +86,7 @@
 ### Core Documentation (in /docs/)
 | File | Reason |
 |------|--------|
+| `/DEVELOPMENT_GUIDELINES.md` | **Development guidelines and contribution rules** |
 | `docs/architecture.md` | Current system architecture |
 | `docs/deployments.md` | CI/CD workflows and procedures |
 | `docs/configuration.md` | Environment configuration |

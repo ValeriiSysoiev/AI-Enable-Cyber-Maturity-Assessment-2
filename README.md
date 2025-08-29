@@ -164,6 +164,16 @@ Automated checks prevent:
 
 See `/docs/repo/` for detailed policies and procedures.
 
+## Contributing & Development
+
+Please read our [Development Guidelines](./DEVELOPMENT_GUIDELINES.md) before contributing. This document covers:
+- Core principles and architecture baseline
+- Non-negotiable rules and security requirements
+- PR guidelines and testing standards
+- CI/CD workflows and release procedures
+
+All contributions must follow these guidelines to maintain system integrity and quality.
+
 ## Support
 
 For issues or questions, please check:
