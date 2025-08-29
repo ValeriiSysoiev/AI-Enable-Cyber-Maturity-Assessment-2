@@ -3,6 +3,7 @@ import { useState, useRef, useEffect, useCallback } from "react";
 import { useParams } from "next/navigation";
 import { searchEvidence } from "../lib/evidence";
 import { downloadUrl } from "../lib/docs";
+import { highlightTextSafely } from "../lib/sanitizer";
 import RAGToggle, { useRAGAvailability } from "./RAGToggle";
 import CitationsList from "./CitationsList";
 import type { SearchResult, EvidenceSearchResponse, RAGSearchResponse } from "../types/evidence";
@@ -211,21 +212,7 @@ export default function EnhancedEvidenceSearch({
     URL.revokeObjectURL(url);
   }
 
-  function highlightText(text: string, query: string): string {
-    if (!query.trim()) return text;
-    
-    const terms = query.toLowerCase().split(/\s+/);
-    let highlightedText = text;
-    
-    terms.forEach(term => {
-      if (term.length > 2) {
-        const regex = new RegExp(`(${term})`, 'gi');
-        highlightedText = highlightedText.replace(regex, '<mark class="bg-yellow-200 px-0.5 py-0.5 rounded">$1</mark>');
-      }
-    });
-    
-    return highlightedText;
-  }
+  // Removed unsafe highlightText function - now using highlightTextSafely from sanitizer
 
   function getSearchModeText() {
     if (useRAG && ragAvailable) {
@@ -415,7 +402,7 @@ export default function EnhancedEvidenceSearch({
               <div 
                 className="text-sm text-gray-700 leading-relaxed border-l-2 border-gray-200 pl-3"
                 dangerouslySetInnerHTML={{ 
-                  __html: highlightText(result.content, query) 
+                  __html: highlightTextSafely(result.content, query) 
                 }}
               />
             </div>

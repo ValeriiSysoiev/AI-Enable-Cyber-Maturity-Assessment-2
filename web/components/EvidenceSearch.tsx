@@ -3,6 +3,7 @@ import { useState } from "react";
 import { useParams } from "next/navigation";
 import { searchEvidence } from "../lib/evidence";
 import { downloadUrl } from "../lib/docs";
+import { highlightTextSafely } from "../lib/sanitizer";
 import type { SearchResult, EvidenceSearchResponse } from "../types/evidence";
 
 interface EvidenceSearchProps {
@@ -83,21 +84,7 @@ export default function EvidenceSearch({
     URL.revokeObjectURL(url);
   }
 
-  function highlightText(text: string, query: string): string {
-    if (!query.trim()) return text;
-    
-    const terms = query.toLowerCase().split(/\s+/);
-    let highlightedText = text;
-    
-    terms.forEach(term => {
-      if (term.length > 2) { // Only highlight terms longer than 2 chars
-        const regex = new RegExp(`(${term})`, 'gi');
-        highlightedText = highlightedText.replace(regex, '<mark class="bg-yellow-200">$1</mark>');
-      }
-    });
-    
-    return highlightedText;
-  }
+  // Removed unsafe highlightText function - now using highlightTextSafely from sanitizer
 
   return (
     <div className={`space-y-4 ${className}`}>
@@ -183,7 +170,7 @@ export default function EvidenceSearch({
               <div 
                 className="text-sm text-gray-700 leading-relaxed"
                 dangerouslySetInnerHTML={{ 
-                  __html: highlightText(result.content, query) 
+                  __html: highlightTextSafely(result.content, query) 
                 }}
               />
             </div>
