@@ -111,6 +111,7 @@ export const authOptions: AuthOptions = {
   },
   pages: {
     signIn: "/signin",
+    signOut: "/signout",
     error: "/signin?error=true",
   },
   debug: process.env.NODE_ENV === "development",
