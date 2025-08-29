@@ -239,9 +239,7 @@ function EmptyState() {
   );
 }
 
-async function EngagementsList({ userEmail, correlationId }: { userEmail: string; correlationId: string }) {
-  const engagements = await fetchEngagements(userEmail, correlationId);
-  
+function EngagementsList({ engagements }: { engagements: Engagement[] }) {
   if (engagements.length === 0) {
     return <EmptyState />;
   }
@@ -310,6 +308,9 @@ export default async function EngagementsPage() {
     redirect('/403');
   }
   
+  // Fetch engagements for the authenticated user
+  const engagements = await fetchEngagements(user.email, correlationId);
+  
   return (
     <div className="min-h-screen bg-gray-50 py-8">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -350,7 +351,7 @@ export default async function EngagementsPage() {
         {/* Engagements List */}
         <ApiErrorBoundary>
           <Suspense fallback={<LoadingState />}>
-            <EngagementsList userEmail={user.email} correlationId={correlationId} />
+            <EngagementsList engagements={engagements} />
           </Suspense>
         </ApiErrorBoundary>
         
