@@ -33,6 +33,7 @@ function getProviders() {
           scope: "openid profile email",
           response_type: "code",
           response_mode: "query",
+          prompt: "select_account", // Always show account selection
         },
       },
       httpOptions: {
