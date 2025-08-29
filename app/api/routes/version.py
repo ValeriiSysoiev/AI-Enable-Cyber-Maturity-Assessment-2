@@ -40,39 +40,61 @@ class VersionResponse(BaseModel):
 
 
 def get_git_info() -> Dict[str, str]:
-    """Get git information safely"""
+    """Get git information safely with input validation"""
     git_info = {
-        "sha": "unknown",
-        "branch": "unknown"
+        "sha": os.getenv("BUILD_SHA", "unknown"),  # Prefer env var
+        "branch": os.getenv("BUILD_BRANCH", "unknown")
     }
     
-    try:
-        # Get git SHA
-        result = subprocess.run(
-            ["git", "rev-parse", "HEAD"],
-            capture_output=True,
-            text=True,
-            timeout=5
-        )
-        if result.returncode == 0:
-            git_info["sha"] = result.stdout.strip()[:12]  # Short SHA
-            
-    except Exception as e:
-        logger.debug(f"Failed to get git SHA: {e}")
-    
-    try:
-        # Get git branch
-        result = subprocess.run(
-            ["git", "rev-parse", "--abbrev-ref", "HEAD"],
-            capture_output=True,
-            text=True,
-            timeout=5
-        )
-        if result.returncode == 0:
-            git_info["branch"] = result.stdout.strip()
-            
-    except Exception as e:
-        logger.debug(f"Failed to get git branch: {e}")
+    # Only try git commands if env vars not set and in development
+    if git_info["sha"] == "unknown" and os.getenv("ENVIRONMENT", "development") == "development":
+        try:
+            # Use shutil to find git executable path (safer)
+            import shutil
+            git_path = shutil.which("git")
+            if not git_path:
+                return git_info
+                
+            # Get git SHA with strict validation
+            result = subprocess.run(
+                [git_path, "rev-parse", "HEAD"],
+                capture_output=True,
+                text=True,
+                timeout=5,
+                cwd=os.getcwd(),  # Explicit working directory
+                env={"PATH": os.environ.get("PATH", "")},  # Minimal environment
+                check=False  # Don't raise on non-zero exit
+            )
+            if result.returncode == 0 and result.stdout:
+                # Validate SHA format (40 hex chars)
+                sha = result.stdout.strip()
+                if len(sha) == 40 and all(c in "0123456789abcdef" for c in sha.lower()):
+                    git_info["sha"] = sha[:12]  # Short SHA
+                
+        except (subprocess.TimeoutExpired, OSError) as e:
+            logger.debug(f"Failed to get git SHA: {e}")
+        
+        try:
+            # Get git branch with validation
+            git_path = shutil.which("git")
+            if git_path:
+                result = subprocess.run(
+                    [git_path, "rev-parse", "--abbrev-ref", "HEAD"],
+                    capture_output=True,
+                    text=True,
+                    timeout=5,
+                    cwd=os.getcwd(),
+                    env={"PATH": os.environ.get("PATH", "")},
+                    check=False
+                )
+                if result.returncode == 0 and result.stdout:
+                    # Validate branch name (alphanumeric, dash, underscore, slash)
+                    branch = result.stdout.strip()
+                    if branch and all(c.isalnum() or c in "-_/" for c in branch):
+                        git_info["branch"] = branch
+                
+        except (subprocess.TimeoutExpired, OSError) as e:
+            logger.debug(f"Failed to get git branch: {e}")
     
     return git_info
 

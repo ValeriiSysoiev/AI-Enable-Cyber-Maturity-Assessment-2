@@ -186,7 +186,8 @@ Please analyze the original content while considering the relevant evidence prov
             rag_operational = retriever.is_operational()
             if not search_backend_used:
                 search_backend_used = retriever.backend.value
-        except:
+        except Exception as e:
+            logger.warning(f"Failed to check RAG operational status: {e}")
             rag_operational = False
     
     repo.add_findings(req.assessment_id, findings)

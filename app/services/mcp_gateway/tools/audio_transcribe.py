@@ -287,8 +287,8 @@ class AudioTranscriptionTool:
                 try:
                     if 'path' in locals() and os.path.exists(path):
                         os.unlink(path)
-                except:
-                    pass
+                except OSError as cleanup_error:
+                    logger.debug(f"Failed to clean up temp file {path}: {cleanup_error}")
             raise ValueError(f"Transcription failed: {str(e)}")
     
     def _chunk_audio(self, audio: AudioSegment) -> List[AudioSegment]:

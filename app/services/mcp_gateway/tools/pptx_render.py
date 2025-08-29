@@ -381,8 +381,8 @@ class PPTXRenderTool:
             # Clean up temp file on error
             try:
                 os.unlink(temp_path)
-            except:
-                pass
+            except OSError as cleanup_error:
+                logger.debug(f"Failed to clean up temp file {temp_path}: {cleanup_error}")
             raise e
     
     def _mock_presentation(self, config: Dict[str, Any]) -> Dict[str, Any]:

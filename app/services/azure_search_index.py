@@ -316,7 +316,8 @@ class AzureSearchIndexManager:
         try:
             self.index_client.get_index(self.index_name)
             return True
-        except:
+        except Exception as e:
+            logger.debug(f"Index {self.index_name} does not exist or is inaccessible: {e}")
             return False
     
     async def upload_documents(self, embeddings: List[EmbeddingDocument]) -> Tuple[int, List[str]]:

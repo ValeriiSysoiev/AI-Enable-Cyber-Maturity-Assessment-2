@@ -519,8 +519,9 @@ class RAGRetriever:
                     }
                 else:
                     status["azure_search"] = {"index_exists": False}
-            except:
-                status["azure_search"] = {"status": "error"}
+            except Exception as e:
+                logger.error(f"Error getting Azure Search status: {e}")
+                status["azure_search"] = {"status": "error", "message": str(e)[:100]}
         
         elif self.backend == SearchBackend.COSMOS_DB and self.rag_service:
             status["cosmos_db"] = self.rag_service.get_status()
