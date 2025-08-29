@@ -70,16 +70,18 @@ export default function SignIn() {
 
   const handleAADSignIn = async () => {
     try {
-      // Use NextAuth signIn function for proper CSRF handling
+      // Force a fresh authentication by adding prompt=login
+      // This ensures Azure AD doesn't use cached credentials
       await signIn('azure-ad', { 
         callbackUrl: '/engagements',
-        redirect: true 
+        redirect: true,
+        prompt: 'login' // Force re-authentication
       });
     } catch (error) {
       console.error('AAD sign in error:', error);
       // Fallback to direct redirect if NextAuth signIn fails
       if (typeof window !== 'undefined') {
-        window.location.href = '/api/auth/signin/azure-ad?callbackUrl=' + encodeURIComponent('/engagements');
+        window.location.href = '/api/auth/signin/azure-ad?callbackUrl=' + encodeURIComponent('/engagements') + '&prompt=login';
       }
     }
   };
