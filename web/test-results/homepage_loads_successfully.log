@@ -1,66 +1,66 @@
-[2025-08-29T00:51:44.847Z] [INFO] Starting homepage load test
-[2025-08-29T00:51:44.847Z] [INFO] Starting step: Navigate to homepage
-[2025-08-29T00:51:44.856Z] [ERROR] Step failed: Navigate to homepage
+[2025-08-29T01:37:35.469Z] [INFO] Starting homepage load test
+[2025-08-29T01:37:35.470Z] [INFO] Starting step: Navigate to homepage
+[2025-08-29T01:37:35.476Z] [ERROR] Step failed: Navigate to homepage
 {
-  "duration": 8,
+  "duration": 6,
   "error": "page.goto: Protocol error (Page.navigate): Cannot navigate to invalid URL\nCall log:\n\u001b[2m  - navigating to \"/\", waiting until \"load\"\u001b[22m\n"
 }
-[2025-08-29T00:51:44.856Z] [ERROR] Capturing error context
+[2025-08-29T01:37:35.477Z] [ERROR] Capturing error context
 {
   "error": "page.goto: Protocol error (Page.navigate): Cannot navigate to invalid URL\nCall log:\n\u001b[2m  - navigating to \"/\", waiting until \"load\"\u001b[22m\n",
   "stack": "page.goto: Protocol error (Page.navigate): Cannot navigate to invalid URL\nCall log:\n\u001b[2m  - navigating to \"/\", waiting until \"load\"\u001b[22m\n\n    at PerformanceMonitor.measurePageLoad (/Users/svvval/Documents/AI-Enable-Cyber-Maturity-Assessment-2/web/e2e/test-utils.ts:215:21)\n    at action (/Users/svvval/Documents/AI-Enable-Cyber-Maturity-Assessment-2/web/e2e/tests/smoke.spec.ts:20:44)\n    at TestStepTracker.executeStep (/Users/svvval/Documents/AI-Enable-Cyber-Maturity-Assessment-2/web/e2e/test-utils.ts:87:28)\n    at /Users/svvval/Documents/AI-Enable-Cyber-Maturity-Assessment-2/web/e2e/tests/smoke.spec.ts:19:25"
 }
-[2025-08-29T00:51:44.925Z] [INFO] Error screenshot captured
+[2025-08-29T01:37:35.538Z] [INFO] Error screenshot captured
 {
   "message": "Screenshot saved",
-  "sanitizedPath": "error-screenshot-1756428704856.png",
-  "timestamp": "2025-08-29T00:51:44.925Z"
+  "sanitizedPath": "error-screenshot-1756431455477.png",
+  "timestamp": "2025-08-29T01:37:35.538Z"
 }
-[2025-08-29T00:51:44.927Z] [INFO] Error HTML captured
+[2025-08-29T01:37:35.539Z] [INFO] Error HTML captured
 {
   "message": "HTML content saved",
-  "sanitizedPath": "error-html-1756428704927.html",
-  "timestamp": "2025-08-29T00:51:44.927Z"
+  "sanitizedPath": "error-html-1756431455539.html",
+  "timestamp": "2025-08-29T01:37:35.539Z"
 }
-[2025-08-29T00:51:44.928Z] [INFO] Console logs at error
+[2025-08-29T01:37:35.540Z] [INFO] Console logs at error
 {
   "logs": "No logs available"
 }
-[2025-08-29T00:51:44.929Z] [INFO] Page state at error
+[2025-08-29T01:37:35.541Z] [INFO] Page state at error
 {
   "url": "about:blank",
   "title": ""
 }
-[2025-08-29T00:51:44.929Z] [ERROR] Homepage test failed
+[2025-08-29T01:37:35.541Z] [ERROR] Homepage test failed
 {
   "error": "page.goto: Protocol error (Page.navigate): Cannot navigate to invalid URL\nCall log:\n\u001b[2m  - navigating to \"/\", waiting until \"load\"\u001b[22m\n"
 }
-[2025-08-29T00:52:21.528Z] [INFO] Starting homepage load test
-[2025-08-29T00:52:21.534Z] [INFO] Starting step: Navigate to homepage
-[2025-08-29T00:52:22.959Z] [INFO] Page load time for /
+[2025-08-29T01:37:49.801Z] [INFO] Starting homepage load test
+[2025-08-29T01:37:49.807Z] [INFO] Starting step: Navigate to homepage
+[2025-08-29T01:37:51.167Z] [INFO] Page load time for /
 {
-  "loadTime": 1416
+  "loadTime": 1359
 }
-[2025-08-29T00:52:22.974Z] [INFO] Step completed: Navigate to homepage
+[2025-08-29T01:37:51.179Z] [INFO] Step completed: Navigate to homepage
 {
-  "duration": 1431
+  "duration": 1372
 }
-[2025-08-29T00:52:22.974Z] [INFO] Starting step: Verify main navigation elements
-[2025-08-29T00:52:22.980Z] [INFO] Step completed: Verify main navigation elements
+[2025-08-29T01:37:51.180Z] [INFO] Starting step: Verify main navigation elements
+[2025-08-29T01:37:51.186Z] [INFO] Step completed: Verify main navigation elements
 {
   "duration": 6
 }
-[2025-08-29T00:52:22.981Z] [INFO] Homepage test completed successfully
+[2025-08-29T01:37:51.186Z] [INFO] Homepage test completed successfully
 {
   "total": 2,
   "passed": 2,
   "failed": 0,
-  "totalDuration": 1437,
+  "totalDuration": 1378,
   "steps": [
     {
       "name": "Navigate to homepage",
       "status": "passed",
-      "duration": 1431
+      "duration": 1372
     },
     {
       "name": "Verify main navigation elements",
@@ -69,71 +69,71 @@
     }
   ]
 }
-[2025-08-29T00:52:24.152Z] [INFO] Starting homepage load test
-[2025-08-29T00:52:24.153Z] [INFO] Starting step: Navigate to homepage
-[2025-08-29T00:52:25.064Z] [INFO] Page load time for /
+[2025-08-29T01:37:52.290Z] [INFO] Starting homepage load test
+[2025-08-29T01:37:52.290Z] [INFO] Starting step: Navigate to homepage
+[2025-08-29T01:37:53.149Z] [INFO] Page load time for /
 {
-  "loadTime": 911
+  "loadTime": 858
 }
-[2025-08-29T00:52:25.075Z] [INFO] Step completed: Navigate to homepage
+[2025-08-29T01:37:53.167Z] [INFO] Step completed: Navigate to homepage
 {
-  "duration": 922
+  "duration": 876
 }
-[2025-08-29T00:52:25.075Z] [INFO] Starting step: Verify main navigation elements
-[2025-08-29T00:52:25.080Z] [INFO] Step completed: Verify main navigation elements
+[2025-08-29T01:37:53.167Z] [INFO] Starting step: Verify main navigation elements
+[2025-08-29T01:37:53.173Z] [INFO] Step completed: Verify main navigation elements
 {
-  "duration": 4
+  "duration": 6
 }
-[2025-08-29T00:52:25.080Z] [INFO] Homepage test completed successfully
+[2025-08-29T01:37:53.173Z] [INFO] Homepage test completed successfully
 {
   "total": 2,
   "passed": 2,
   "failed": 0,
-  "totalDuration": 926,
+  "totalDuration": 882,
   "steps": [
     {
       "name": "Navigate to homepage",
       "status": "passed",
-      "duration": 922
+      "duration": 876
+    },
+    {
+      "name": "Verify main navigation elements",
+      "status": "passed",
+      "duration": 6
+    }
+  ]
+}
+[2025-08-29T01:37:57.812Z] [INFO] Starting homepage load test
+[2025-08-29T01:37:57.813Z] [INFO] Starting step: Navigate to homepage
+[2025-08-29T01:37:58.668Z] [INFO] Page load time for /
+{
+  "loadTime": 854
+}
+[2025-08-29T01:37:58.684Z] [INFO] Step completed: Navigate to homepage
+{
+  "duration": 871
+}
+[2025-08-29T01:37:58.684Z] [INFO] Starting step: Verify main navigation elements
+[2025-08-29T01:37:58.689Z] [INFO] Step completed: Verify main navigation elements
+{
+  "duration": 4
+}
+[2025-08-29T01:37:58.690Z] [INFO] Homepage test completed successfully
+{
+  "total": 2,
+  "passed": 2,
+  "failed": 0,
+  "totalDuration": 875,
+  "steps": [
+    {
+      "name": "Navigate to homepage",
+      "status": "passed",
+      "duration": 871
     },
     {
       "name": "Verify main navigation elements",
       "status": "passed",
       "duration": 4
-    }
-  ]
-}
-[2025-08-29T00:52:29.697Z] [INFO] Starting homepage load test
-[2025-08-29T00:52:29.698Z] [INFO] Starting step: Navigate to homepage
-[2025-08-29T00:52:30.587Z] [INFO] Page load time for /
-{
-  "loadTime": 889
-}
-[2025-08-29T00:52:30.605Z] [INFO] Step completed: Navigate to homepage
-{
-  "duration": 907
-}
-[2025-08-29T00:52:30.605Z] [INFO] Starting step: Verify main navigation elements
-[2025-08-29T00:52:30.611Z] [INFO] Step completed: Verify main navigation elements
-{
-  "duration": 6
-}
-[2025-08-29T00:52:30.612Z] [INFO] Homepage test completed successfully
-{
-  "total": 2,
-  "passed": 2,
-  "failed": 0,
-  "totalDuration": 913,
-  "steps": [
-    {
-      "name": "Navigate to homepage",
-      "status": "passed",
-      "duration": 907
-    },
-    {
-      "name": "Verify main navigation elements",
-      "status": "passed",
-      "duration": 6
     }
   ]
 }
