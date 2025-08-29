@@ -195,10 +195,15 @@ class AppConfig(BaseModel):
         e.strip().lower() for e in os.getenv("ADMIN_EMAILS", "").split(",") if e.strip()
     ])
     
-    # CORS settings
+    # CORS settings - NEVER default to wildcard in production
     allowed_origins: list[str] = Field(default_factory=lambda: [
         o.strip() for o in os.getenv("API_ALLOWED_ORIGINS", "").split(",") if o.strip()
-    ] or ["*"])
+    ] or (
+        # Development defaults only
+        ["http://localhost:3000", "http://localhost:3001", "http://127.0.0.1:3000"] 
+        if os.getenv("ENVIRONMENT", "development").lower() in ["development", "dev", "local"]
+        else []  # No default origins in production - must be explicitly configured
+    ))
 
     def is_rag_enabled(self) -> bool:
         """Check if RAG is properly configured and enabled"""

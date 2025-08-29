@@ -52,11 +52,18 @@ app.add_middleware(PerformanceTrackingMiddleware)
 app.add_middleware(CorrelationIDMiddleware)
 
 # --- CORS configuration (env-driven) ---
+# Security: Never allow credentials with wildcard origins
+cors_allow_credentials = True
+if "*" in config.allowed_origins:
+    # If wildcard is somehow present (should only happen in dev), disable credentials
+    cors_allow_credentials = False
+    logger.warning("Wildcard CORS origin detected - disabling credentials for security")
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=config.allowed_origins,
-    allow_credentials=True,
-    allow_methods=["*"],
+    allow_origins=config.allowed_origins if config.allowed_origins else ["http://localhost:3000"],  # Fallback for local dev
+    allow_credentials=cors_allow_credentials,
+    allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"],  # Explicit methods instead of wildcard
     allow_headers=["*"],  # allow custom headers like X-User-Email, X-Engagement-ID, X-Correlation-ID
     expose_headers=["Content-Disposition", "X-Response-Time-MS", "X-Correlation-ID", "X-Cache-Hits", "X-Cache-Misses", "X-Cache-Hit-Rate"],
 )
@@ -69,6 +76,19 @@ async def on_startup():
         format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
     )
     logger = logging.getLogger(__name__)
+    
+    # Validate CORS configuration
+    if os.getenv("ENVIRONMENT", "development").lower() in ["production", "staging", "prod"]:
+        if not config.allowed_origins:
+            logger.error("CRITICAL: No CORS origins configured for production! Set API_ALLOWED_ORIGINS environment variable.")
+            raise ValueError("CORS origins must be explicitly configured in production")
+        
+        if "*" in config.allowed_origins:
+            logger.error("CRITICAL: Wildcard CORS origin (*) is not allowed in production!")
+            raise ValueError("Wildcard CORS origin is not allowed in production")
+        
+        # Log configured origins for transparency
+        logger.info(f"CORS configured for origins: {config.allowed_origins}")
     
     # Check and log CI/ML mode configuration
     ci_mode = os.getenv('CI_MODE', '0') == '1'
