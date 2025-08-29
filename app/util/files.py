@@ -2,6 +2,7 @@ import os
 import io
 from typing import Tuple, Optional
 from pydantic import BaseModel
+import aiofiles
 
 class ExtractResult(BaseModel):
     text: str
@@ -37,7 +38,7 @@ def safe_join(*parts: str) -> str:
     
     return abs_joined
 
-def extract_text(path: str, content_type: Optional[str], max_chars: int = 20000) -> ExtractResult:
+async def extract_text(path: str, content_type: Optional[str], max_chars: int = 20000) -> ExtractResult:
     # simple heuristics by extension; avoid heavy deps
     ext = os.path.splitext(path)[1].lower()
     text = ""
@@ -67,9 +68,11 @@ def extract_text(path: str, content_type: Optional[str], max_chars: int = 20000)
                 text = text[:max_chars]
                 note = "Truncated"
         else:
-            with open(path, "r", encoding="utf-8", errors="ignore") as f:
-                text = f.read(max_chars)
-                if f.read(1):
+            async with aiofiles.open(path, "r", encoding="utf-8", errors="ignore") as f:
+                text = await f.read(max_chars)
+                # Check if there's more content to determine truncation
+                remainder = await f.read(1)
+                if remainder:
                     note = "Truncated"
     except Exception as e:
         return ExtractResult(text="", page_count=None, note=f"Extract error: {e}")

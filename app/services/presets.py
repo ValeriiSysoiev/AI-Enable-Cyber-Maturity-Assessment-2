@@ -5,6 +5,8 @@ from fastapi import HTTPException
 from api.schemas import AssessmentPreset
 from services.cache import get_cached, invalidate_cache_key, cache_manager
 import sys
+import aiofiles
+import asyncio
 sys.path.append("/app")
 from config import config
 
@@ -14,10 +16,12 @@ DATA_DIR = Path("data/presets")
 def ensure_dirs():
     DATA_DIR.mkdir(parents=True, exist_ok=True)
 
-def _load_json(p: Path) -> Dict[str, Any]:
+async def _load_json(p: Path) -> Dict[str, Any]:
+    """Async version of JSON file loading"""
     try:
-        with p.open("r", encoding="utf-8") as f:
-            return json.load(f)
+        async with aiofiles.open(p, "r", encoding="utf-8") as f:
+            content = await f.read()
+            return json.loads(content)
     except json.JSONDecodeError as e:
         raise HTTPException(400, f"Invalid JSON in {p.name}: {e}") from e
     except OSError as e:
@@ -78,10 +82,10 @@ def _transform_legacy_preset(data: Dict[str, Any]) -> Dict[str, Any]:
 async def list_presets() -> List[Dict[str, Any]]:
     """List all available presets with caching for performance"""
     if not config.cache.enabled:
-        return _list_presets_uncached()
+        return await _list_presets_uncached()
     
     async def compute_presets_list():
-        return _list_presets_uncached()
+        return await _list_presets_uncached()
     
     return await get_cached(
         cache_name="presets",
@@ -94,14 +98,14 @@ async def list_presets() -> List[Dict[str, Any]]:
     )
 
 
-def _list_presets_uncached() -> List[Dict[str, Any]]:
+async def _list_presets_uncached() -> List[Dict[str, Any]]:
     """Internal uncached implementation of list_presets"""
     ensure_dirs()
     items: List[Dict[str, Any]] = []
 
     # bundled
     for pid, path in BUNDLED.items():
-        data = _load_json(path)
+        data = await _load_json(path)
         try:
             # Transform legacy format if needed
             transformed_data = _transform_legacy_preset(data)
@@ -117,7 +121,7 @@ def _list_presets_uncached() -> List[Dict[str, Any]]:
 
     # uploaded
     for p in DATA_DIR.glob("*.json"):
-        data = _load_json(p)
+        data = await _load_json(p)
         try:
             # Transform legacy format if needed
             transformed_data = _transform_legacy_preset(data)
@@ -140,10 +144,10 @@ def _list_presets_uncached() -> List[Dict[str, Any]]:
 async def get_preset(preset_id: str) -> AssessmentPreset:
     """Get a specific preset with caching for performance"""
     if not config.cache.enabled:
-        return _get_preset_uncached(preset_id)
+        return await _get_preset_uncached(preset_id)
     
     async def compute_preset():
-        return _get_preset_uncached(preset_id)
+        return await _get_preset_uncached(preset_id)
     
     cached_preset = await get_cached(
         cache_name="presets",
@@ -158,19 +162,19 @@ async def get_preset(preset_id: str) -> AssessmentPreset:
     return AssessmentPreset(**cached_preset) if isinstance(cached_preset, dict) else cached_preset
 
 
-def _get_preset_uncached(preset_id: str) -> AssessmentPreset:
+async def _get_preset_uncached(preset_id: str) -> AssessmentPreset:
     """Internal uncached implementation of get_preset"""
     ensure_dirs()
     # uploaded takes precedence
     up = DATA_DIR / f"{preset_id}.json"
     if up.exists():
-        data = _load_json(up)
+        data = await _load_json(up)
         transformed_data = _transform_legacy_preset(data)
         return AssessmentPreset(**transformed_data)
     # then bundled
     path = BUNDLED.get(preset_id)
     if path and path.exists():
-        data = _load_json(path)
+        data = await _load_json(path)
         transformed_data = _transform_legacy_preset(data)
         return AssessmentPreset(**transformed_data)
     raise HTTPException(404, "Preset not found")
@@ -188,8 +192,9 @@ async def save_uploaded_preset(data: dict) -> AssessmentPreset:
     if not out.resolve().is_relative_to(DATA_DIR.resolve()):
         raise HTTPException(400, f"Invalid preset ID: path traversal detected")
     
-    with out.open("w", encoding="utf-8") as f:
-        json.dump(preset.model_dump(), f, ensure_ascii=False, indent=2)
+    async with aiofiles.open(out, "w", encoding="utf-8") as f:
+        content = json.dumps(preset.model_dump(), ensure_ascii=False, indent=2)
+        await f.write(content)
     
     # Invalidate caches when preset is saved
     if config.cache.enabled:

@@ -11,6 +11,7 @@ import json
 import os
 from pathlib import Path
 import logging
+import aiofiles
 
 logger = logging.getLogger(__name__)
 
@@ -50,31 +51,40 @@ class FileAdminRepository(AdminRepository):
         """Ensure the admin file and directory exist"""
         self.file_path.parent.mkdir(parents=True, exist_ok=True)
         if not self.file_path.exists():
-            self._write_admins(set())
+            # Create empty file synchronously during initialization
+            try:
+                data = {'emails': []}
+                content = json.dumps(data, indent=2)
+                with open(self.file_path, 'w') as f:
+                    f.write(content)
+            except Exception as e:
+                logger.error(f"Failed to create initial admin file: {e}")
     
-    def _read_admins(self) -> Set[str]:
-        """Read admin emails from file"""
+    async def _read_admins(self) -> Set[str]:
+        """Read admin emails from file asynchronously"""
         try:
-            with open(self.file_path, 'r') as f:
-                data = json.load(f)
+            async with aiofiles.open(self.file_path, 'r') as f:
+                content = await f.read()
+                data = json.loads(content)
                 return set(email.strip().lower() for email in data.get('emails', []) if email.strip())
         except Exception as e:
             logger.warning(f"Failed to read admin file {self.file_path}: {e}")
             return set()
     
-    def _write_admins(self, admins: Set[str]):
-        """Write admin emails to file"""
+    async def _write_admins(self, admins: Set[str]):
+        """Write admin emails to file asynchronously"""
         try:
             data = {'emails': sorted(list(admins))}
-            with open(self.file_path, 'w') as f:
-                json.dump(data, f, indent=2)
+            content = json.dumps(data, indent=2)
+            async with aiofiles.open(self.file_path, 'w') as f:
+                await f.write(content)
         except Exception as e:
             logger.error(f"Failed to write admin file {self.file_path}: {e}")
             raise
     
     async def get_demo_admins(self) -> Set[str]:
         """Get list of demo admin emails"""
-        return self._read_admins()
+        return await self._read_admins()
     
     async def add_demo_admin(self, email: str) -> bool:
         """Add email to demo admin list"""
@@ -82,13 +92,13 @@ class FileAdminRepository(AdminRepository):
             return False
         
         normalized_email = email.strip().lower()
-        admins = self._read_admins()
+        admins = await self._read_admins()
         
         if normalized_email in admins:
             return False  # Already exists
         
         admins.add(normalized_email)
-        self._write_admins(admins)
+        await self._write_admins(admins)
         
         logger.info(f"Added demo admin: {normalized_email}")
         return True
@@ -99,13 +109,13 @@ class FileAdminRepository(AdminRepository):
             return False
         
         normalized_email = email.strip().lower()
-        admins = self._read_admins()
+        admins = await self._read_admins()
         
         if normalized_email not in admins:
             return False  # Not found
         
         admins.remove(normalized_email)
-        self._write_admins(admins)
+        await self._write_admins(admins)
         
         logger.info(f"Removed demo admin: {normalized_email}")
         return True
