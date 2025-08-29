@@ -103,19 +103,45 @@ export default function TopNav() {
     try {
       console.log('Sign out clicked, auth mode:', auth.mode.mode);
       if (auth.mode.mode === 'aad') {
-        // For Azure AD, redirect directly to our Azure signout endpoint
-        console.log('Using Azure AD federated signout');
+        // Two-step signout process for Azure AD
+        console.log('Step 1: Clearing app session');
         
-        // Clear local storage first
+        // Clear local storage
         localStorage.removeItem('email');
         localStorage.removeItem('engagementId');
+        localStorage.clear(); // Clear everything from localStorage
         
-        // Redirect to Azure AD signout endpoint
-        window.location.href = '/api/auth/azure-signout';
+        // Clear session storage too
+        sessionStorage.clear();
+        
+        // Step 1: Clear NextAuth session first
+        try {
+          const clearResponse = await fetch('/api/auth/clear-session', {
+            method: 'POST',
+            credentials: 'include'
+          });
+          
+          if (clearResponse.ok) {
+            const data = await clearResponse.json();
+            console.log('Session cleared:', data);
+          }
+        } catch (err) {
+          console.error('Error clearing session:', err);
+        }
+        
+        // Step 2: Small delay to ensure cookies are cleared, then redirect to Azure AD logout
+        console.log('Step 2: Redirecting to Azure AD logout');
+        setTimeout(() => {
+          window.location.href = '/api/auth/azure-signout';
+        }, 100);
+        
       } else {
         console.log('Using demo signOut');
         localStorage.removeItem('email');
         localStorage.removeItem('engagementId');
+        localStorage.clear();
+        sessionStorage.clear();
+        
         // For demo mode, also clear the cookie
         await fetch('/api/demo/signout', { method: 'POST' });
         window.location.href = '/signin';
