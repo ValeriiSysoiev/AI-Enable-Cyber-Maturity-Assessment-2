@@ -29,21 +29,45 @@ from .middleware.rate_limiting import RateLimitingMiddleware
 from services.performance import start_performance_monitoring, stop_performance_monitoring
 from services.cache import cache_manager
 
+# Initialize logger for main module
+logger = logging.getLogger(__name__)
+
 app = FastAPI(title="AI Maturity Tool API", version="0.1.0")
 
 # --- Middleware stack (order matters - first added runs last) ---
 # 1. Security headers middleware (runs last, adds headers to all responses)
 app.add_middleware(SecurityHeadersMiddleware)
 
-# 2. Rate limiting middleware (disabled by default, can be enabled via env var)
-rate_limiting_enabled = os.getenv('RATE_LIMITING_ENABLED', '0') == '1'
+# 2. Rate limiting middleware (enabled by default in production for DoS protection)
+# Can be disabled via RATE_LIMITING_ENABLED=0 for development/testing
+is_production = os.getenv('NODE_ENV') == 'production' or os.getenv('ENVIRONMENT', '').lower() == 'production'
+is_ci_mode = os.getenv('CI_MODE', '0') == '1'
+is_test_mode = os.getenv('PYTEST_CURRENT_TEST') is not None
+
+# Enable rate limiting by default in production, but allow override
+rate_limiting_enabled = os.getenv('RATE_LIMITING_ENABLED')
+if rate_limiting_enabled is None:
+    # Default behavior: enable in production, disable in development and CI/test
+    rate_limiting_enabled = is_production and not is_ci_mode and not is_test_mode
+else:
+    # Explicit override from environment variable
+    rate_limiting_enabled = rate_limiting_enabled == '1'
+
 if rate_limiting_enabled:
     requests_per_minute = int(os.getenv('RATE_LIMIT_PER_MINUTE', '60'))
     burst_per_second = int(os.getenv('RATE_LIMIT_BURST_PER_SECOND', '10'))
+    admin_requests_per_minute = int(os.getenv('RATE_LIMIT_ADMIN_PER_MINUTE', '120'))
+    health_requests_per_minute = int(os.getenv('RATE_LIMIT_HEALTH_PER_MINUTE', '300'))
+    
     app.add_middleware(RateLimitingMiddleware, 
                       default_requests_per_minute=requests_per_minute,
                       burst_requests_per_second=burst_per_second,
+                      admin_requests_per_minute=admin_requests_per_minute,
+                      health_requests_per_minute=health_requests_per_minute,
                       enabled=True)
+    logger.info(f"Rate limiting enabled with {requests_per_minute} req/min, {burst_per_second} burst/sec")
+else:
+    logger.info("Rate limiting disabled (development/test mode or explicitly disabled)")
 
 # 3. Performance tracking middleware 
 app.add_middleware(PerformanceTrackingMiddleware)
