@@ -1,0 +1,220 @@
+name: Repository Size Guard
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+
+jobs:
+  size-check:
+    name: Repository Size Check
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          # Fetch recent history to check for large objects
+          fetch-depth: 50
+          
+      - name: Install analysis tools
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y tree
+          
+      - name: Check large files in working tree
+        run: |
+          echo "🔍 Scanning for large files (>10MB)..."
+          large_files=$(find . -type f -size +10M -not -path "./.git/*" -not -path "./node_modules/*" -not -path "./.next/*" -not -path "./.venv/*" -not -path "./.terraform/*")
+          
+          if [ -n "$large_files" ]; then
+            echo "❌ VIOLATION: Large files detected:"
+            echo "$large_files" | while read file; do
+              size=$(du -h "$file" | cut -f1)
+              echo "  - $file ($size)"
+            done
+            echo ""
+            echo "📋 Policy: Individual files must be <10MB"
+            echo "💡 Solution: Move large files to Azure Blob Storage or use .gitignore"
+            exit 1
+          else
+            echo "✅ No large files found in working tree"
+          fi
+          
+      - name: Check prohibited file patterns
+        run: |
+          echo "🔍 Scanning for prohibited file patterns..."
+          violations=0
+          
+          # Define prohibited patterns
+          patterns=(
+            "node_modules"
+            ".next" 
+            "__pycache__"
+            ".terraform/providers"
+            "*.log"
+            "error-screenshot-*.png"
+            "test-results"
+            "playwright-report"
+            "*.zip"
+            "*.tar.gz"
+            ".venv"
+            "venv/"
+            "dist/"
+            "build/"
+          )
+          
+          for pattern in "${patterns[@]}"; do
+            if find . -path "./.git" -prune -o -name "$pattern" -print | grep -q .; then
+              echo "❌ VIOLATION: Prohibited pattern '$pattern' found:"
+              find . -path "./.git" -prune -o -name "$pattern" -print | head -5
+              violations=$((violations + 1))
+            fi
+          done
+          
+          if [ $violations -gt 0 ]; then
+            echo ""
+            echo "📋 Policy: Build artifacts and dependencies must not be committed"
+            echo "💡 Solution: Add to .gitignore and remove from repository"
+            exit 1
+          else
+            echo "✅ No prohibited patterns found"
+          fi
+          
+      - name: Check git history for large objects
+        run: |
+          echo "🔍 Scanning recent commits for large objects..."
+          
+          # Check for large objects in recent commits
+          large_objects=$(git rev-list --objects HEAD~10..HEAD | git cat-file --batch-check='%(objecttype) %(objectname) %(objectsize) %(rest)' | awk '/^blob/ && $3 > 10485760 {print $3, $4}' | sort -nr)
+          
+          if [ -n "$large_objects" ]; then
+            echo "⚠️  WARNING: Large objects detected in recent commits:"
+            echo "$large_objects" | while read size file; do
+              size_mb=$((size / 1024 / 1024))
+              echo "  - $file (${size_mb}MB)"
+            done
+            echo ""
+            echo "📋 Policy: Large objects should not be committed to git history"
+            echo "💡 Solution: Use git-filter-repo or BFG to remove large objects"
+            # Don't fail the build for history issues, just warn
+          else
+            echo "✅ No large objects in recent commits"
+          fi
+          
+      - name: Repository size summary
+        run: |
+          echo "📊 Repository Size Summary:"
+          echo "=========================="
+          
+          # Working tree size (excluding .git)
+          work_size=$(du -sh . --exclude=.git | cut -f1)
+          echo "Working tree: $work_size"
+          
+          # Git database size
+          git_size=$(du -sh .git | cut -f1)
+          echo "Git database: $git_size"
+          
+          # Total size
+          total_size=$(du -sh . | cut -f1)
+          echo "Total repository: $total_size"
+          
+          echo ""
+          echo "🎯 Size Targets:"
+          echo "  - Working tree: <100MB (currently $work_size)"
+          echo "  - Git database: <200MB (currently $git_size)" 
+          echo "  - Total repository: <500MB (currently $total_size)"
+          
+      - name: File type breakdown
+        run: |
+          echo "📁 File Type Breakdown (top 10):"
+          echo "==============================="
+          find . -type f -not -path "./.git/*" | sed 's/.*\.//' | sort | uniq -c | sort -nr | head -10 | while read count ext; do
+            echo "  $ext: $count files"
+          done
+          
+      - name: Check for secrets patterns
+        run: |
+          echo "🔐 Scanning for potential secrets..."
+          
+          # Simple secret patterns (non-comprehensive)
+          secret_patterns=(
+            "password\s*=\s*['\"][^'\"]*['\"]"
+            "api_key\s*=\s*['\"][^'\"]*['\"]"
+            "secret\s*=\s*['\"][^'\"]*['\"]"
+            "token\s*=\s*['\"][^'\"]*['\"]"
+            "-----BEGIN.*PRIVATE KEY-----"
+          )
+          
+          violations=0
+          for pattern in "${secret_patterns[@]}"; do
+            if grep -r -i -E "$pattern" . --exclude-dir=.git --exclude-dir=node_modules --exclude="*.md" --exclude="*.log" >/dev/null 2>&1; then
+              echo "⚠️  WARNING: Potential secret pattern found: $pattern"
+              violations=$((violations + 1))
+            fi
+          done
+          
+          if [ $violations -eq 0 ]; then
+            echo "✅ No obvious secret patterns detected"
+          else
+            echo ""
+            echo "💡 Review findings and ensure no real secrets are committed"
+          fi
+          
+      - name: Performance impact assessment
+        run: |
+          echo "⚡ Performance Impact Assessment:"
+          echo "==============================="
+          
+          # Estimate clone time (rough calculation)
+          total_size_mb=$(du -sm . | cut -f1)
+          estimated_clone_seconds=$((total_size_mb / 10))  # Rough estimate: 10MB/sec
+          
+          echo "Estimated clone time: ${estimated_clone_seconds}s (target: <30s)"
+          echo "Repository size: ${total_size_mb}MB (target: <500MB)"
+          
+          if [ $total_size_mb -gt 500 ]; then
+            echo "❌ Repository exceeds 500MB target size"
+            echo "💡 Consider history cleanup or moving large assets to external storage"
+          elif [ $total_size_mb -gt 200 ]; then
+            echo "⚠️  Repository approaching size limits"
+          else
+            echo "✅ Repository size within acceptable limits"
+          fi
+          
+  pre-commit-simulation:
+    name: Pre-commit Hook Simulation  
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        
+      - name: Simulate pre-commit checks
+        run: |
+          echo "🪝 Simulating pre-commit hooks..."
+          
+          # Check files being committed (simulate git diff --cached --name-only)
+          files_to_check=$(git diff --name-only HEAD~1 2>/dev/null || git ls-files)
+          
+          echo "Files to check: $(echo "$files_to_check" | wc -l)"
+          
+          violations=0
+          echo "$files_to_check" | while read file; do
+            if [ -f "$file" ]; then
+              size=$(stat -c%s "$file" 2>/dev/null || echo 0)
+              if [ $size -gt 10485760 ]; then
+                size_mb=$((size / 1024 / 1024))
+                echo "❌ $file is ${size_mb}MB (>10MB limit)"
+                violations=$((violations + 1))
+              fi
+            fi
+          done
+          
+          if [ $violations -gt 0 ]; then
+            echo "Pre-commit would block this commit"
+            exit 1
+          else
+            echo "✅ Pre-commit checks would pass"
+          fi

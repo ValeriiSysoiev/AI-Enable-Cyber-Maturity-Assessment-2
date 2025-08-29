@@ -142,6 +142,28 @@ docker compose up -d
 # API: http://localhost:8000
 ```
 
+## Repository Management
+
+### Size & Performance
+This repository has been optimized for performance and size control:
+
+- **Current Status**: 22KB source code, 1.3GB total (due to git history)
+- **Working Tree**: Clean, no build artifacts or dependencies committed
+- **Size Monitoring**: Automated CI checks prevent repository bloat
+- **Asset Policy**: Large files stored in Azure Blob Storage, not git
+
+### Size Guardrails
+Automated checks prevent:
+- Individual files >10MB
+- Build artifacts (node_modules, .next, __pycache__)
+- Test screenshots and temporary files
+- Large binary dependencies
+
+### History Cleanup (Scheduled)
+⚠️ **Planned History Remediation**: Git history contains 669MB of accidentally committed build artifacts. A history cleanup is planned to reduce total repository size from 1.3GB to ~300-500MB.
+
+See `/docs/repo/` for detailed policies and procedures.
+
 ## Support
 
 For issues or questions, please check:

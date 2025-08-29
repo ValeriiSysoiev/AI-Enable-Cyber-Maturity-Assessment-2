@@ -45,17 +45,41 @@ __pycache__/
 
 # Artifacts directory (preserve structure, ignore contents)
 artifacts/
+!artifacts/repo_size/
+!artifacts/**/.gitkeep
 
-# Deployment logs
-logs/reports/*.log
-logs/reports/*.md
-
-# Backup files from Azure investigation
-backup-*.json
+# Runtime files and logs
+logs/
+*.log
 LogFiles/
 deployments/
 webapp-logs.zip
-*.log
+
+# Backup and temporary files
+backup-*.json
+*.tmp
+*.temp
+*.bak
+*.backup
+*~
+.DS_Store
+Thumbs.db
+
+# Cache and build artifacts
+.cache/
+.build/
+.output/
+.nuxt/
+.sass-cache/
+coverage/
+*.tsbuildinfo
+
+# IDE and editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
 
 # Debug artifacts
 web/app/api/debug/
@@ -66,3 +90,37 @@ to_cursor*
 # IDE named pipes (Claude and Cursor)
 claude_input
 cursor_input
+
+# Large files and archives (prevent accidental commits)
+*.zip
+*.tar
+*.tar.gz
+*.rar
+*.7z
+*.dmg
+*.iso
+
+# Media files (unless explicitly needed)
+*.mp4
+*.mov
+*.avi
+*.mkv
+*.webm
+
+# Prevent accidentally committing secrets
+.env.local
+.env.*.local
+*.key
+*.pem
+*.p12
+*.pfx
+
+# Test screenshots and artifacts
+error-screenshot-*.png
+screenshot-*.png
+test-*.png
+**/test-results/
+**/playwright-report/
+**/artifacts/uat/
+**/e2e/artifacts/
+**/coverage/
