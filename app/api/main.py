@@ -15,7 +15,6 @@ from api.models import Assessment, Answer
 from api.schemas import AssessmentCreate, AssessmentResponse, AnswerUpsert, ScoreResponse, PillarScore
 from api.scoring import compute_scores
 from api.routes import assessments as assessments_router, orchestrations as orchestrations_router, engagements as engagements_router, documents, summary, presets as presets_router, version as version_router, admin_auth as admin_auth_router, gdpr as gdpr_router, admin_settings as admin_settings_router, evidence as evidence_router, csf as csf_router, workshops as workshops_router, minutes as minutes_router, roadmap_prioritization as roadmap_prioritization_router, chat as chat_router
-# from services.mcp_gateway.main import router as mcp_gateway_router  # Broken imports
 from domain.repository import InMemoryRepository
 from domain.file_repo import FileRepository
 from ai.llm import LLMClient
@@ -465,6 +464,16 @@ async def diagnostic_endpoint():
 import logging
 logger = logging.getLogger(__name__)
 
+# Try to import MCP Gateway (optional - requires additional dependencies)
+try:
+    from services.mcp_gateway.main import router as mcp_gateway_router
+    MCP_GATEWAY_AVAILABLE = True
+    logger.info("MCP Gateway module loaded successfully")
+except ImportError as e:
+    logger.warning(f"MCP Gateway not available (missing dependencies): {e}")
+    mcp_gateway_router = None
+    MCP_GATEWAY_AVAILABLE = False
+
 # Critical routers that must load for the app to function
 CRITICAL_ROUTERS = {
     "assessments_router": "Core assessment functionality",
@@ -560,13 +569,16 @@ except Exception as e:
     logger.error(f"Failed to include roadmap_prioritization_router: {e}")
     failed_routers.append(("roadmap_prioritization_router", str(e)))
 
-# MCP Gateway router
-# MCP gateway router disabled - broken imports
-# try:
-#     app.include_router(mcp_gateway_router)
-# except Exception as e:
-#     logger.error(f"Failed to include mcp_gateway_router: {e}")
-#     failed_routers.append(("mcp_gateway_router", str(e)))
+# MCP Gateway router (optional - requires additional dependencies)
+if MCP_GATEWAY_AVAILABLE and mcp_gateway_router:
+    try:
+        app.include_router(mcp_gateway_router)
+        logger.info("MCP Gateway router successfully included")
+    except Exception as e:
+        logger.error(f"Failed to include mcp_gateway_router: {e}")
+        failed_routers.append(("mcp_gateway_router", str(e)))
+else:
+    logger.info("MCP Gateway router not included (missing optional dependencies)")
 
 # Check if any critical routers failed to load
 critical_failures = []

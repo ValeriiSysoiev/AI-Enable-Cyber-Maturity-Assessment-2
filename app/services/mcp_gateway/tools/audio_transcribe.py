@@ -20,8 +20,8 @@ try:
 except ImportError:
     AUDIO_DEPS_AVAILABLE = False
 
-from api.security import SecurityPolicy
-from config import MCPConfig
+from services.mcp_gateway.security import SecurityPolicy
+from services.mcp_gateway.config import MCPConfig, MCPOperationContext
 
 logger = logging.getLogger(__name__)
 

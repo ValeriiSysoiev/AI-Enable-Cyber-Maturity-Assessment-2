@@ -25,8 +25,8 @@ except ImportError:
 # Check if ML features are disabled via environment variables
 ML_DISABLED = os.getenv('DISABLE_ML', '0') == '1' or os.getenv('CI_MODE', '0') == '1'
 
-from config import MCPConfig, MCPOperationContext
-from api.security import MCPSecurityValidator, redact_sensitive_content
+from services.mcp_gateway.config import MCPConfig, MCPOperationContext
+from services.mcp_gateway.security import MCPSecurityValidator, redact_sensitive_content, sanitize_filename
 
 
 class SearchEmbedRequest(BaseModel):

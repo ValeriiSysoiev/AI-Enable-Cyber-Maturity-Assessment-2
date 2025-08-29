@@ -10,7 +10,7 @@ from util.logging import get_correlated_logger
 from api.security import current_context, require_member
 from domain.repository import Repository
 
-from api.config import MCPConfig, MCPOperationContext, get_mcp_config
+from services.mcp_gateway.config import MCPConfig, MCPOperationContext, get_mcp_config
 from .tools.filesystem import MCPFilesystemTool, FSReadRequest, FSWriteRequest, FSResponse
 from .tools.pdf_parser import MCPPDFParserTool, PDFParseRequest, PDFParseResponse
 from .tools.search import MCPSearchTool, SearchEmbedRequest, SearchQueryRequest, SearchEmbedResponse, SearchQueryResponse

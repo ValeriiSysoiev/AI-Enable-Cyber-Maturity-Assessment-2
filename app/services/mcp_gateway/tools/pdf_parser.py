@@ -10,8 +10,8 @@ from typing import Dict, Any, Optional, List
 from pydantic import BaseModel, Field
 from util.logging import get_correlated_logger, log_operation
 
-from config import MCPConfig, MCPOperationContext
-from api.security import MCPSecurityValidator, redact_sensitive_content
+from services.mcp_gateway.config import MCPConfig, MCPOperationContext
+from services.mcp_gateway.security import MCPSecurityValidator, redact_sensitive_content, sanitize_filename
 
 
 class PDFParseRequest(BaseModel):

@@ -10,7 +10,7 @@ from pathlib import Path, PurePath
 from typing import Dict, Any, Optional, List, Set, Union
 from util.logging import get_correlated_logger, log_security_event
 
-from api.config import MCPConfig, MCPOperationContext
+from services.mcp_gateway.config import MCPConfig, MCPOperationContext
 
 
 class SecurityError(Exception):
@@ -181,6 +181,26 @@ def sanitize_filename(filename: str) -> str:
         sanitized = "unnamed_file"
     
     return sanitized
+
+
+class SecurityPolicy:
+    """Security policy configuration for MCP tools"""
+    
+    def __init__(self, max_file_size_mb: int = 10, allowed_extensions: Optional[Set[str]] = None):
+        self.max_file_size_mb = max_file_size_mb
+        self.allowed_extensions = allowed_extensions or {".txt", ".md", ".json", ".csv", ".pdf"}
+        self.enable_redaction = True
+        self.enable_path_jailing = True
+    
+    def validate_file_size(self, size_bytes: int) -> bool:
+        """Check if file size is within limits"""
+        size_mb = size_bytes / (1024 * 1024)
+        return size_mb <= self.max_file_size_mb
+    
+    def validate_extension(self, filepath: str) -> bool:
+        """Check if file extension is allowed"""
+        path = Path(filepath)
+        return path.suffix.lower() in self.allowed_extensions
 
 
 class MCPSecurityValidator:
