@@ -21,15 +21,6 @@ export default function SignIn() {
     }
   }, [status, session, router]);
 
-  // Show loading while checking session
-  if (status === "loading") {
-    return (
-      <div className="flex min-h-screen items-center justify-center bg-gray-50">
-        <div>Loading...</div>
-      </div>
-    );
-  }
-
   useEffect(() => {
     // Only fetch auth mode in browser environment to prevent SSG build errors
     if (typeof window !== 'undefined') {
@@ -93,7 +84,8 @@ export default function SignIn() {
     }
   };
 
-  if (isLoading) {
+  // Show loading while checking session or auth mode
+  if (status === "loading" || isLoading) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-gray-50">
         <div>Loading...</div>
