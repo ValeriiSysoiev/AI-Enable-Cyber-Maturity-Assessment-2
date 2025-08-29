@@ -11,6 +11,37 @@ export async function GET(request: NextRequest) {
   const protocol = host.includes('localhost') ? 'http' : 'https';
   const baseUrl = `${protocol}://${host}`;
   
+  // Check if this is a front-channel logout request from Azure AD
+  const sid = url.searchParams.get('sid'); // Session ID from Azure AD
+  const issuer = url.searchParams.get('iss'); // Issuer from Azure AD
+  
+  if (sid || issuer) {
+    // This is a front-channel logout from Azure AD
+    // Clear the session and return a minimal response (no redirect)
+    const cookieStore = cookies();
+    const allCookies = cookieStore.getAll();
+    
+    // Create a simple response (Azure AD expects an image or empty response)
+    const response = new NextResponse('', { status: 200 });
+    
+    // Clear all auth cookies
+    allCookies.forEach(cookie => {
+      if (cookie.name.includes('next-auth') || 
+          cookie.name.includes('auth') ||
+          cookie.name.includes('session')) {
+        response.cookies.delete(cookie.name);
+        response.cookies.set(cookie.name, '', {
+          value: '',
+          maxAge: 0,
+          expires: new Date(0),
+          path: '/'
+        });
+      }
+    });
+    
+    return response;
+  }
+  
   // If this is the confirmation page request (no csrf token), show our custom confirmation
   const csrfToken = url.searchParams.get('csrf');
   if (!csrfToken) {
