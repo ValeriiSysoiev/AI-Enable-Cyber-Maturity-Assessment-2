@@ -1,6 +1,7 @@
 import { type AuthOptions } from "next-auth";
 import AzureADProvider from "next-auth/providers/azure-ad";
 import CredentialsProvider from "next-auth/providers/credentials";
+import { getSessionConfig } from "./session-config";
 
 // Dynamic provider configuration - evaluated at runtime
 function getProviders() {
@@ -68,10 +69,18 @@ function getProviders() {
   return providers;
 }
 
+// Get session configuration based on environment
+const sessionConfig = getSessionConfig();
+console.log(`Session configured for ${sessionConfig.environment}: maxAge=${sessionConfig.maxAge}s, updateAge=${sessionConfig.updateAge}s`);
+
 export const authOptions: AuthOptions = {
   secret: process.env.NEXTAUTH_SECRET || process.env.AUTH_SECRET,
   providers: getProviders(),
-  session: { strategy: "jwt", maxAge: 30 * 24 * 60 * 60 },
+  session: { 
+    strategy: "jwt", 
+    maxAge: sessionConfig.maxAge,
+    updateAge: sessionConfig.updateAge
+  },
   callbacks: {
     async jwt({ token, account, profile }) {
       // Surface AAD groups/roles when available
