@@ -1,289 +1,232 @@
-# Development Guidelines
+# DEVELOPMENT GUIDELINES — AI-Enabled Cyber Maturity Assessment
 
-This document defines the non-negotiable principles, architecture baseline, and operational rules for contributing to the AI-Enabled Cyber Maturity Assessment platform.
+> **Mandatory reading**  
+> Before you start **any** change — and **before every subsequent commit** in an ongoing change — re-read:
+> - `README.md` (architecture & intent)  
+> - `/docs/*` (operations, security, deployments, UAT)  
+> - `/DEVELOPMENT_GUIDELINES.md` (this file)
 
-## Core Principles
+These guidelines are **non-negotiable**. They encode our long-term architecture, security posture, and delivery discipline so every change improves — not erodes — the system.
 
-1. **Architecture-First**: Every change must align with the documented architecture in README.md and /docs
-2. **No Hacks**: Fix root causes only. No workarounds or temporary patches allowed
-3. **Tiny PRs**: Maximum 300 LOC per PR (excluding generated files), single concern only
-4. **Actions Canonical**: GitHub Actions is the single source of truth for CI/CD
-5. **UAT Gate**: Every production deployment must pass the critical user journey validation
+## Quick Navigation
 
-## Architecture Baseline
+[Core Principles](#0-core-principles) | [Architecture](#1-architecture-baseline-do-not-diverge) | [Non-negotiable Rules](#2-non-negotiable-rules-violations-break-prod) | [PR Rules](#3-change-discipline--pr-rules) | [Testing](#4-testing--quality-bars) | [CI/CD](#5-cicd--release-invariants) | [Repo Hygiene](#6-repository-hygiene--size-policy) | [Security](#7-security-checklist-run-for-every-change) | [Checklists](#8-pre-refactor--pre-merge-checklists) | [Troubleshooting](#9-troubleshooting-playbook-what-to-verify) | [Breaking Changes](#10-breaking-change-protocol) | [Acceptance Criteria](#11-acceptance-criteria-for-any-change)
 
-### System Components
-- **Web**: Next.js 14 on Azure Container Apps
-  - Production: `https://web-cybermat-prd-aca.icystone-69c102b0.westeurope.azurecontainerapps.io`
-  - TypeScript, React 18, Tailwind CSS, App Router
-  
-- **API**: FastAPI on Azure Container Apps
-  - Production: `https://api-cybermat-prd-aca.icystone-69c102b0.westeurope.azurecontainerapps.io`
-  - Python 3.11, async/await, Pydantic validation
-  
-- **Auth**: Azure AD (Entra ID) only in production
-  - No demo mode in production
-  - Role-based access: Admin, Consultant, Client
-  
-- **Proxy**: Web proxies API via `/api/proxy/*`
-  - SSRF protection, rate limiting, auth forwarding
-  
-### Invariants
-- Health endpoints: `/health` (API), `/api/health` (Web)
-- Version endpoint: `/version` returns deployment SHA
-- Actions workflow: `.github/workflows/deploy-container-apps.yml`
-- UAT Flow: Sign-in → View engagements → Create/Open → Navigate to `/new` → Complete workflow → Sign-out
+---
 
-## Non-Negotiable Rules
+## 0) Core Principles
 
-### Authentication & Authorization
-- Production uses Azure AD exclusively - no demo mode
-- Sign-in: `/signin`, Sign-out: via user menu
-- All endpoints require authentication except health/version
-- Engagement-level authorization enforced at API layer
+1. **Architecture-first.** The architecture in `README.md` and `/docs` is the source of truth. Align every change to it.
+2. **No hacks / no workarounds.** Fix **root causes** only. Temporary band-aids are not allowed.
+3. **Tiny PRs.** ≤ **300 LOC**, **single concern**, audited with tests, docs, and logs.
+4. **Actions is canonical.** All deploys go through GitHub Actions; green checks are required.
+5. **UAT Gate after every rollout.** The critical journey **must** pass:
+   - AAD sign-in → engagements list → create/open engagement → `/new` preset → sign-out
 
-### Proxy Contract
-- Client calls `/api/proxy/*` → Web forwards to API
-- Web handles auth token injection
-- API never exposed directly to browser
-- Request validation and sanitization at proxy layer
+---
 
-### Imports & Case Sensitivity
-- Linux containers are case-sensitive
-- Always use exact case for imports
-- Verify imports work on Linux before PR
-- No relative imports beyond `../` (max one level)
+## 1) Architecture Baseline (do not diverge)
 
-### IDs & Storage
-- UUIDs for all entity IDs
-- Cosmos DB for documents
-- Azure Storage for blobs
-- No local file storage in containers
+### System Components (Production)
 
-### Security Posture
-- No secrets in code or logs
-- Environment variables for configuration
-- Managed Identity for Azure resources
-- Input validation on all endpoints
-- Rate limiting in production
+- **Web (Next.js 14)** → **Azure Container Apps**  
+  Host (prod): `https://web-cybermat-prd-aca.icystone-69c102b0.westeurope.azurecontainerapps.io`  
+  Stack: TypeScript, React 18, App Router, Tailwind
 
-## Change Discipline
+- **API (FastAPI)** → **Azure Container Apps**  
+  Host (prod): `https://api-cybermat-prd-aca.icystone-69c102b0.westeurope.azurecontainerapps.io`  
+  Stack: Python 3.11+, async, Pydantic
 
-### PR Rules
-1. Single concern per PR
-2. <300 LOC (excluding generated)
-3. Must include tests
-4. Must update docs if behavior changes
-5. Must pass all CI checks
-6. Security review for auth/data changes
-7. QA approval for UX changes
+- **Auth (NextAuth)** → **Azure AD (Entra ID) only in production**  
+  No demo/credentials provider in prod. Role model: Admin / Consultant / Client.
 
-### Documentation Updates
-- README.md for architecture changes
-- /docs for operational changes
-- Inline comments only for complex algorithms
-- API documentation via OpenAPI/Swagger
-- TypeScript types are self-documenting
+- **Proxy** → Web calls API via **`/api/proxy/*`** (no direct API hostnames in the UI)
 
-### Testing Requirements
-- Unit tests for business logic
-- Integration tests for API endpoints
-- E2E tests for critical user journeys
-- Type safety enforced (no `any` without justification)
-- Performance tests for data operations
+### Invariants we prove on every release
 
-## Testing & Quality Bars
+- **Health endpoints**  
+  Web: `**/health**` • API: `**/health**`
 
-### Unit & Integration Tests
-- Python: pytest with >80% coverage
-- TypeScript: Jest with >70% coverage
-- Mock external dependencies
-- Test error paths explicitly
-- No test skips without issue reference
+- **Version proof**  
+  Web: `**/api/version**` returns the **deployed SHA** and must equal `${{ github.sha }}` post-deploy.
 
-### Playwright UAT
-- Critical user journey must pass
-- Screenshots on failure
-- Retry logic for transient issues
-- Run against staging before production
-- Performance metrics captured
+- **Actions behaviors (not file names)**  
+  - **Staging**: auto-deploy on **push** to `main`  
+  - **Production**: **manual dispatch** builds a web image **tagged with `${{ github.sha }}`**, wires it, sets the build SHA, and **proves** `/api/version == sha`  
+  - Deployments view shows the latest green run
 
-### Type Safety
-- TypeScript strict mode enabled
-- Pydantic models for all API contracts
-- No implicit any
-- Exhaustive switch cases
-- Null safety enforced
+- **UAT Gate**  
+  Must pass after every production rollout (staging first, then prod-safe).
 
-### Performance Standards
-- API response <500ms p95
-- Page load <3s on 3G
-- Bundle size <500KB gzipped
-- Memory usage stable over time
-- No blocking operations in event loop
+---
 
-## CI/CD & Release Invariants
+## 2) Non-negotiable Rules (violations break prod)
 
-### Deployment Flow
-1. **Staging**: Auto-deploy on push to `main`
-2. **Production**: Manual dispatch with SHA tagging
-3. **Verification**: `/api/version` returns deployed SHA
-4. **UAT Gate**: Critical journey validation required
+### 2.1 Authentication & Authorization (Prod = AAD only)
 
-### GitHub Actions Invariants
-- Workflow: `.github/workflows/deploy-container-apps.yml`
-- Build Docker images tagged with `${{ github.sha }}`
-- Update Container Apps with new image
-- Set `BUILD_SHA` environment variable
-- Health checks must pass before traffic switch
+- Only the **Azure AD** provider is active in prod.  
+  No demo/credentials fallback. No silent auto-login that bypasses AAD.
+- `NEXTAUTH_URL` must equal the **public Container Apps host**.  
+  **Never** emit `0.0.0.0:3000` or `localhost` in prod flows (signin/signout/callbacks).
+- Reply URLs for the active host must exist in the **AAD app registration**  
+  (e.g., `/api/auth/callback/azure-ad` & `/api/auth/callback/aad`).
+- **Sign-out** must clear app cookies/session and land on `/signin` at the Container Apps host.
 
-### Release Criteria
-- All CI checks green
-- Security scan passed
-- Dependencies up to date
-- Changelog updated
-- Version bumped appropriately
-- UAT Gate validated
+### 2.2 Proxy invariants
 
-## Repository Hygiene & Size Policy
+- Client → `/api/proxy/*` → Web forwards to API with identity/correlation IDs.  
+  No direct API hostnames in browser code.
+- Proxy **must not** return success when the API fails; surface real errors; log correlation IDs.
 
-### .gitignore Rules
-- No build artifacts (node_modules, .next, __pycache__)
-- No test artifacts (screenshots, coverage)
-- No environment files (.env, .env.local)
-- No IDE files (.vscode, .idea)
-- No temporary files (*.tmp, *.log)
-- No large binaries (>10MB)
+### 2.3 Imports & case-sensitivity
 
-### Size Guards
-- CI check prevents files >10MB
-- Total repo <500MB (working tree)
-- Git history periodically cleaned
-- Large files in Azure Storage
-- Dependencies not committed
+- CI runs on Linux: **imports are case-sensitive**.
+- Preferred app-wide alias: **`@/…`** with `baseUrl: "."` in `tsconfig.json`.  
+  Keep relative imports **shallow**; avoid deep `../../../…` chains.
+- Fix **every** case mismatch before merging.
 
-### Clean Working Tree
-- No uncommitted changes in production
-- No stale branches (>30 days)
-- No open PRs (>7 days)
-- Feature flags for partial work
-- Rollback plan documented
+### 2.4 IDs & storage
 
-## Security Checklist
+- Use **consistent ID conventions** that round-trip between web & API (e.g., `engagement-…`).  
+  Do **not** introduce client-only synthetic IDs that the API cannot fetch.
+- Cosmos DB for documents; Azure Storage for blobs.  
+  No local file storage in containers.
 
-### Secrets Management
-- [ ] No hardcoded secrets
-- [ ] Environment variables used
-- [ ] Key Vault for production secrets
-- [ ] Rotation schedule defined
-- [ ] Audit trail enabled
+### 2.5 Security posture
 
-### RBAC Verification
-- [ ] Least privilege principle
-- [ ] Role assignments reviewed
-- [ ] Service principals scoped
-- [ ] Admin actions logged
-- [ ] Break-glass procedure documented
+- Never log secrets, tokens, PII, or cookies.  
+  Secrets live in env/Key Vault; use Managed Identity wherever feasible.
+- Tight CORS in prod; no wildcards.  
+  Validate inputs; deny path traversal; prevent injection (SQL/NoSQL/command/template).  
+  Add CSRF protections where applicable.  
+  Enforce server-side RBAC on admin endpoints.  
+  Rate-limit and bound payload sizes; redact sensitive values in logs.
 
-### Input Validation
-- [ ] All inputs sanitized
-- [ ] SQL injection prevented
-- [ ] XSS protection enabled
-- [ ] File upload restrictions
-- [ ] Rate limiting configured
+---
 
-### Logging & Monitoring
-- [ ] PII redacted from logs
-- [ ] Correlation IDs used
-- [ ] Error details sanitized
-- [ ] Audit events captured
-- [ ] Alerts configured
+## 3) Change Discipline & PR Rules
 
-## Pre-Refactor Checklist
+**Every PR must:**
 
-Before any refactoring:
-1. [ ] Document current behavior
-2. [ ] Write characterization tests
-3. [ ] Identify breaking changes
-4. [ ] Plan incremental migration
-5. [ ] Update documentation first
-6. [ ] Feature flag if needed
-7. [ ] Rollback plan ready
+1. Be **single-concern**, ≤ **300 LOC** (generated files excluded).  
+2. Include **tests** that would have caught the defect.  
+3. Update **docs** (README or `/docs/*`) when behavior/UX/ops change.  
+4. Pass all **CI** checks (no bypassing policies or gates).  
+5. Undergo **Security review** for auth/data/infra changes; **QA** review for UX changes.  
+6. Keep **auditability** intact (clear title, rationale, links to artifacts & runs).
 
-## Pre-Merge Checklist
+> **Never** merge red checks. **Never** skip tests. **Never** weaken guards to “get it out.”
 
-Before merging any PR:
-1. [ ] CI checks all green
-2. [ ] Code review approved
-3. [ ] Tests added/updated
-4. [ ] Documentation updated
-5. [ ] Security review if needed
-6. [ ] QA approval if UX changed
-7. [ ] Deployment plan clear
+---
 
-## Troubleshooting Playbook
+## 4) Testing & Quality Bars
 
-### Common Issues
-1. **503 Service Unavailable**
-   - Check Container Apps health
-   - Verify environment variables
-   - Review deployment logs
-   
-2. **Module not found**
-   - Check case sensitivity
-   - Verify Linux compatibility
-   - Confirm dependencies installed
-   
-3. **Auth failures**
-   - Verify AAD configuration
-   - Check redirect URIs
-   - Confirm token validation
-   
-4. **Performance degradation**
-   - Check memory usage
-   - Review database queries
-   - Analyze network calls
+- **Unit & Integration**  
+  - Python: pytest, meaningful coverage with error-path tests  
+  - TypeScript: Jest/VTU, strict types (no implicit `any`), null-safety upheld
 
-### Rollback Procedure
-1. Identify last known good SHA
-2. Trigger deployment with SHA
-3. Verify health endpoints
-4. Run UAT validation
-5. Document incident
+- **Playwright UAT**  
+  Critical journey must pass; capture screenshots/videos on failure; run on staging before prod; retry only for demonstrable flake.
 
-## Breaking Change Protocol
+- **Performance**  
+  Watch bundle size, critical route cost, and API p95; remove N+1; add safe caches where architecturally appropriate.
 
-For any breaking change:
-1. **RFC Required**: Document in `/docs/rfc/`
-2. **Migration Guide**: Step-by-step instructions
-3. **Deprecation Period**: Minimum 30 days
-4. **Feature Flag**: Enable gradual rollout
-5. **Rollback Plan**: Tested and documented
-6. **Communication**: Email stakeholders
-7. **Version Bump**: Major version increment
+- **Reliability**  
+  Timeouts, retry/backoff, idempotency on creates; consistent error envelopes; graceful degradation; correlation IDs end-to-end.
 
-## Acceptance Criteria for Any Change
+- **Accessibility (WCAG 2.1 AA)**  
+  Semantics, labels, focus order, keyboard nav, contrast; cross-browser smoke set.
 
-Every change must meet ALL criteria:
-- [ ] **Alignment**: Matches architecture & vision in README
-- [ ] **Tiny PR**: <300 LOC, single concern
-- [ ] **Actions Green**: All CI checks passing
-- [ ] **UAT Gate**: Critical journey validated
-- [ ] **No Workarounds**: Root cause fixed
-- [ ] **Repo Hygiene**: .gitignore rules followed, no bloat
-- [ ] **Security**: No degradation of security posture
-- [ ] **Documentation**: Updated where needed
-- [ ] **Tests**: Appropriate coverage added
-- [ ] **Performance**: No degradation measured
+---
+
+## 5) CI/CD & Release Invariants
+
+- **Staging**: push to `main` → CI → deploy → UAT Gate (staging).  
+- **Production**: dispatch → build web **image tag=`${{ github.sha }}`** → wire → set build SHA → **prove** `/api/version == sha` → UAT Gate (prod-safe).  
+- Remove/disable any pipelines targeting deprecated **App Service API**; API target is **Container Apps** only.
+
+---
+
+## 6) Repository Hygiene & Size Policy
+
+- `.gitignore` must block: `.next`, `dist`, `out`, `node_modules`, `__pycache__`, coverage, screenshots/videos, large logs/dumps, IDE/OS files.  
+- CI size guard: block files **> 10 MB** (unless LFS/approved).  
+- Keep working tree **lean** (< ~500 MB as a guideline).  
+- Use external storage (or LFS if architecturally justified) for large versioned assets.  
+- Remove legacy/duplicate docs; if you must retain context, move to `/docs/archive/` with a dated rationale.
+
+---
+
+## 7) Security Checklist (run for **every** change)
+
+- [ ] Secrets only in env/Key Vault; never in code, tests, or logs  
+- [ ] Server-side RBAC enforced on admin endpoints  
+- [ ] Inputs validated; injection & traversal denied; CORS tight  
+- [ ] PII redacted; correlation IDs in logs  
+- [ ] Rate limits & payload bounds enforced; error envelopes sanitized
+
+---
+
+## 8) Pre-refactor & Pre-merge Checklists
+
+**Pre-refactor (discovery)**  
+- [ ] Scan for existing implementations to avoid duplication  
+- [ ] Map imports/callers; plan safe moves; fix references  
+- [ ] Confirm related docs/env keys; plan migration if contracts shift
+
+**Pre-merge (verification)**  
+- [ ] Types & lints pass; no case-sensitivity issues  
+- [ ] UAT Gate passes on staging; Actions green  
+- [ ] Docs/README updated; impact documented  
+- [ ] No workaround remains; **root cause** fixed
+
+---
+
+## 9) Troubleshooting playbook (what to verify)
+
+- **Sign-in**: `/api/auth/providers` shows **azure-ad** only; click AAD triggers Microsoft round-trip; callback lands on our host.  
+- **Sign-out**: app cookies cleared; landing on `/signin`; no auto-login without explicit AAD flow.  
+- **Presets/Assessments**: API list/get/upload 2xx; create→get 201→200; no 503 via proxy.  
+- **Engagements/Admin**: list 2xx; `/api/proxy/admin/status` returns 200 for Admin.
+
+---
+
+## 10) Breaking-change protocol
+
+- **RFC first** (`/docs/rfc/…`) + migration guide  
+- Deprecate before removal; feature-flag gradual rollout  
+- Extended UAT + tested rollback plan  
+- Communicate widely; version bump appropriately
+
+---
+
+## 11) Acceptance criteria for **any** change
+
+A change is acceptable only if **all** are true:
+
+- [ ] **Alignment**: Matches architecture & vision in README + `/docs`  
+- [ ] **Tiny PR**: ≤ 300 LOC, **single concern**  
+- [ ] **Actions green**: All CI checks pass; no policy bypass  
+- [ ] **SHA proof**: `/api/version == HEAD SHA` post-deploy  
+- [ ] **UAT Gate**: Critical journey validated (staging → prod-safe)  
+- [ ] **No workarounds**: Root cause fixed; maintainability preserved  
+- [ ] **Repo hygiene**: `.gitignore` & size guards upheld; no artifacts/data committed  
+- [ ] **Security**: Posture unchanged or improved  
+- [ ] **Docs**: Updated where needed  
+- [ ] **Tests**: Appropriate coverage added; no flakes introduced
+
+---
 
 ## References
 
-- [README.md](./README.md) - Architecture and system overview
-- [/docs](./docs) - Detailed documentation
-- [Team Playbook v2.3](./docs/team-playbook.md) - Operating procedures
-- [Security Practices](./docs/security.md) - Security guidelines
-- [Operations Guide](./docs/operations.md) - Operational procedures
+- [README.md](./README.md) — architecture & system overview  
+- [/docs](./docs) — operations, security, deployments, UAT  
+- [Team Playbook v2.3](./docs/team-playbook.md) — operating procedures  
+- [Security Practices](./docs/security.md) — security guidelines  
+- [Operations Guide](./docs/operations.md) — operational procedures  
+- [.github/PULL_REQUEST_TEMPLATE.md](./.github/PULL_REQUEST_TEMPLATE.md) — PR gates & checklist
 
 ---
-*Last Updated: August 2025*
-*Version: 1.0.0*
+
+*Last Updated: August 2025*  
+*Version: 1.1.0*
