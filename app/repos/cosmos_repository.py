@@ -18,6 +18,12 @@ from typing import Dict, List, Optional, Any, Union
 
 from azure.cosmos import CosmosClient, PartitionKey
 from azure.cosmos.exceptions import CosmosResourceNotFoundError, CosmosHttpResponseError
+from fastapi import HTTPException
+from api.database_errors import (
+    retry_database_operation,
+    handle_database_errors,
+    translate_database_error
+)
 from azure.identity import DefaultAzureCredential
 
 from domain.models import (
@@ -173,44 +179,36 @@ class CosmosRepository(Repository):
     
     # Helper methods for Cosmos DB operations
     async def _upsert_item(self, container_name: str, item: Dict[str, Any]) -> Dict[str, Any]:
-        """Upsert an item in the specified container"""
-        try:
+        """Upsert an item in the specified container with retry logic"""
+        async def operation():
             return await asyncio.to_thread(
                 self.containers[container_name].upsert_item,
                 body=item
             )
-        except Exception as e:
-            logger.error(
-                f"Failed to upsert item in {container_name}",
-                extra={
-                    "correlation_id": self.correlation_id,
-                    "container": container_name,
-                    "item_id": item.get("id"),
-                    "error": str(e)
-                }
-            )
-            raise
+        
+        return await retry_database_operation(
+            operation,
+            context=f"upsert item in {container_name}"
+        )
     
     async def _get_item(self, container_name: str, item_id: str, partition_key: str) -> Optional[Dict[str, Any]]:
-        """Get an item from the specified container"""
+        """Get an item from the specified container with proper error handling"""
         try:
-            return await asyncio.to_thread(
-                self.containers[container_name].read_item,
-                item=item_id,
-                partition_key=partition_key
+            async def operation():
+                return await asyncio.to_thread(
+                    self.containers[container_name].read_item,
+                    item=item_id,
+                    partition_key=partition_key
+                )
+            
+            return await retry_database_operation(
+                operation,
+                context=f"get item {item_id} from {container_name}"
             )
-        except CosmosResourceNotFoundError:
-            return None
-        except Exception as e:
-            logger.error(
-                f"Failed to get item from {container_name}",
-                extra={
-                    "correlation_id": self.correlation_id,
-                    "container": container_name,
-                    "item_id": item_id,
-                    "error": str(e)
-                }
-            )
+        except HTTPException as e:
+            # Check if it's a 404 - return None for not found
+            if e.status_code == 404:
+                return None
             raise
     
     async def _query_items(
@@ -220,8 +218,8 @@ class CosmosRepository(Repository):
         parameters: List[Dict[str, Any]] = None,
         partition_key: str = None
     ) -> List[Dict[str, Any]]:
-        """Query items from the specified container"""
-        try:
+        """Query items from the specified container with retry logic"""
+        async def operation():
             query_args = {
                 "query": query,
                 "parameters": parameters or []
@@ -232,39 +230,31 @@ class CosmosRepository(Repository):
             return await asyncio.to_thread(
                 lambda: list(self.containers[container_name].query_items(**query_args))
             )
-        except Exception as e:
-            logger.error(
-                f"Failed to query items from {container_name}",
-                extra={
-                    "correlation_id": self.correlation_id,
-                    "container": container_name,
-                    "query": query,
-                    "error": str(e)
-                }
-            )
-            raise
+        
+        return await retry_database_operation(
+            operation,
+            context=f"query items from {container_name}"
+        )
     
     async def _delete_item(self, container_name: str, item_id: str, partition_key: str) -> bool:
-        """Delete an item from the specified container"""
+        """Delete an item from the specified container with proper error handling"""
         try:
-            await asyncio.to_thread(
-                self.containers[container_name].delete_item,
-                item=item_id,
-                partition_key=partition_key
+            async def operation():
+                await asyncio.to_thread(
+                    self.containers[container_name].delete_item,
+                    item=item_id,
+                    partition_key=partition_key
+                )
+                return True
+            
+            return await retry_database_operation(
+                operation,
+                context=f"delete item {item_id} from {container_name}"
             )
-            return True
-        except CosmosResourceNotFoundError:
-            return False
-        except Exception as e:
-            logger.error(
-                f"Failed to delete item from {container_name}",
-                extra={
-                    "correlation_id": self.correlation_id,
-                    "container": container_name,
-                    "item_id": item_id,
-                    "error": str(e)
-                }
-            )
+        except HTTPException as e:
+            # Check if it's a 404 - return False for not found
+            if e.status_code == 404:
+                return False
             raise
     
     # Engagement & Membership methods
@@ -350,30 +340,18 @@ class CosmosRepository(Repository):
         return True
     
     # GDPR-specific methods
+    @handle_database_errors("store background job")
     async def store_background_job(self, job: BackgroundJob) -> BackgroundJob:
-        """Store background job in Cosmos DB"""
-        try:
-            job_dict = job.model_dump()
-            job_dict["id"] = job.id
-            
-            # Add TTL if specified
-            if job.ttl:
-                job_dict["ttl"] = job.ttl
-            
-            stored_item = await self._upsert_item("background_jobs", job_dict)
-            return BackgroundJob(**stored_item)
-            
-        except Exception as e:
-            logger.error(
-                f"Failed to store background job: {str(e)}",
-                extra={
-                    "correlation_id": self.correlation_id,
-                    "job_id": job.id,
-                    "job_type": job.job_type,
-                    "error": str(e)
-                }
-            )
-            raise
+        """Store background job in Cosmos DB with proper error handling"""
+        job_dict = job.model_dump()
+        job_dict["id"] = job.id
+        
+        # Add TTL if specified
+        if job.ttl:
+            job_dict["ttl"] = job.ttl
+        
+        stored_item = await self._upsert_item("background_jobs", job_dict)
+        return BackgroundJob(**stored_item)
     
     async def get_background_job(self, job_id: str, created_by: str) -> Optional[BackgroundJob]:
         """Get background job by ID"""
