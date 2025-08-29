@@ -1,12 +1,11 @@
 import os
-import re
-import email.utils
 import logging
 from fastapi import Header, HTTPException, Depends, Request
 from typing import Any, Dict, Optional, Set
 from domain.repository import Repository
 from config import config
 from services.aad_groups import create_aad_groups_service, UserRoles
+from api.input_validation import validate_email, validate_engagement_id, validate_tenant_id
 
 logger = logging.getLogger(__name__)
 
@@ -75,30 +74,16 @@ async def current_context(
     Extract current user and engagement context from headers.
     Includes AAD group information when AAD groups mode is enabled.
     """
-    # Validate and sanitize email
-    if not x_user_email or not x_user_email.strip():
-        raise HTTPException(422, "X-User-Email header is required")
-    
-    parsed = email.utils.parseaddr(x_user_email.strip())
-    if not parsed[1] or '@' not in parsed[1]:
-        raise HTTPException(422, "X-User-Email header must be a valid email address")
-    
-    canonical_email = parsed[1].strip().lower()
-    
-    # Validate and sanitize engagement ID
-    if not x_engagement_id or not x_engagement_id.strip():
-        raise HTTPException(422, "X-Engagement-ID header is required")
-    
-    engagement_id_normalized = x_engagement_id.strip()
-    # Basic validation - alphanumeric, hyphens, underscores allowed
-    if not re.match(r'^[a-zA-Z0-9_-]+$', engagement_id_normalized):
-        raise HTTPException(422, "X-Engagement-ID header must contain only alphanumeric characters, hyphens, and underscores")
+    # Use comprehensive input validation
+    canonical_email = validate_email(x_user_email, "X-User-Email header")
+    engagement_id_normalized = validate_engagement_id(x_engagement_id)
+    tenant_id_validated = validate_tenant_id(x_tenant_id)
     
     # Base context (always present)
     context = {
         "user_email": canonical_email,
         "engagement_id": engagement_id_normalized,
-        "tenant_id": x_tenant_id,
+        "tenant_id": tenant_id_validated,
         "aad_groups_enabled": config.is_aad_groups_enabled()
     }
     
@@ -109,19 +94,19 @@ async def current_context(
             aad_service = create_aad_groups_service(correlation_id)
             
             # Validate tenant isolation
-            if x_tenant_id and not aad_service.validate_tenant_isolation(x_tenant_id):
+            if tenant_id_validated and not aad_service.validate_tenant_isolation(tenant_id_validated):
                 logger.warning(
                     "Tenant isolation violation",
                     extra={
                         "user_email": canonical_email,
-                        "user_tenant_id": x_tenant_id,
+                        "user_tenant_id": tenant_id_validated,
                         "correlation_id": correlation_id
                     }
                 )
                 raise HTTPException(403, "Access denied: tenant not allowed")
             
             # Get user roles from AAD groups
-            user_roles = await aad_service.get_user_roles(canonical_email, x_tenant_id)
+            user_roles = await aad_service.get_user_roles(canonical_email, tenant_id_validated)
             
             # Add AAD context information
             context.update({
