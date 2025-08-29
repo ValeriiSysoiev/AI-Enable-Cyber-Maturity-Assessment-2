@@ -29,6 +29,12 @@ interface AnalysisSession {
   evidenceSummary?: string;
 }
 
+interface SearchResponse {
+  evidence_used?: boolean;
+  search_backend?: string;
+  evidence_summary?: string;
+}
+
 export default function RAGSourcesPanel({
   className = "",
   defaultQuery = "",
@@ -66,7 +72,7 @@ export default function RAGSourcesPanel({
     if (historyStored) {
       try {
         const parsed = JSON.parse(historyStored);
-        const sessions = parsed.map((s: any) => ({
+        const sessions = parsed.map((s: Omit<AnalysisSession, 'timestamp'> & { timestamp: string }) => ({
           ...s,
           timestamp: new Date(s.timestamp)
         }));
@@ -136,7 +142,7 @@ export default function RAGSourcesPanel({
     }));
   };
 
-  const handleSearchResults = (results: SearchResult[], query: string, response?: any) => {
+  const handleSearchResults = (results: SearchResult[], query: string, response?: SearchResponse) => {
     addAnalysisSession(query, results, {
       evidenceUsed: response?.evidence_used,
       searchBackend: response?.search_backend,

@@ -8,7 +8,7 @@ import type { Citation, RAGAnalysisResponse } from "../types/evidence";
 
 interface AnalysisWithEvidenceProps {
   initialContent?: string;
-  onAnalysisComplete?: (result: any) => void;
+  onAnalysisComplete?: (result: RAGAnalysisResponse) => void;
   className?: string;
 }
 
@@ -90,7 +90,8 @@ export default function AnalysisWithEvidence({
     }
   }
 
-  function formatAnalysisResult(result: any): string {
+  function formatAnalysisResult(result: RAGAnalysisResponse | null): string {
+    if (!result) return "";
     if (typeof result === "string") return result;
     if (result.content) return result.content;
     if (result.analysis) return result.analysis;
