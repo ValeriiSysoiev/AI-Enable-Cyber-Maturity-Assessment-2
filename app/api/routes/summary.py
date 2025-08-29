@@ -35,7 +35,7 @@ def get_summary(engagement_id: str, request: Request, repo: Repository = Depends
 
     # Activity stream
     events: List[ActivityItem] = []
-    def _ts(o): 
+    def _ts(o: Any) -> Optional[str]:
         return getattr(o, "created_at", None) or getattr(o, "uploaded_at", None) or getattr(o, "ts", None) or getattr(o, "timestamp", None)
 
     for a in assessments[:50]:

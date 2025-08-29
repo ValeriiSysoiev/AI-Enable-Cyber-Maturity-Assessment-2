@@ -109,10 +109,33 @@ def _validate_file_size(size_bytes: int) -> bool:
     return size_bytes <= max_bytes
 
 async def _check_engagement_membership(user_email: str, engagement_id: str) -> bool:
-    """Check if user is a member of the engagement (placeholder for actual check)"""
-    # TODO: Implement actual membership check via repository
-    # For now, return True for development
-    return True
+    """Check if user is a member of the engagement"""
+    try:
+        # Import here to avoid circular dependency
+        from api.main import app
+        
+        # Get repository from app state
+        repository = getattr(app.state, 'repo', None)
+        if not repository:
+            logger.warning("Repository not available for membership check")
+            return False
+        
+        # Check membership
+        membership = repository.get_membership(engagement_id, user_email)
+        
+        # User is member if they have any role
+        return membership is not None
+        
+    except Exception as e:
+        logger.error(
+            f"Failed to check engagement membership",
+            extra={
+                "user_email": user_email,
+                "engagement_id": engagement_id,
+                "error": str(e)
+            }
+        )
+        return False
 
 @router.post("/sas", response_model=SASResponse)
 async def generate_evidence_sas(
