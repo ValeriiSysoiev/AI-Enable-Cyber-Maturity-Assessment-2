@@ -5,6 +5,11 @@ data/projects/*
 !data/projects/demo/**
 
 .env
+.env.production
+.env.staging
+.env.development
+.env.local
+.env.*.local
 
 README.bak
 
