@@ -94,7 +94,6 @@ export default function AnalysisWithEvidence({
     if (!result) return "";
     if (typeof result === "string") return result;
     if (result.content) return result.content;
-    if (result.analysis) return result.analysis;
     return JSON.stringify(result, null, 2);
   }
 
