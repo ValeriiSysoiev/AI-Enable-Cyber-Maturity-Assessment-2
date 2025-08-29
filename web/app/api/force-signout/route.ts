@@ -7,8 +7,15 @@ export async function GET(request: NextRequest) {
   // Get all cookies
   const allCookies = cookieStore.getAll();
   
-  // Create response that redirects to signin
-  const response = NextResponse.redirect(new URL('/signin', request.url));
+  // Get the proper base URL from the request or environment
+  const baseUrl = process.env.NEXTAUTH_URL || 
+                  request.headers.get('host') ? 
+                  `https://${request.headers.get('host')}` : 
+                  request.url;
+  
+  // Create response that redirects to signin with the correct base URL
+  const signinUrl = new URL('/signin', baseUrl);
+  const response = NextResponse.redirect(signinUrl);
   
   // Clear ALL auth-related cookies
   allCookies.forEach(cookie => {
