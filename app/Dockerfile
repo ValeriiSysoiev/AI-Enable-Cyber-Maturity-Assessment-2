@@ -18,9 +18,15 @@ RUN apt-get update && apt-get install -y \
     ffmpeg \
     && rm -rf /var/lib/apt/lists/*
 
+# Update pip, setuptools, and wheel for security
+RUN pip install --no-cache-dir --upgrade pip>=23.3 setuptools>=70.0.0 wheel>=0.38.1
+
 # Copy Python deps and install
 COPY requirements.txt ./
-RUN pip install --no-cache-dir -r requirements.txt
+COPY requirements-security.txt ./
+# First install security updates, then main requirements
+RUN pip install --no-cache-dir -r requirements-security.txt && \
+    pip install --no-cache-dir -r requirements.txt
 
 # Copy application code
 COPY api/ ./api/

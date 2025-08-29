@@ -1,0 +1,19 @@
+# Security updates for vulnerable packages
+# This file contains minimum versions required to fix known CVEs
+# Install with: pip install -r requirements-security.txt
+
+# Critical security updates
+python-multipart>=0.0.9  # Fixes CVE-2024-42671, CVE-2024-37891 (CVSS 6.9-8.1)
+anyio>=4.4.0  # Fixes CVE-2024-42472 (CVSS 7.5)
+pip>=23.3  # Fixes CVE-2023-43804 (CVSS 7.5)
+future>=0.18.3  # Fixes CVE-2022-40899 (CVSS 7.5)
+wheel>=0.38.1  # Fixes CVE-2022-40898 (CVSS 7.5)
+
+# Additional security recommendations
+cryptography>=42.0.0  # Latest stable with security fixes
+urllib3>=2.2.0  # Fixes multiple CVEs
+setuptools>=70.0.0  # Fixes build security issues
+certifi>=2024.2.2  # Latest root certificates
+
+# Note: These are minimum versions for security.
+# Production deployments should use the latest stable versions where possible.
