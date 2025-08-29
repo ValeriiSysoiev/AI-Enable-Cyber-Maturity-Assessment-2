@@ -44,7 +44,7 @@
 | Secret Type | Storage | Rotation | Access |
 |-------------|---------|----------|--------|
 | API Keys | Key Vault | 90 days | Managed Identity |
-| Database Keys | Key Vault | 90 days | App Service |
+| Database Keys | Key Vault | 90 days | Container Apps |
 | Client Secrets | Key Vault | 365 days | GitHub Actions |
 | Certificates | Key Vault | Annual | Automatic |
 | Session Keys | Generated | Per deployment | Application |
