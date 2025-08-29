@@ -18,9 +18,23 @@ function getProviders() {
     && !!process.env.AZURE_AD_TENANT_ID
     && !!process.env.AZURE_AD_CLIENT_SECRET;
 
-  const demoEnabled = process.env.DEMO_E2E === "1";
+  // Demo provider should ONLY be enabled in development or explicit E2E testing
+  const isDevelopment = process.env.NODE_ENV === "development";
+  const isE2ETesting = process.env.DEMO_E2E === "1";
+  const demoEnabled = isDevelopment || isE2ETesting;
   
-  console.log("Provider config:", { aadEnabled, demoEnabled });
+  // In production, require AAD to be configured
+  const isProduction = process.env.NODE_ENV === "production";
+  if (isProduction && !aadEnabled && !isE2ETesting) {
+    console.error("SECURITY ERROR: Production requires Azure AD authentication to be configured");
+  }
+  
+  console.log("Provider config:", { 
+    aadEnabled, 
+    demoEnabled, 
+    environment: process.env.NODE_ENV,
+    e2e: isE2ETesting 
+  });
 
   const providers = [];
   if (aadEnabled) {
@@ -49,22 +63,43 @@ function getProviders() {
       },
     }));
   }
-  if (demoEnabled || providers.length === 0) {
-    // Always include demo provider as fallback to prevent 405 errors
+  // Only add demo provider in development or E2E testing
+  if (demoEnabled) {
     providers.push(CredentialsProvider({
       name: "Demo",
       credentials: { email: { label: "Email", type: "text" } },
-      async authorize(creds) { 
+      async authorize(creds) {
+        // Additional check - never allow in production without E2E flag
+        if (process.env.NODE_ENV === "production" && process.env.DEMO_E2E !== "1") {
+          console.error("Demo authentication attempted in production!");
+          return null;
+        }
+        
+        // Validate email format
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!creds?.email || !emailRegex.test(creds.email)) {
+          return null;
+        }
+        
         return { 
           id: "demo-user", 
-          email: creds?.email || "demo@example.com", 
+          email: creds.email, 
           name: "Demo User",
-          role: "admin", 
-          groups: ["admin"] 
+          role: "demo", // Never grant admin in demo mode
+          groups: ["demo"] 
         }; 
       }
     }));
   }
+  
+  // Ensure we have at least one provider configured
+  if (providers.length === 0) {
+    console.error("CRITICAL: No authentication providers configured!");
+    if (isProduction) {
+      throw new Error("Production requires authentication provider configuration");
+    }
+  }
+  
   return providers;
 }
 
