@@ -4,35 +4,23 @@ const nextConfig = {
   experimental: {
     serverComponentsExternalPackages: ['@azure/cosmos'],
   },
-  // Enable runtime environment variables
+  // Only expose non-sensitive runtime variables
   env: {
-    // These will be available at runtime
+    // Public variables only - no secrets
     AUTH_MODE: process.env.AUTH_MODE,
-    AZURE_AD_CLIENT_ID: process.env.AZURE_AD_CLIENT_ID,
-    AZURE_AD_TENANT_ID: process.env.AZURE_AD_TENANT_ID,
-    AZURE_AD_CLIENT_SECRET: process.env.AZURE_AD_CLIENT_SECRET,
     DEMO_E2E: process.env.DEMO_E2E,
-    NEXTAUTH_URL: process.env.NEXTAUTH_URL,
-    NEXTAUTH_SECRET: process.env.NEXTAUTH_SECRET,
     NEXT_PUBLIC_BUILD_SHA: process.env.NEXT_PUBLIC_BUILD_SHA,
     BUILD_SHA: process.env.BUILD_SHA,
     GITHUB_SHA: process.env.GITHUB_SHA,
   },
-  // Also expose as public environment variables for client-side access
+  // Public runtime config - no sensitive data
   publicRuntimeConfig: {
     AUTH_MODE: process.env.AUTH_MODE,
     DEMO_E2E: process.env.DEMO_E2E,
+    BUILD_SHA: process.env.BUILD_SHA || process.env.GITHUB_SHA,
   },
-  // Server-side runtime config
-  serverRuntimeConfig: {
-    AUTH_MODE: process.env.AUTH_MODE,
-    AZURE_AD_CLIENT_ID: process.env.AZURE_AD_CLIENT_ID,
-    AZURE_AD_TENANT_ID: process.env.AZURE_AD_TENANT_ID,
-    AZURE_AD_CLIENT_SECRET: process.env.AZURE_AD_CLIENT_SECRET,
-    DEMO_E2E: process.env.DEMO_E2E,
-    NEXTAUTH_URL: process.env.NEXTAUTH_URL,
-    NEXTAUTH_SECRET: process.env.NEXTAUTH_SECRET,
-  },
+  // Server-side runtime config - removed to prevent exposure
+  // Secrets should be accessed directly via process.env in server components
 }
 
 module.exports = nextConfig

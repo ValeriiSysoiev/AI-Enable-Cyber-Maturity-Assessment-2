@@ -138,9 +138,12 @@ export const authOptions: AuthOptions = {
 export function isAdmin(): boolean {
   if (typeof window === 'undefined') return false;
   
+  // Demo mode only - production uses server-side role checks
+  if (process.env.NODE_ENV === 'production') return false;
+  
   // Check localStorage for admin role (demo mode)
   const email = localStorage.getItem('email');
-  const adminEmails = ['admin@example.com', 'va.sysoiev@audit3a.com'];
+  const adminEmails = ['admin@example.com'];
   
   return email ? adminEmails.includes(email.toLowerCase()) : false;
 }
