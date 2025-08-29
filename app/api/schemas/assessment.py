@@ -7,6 +7,7 @@ class AssessmentCreate(BaseModel):
     """Schema for creating an assessment"""
     name: str
     preset_id: str
+    engagement_id: str  # Required for authorization
 
 
 class AnswerUpsert(BaseModel):
@@ -22,6 +23,7 @@ class AssessmentResponse(BaseModel):
     id: str
     name: str
     preset_id: str
+    engagement_id: str
     created_at: datetime
     answers: List[AnswerUpsert] = []
 

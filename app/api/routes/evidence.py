@@ -10,7 +10,8 @@ from typing import Optional, List, Dict, Any
 from fastapi import APIRouter, HTTPException, Depends, Query, Response
 from pydantic import BaseModel, Field
 
-from api.security import current_context, require_member
+from api.security import current_context, require_member, is_admin_with_demo_fallback
+from api.authorization import AuthorizationService, get_authorization_service
 from domain.models import Evidence
 from security.secret_provider import get_secret
 from services.evidence_processing import EvidenceProcessor
@@ -108,11 +109,18 @@ def _validate_file_size(size_bytes: int) -> bool:
     max_bytes = MAX_FILE_SIZE_MB * 1024 * 1024
     return size_bytes <= max_bytes
 
-async def _check_engagement_membership(user_email: str, engagement_id: str) -> bool:
-    """Check if user is a member of the engagement (placeholder for actual check)"""
-    # TODO: Implement actual membership check via repository
-    # For now, return True for development
-    return True
+async def _check_engagement_membership(
+    user_email: str, 
+    engagement_id: str,
+    auth_service: AuthorizationService
+) -> bool:
+    """Check if user is a member of the engagement using authorization service"""
+    is_admin = await is_admin_with_demo_fallback(user_email)
+    return await auth_service.check_engagement_access(
+        user_email=user_email,
+        engagement_id=engagement_id,
+        is_admin=is_admin
+    )
 
 @router.post("/sas", response_model=SASResponse)
 async def generate_evidence_sas(
@@ -141,8 +149,9 @@ async def generate_evidence_sas(
         }
     )
     
-    # Check engagement membership
-    is_member = await _check_engagement_membership(user_email, request.engagement_id)
+    # Check engagement membership using authorization service
+    auth_service = await get_authorization_service()
+    is_member = await _check_engagement_membership(user_email, request.engagement_id, auth_service)
     if not is_member:
         logger.warning(
             "Evidence SAS denied - not a member",
@@ -260,8 +269,9 @@ async def complete_evidence_upload(
         }
     )
     
-    # Check engagement membership
-    is_member = await _check_engagement_membership(user_email, request.engagement_id)
+    # Check engagement membership using authorization service
+    auth_service = await get_authorization_service()
+    is_member = await _check_engagement_membership(user_email, request.engagement_id, auth_service)
     if not is_member:
         logger.warning(
             "Evidence complete denied - not a member",
@@ -389,8 +399,9 @@ async def list_evidence(
     correlation_id = context.get("correlation_id")
     user_email = context["email"]
     
-    # Check engagement membership
-    is_member = await _check_engagement_membership(user_email, engagement_id)
+    # Check engagement membership using authorization service
+    auth_service = await get_authorization_service()
+    is_member = await _check_engagement_membership(user_email, engagement_id, auth_service)
     if not is_member:
         logger.warning(
             "Evidence list denied - not a member",
@@ -473,8 +484,9 @@ async def link_evidence(
         if not evidence:
             raise HTTPException(status_code=404, detail="Evidence not found")
         
-        # Check engagement membership for the evidence
-        is_member = await _check_engagement_membership(user_email, evidence.engagement_id)
+        # Check engagement membership for the evidence using authorization service
+        auth_service = await get_authorization_service()
+        is_member = await _check_engagement_membership(user_email, evidence.engagement_id, auth_service)
         if not is_member:
             logger.warning(
                 "Evidence link denied - not a member",
@@ -582,8 +594,9 @@ async def unlink_evidence(
         if not evidence:
             raise HTTPException(status_code=404, detail="Evidence not found")
         
-        # Check engagement membership for the evidence
-        is_member = await _check_engagement_membership(user_email, evidence.engagement_id)
+        # Check engagement membership for the evidence using authorization service
+        auth_service = await get_authorization_service()
+        is_member = await _check_engagement_membership(user_email, evidence.engagement_id, auth_service)
         if not is_member:
             logger.warning(
                 "Evidence unlink denied - not a member",

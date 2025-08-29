@@ -8,6 +8,7 @@ class Assessment(SQLModel, table=True):
     id: str = Field(default_factory=lambda: str(uuid.uuid4()), primary_key=True)
     name: str
     preset_id: str
+    engagement_id: str  # Link to engagement for authorization
     created_at: datetime = Field(default_factory=datetime.utcnow)
     
     # Relationship

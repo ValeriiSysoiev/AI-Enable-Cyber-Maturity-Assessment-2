@@ -6,7 +6,7 @@ from pathlib import Path
 import json
 import os
 import logging
-from typing import List, Dict
+from typing import List, Dict, Any
 from datetime import datetime, timezone
 from api.assist import router as assist_router
 from api.storage import router as storage_router
@@ -14,6 +14,8 @@ from api.db import create_db_and_tables, get_session
 from api.models import Assessment, Answer
 from api.schemas import AssessmentCreate, AssessmentResponse, AnswerUpsert, ScoreResponse, PillarScore
 from api.scoring import compute_scores
+from api.authorization import AuthorizationService, get_authorization_service
+from api.security import current_context, is_admin_with_demo_fallback
 from api.routes import assessments as assessments_router, orchestrations as orchestrations_router, engagements as engagements_router, documents, summary, presets as presets_router, version as version_router, admin_auth as admin_auth_router, gdpr as gdpr_router, admin_settings as admin_settings_router, evidence as evidence_router, csf as csf_router, workshops as workshops_router, minutes as minutes_router, roadmap_prioritization as roadmap_prioritization_router, chat as chat_router
 # from services.mcp_gateway.main import router as mcp_gateway_router  # Broken imports
 from domain.repository import InMemoryRepository
@@ -655,8 +657,24 @@ async def diagnostic_endpoint():
 
 
 @app.post("/assessments", response_model=AssessmentResponse)
-def create_assessment(assessment: AssessmentCreate, session: Session = Depends(get_session)):
-    """Create a new assessment"""
+async def create_assessment(
+    assessment: AssessmentCreate, 
+    session: Session = Depends(get_session),
+    context: Dict[str, Any] = Depends(current_context),
+    auth_service: AuthorizationService = Depends(get_authorization_service)
+):
+    """Create a new assessment - requires engagement access"""
+    # Check authorization for the engagement
+    user_email = context["user_email"]
+    is_admin = await is_admin_with_demo_fallback(user_email)
+    has_access = await auth_service.check_engagement_access(
+        user_email=user_email,
+        engagement_id=assessment.engagement_id,
+        is_admin=is_admin
+    )
+    if not has_access:
+        raise HTTPException(status_code=403, detail="Access denied to this engagement")
+    
     # Verify preset exists
     try:
         load_preset(assessment.preset_id)
@@ -672,17 +690,34 @@ def create_assessment(assessment: AssessmentCreate, session: Session = Depends(g
         id=db_assessment.id,
         name=db_assessment.name,
         preset_id=db_assessment.preset_id,
+        engagement_id=db_assessment.engagement_id,
         created_at=db_assessment.created_at,
         answers=[]
     )
 
 
 @app.get("/assessments/{assessment_id}", response_model=AssessmentResponse)
-def get_assessment(assessment_id: str, session: Session = Depends(get_session)):
-    """Get assessment with answers"""
+async def get_assessment(
+    assessment_id: str, 
+    session: Session = Depends(get_session),
+    context: Dict[str, Any] = Depends(current_context),
+    auth_service: AuthorizationService = Depends(get_authorization_service)
+):
+    """Get assessment with answers - requires engagement access"""
     assessment = session.get(Assessment, assessment_id)
     if not assessment:
         raise HTTPException(status_code=404, detail="Assessment not found")
+    
+    # Check authorization for this assessment
+    user_email = context["user_email"]
+    is_admin = await is_admin_with_demo_fallback(user_email)
+    has_access = await auth_service.check_assessment_access(
+        user_email=user_email,
+        assessment_id=assessment_id,
+        is_admin=is_admin
+    )
+    if not has_access:
+        raise HTTPException(status_code=403, detail="Access denied to this assessment")
     
     answers = [
         AnswerUpsert(
@@ -698,18 +733,36 @@ def get_assessment(assessment_id: str, session: Session = Depends(get_session)):
         id=assessment.id,
         name=assessment.name,
         preset_id=assessment.preset_id,
+        engagement_id=assessment.engagement_id,
         created_at=assessment.created_at,
         answers=answers
     )
 
 
 @app.post("/assessments/{assessment_id}/answers")
-def upsert_answer(assessment_id: str, answer: AnswerUpsert, session: Session = Depends(get_session)):
-    """Upsert an answer (insert or update by pillar_id and question_id)"""
+async def upsert_answer(
+    assessment_id: str, 
+    answer: AnswerUpsert, 
+    session: Session = Depends(get_session),
+    context: Dict[str, Any] = Depends(current_context),
+    auth_service: AuthorizationService = Depends(get_authorization_service)
+):
+    """Upsert an answer (insert or update by pillar_id and question_id) - requires engagement access"""
     # Verify assessment exists
     assessment = session.get(Assessment, assessment_id)
     if not assessment:
         raise HTTPException(status_code=404, detail="Assessment not found")
+    
+    # Check authorization for this assessment
+    user_email = context["user_email"]
+    is_admin = await is_admin_with_demo_fallback(user_email)
+    has_access = await auth_service.check_assessment_access(
+        user_email=user_email,
+        assessment_id=assessment_id,
+        is_admin=is_admin
+    )
+    if not has_access:
+        raise HTTPException(status_code=403, detail="Access denied to this assessment")
     
     # Find existing answer
     statement = select(Answer).where(
@@ -736,12 +789,28 @@ def upsert_answer(assessment_id: str, answer: AnswerUpsert, session: Session = D
 
 
 @app.get("/assessments/{assessment_id}/scores", response_model=ScoreResponse)
-def get_scores(assessment_id: str, session: Session = Depends(get_session)):
-    """Get scores for an assessment"""
+async def get_scores(
+    assessment_id: str, 
+    session: Session = Depends(get_session),
+    context: Dict[str, Any] = Depends(current_context),
+    auth_service: AuthorizationService = Depends(get_authorization_service)
+):
+    """Get scores for an assessment - requires engagement access"""
     # Get assessment
     assessment = session.get(Assessment, assessment_id)
     if not assessment:
         raise HTTPException(status_code=404, detail="Assessment not found")
+    
+    # Check authorization for this assessment
+    user_email = context["user_email"]
+    is_admin = await is_admin_with_demo_fallback(user_email)
+    has_access = await auth_service.check_assessment_access(
+        user_email=user_email,
+        assessment_id=assessment_id,
+        is_admin=is_admin
+    )
+    if not has_access:
+        raise HTTPException(status_code=403, detail="Access denied to this assessment")
     
     # Load preset
     try:
