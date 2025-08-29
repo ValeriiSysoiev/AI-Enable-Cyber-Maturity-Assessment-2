@@ -99,54 +99,120 @@ class PerformanceMonitor:
     def __init__(self):
         self.config = config.performance
         
-        # In-memory storage for recent metrics (configurable retention)
-        self.request_metrics: deque = deque(maxlen=10000)
-        self.query_metrics: deque = deque(maxlen=50000)
-        self.performance_alerts: deque = deque(maxlen=1000)
+        # Memory-efficient storage with reasonable limits for production
+        # Reduced limits to prevent memory leaks while maintaining functionality
+        self.request_metrics: deque = deque(maxlen=self._get_request_metrics_limit())
+        self.query_metrics: deque = deque(maxlen=self._get_query_metrics_limit())  
+        self.performance_alerts: deque = deque(maxlen=500)  # Reduced from 1000
         
-        # Real-time statistics tracking
+        # Real-time statistics tracking with smaller windows
         self.current_requests = 0
-        self.response_times: deque = deque(maxlen=1000)
-        self.query_times: deque = deque(maxlen=5000)
+        self.response_times: deque = deque(maxlen=500)  # Reduced from 1000
+        self.query_times: deque = deque(maxlen=1000)     # Reduced from 5000
         
         # Alert tracking
         self.slow_request_window = deque(maxlen=self.config.alert_slow_request_count_threshold)
         self.last_alert_time = defaultdict(lambda: datetime.min)
         
-        # Background monitoring task
+        # Background monitoring and cleanup
         self._monitoring_task: Optional[asyncio.Task] = None
-        self._shutdown_event = asyncio.Event()
+        self._cleanup_task: Optional[asyncio.Task] = None
+        self._shutdown_event: Optional[asyncio.Event] = None  # Lazy initialization
+        self._last_cleanup_time = datetime.utcnow()
+        
+        # Memory management settings
+        self._cleanup_interval_seconds = 300  # 5 minutes
+        self._metrics_retention_hours = 1     # Keep metrics for 1 hour max
         
         logger.info(
             "Performance monitor initialized",
             extra={
                 "slow_request_threshold_ms": self.config.slow_request_threshold_ms,
                 "slow_query_threshold_ms": self.config.slow_query_threshold_ms,
-                "enable_alerts": self.config.enable_performance_alerts
+                "enable_alerts": self.config.enable_performance_alerts,
+                "request_metrics_limit": self.request_metrics.maxlen,
+                "query_metrics_limit": self.query_metrics.maxlen,
+                "cleanup_interval_seconds": self._cleanup_interval_seconds,
+                "metrics_retention_hours": self._metrics_retention_hours
             }
         )
     
+    def _get_request_metrics_limit(self) -> int:
+        """Get memory-efficient limit for request metrics based on environment"""
+        import os
+        
+        # Use smaller limits in production to prevent memory leaks
+        is_production = (
+            os.getenv('NODE_ENV') == 'production' or 
+            os.getenv('ENVIRONMENT', '').lower() == 'production'
+        )
+        
+        if is_production:
+            return 2000  # Reduced from 10000 for production
+        else:
+            return 5000  # Moderate limit for development
+    
+    def _get_query_metrics_limit(self) -> int:
+        """Get memory-efficient limit for query metrics based on environment"""
+        import os
+        
+        # Use smaller limits in production to prevent memory leaks
+        is_production = (
+            os.getenv('NODE_ENV') == 'production' or 
+            os.getenv('ENVIRONMENT', '').lower() == 'production'
+        )
+        
+        if is_production:
+            return 5000  # Reduced from 50000 for production
+        else:
+            return 15000  # Moderate limit for development
+    
+    def _get_shutdown_event(self) -> asyncio.Event:
+        """Get or create shutdown event (lazy initialization)"""
+        if self._shutdown_event is None:
+            self._shutdown_event = asyncio.Event()
+        return self._shutdown_event
+    
     async def start_monitoring(self) -> None:
-        """Start background monitoring tasks"""
+        """Start background monitoring and cleanup tasks"""
         if self._monitoring_task is None:
             self._monitoring_task = asyncio.create_task(self._monitoring_loop())
             logger.info("Started performance monitoring background task")
+        
+        if self._cleanup_task is None:
+            self._cleanup_task = asyncio.create_task(self._cleanup_loop())
+            logger.info("Started performance cleanup background task")
     
     async def stop_monitoring(self) -> None:
-        """Stop background monitoring tasks"""
+        """Stop background monitoring and cleanup tasks"""
+        tasks_to_stop = []
+        
         if self._monitoring_task:
-            self._shutdown_event.set()
+            tasks_to_stop.append(self._monitoring_task)
+        
+        if self._cleanup_task:
+            tasks_to_stop.append(self._cleanup_task)
+        
+        if tasks_to_stop:
+            shutdown_event = self._get_shutdown_event()
+            shutdown_event.set()
+            
             try:
-                await asyncio.wait_for(self._monitoring_task, timeout=5.0)
+                await asyncio.wait_for(asyncio.gather(*tasks_to_stop, return_exceptions=True), timeout=5.0)
             except asyncio.TimeoutError:
-                self._monitoring_task.cancel()
+                for task in tasks_to_stop:
+                    if not task.done():
+                        task.cancel()
             
             self._monitoring_task = None
-            logger.info("Stopped performance monitoring background task")
+            self._cleanup_task = None
+            self._shutdown_event = None  # Clean up event
+            logger.info("Stopped performance monitoring and cleanup background tasks")
     
     async def _monitoring_loop(self) -> None:
         """Background monitoring loop"""
-        while not self._shutdown_event.is_set():
+        shutdown_event = self._get_shutdown_event()
+        while not shutdown_event.is_set():
             try:
                 # Collect system metrics if enabled
                 if self.config.enable_memory_monitoring:
@@ -162,7 +228,7 @@ class PerformanceMonitor:
                 
                 # Wait for next monitoring interval
                 await asyncio.wait_for(
-                    self._shutdown_event.wait(),
+                    shutdown_event.wait(),
                     timeout=self.config.cache_metrics_interval_seconds
                 )
                 
@@ -175,6 +241,101 @@ class PerformanceMonitor:
                     extra={"error": str(e)}
                 )
                 await asyncio.sleep(30)  # Wait before retrying
+    
+    async def _cleanup_loop(self) -> None:
+        """Background cleanup loop to prevent memory leaks"""
+        shutdown_event = self._get_shutdown_event()
+        while not shutdown_event.is_set():
+            try:
+                # Perform cleanup at regular intervals
+                await asyncio.wait_for(
+                    shutdown_event.wait(),
+                    timeout=self._cleanup_interval_seconds
+                )
+                
+            except asyncio.TimeoutError:
+                # Normal timeout, perform cleanup
+                await self._cleanup_old_metrics()
+                continue
+            except Exception as e:
+                logger.error(
+                    f"Error in performance cleanup loop: {e}",
+                    extra={"error": str(e)}
+                )
+                await asyncio.sleep(60)  # Wait longer before retrying cleanup
+    
+    async def _cleanup_old_metrics(self) -> None:
+        """Clean up old metrics to prevent memory leaks"""
+        try:
+            current_time = datetime.utcnow()
+            cutoff_time = current_time - timedelta(hours=self._metrics_retention_hours)
+            
+            # Count metrics before cleanup
+            initial_request_count = len(self.request_metrics)
+            initial_query_count = len(self.query_metrics)
+            initial_alert_count = len(self.performance_alerts)
+            
+            # Clean up old request metrics
+            # Convert deque to list for filtering, then create new deque
+            filtered_requests = [
+                metric for metric in self.request_metrics
+                if metric.timestamp >= cutoff_time
+            ]
+            self.request_metrics.clear()
+            self.request_metrics.extend(filtered_requests)
+            
+            # Clean up old query metrics
+            filtered_queries = [
+                metric for metric in self.query_metrics
+                if metric.timestamp >= cutoff_time
+            ]
+            self.query_metrics.clear()
+            self.query_metrics.extend(filtered_queries)
+            
+            # Clean up old alerts
+            filtered_alerts = [
+                alert for alert in self.performance_alerts
+                if alert.timestamp >= cutoff_time
+            ]
+            self.performance_alerts.clear()
+            self.performance_alerts.extend(filtered_alerts)
+            
+            # Clean up slow request window (keep only recent timestamps)
+            slow_window_cutoff = current_time - timedelta(minutes=self.config.alert_time_window_minutes * 2)
+            recent_slow_requests = [
+                timestamp for timestamp in self.slow_request_window
+                if timestamp >= slow_window_cutoff
+            ]
+            self.slow_request_window.clear()
+            self.slow_request_window.extend(recent_slow_requests)
+            
+            # Update cleanup timestamp
+            self._last_cleanup_time = current_time
+            
+            # Log cleanup results
+            requests_cleaned = initial_request_count - len(self.request_metrics)
+            queries_cleaned = initial_query_count - len(self.query_metrics)
+            alerts_cleaned = initial_alert_count - len(self.performance_alerts)
+            
+            if requests_cleaned > 0 or queries_cleaned > 0 or alerts_cleaned > 0:
+                logger.info(
+                    "Performance metrics cleanup completed",
+                    extra={
+                        "requests_cleaned": requests_cleaned,
+                        "queries_cleaned": queries_cleaned,
+                        "alerts_cleaned": alerts_cleaned,
+                        "remaining_requests": len(self.request_metrics),
+                        "remaining_queries": len(self.query_metrics),
+                        "remaining_alerts": len(self.performance_alerts),
+                        "retention_hours": self._metrics_retention_hours
+                    }
+                )
+            
+        except Exception as e:
+            logger.error(
+                f"Failed to cleanup old metrics: {e}",
+                extra={"error": str(e)}
+            )
     
     async def _collect_system_metrics(self) -> None:
         """Collect system resource metrics"""
@@ -482,7 +643,13 @@ class PerformanceMonitor:
         return sorted(slow_queries, key=lambda x: x.timestamp, reverse=True)[:limit]
     
     def clear_metrics(self) -> None:
-        """Clear all stored metrics"""
+        """Clear all stored metrics and force garbage collection"""
+        # Count metrics before clearing
+        request_count = len(self.request_metrics)
+        query_count = len(self.query_metrics)
+        alert_count = len(self.performance_alerts)
+        
+        # Clear all collections
         self.request_metrics.clear()
         self.query_metrics.clear()
         self.performance_alerts.clear()
@@ -490,7 +657,61 @@ class PerformanceMonitor:
         self.query_times.clear()
         self.slow_request_window.clear()
         
-        logger.info("Cleared all performance metrics")
+        # Clear alert tracking
+        self.last_alert_time.clear()
+        
+        # Force garbage collection to free memory immediately
+        import gc
+        gc.collect()
+        
+        logger.info(
+            "Cleared all performance metrics",
+            extra={
+                "cleared_requests": request_count,
+                "cleared_queries": query_count,
+                "cleared_alerts": alert_count
+            }
+        )
+    
+    async def cleanup_old_metrics_now(self) -> None:
+        """Manually trigger cleanup of old metrics (useful for testing and maintenance)"""
+        await self._cleanup_old_metrics()
+    
+    def get_memory_usage_info(self) -> Dict[str, Any]:
+        """Get current memory usage information for monitoring"""
+        try:
+            import sys
+            
+            # Calculate approximate memory usage of metrics collections
+            request_metrics_size = sys.getsizeof(self.request_metrics)
+            for metric in self.request_metrics:
+                request_metrics_size += sys.getsizeof(metric)
+            
+            query_metrics_size = sys.getsizeof(self.query_metrics)
+            for metric in self.query_metrics:
+                query_metrics_size += sys.getsizeof(metric)
+            
+            return {
+                "request_metrics_count": len(self.request_metrics),
+                "query_metrics_count": len(self.query_metrics),
+                "alert_count": len(self.performance_alerts),
+                "request_metrics_size_bytes": request_metrics_size,
+                "query_metrics_size_bytes": query_metrics_size,
+                "request_metrics_limit": self.request_metrics.maxlen,
+                "query_metrics_limit": self.query_metrics.maxlen,
+                "last_cleanup_time": self._last_cleanup_time.isoformat(),
+                "cleanup_interval_seconds": self._cleanup_interval_seconds,
+                "retention_hours": self._metrics_retention_hours
+            }
+            
+        except Exception as e:
+            logger.warning(f"Failed to get memory usage info: {e}")
+            return {
+                "request_metrics_count": len(self.request_metrics),
+                "query_metrics_count": len(self.query_metrics),
+                "alert_count": len(self.performance_alerts),
+                "error": str(e)
+            }
 
 
 # Global performance monitor instance
