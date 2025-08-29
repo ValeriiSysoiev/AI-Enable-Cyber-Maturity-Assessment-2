@@ -29,9 +29,8 @@ export async function GET(request: NextRequest) {
       if (cookieHeader && cookieHeader.includes('demo-email')) {
         const email = decodeURIComponent(cookieHeader.split('demo-email=')[1]?.split(';')[0] || '');
         if (email && email.trim()) {
-          // Determine admin role based on email
-          const adminEmails = ['admin@example.com', 'va.sysoiev@audit3a.com'];
-          const isAdmin = adminEmails.includes(email.toLowerCase());
+          // In demo mode, no users have admin privileges for security
+          const isAdmin = false; // Admin roles must come from AAD in production
           
           return NextResponse.json({
             user: {

@@ -4,23 +4,16 @@ import CredentialsProvider from "next-auth/providers/credentials";
 
 // Dynamic provider configuration - evaluated at runtime
 function getProviders() {
-  // Debug environment variables
-  console.log("Auth config debug:", {
-    AUTH_MODE: process.env.AUTH_MODE,
-    AZURE_AD_CLIENT_ID: !!process.env.AZURE_AD_CLIENT_ID ? "SET" : "MISSING",
-    AZURE_AD_TENANT_ID: !!process.env.AZURE_AD_TENANT_ID ? "SET" : "MISSING", 
-    AZURE_AD_CLIENT_SECRET: !!process.env.AZURE_AD_CLIENT_SECRET ? "SET" : "MISSING",
-    DEMO_E2E: process.env.DEMO_E2E,
-  });
+  // Production safety check
+  const isProduction = process.env.NODE_ENV === 'production';
 
   const aadEnabled = process.env.AUTH_MODE === "aad"
     && !!process.env.AZURE_AD_CLIENT_ID
     && !!process.env.AZURE_AD_TENANT_ID
     && !!process.env.AZURE_AD_CLIENT_SECRET;
 
-  const demoEnabled = process.env.DEMO_E2E === "1";
-  
-  console.log("Provider config:", { aadEnabled, demoEnabled });
+  // Demo mode is ONLY allowed in non-production environments
+  const demoEnabled = !isProduction && process.env.DEMO_E2E === "1";
 
   const providers = [];
   if (aadEnabled) {
@@ -49,8 +42,8 @@ function getProviders() {
       },
     }));
   }
-  if (demoEnabled || providers.length === 0) {
-    // Always include demo provider as fallback to prevent 405 errors
+  // Demo provider ONLY in development/test environments
+  if (demoEnabled && !isProduction) {
     providers.push(CredentialsProvider({
       name: "Demo",
       credentials: { email: { label: "Email", type: "text" } },
@@ -59,11 +52,16 @@ function getProviders() {
           id: "demo-user", 
           email: creds?.email || "demo@example.com", 
           name: "Demo User",
-          role: "admin", 
-          groups: ["admin"] 
+          role: "member", // Never grant admin in demo mode
+          groups: ["member"] 
         }; 
       }
     }));
+  }
+  
+  // In production, require AAD to be configured
+  if (isProduction && providers.length === 0) {
+    throw new Error("Production requires Azure AD authentication to be configured");
   }
   return providers;
 }
@@ -99,11 +97,10 @@ export const authOptions: AuthOptions = {
       return session;
     },
     async signIn({ user, account, profile, email, credentials }) {
-      console.log('NextAuth signIn callback:', { user: user?.email, account: account?.provider });
+      // Validate sign-in attempt
       return true;
     },
     async redirect({ url, baseUrl }) {
-      console.log('NextAuth redirect callback:', { url, baseUrl });
       // Ensure we redirect to the correct base URL
       if (url.startsWith("/")) return `${baseUrl}${url}`;
       if (new URL(url).origin === baseUrl) return url;
@@ -112,7 +109,6 @@ export const authOptions: AuthOptions = {
   },
   events: {
     async signOut(message) {
-      console.log('NextAuth signOut event triggered');
       // Clear server-side session completely
     }
   },
@@ -120,18 +116,7 @@ export const authOptions: AuthOptions = {
     signIn: "/signin",
     error: "/signin?error=true",
   },
-  debug: process.env.NODE_ENV === "development",
-  logger: {
-    error(code, metadata) {
-      console.error('NextAuth error:', code, metadata);
-    },
-    warn(code) {
-      console.warn('NextAuth warning:', code);
-    },
-    debug(code, metadata) {
-      console.log('NextAuth debug:', code, metadata);
-    }
-  }
+  debug: process.env.NODE_ENV === "development"
 };
 
 // Client-side utility functions

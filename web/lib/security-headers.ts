@@ -22,17 +22,25 @@ export function addSecurityHeaders(response: NextResponse): NextResponse {
       'camera=(), microphone=(), geolocation=(), interest-cohort=()'
     );
     
-    // Content Security Policy
+    // Content Security Policy - Strict mode for production
+    // Generate a nonce for inline scripts if needed
+    const nonce = Buffer.from(crypto.randomUUID()).toString('base64');
+    response.headers.set('X-Nonce', nonce);
+    
     const cspHeader = [
       "default-src 'self'",
-      "script-src 'self' 'unsafe-inline' 'unsafe-eval'",
-      "style-src 'self' 'unsafe-inline'",
+      // Remove unsafe-inline and unsafe-eval for security
+      // Next.js requires some inline scripts, use nonce-based approach
+      `script-src 'self' 'nonce-${nonce}'`,
+      // Style can use nonce for Next.js critical CSS
+      `style-src 'self' 'nonce-${nonce}'`,
       "img-src 'self' data: blob: https:",
       "font-src 'self' data:",
-      "connect-src 'self' https://login.microsoftonline.com",
+      "connect-src 'self' https://login.microsoftonline.com https://graph.microsoft.com",
       "frame-ancestors 'self'",
       "base-uri 'self'",
       "form-action 'self'",
+      "upgrade-insecure-requests",
     ].join('; ');
     
     response.headers.set('Content-Security-Policy', cspHeader);
