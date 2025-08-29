@@ -465,6 +465,15 @@ async def diagnostic_endpoint():
 import logging
 logger = logging.getLogger(__name__)
 
+# Critical routers that must load for the app to function
+CRITICAL_ROUTERS = {
+    "assessments_router": "Core assessment functionality",
+    "engagements_router": "Engagement management",
+    "presets_router": "Assessment presets",
+    "version_router": "Health and version endpoints",
+    "documents": "Document handling"
+}
+
 failed_routers = []
 
 try:
@@ -559,13 +568,38 @@ except Exception as e:
 #     logger.error(f"Failed to include mcp_gateway_router: {e}")
 #     failed_routers.append(("mcp_gateway_router", str(e)))
 
+# Check if any critical routers failed to load
+critical_failures = []
+for router_name, error in failed_routers:
+    if router_name in CRITICAL_ROUTERS:
+        critical_failures.append({
+            "router": router_name,
+            "purpose": CRITICAL_ROUTERS[router_name],
+            "error": error
+        })
+
+# Fail startup if critical routers couldn't load
+if critical_failures:
+    error_msg = "CRITICAL: Failed to load essential routers:\n"
+    for failure in critical_failures:
+        error_msg += f"  - {failure['router']}: {failure['purpose']} - Error: {failure['error']}\n"
+    logger.critical(error_msg)
+    
+    # In production, fail fast
+    if os.getenv("ENVIRONMENT", "development") == "production":
+        raise RuntimeError(f"Cannot start application - critical routers failed: {[f['router'] for f in critical_failures]}")
+    else:
+        logger.warning("Continuing in development mode despite critical router failures")
+
 # Add diagnostic info about failed routers
 @app.get("/api/router-status")
 async def router_status():
     """Check which routers failed to load"""
     return {
         "failed_routers": failed_routers,
-        "failed_count": len(failed_routers)
+        "failed_count": len(failed_routers),
+        "critical_failures": critical_failures,
+        "status": "degraded" if critical_failures else "healthy"
     }
 
 # S4 Feature routers - conditionally included based on feature flags
