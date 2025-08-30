@@ -143,7 +143,7 @@ These guidelines are **non-negotiable**. They encode our long-term architecture,
 
 - **Staging**: push to `main` → CI → deploy → UAT Gate (staging).  
 - **Production**: dispatch → build web **image tag=`${{ github.sha }}`** → wire → set build SHA → **prove** `/api/version == sha` → UAT Gate (prod-safe).  
-- Remove/disable any pipelines targeting deprecated **App Service API**; API target is **Container Apps** only.
+- API and Web services target **Container Apps** only.
 
 ---
 

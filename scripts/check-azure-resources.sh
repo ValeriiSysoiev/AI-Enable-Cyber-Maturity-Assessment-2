@@ -40,27 +40,26 @@ fi
 
 echo ""
 
-# App Services
-echo -e "${BLUE}Checking App Services:${NC}"
+# Container Apps (primary deployment target)
+echo -e "${BLUE}Checking Container Apps:${NC}"
 
-check_webapp() {
+check_container_app() {
     local app_name=$1
     echo -n "  $app_name: "
-    if az webapp show --resource-group $RESOURCE_GROUP --name $app_name &>/dev/null; then
+    if az containerapp show --resource-group $RESOURCE_GROUP --name $app_name &>/dev/null; then
         echo -e "${GREEN}✓ Exists${NC}"
-        # Check if running
-        STATE=$(az webapp show --resource-group $RESOURCE_GROUP --name $app_name --query state -o tsv)
-        echo "    State: $STATE"
-        # Get URL
-        URL=$(az webapp show --resource-group $RESOURCE_GROUP --name $app_name --query defaultHostName -o tsv)
-        echo "    URL: https://$URL"
+        # Get ingress URL
+        URL=$(az containerapp show --resource-group $RESOURCE_GROUP --name $app_name --query properties.configuration.ingress.fqdn -o tsv 2>/dev/null)
+        if [ -n "$URL" ]; then
+            echo "    URL: https://$URL"
+        fi
     else
         echo -e "${RED}✗ Does not exist${NC}"
     fi
 }
 
-check_webapp "api-cybermat-prd"
-check_webapp "web-cybermat-prd"
+check_container_app "api-cybermat-prd-aca"
+check_container_app "web-cybermat-prd-aca"
 
 echo ""
 
