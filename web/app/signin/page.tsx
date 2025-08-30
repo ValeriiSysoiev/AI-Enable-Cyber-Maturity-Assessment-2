@@ -11,6 +11,7 @@ export default function SignIn() {
   const [email, setEmail] = useState("");
   const [isAAD, setIsAAD] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  const [authError, setAuthError] = useState<string | null>(null);
   const router = useRouter();
   const { data: session, status } = useSession();
 
@@ -26,18 +27,38 @@ export default function SignIn() {
     if (typeof window !== 'undefined') {
       // Check auth mode endpoint to determine if AAD is properly configured
       fetch('/api/auth/mode')
-        .then(res => res.json())
+        .then(res => {
+          if (!res.ok && res.status === 500) {
+            // Handle production AAD configuration error
+            return res.json().then(data => {
+              throw new Error(data.error || 'Authentication configuration error');
+            });
+          }
+          return res.json();
+        })
         .then(data => {
-          setIsAAD(data.mode === 'aad' && data.enabled && data.aadEnabled);
+          // In production, only AAD is allowed
+          if (data.mode === 'aad') {
+            setIsAAD(true);
+          } else if (data.mode === 'error') {
+            setAuthError(data.error || 'Authentication not properly configured');
+            setIsAAD(true); // Show AAD UI even if misconfigured
+          } else {
+            // Demo mode - only in non-production
+            setIsAAD(false);
+          }
           setIsLoading(false);
         })
-        .catch(() => {
-          setIsAAD(false);
+        .catch((error) => {
+          console.error('Auth mode check failed:', error);
+          setAuthError(error.message || 'Failed to determine authentication mode');
+          // Default to AAD in case of error (safer for production)
+          setIsAAD(true);
           setIsLoading(false);
         });
     } else {
-      // During build/SSG, default to demo mode to prevent errors
-      setIsAAD(false);
+      // During build/SSG, default to AAD mode for production safety
+      setIsAAD(true);
       setIsLoading(false);
     }
   }, []);
@@ -60,10 +81,20 @@ export default function SignIn() {
           localStorage.setItem('email', email.trim());
           router.push("/engagements");
         } else {
-          console.error('Failed to sign in');
+          const errorData = await response.json().catch(() => ({}));
+          const errorMessage = errorData.error || `Sign in failed (${response.status})`;
+          console.error('Failed to sign in:', errorMessage);
+          
+          // Show user-friendly error message
+          if (response.status === 403) {
+            alert('Demo sign-in is not available in production. Please use Azure Active Directory.');
+          } else {
+            alert(`Sign in failed: ${errorMessage}`);
+          }
         }
       } catch (error) {
         console.error('Sign in error:', error);
+        alert('An error occurred during sign in. Please try again.');
       }
     }
   };
@@ -107,10 +138,37 @@ export default function SignIn() {
               Use your organizational account to continue
             </p>
           </div>
+          
+          {authError && (
+            <div className="rounded-md bg-red-50 p-4">
+              <div className="flex">
+                <div className="flex-shrink-0">
+                  <svg className="h-5 w-5 text-red-400" viewBox="0 0 20 20" fill="currentColor">
+                    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+                  </svg>
+                </div>
+                <div className="ml-3">
+                  <h3 className="text-sm font-medium text-red-800">
+                    Authentication Configuration Error
+                  </h3>
+                  <div className="mt-2 text-sm text-red-700">
+                    <p>{authError}</p>
+                    <p className="mt-1">Please contact your system administrator.</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+          
           <div className="mt-8">
             <button
               onClick={handleAADSignIn}
-              className="group relative flex w-full justify-center rounded-md border border-transparent bg-indigo-600 py-2 px-4 text-sm font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+              disabled={!!authError}
+              className={`group relative flex w-full justify-center rounded-md border border-transparent py-2 px-4 text-sm font-medium text-white focus:outline-none focus:ring-2 focus:ring-offset-2 ${
+                authError 
+                  ? 'bg-gray-400 cursor-not-allowed' 
+                  : 'bg-indigo-600 hover:bg-indigo-700 focus:ring-indigo-500'
+              }`}
             >
               Sign in with Azure Active Directory
             </button>
