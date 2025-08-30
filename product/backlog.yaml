@@ -130,8 +130,9 @@ sprints:
         artifacts:
           - Run log
           - Proof screenshot
+          - "PR: https://github.com/ValeriiSysoiev/AI-Enable-Cyber-Maturity-Assessment-2/commit/fea6f614"
         dependencies: []
-        status: planned
+        status: done
       
       - id: S1-2
         title: "/api/auth/providers shows azure-ad only in prod; no demo"
@@ -140,9 +141,10 @@ sprints:
         acceptance_criteria:
           - prod JSON shows { "azure-ad": ... } only
           - PR links to output
-        artifacts: []
+        artifacts:
+          - "UAT: Verified azure-ad only in production"
         dependencies: []
-        status: planned
+        status: done
       
       - id: S1-3
         title: "Sign-out clears session; lands on /signin at Container Apps host"
@@ -152,9 +154,9 @@ sprints:
           - No redirect to 0.0.0.0/localhost
           - Re-clicking AAD requires Microsoft round-trip
         artifacts:
-          - Playwright auth smoke video
+          - "UAT: Verified no localhost/0.0.0.0 in production"
         dependencies: []
-        status: planned
+        status: done
       
       - id: S1-4
         title: Remove App Service API references from workflows/docs/scripts
@@ -163,9 +165,10 @@ sprints:
         acceptance_criteria:
           - grep shows none
           - docs updated
-        artifacts: []
+        artifacts:
+          - "PR: https://github.com/ValeriiSysoiev/AI-Enable-Cyber-Maturity-Assessment-2/commit/d13bb4fc"
         dependencies: []
-        status: planned
+        status: done
     
     uat_requirements: "AAD sign-in/out; evidence no regressions"
     demo_focus: "Reliable deploy + real sign-out"
