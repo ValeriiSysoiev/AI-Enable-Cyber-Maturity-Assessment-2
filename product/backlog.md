@@ -4,6 +4,12 @@
 **Last Updated:** 2025-08-30  
 **Source:** `/product/backlog.yaml`
 
+## 📊 Overall Progress
+- **Sprints Completed:** 1/10 (10%)
+- **Story Points Delivered:** 8/77 (10.4%)
+- **Current Sprint:** Sprint 2 (Ready to Start)
+- **Last Deployment:** Sprint 1 completed Aug 30, 2025
+
 ## Quick Navigation
 
 [Epics](#epics) | [Sprints](#sprints) | [User Stories](#additional-user-stories) | [Metrics](#metrics--governance)
@@ -123,23 +129,23 @@
 
 ## Sprints
 
-### Sprint 1: Stabilize Releases & Sign-in/out Baseline
-**Dates:** Sep 2-8, 2025 | **Points:** 8 | **Epics:** E1, E2
+### Sprint 1: Stabilize Releases & Sign-in/out Baseline ✅
+**Dates:** Sep 2-8, 2025 | **Points:** 8/8 | **Epics:** E1, E2 | **Status:** DONE (Aug 30, 2025)
 
 | Story | Title | Points | Status |
 |-------|-------|--------|--------|
-| S1-1 | Production workflow SHA verification | 3 | 🔵 Planned |
-| S1-2 | AAD-only providers in production | 1 | 🔵 Planned |
-| S1-3 | Sign-out session clearing | 3 | 🔵 Planned |
-| S1-4 | Remove App Service API references | 1 | 🔵 Planned |
+| S1-1 | Production workflow SHA verification | 3 | ✅ Done |
+| S1-2 | AAD-only providers in production | 1 | ✅ Done |
+| S1-3 | Sign-out session clearing | 3 | ✅ Done |
+| S1-4 | Remove App Service API references | 1 | ✅ Done |
 
 **UAT:** AAD sign-in/out; evidence no regressions  
 **Demo:** Reliable deploy + real sign-out
 
 ---
 
-### Sprint 2: Contracts - Presets/Assessments/Engagements
-**Dates:** Sep 9-15, 2025 | **Points:** 10 | **Epics:** E3
+### Sprint 2: Contracts - Presets/Assessments/Engagements 🚀
+**Dates:** Sep 9-15, 2025 | **Points:** 10 | **Epics:** E3 | **Status:** READY
 
 | Story | Title | Points | Status |
 |-------|-------|--------|--------|
@@ -262,19 +268,20 @@
 
 ## Sprint Summary
 
-| Sprint | Points | Focus Area |
-|--------|--------|------------|
-| Sprint 1 | 8 | Foundation - Releases & Auth |
-| Sprint 2 | 10 | API Contracts |
-| Sprint 3 | 7 | Chat Orchestration |
-| Sprint 4 | 8 | Evidence Mapping |
-| Sprint 5 | 8 | Maturity Scoring |
-| Sprint 6 | 11 | Roadmap & Exports |
-| Sprint 7 | 8 | RAG & Citations |
-| Sprint 8 | 4 | Admin Tools |
-| Sprint 9 | 6 | Privacy & Consent |
-| Sprint 10 | 7 | Operations & Security |
-| **Total** | **77** | **10 weeks** |
+| Sprint | Points | Status | Focus Area |
+|--------|--------|--------|------------|
+| Sprint 1 | 8/8 | ✅ Done | Foundation - Releases & Auth |
+| Sprint 2 | 10 | 🚀 Ready | API Contracts |
+| Sprint 3 | 7 | 🔵 Planned | Chat Orchestration |
+| Sprint 4 | 8 | 🔵 Planned | Evidence Mapping |
+| Sprint 5 | 8 | 🔵 Planned | Maturity Scoring |
+| Sprint 6 | 11 | 🔵 Planned | Roadmap & Exports |
+| Sprint 7 | 8 | 🔵 Planned | RAG & Citations |
+| Sprint 8 | 4 | 🔵 Planned | Admin Tools |
+| Sprint 9 | 6 | 🔵 Planned | Privacy & Consent |
+| Sprint 10 | 7 | 🔵 Planned | Operations & Security |
+| **Total** | **77** | | **10 weeks** |
+| **Completed** | **8** | | **1 week done** |
 
 ---
 
