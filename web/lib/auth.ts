@@ -59,11 +59,24 @@ function getProviders() {
     }));
   }
   
-  // In production, require AAD to be configured
-  if (isProduction && providers.length === 0) {
-    throw new Error("Production requires Azure AD authentication to be configured");
-  }
+  // Note: In production, AAD will be validated at runtime when secrets are injected
+  // Don't validate during build time as secrets aren't available in Docker build context
   return providers;
+}
+
+// Runtime validation function (called only when auth is actually used)
+function validateProductionConfig() {
+  const isProduction = process.env.NODE_ENV === 'production';
+  if (isProduction) {
+    const aadEnabled = process.env.AUTH_MODE === "aad"
+      && !!process.env.AZURE_AD_CLIENT_ID
+      && !!process.env.AZURE_AD_TENANT_ID
+      && !!process.env.AZURE_AD_CLIENT_SECRET;
+    
+    if (!aadEnabled) {
+      throw new Error("Production requires Azure AD authentication to be configured");
+    }
+  }
 }
 
 export const authOptions: AuthOptions = {
@@ -72,6 +85,9 @@ export const authOptions: AuthOptions = {
   session: { strategy: "jwt", maxAge: 30 * 24 * 60 * 60 },
   callbacks: {
     async jwt({ token, account, profile }) {
+      // Runtime validation only when auth is actually used
+      validateProductionConfig();
+      
       // Surface AAD groups/roles when available
       if (account && profile) {
         token.groups = (profile as any).groups || token.groups;
