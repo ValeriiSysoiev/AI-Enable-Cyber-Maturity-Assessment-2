@@ -123,6 +123,13 @@ curl https://api-cybermat-prd-aca.icystone-69c102b0.westeurope.azurecontainerapp
 - [Security](./docs/security.md) - Identity model and security practices
 - [Release Notes Template](./docs/release_notes_template.md) - Template for version releases
 
+## Product Backlog
+
+- [Backlog (YAML)](./product/backlog.yaml) - Machine-readable canonical source of truth
+- [Backlog (Markdown)](./product/backlog.md) - Human-friendly view with tables and summaries
+- [Sprint Notes](./product/sprint_notes/) - Historical sprint close-out summaries
+- [Product README](./product/README.md) - Backlog management and workflow documentation
+
 ## Quick Start (Local Development)
 
 ```bash
