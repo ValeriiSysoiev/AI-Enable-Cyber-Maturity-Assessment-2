@@ -1,0 +1,576 @@
+# AI-Enabled Cyber Maturity Assessment - Product Backlog
+# Source of Truth for Epics, Sprints, and Stories
+version: 1.0.0
+updated_at: 2025-08-30
+
+metadata:
+  sprint_duration: 1 week
+  ceremonies:
+    - Sprint Planning (90m)
+    - Daily Standup (15m)
+    - Mid-sprint Review (30m)
+    - Sprint Review/Demo (45m)
+    - Retrospective (30m)
+  
+  definition_of_ready:
+    - User value clearly defined
+    - Acceptance criteria in Given/When/Then format
+    - Test notes included
+    - No external blockers identified
+  
+  definition_of_done:
+    - Code implemented
+    - Tests written and passing
+    - Documentation updated
+    - GitHub Actions green
+    - SHA proof (/api/version == HEAD SHA)
+    - UAT Gate passed in staging & production
+    - Demo recorded
+  
+  constraints:
+    - Re-read README, /docs, and /DEVELOPMENT_GUIDELINES.md before every change
+    - No hacks/workarounds - fix root causes only
+    - Actions is canonical; post-deploy UAT Gate is mandatory
+    - PRs must be <300 LOC, single concern
+
+epics:
+  - id: E1
+    title: CI/CD & Environment Baseline
+    description: Deterministic Releases - Deployments are reliable, SHA-proven; dual infra drift removed
+    success_criteria: Production workflow builds web image tag=${{ github.sha }}, wires, sets build SHA, and proves /api/version == sha
+    status: planned
+  
+  - id: E2
+    title: Auth Lifecycle Hardening
+    description: AAD-Only Prod - Sign-in/out deterministic; no demo in prod; no 0.0.0.0 callbacks
+    success_criteria: AAD round-trip & sign-out are reliable; no auto-login without Microsoft round-trip
+    status: planned
+  
+  - id: E3
+    title: API Health & Contracts
+    description: Presets/Assessments/Engagements/Admin - UI↔API contracts via /api/proxy are consistent and resilient
+    success_criteria: Presets list/get/upload 2xx; create→get 201→200; engagements list 2xx; /api/proxy/admin/status 200 for Admin
+    status: planned
+  
+  - id: E4
+    title: Chat Orchestrator v1
+    description: Conversation & Tool Routing - Minimal "brain" to route intents to tools; maintain conversation state
+    success_criteria: Chat can call Doc Analyzer & Transcribe→Minutes tools and persist run logs
+    status: planned
+  
+  - id: E5
+    title: Evidence Ingestion & Mapping v1
+    description: Ingest docs; map to maturity controls; evidence traceability
+    success_criteria: Uploaded docs produce control coverage with citations
+    status: planned
+  
+  - id: E6
+    title: Maturity Scoring v1
+    description: Score domains from mapped evidence; explainability with gaps
+    success_criteria: Domain levels computed with "why" + missing evidence list
+    status: planned
+  
+  - id: E7
+    title: Roadmap & Exports v1
+    description: PPTX/Jira - From gaps to prioritized roadmap with cost/effort & exports
+    success_criteria: PPTX deck + Jira epics/issues generated from roadmap
+    status: planned
+  
+  - id: E8
+    title: Engagement RAG & Citations
+    description: Per-engagement index used by chat/Doc Analyzer for citations
+    success_criteria: Answers contain citations to evidence; contradiction prompts
+    status: planned
+  
+  - id: E9
+    title: Admin & Presets Management
+    description: Admin can curate models/presets; imports validated & versioned
+    success_criteria: Admin-presets CRUD & validation; canonical presets seeded
+    status: planned
+  
+  - id: E10
+    title: Consent & GDPR
+    description: Consent workflow for audio/docs; privacy TTL/audit dashboards
+    success_criteria: Consent stored & auditable; GDPR Ops dashboards render
+    status: planned
+  
+  - id: E11
+    title: Observability & SLOs
+    description: Structured logs, correlation IDs, SLO dashboards; alerts
+    success_criteria: Error budgets & alerts configured; support bundle script
+    status: planned
+  
+  - id: E12
+    title: Security & Compliance
+    description: CRITICAL/HIGH security backlog closed; dependency/license guardrails
+    success_criteria: No high/critical open; scans & policy checks green
+    status: planned
+  
+  - id: E13
+    title: Repo Hygiene & Docs
+    description: Size guards; dead docs removed; single source-of-truth docs; PR checklist
+    success_criteria: Repo lean; docs current; PR template enforced
+    status: planned
+
+sprints:
+  - number: 1
+    name: "Sprint 1 - Stabilize Releases & Sign-in/out Baseline"
+    start_date: "2025-09-02"
+    end_date: "2025-09-08"
+    goal: Establish reliable deployments and authentication foundation
+    epics: [E1, E2]
+    stories:
+      - id: S1-1
+        title: Production workflow must set build SHA and assert GET /api/version == sha
+        epic_ref: E1
+        points: 3
+        acceptance_criteria:
+          - Failing proof fails job
+          - Passing proof marks green
+        artifacts:
+          - Run log
+          - Proof screenshot
+        dependencies: []
+        status: planned
+      
+      - id: S1-2
+        title: "/api/auth/providers shows azure-ad only in prod; no demo"
+        epic_ref: E2
+        points: 1
+        acceptance_criteria:
+          - prod JSON shows { "azure-ad": ... } only
+          - PR links to output
+        artifacts: []
+        dependencies: []
+        status: planned
+      
+      - id: S1-3
+        title: "Sign-out clears session; lands on /signin at Container Apps host"
+        epic_ref: E2
+        points: 3
+        acceptance_criteria:
+          - No redirect to 0.0.0.0/localhost
+          - Re-clicking AAD requires Microsoft round-trip
+        artifacts:
+          - Playwright auth smoke video
+        dependencies: []
+        status: planned
+      
+      - id: S1-4
+        title: Remove App Service API references from workflows/docs/scripts
+        epic_ref: E1
+        points: 1
+        acceptance_criteria:
+          - grep shows none
+          - docs updated
+        artifacts: []
+        dependencies: []
+        status: planned
+    
+    uat_requirements: "AAD sign-in/out; evidence no regressions"
+    demo_focus: "Reliable deploy + real sign-out"
+  
+  - number: 2
+    name: "Sprint 2 - Contracts: Presets/Assessments/Engagements Admin Status"
+    start_date: "2025-09-09"
+    end_date: "2025-09-15"
+    goal: Establish API contracts and data flow
+    epics: [E3]
+    stories:
+      - id: S2-1
+        title: "/api/proxy/presets list/get return 2xx; seed includes cscm-v3, cyber-for-ai"
+        epic_ref: E3
+        points: 3
+        acceptance_criteria:
+          - UI table non-empty
+          - GET id works
+        artifacts: []
+        dependencies: []
+        status: planned
+      
+      - id: S2-2
+        title: Preset upload returns 201 and appears in list
+        epic_ref: E3
+        points: 3
+        acceptance_criteria:
+          - Upload 201
+          - Retrievable by id
+        artifacts: []
+        dependencies: [S2-1]
+        status: planned
+      
+      - id: S2-3
+        title: "Assessment create→get 201→200; ID shape consistent (engagement-...)"
+        epic_ref: E3
+        points: 3
+        acceptance_criteria:
+          - UI detail page loads without "Failed to get assessment"
+        artifacts: []
+        dependencies: []
+        status: planned
+      
+      - id: S2-4
+        title: "/api/proxy/admin/status 200 for Admin session (server-verified)"
+        epic_ref: E3
+        points: 1
+        acceptance_criteria:
+          - "Playwright smoke: admin Ops/GDPR no longer 'Access denied'"
+        artifacts: []
+        dependencies: []
+        status: planned
+    
+    uat_requirements: "Create assessment and open it; admin pages render"
+    demo_focus: "Preset catalog & create→read assessment"
+  
+  - number: 3
+    name: "Sprint 3 - Chat Orchestrator v1 (Conversation + Minimal Routing)"
+    start_date: "2025-09-16"
+    end_date: "2025-09-22"
+    goal: Implement basic chat orchestration and tool routing
+    epics: [E4]
+    stories:
+      - id: S3-1
+        title: Conversation store per engagement (metadata, participants, run-logs)
+        epic_ref: E4
+        points: 3
+        acceptance_criteria:
+          - Inspectable JSON
+          - Persisted
+        artifacts: []
+        dependencies: []
+        status: planned
+      
+      - id: S3-2
+        title: "Intent→tool routing minimal: 'analyze doc' + 'transcribe minutes'"
+        epic_ref: E4
+        points: 3
+        acceptance_criteria:
+          - Chat commands invoke tools
+          - Run logs captured
+        artifacts: []
+        dependencies: [S3-1]
+        status: planned
+      
+      - id: S3-3
+        title: "Guardrails: RBAC + consent flag check per tool"
+        epic_ref: E4
+        points: 1
+        acceptance_criteria:
+          - Unauthorized tool calls blocked with clear message
+        artifacts: []
+        dependencies: [S3-2]
+        status: planned
+    
+    uat_requirements: "Chat invokes Doc Analyzer with a doc; Transcribe with a short audio; logs visible"
+    demo_focus: "Hello orchestrator"
+  
+  - number: 4
+    name: "Sprint 4 - Evidence Mapping v1"
+    start_date: "2025-09-23"
+    end_date: "2025-09-29"
+    goal: Map evidence to maturity controls
+    epics: [E5]
+    stories:
+      - id: S4-1
+        title: Doc Analyzer maps controls for active model; store traceability (citations)
+        epic_ref: E5
+        points: 5
+        acceptance_criteria:
+          - Control coverage list with evidence snippet refs
+        artifacts: []
+        dependencies: [S3-2]
+        status: planned
+      
+      - id: S4-2
+        title: Evidence overview page under engagement (tab)
+        epic_ref: E5
+        points: 3
+        acceptance_criteria:
+          - List shows documents, mapped controls, confidence
+        artifacts: []
+        dependencies: [S4-1]
+        status: planned
+    
+    uat_requirements: "Upload doc, chat analyze → mapped controls visible with citations"
+    demo_focus: "Evidence to controls"
+  
+  - number: 5
+    name: "Sprint 5 - Maturity Scoring v1"
+    start_date: "2025-09-30"
+    end_date: "2025-10-06"
+    goal: Compute maturity scores from evidence
+    epics: [E6]
+    stories:
+      - id: S5-1
+        title: Scoring agent computes domain levels with rationale & missing-evidence prompts
+        epic_ref: E6
+        points: 5
+        acceptance_criteria:
+          - JSON result persisted
+          - UI renders domain radar/table
+          - Reasons visible
+        artifacts: []
+        dependencies: [S4-1]
+        status: planned
+      
+      - id: S5-2
+        title: "'Ask for what's missing' prompts added to chat"
+        epic_ref: E6
+        points: 3
+        acceptance_criteria:
+          - Chat returns 2–3 targeted follow-ups
+        artifacts: []
+        dependencies: [S5-1]
+        status: planned
+    
+    uat_requirements: "From mapped evidence, score maturity; see gaps & prompts"
+    demo_focus: "Your current maturity, here's why"
+  
+  - number: 6
+    name: "Sprint 6 - Roadmap & Exports v1 (PPTX/Jira)"
+    start_date: "2025-10-07"
+    end_date: "2025-10-13"
+    goal: Generate roadmaps and export to various formats
+    epics: [E7]
+    stories:
+      - id: S6-1
+        title: Roadmap generator with cost bands & resource profiles
+        epic_ref: E7
+        points: 5
+        acceptance_criteria:
+          - Prioritized, impact/effort, dependencies, ETA
+        artifacts: []
+        dependencies: [S5-1]
+        status: planned
+      
+      - id: S6-2
+        title: "Export: PPTX deck (title, scores, roadmap)"
+        epic_ref: E7
+        points: 3
+        acceptance_criteria:
+          - Downloadable PPTX with correct sections
+        artifacts: []
+        dependencies: [S6-1]
+        status: planned
+      
+      - id: S6-3
+        title: "Export to Jira: epics/issues with idempotency"
+        epic_ref: E7
+        points: 3
+        acceptance_criteria:
+          - Jira issues created once
+          - Re-runs update, not duplicate
+        artifacts: []
+        dependencies: [S6-1]
+        status: planned
+    
+    uat_requirements: "Generate roadmap from current scores; export PPTX & Jira"
+    demo_focus: "From gaps to an exec deck & tickets"
+  
+  - number: 7
+    name: "Sprint 7 - RAG Index & Citations"
+    start_date: "2025-10-14"
+    end_date: "2025-10-20"
+    goal: Implement per-engagement RAG with citations
+    epics: [E8]
+    stories:
+      - id: S7-1
+        title: Per-engagement RAG index; chat & Doc Analyzer cite sources
+        epic_ref: E8
+        points: 5
+        acceptance_criteria:
+          - Answers show citations
+          - Clicking opens snippet
+        artifacts: []
+        dependencies: []
+        status: planned
+      
+      - id: S7-2
+        title: Contradictions agent highlights conflicts across evidence/minutes
+        epic_ref: E8
+        points: 3
+        acceptance_criteria:
+          - Contradiction list rendered
+          - Follow-up questions in chat
+        artifacts: []
+        dependencies: [S7-1]
+        status: planned
+    
+    uat_requirements: "Ask 'why level X?' → cited answer; contradictions surfaced"
+    demo_focus: "Show me the evidence"
+  
+  - number: 8
+    name: "Sprint 8 - Admin & Presets Management"
+    start_date: "2025-10-21"
+    end_date: "2025-10-27"
+    goal: Admin tools for preset curation
+    epics: [E9]
+    stories:
+      - id: S8-1
+        title: Admin presets CRUD (validate, version, owner, notes)
+        epic_ref: E9
+        points: 3
+        acceptance_criteria:
+          - Create/update works
+          - Invalid JSON rejected with messages
+        artifacts: []
+        dependencies: []
+        status: planned
+      
+      - id: S8-2
+        title: Seed canonical presets in prod (idempotent)
+        epic_ref: E9
+        points: 1
+        acceptance_criteria:
+          - Seeds appear once
+          - Re-run safe
+        artifacts: []
+        dependencies: [S8-1]
+        status: planned
+    
+    uat_requirements: "Admin imports/edits preset; appears in user flow"
+    demo_focus: "Curate your maturity model presets"
+  
+  - number: 9
+    name: "Sprint 9 - Consent & GDPR"
+    start_date: "2025-10-28"
+    end_date: "2025-11-03"
+    goal: Privacy and consent management
+    epics: [E10]
+    stories:
+      - id: S9-1
+        title: "Consent UI: capture, store, link to artifacts (audio/docs)"
+        epic_ref: E10
+        points: 3
+        acceptance_criteria:
+          - Audit entry created & visible
+          - PII scrub step enforced
+        artifacts: []
+        dependencies: []
+        status: planned
+      
+      - id: S9-2
+        title: GDPR Ops dashboards render (TTL, audit logs, jobs)
+        epic_ref: E10
+        points: 3
+        acceptance_criteria:
+          - Admin pages no longer "Access denied"
+          - Show data
+        artifacts: []
+        dependencies: []
+        status: planned
+    
+    uat_requirements: "Ingest audio with consent; verify GDPR page shows record"
+    demo_focus: "Privacy built in"
+  
+  - number: 10
+    name: "Sprint 10 - Observability, Security, Hygiene"
+    start_date: "2025-11-04"
+    end_date: "2025-11-10"
+    goal: Operations, security hardening, and repository health
+    epics: [E11, E12, E13]
+    stories:
+      - id: S10-1
+        title: Add SLO dashboards & alerts; support bundle script
+        epic_ref: E11
+        points: 3
+        acceptance_criteria:
+          - Alert triggers on error budget breach
+          - Bundle zips logs/config safely
+        artifacts: []
+        dependencies: []
+        status: planned
+      
+      - id: S10-2
+        title: Close remaining HIGH security findings (injection/path/CORS)
+        epic_ref: E12
+        points: 3
+        acceptance_criteria:
+          - Security scans green
+          - Zero high/critical
+        artifacts: []
+        dependencies: []
+        status: planned
+      
+      - id: S10-3
+        title: CI size guard + .gitignore audit; stalebot for PRs/branches
+        epic_ref: E13
+        points: 1
+        acceptance_criteria:
+          - Large files blocked
+          - Branch/PR hygiene auto-managed
+        artifacts: []
+        dependencies: []
+        status: planned
+    
+    uat_requirements: "Non-functional: alarms tested on staging; size guard blocks test artifact commit"
+    demo_focus: "We can operate & keep it healthy"
+
+# Additional user stories from backlog (for reference/expansion)
+user_stories:
+  - id: US-E2-01
+    epic_ref: E2
+    title: As a user I want sign-out to fully clear my session so returning to /engagements requires a fresh Microsoft login
+    points: 3
+    acceptance_criteria:
+      - Given an authenticated session, when I click sign-out, then navigating to /engagements must redirect to Microsoft (no auto-login)
+    dependencies: [NextAuth routes, cookie config, AAD logout URIs]
+  
+  - id: US-E2-02
+    epic_ref: E2
+    title: As a user I must never see 0.0.0.0:3000 / localhost in any prod sign-in/out redirects
+    points: 1
+    acceptance_criteria:
+      - All redirects show Container Apps host only
+      - PR includes tests
+    dependencies: []
+  
+  - id: US-E3-01
+    epic_ref: E3
+    title: As a consultant I need /api/proxy/presets to list supported models (e.g., cscm-v3, cyber-for-ai) so I can start quickly
+    points: 3
+    acceptance_criteria:
+      - List returns 2xx with expected ids
+      - UI table non-empty
+    dependencies: []
+  
+  - id: US-E3-02
+    epic_ref: E3
+    title: As a consultant I need create→read assessment to work so the detail page loads without error
+    points: 3
+    acceptance_criteria:
+      - 201 on create, 200 on subsequent get
+      - UI shows detail
+      - No "Failed to get assessment"
+    dependencies: []
+  
+  - id: US-E4-01
+    epic_ref: E4
+    title: As a user I want chat to route "analyze this doc" to Doc Analyzer and save results in the conversation context
+    points: 3
+    acceptance_criteria:
+      - Chat turn shows "analyze doc" result
+      - Run log recorded
+      - Context persisted
+    dependencies: []
+
+# Metrics and governance
+metrics:
+  delivery:
+    - Sprint burn-up
+    - Lead time for changes
+    - Change failure rate
+    - Mean time to restore
+  quality:
+    - Test coverage trends
+    - UAT pass rate
+    - Actions failure categories
+  security:
+    - High/Critical findings (#/age)
+    - Key rotations
+    - Dependency freshness
+  slos:
+    - API error rate
+    - P95 latency
+    - Uptime
+    - Alerting thresholds
